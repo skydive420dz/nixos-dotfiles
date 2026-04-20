@@ -16,6 +16,7 @@
 
   boot = {
     initrd.verbose = false;
+    extraModulePackages = [ pkgs.glibc ];
     plymouth = {
       enable = true;
       theme = "catppuccin-mocha";
@@ -34,6 +35,8 @@
     kernelParams = [
       "video=efifb:1920x1080"
       "quiet"
+      "acpi_os=linux"
+      "acpi_enforce_resources=lax"
       "splash"
       "acpi.log_level=0"
       "rd.udev.log_level=0"
@@ -97,9 +100,17 @@
   time.timeZone = "America/New_York";
 
   # Enable sound.
+  security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
     pulse.enable = true;
+    extraConfig = {
+      pipewire."99-silent-bell.conf" = {
+        "context.properties" = {
+          "module.x11.bell" = false;
+        };
+      };
+    };
   };
 
   # Enable touchpad support (enabled default in most desktopManager).

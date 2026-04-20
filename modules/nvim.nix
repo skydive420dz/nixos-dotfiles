@@ -93,6 +93,11 @@
           };
 
           bash.enable = true;
+          json = {
+            enable = true;
+            lsp.enable = true;
+          };
+          java.enable = true;
           clang.enable = true;
           css.enable = true;
           lua.enable = true;

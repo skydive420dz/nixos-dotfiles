@@ -25,12 +25,10 @@
     # ./modules/nvim.nix
   ];
 
-  home.file.".config/hypr".source = ./config/hypr;
-  home.file.".config/waybar".source = ./config/waybar;
-  home.file.".config/foot".source = ./config/foot;
-  home.file.".config/nvim".source = ./config/nvim;
-  home.file.".config/rofi".source = ./config/rofi;
-  home.file.".config/alacritty".source = ./config/alacritty;
+  home.file.".config/hypr".source = /home/skydive420dz/nixos-dotfiles/config/hypr;
+  home.file.".config/waybar".source = /home/skydive420dz/nixos-dotfiles/config/waybar;
+  home.file.".config/foot".source = /home/skydive420dz/nixos-dotfiles/config/foot;
+  home.file.".config/alacritty".source = /home/skydive420dz/nixos-dotfiles/config/alacritty;
   wayland.windowManager.hyprland.systemd.enable = false;
 
 }
