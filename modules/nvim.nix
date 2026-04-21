@@ -92,7 +92,17 @@
             extensions.crates-nvim.enable = true;
           };
 
-          bash.enable = true;
+          bash = {
+            enable = true;
+            format = {
+              enable = true;
+              type = [ "shfmt" ];
+            };
+            lsp = {
+              enable = true;
+              servers = [ "bash-language-server" ];
+            };
+          };
           json = {
             enable = true;
             lsp.enable = true;

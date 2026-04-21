@@ -141,8 +141,13 @@
     STEAM_EXTRA_COMPAT_TOOLS_PATHS = "~.steam/root/compatibilitytools.d";
   };
 
-  # List packages installed in system profile.
-  fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
+  # Fonts install.
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.commit-mono
+    font-awesome
+    nerd-fonts.fantasque-sans-mono
+  ];
 
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
@@ -176,6 +181,10 @@
     mangohud
     protonup-ng
     alacritty
+    snip
+    bluez
+    bluez-tools
+    brightnessctl
   ];
   programs.bat = {
     enable = true;
