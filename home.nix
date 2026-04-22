@@ -29,6 +29,7 @@
   home.file.".config/waybar".source = /home/skydive420dz/nixos-dotfiles/config/waybar;
   home.file.".config/foot".source = /home/skydive420dz/nixos-dotfiles/config/foot;
   home.file.".config/alacritty".source = /home/skydive420dz/nixos-dotfiles/config/alacritty;
+  home.file.".config/kitty".source = /home/skydive420dz/nixos-dotfiles/config/kitty;
   wayland.windowManager.hyprland.systemd.enable = false;
 
 }
