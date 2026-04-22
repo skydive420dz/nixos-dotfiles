@@ -86,6 +86,17 @@
               servers = [ "nixd" ];
             };
           };
+          toml = {
+            enable = true;
+            format = {
+              enable = true;
+              type = [ "taplo" ];
+            };
+            lsp = {
+              enable = true;
+              servers = [ "taplo" ];
+            };
+          };
 
           rust = {
             enable = true;

@@ -30,6 +30,7 @@
   home.file.".config/rofi".source = /home/skydive420dz/nixos-dotfiles/config/rofi;
   home.file.".config/kitty".source = /home/skydive420dz/nixos-dotfiles/config/kitty;
   home.file.".config/wofi".source = /home/skydive420dz/nixos-dotfiles/config/wofi;
+  home.file.".config/yazi".source = /home/skydive420dz/nixos-dotfiles/config/yazi;
   wayland.windowManager.hyprland.systemd.enable = false;
 
 }
