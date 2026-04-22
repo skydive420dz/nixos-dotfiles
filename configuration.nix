@@ -154,7 +154,6 @@
   environment.systemPackages = with pkgs; [
     vim
     wget
-    foot
     waybar
     kitty
     waybar
@@ -179,13 +178,13 @@
     rust-analyzer
     libclang
     wl-clipboard
-    mangohud
     protonup-ng
-    alacritty
     snip
     bluez
     bluez-tools
     brightnessctl
+    yazi
+    wofi
   ];
   programs.bat = {
     enable = true;
