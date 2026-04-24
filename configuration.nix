@@ -15,6 +15,7 @@
   # Use the systemd-boot EFI boot loader.
 
   boot = {
+    consoleLogLevel = 0;
     initrd.verbose = false;
     extraModulePackages = [ pkgs.glibc ];
     plymouth = {
@@ -76,8 +77,8 @@
       open = true;
       prime = {
         sync.enable = true;
-        amdgpuBusId = "PCI:5:0:0";
-        nvidiaBusId = "PCI:1:0:0";
+        amdgpuBusId = "PCI:5@0:0:0";
+        nvidiaBusId = "PCI:1@0:0:0";
         offload = {
           enable = false;
           enableOffloadCmd = false;
@@ -126,11 +127,27 @@
     ];
   };
 
+  environment.shells = [ pkgs.zsh ];
+  programs.zsh = {
+    enable = true;
+    ohMyZsh = {
+      enable = true;
+      plugins = [
+        "git"
+        "zsh-autosuggestions"
+        "zsh-autocomplete"
+        "zsh-sytax-highlighting"
+      ];
+      theme = "agnoster";
+    };
+  };
+
   programs.hyprland = {
     enable = true;
     withUWSM = true;
     xwayland.enable = true;
   };
+
   programs.steam.enable = true;
   programs.steam.gamescopeSession.enable = true;
 
@@ -185,6 +202,12 @@
     brightnessctl
     yazi
     wofi
+    swaynotificationcenter
+    oh-my-zsh
+    zsh
+    qutebrowser
+    ffmpeg-full
+    mpv
   ];
   programs.bat = {
     enable = true;

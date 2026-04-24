@@ -11,9 +11,9 @@
 DEF_VALUE=1
 
 usage() {
-	local script=${0##*/}
+        local script=${0##*/}
 
-	cat <<- EOF
+        cat <<-EOF
 		USAGE: $script {up|down} [value]
 
 		Adjust screen brightness and send a notification with the current level
@@ -32,36 +32,35 @@ usage() {
 }
 
 main() {
-	local action=$1
-	local value=${2:-$DEF_VALUE}
+        local action=$1
+        local value=${2:-$DEF_VALUE}
 
-	if ((value < 1)); then
-		usage >&2
-		return 1
-	fi
+        if ((value < 1)); then
+                usage >&2
+                return 1
+        fi
 
-	case $action in
-		up | down)
-			local sign
+        case $action in
+        up | down)
+                local sign
 
-			case $action in
-				up)   sign='+' ;;
-				down) sign='-' ;;
-			esac
+                case $action in
+                up) sign='+' ;;
+                down) sign='-' ;;
+                esac
 
-			brightnessctl -n set "${value}%${sign}" > /dev/null
+                brightnessctl -n set "${value}%${sign}" >/dev/null
 
-			local level
-			level=$(brightnessctl -m | awk -F ',' '{print $4}')
+                local level
+                level=$(brightnessctl -m | awk -F ',' '{print $4}')
 
-			notify-send "Brightness: $level" -h int:value:"$level" -i \
-				"contrast" -h string:x-canonical-private-synchronous:backlight
-			;;
-		*)
-			usage >&2
-			return 1
-			;;
-	esac
+                hyprctl notify -1 1000 "rgb(ff1ea3)" "fontsize:20" "Brightness: $level" -h int:value:"$level" -i
+                ;;
+        *)
+                usage >&2
+                return 1
+                ;;
+        esac
 }
 
 main "$@"

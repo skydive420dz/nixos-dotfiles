@@ -5,19 +5,20 @@
   home.homeDirectory = "/home/skydive420dz";
   home.stateVersion = "26.05";
   programs.git.enable = true;
-  programs.bash = {
-    enable = true;
-    shellAliases = {
-      btw = "echo I use nixos, btw";
-      nrs = "sudo nixos-rebuild switch --flake ~/nixos-dotfiles#nixos";
-      vim = "nvim";
+  programs = {
+    bash = {
+      enable = true;
+      shellAliases = {
+        btw = "echo I use nixos, btw";
+        nrs = "sudo nixos-rebuild switch --impure --flake ~/nixos-dotfiles#nixos";
+        vim = "nvim";
+      };
+      profileExtra = ''
+        if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
+          exec start-hyprland
+        fi
+      '';
     };
-
-    profileExtra = ''
-      if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
-        exec start-hyprland
-      fi
-    '';
   };
 
   imports = [
