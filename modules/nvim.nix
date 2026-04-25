@@ -116,11 +116,24 @@
           };
           json = {
             enable = true;
-            lsp.enable = true;
+            lsp = {
+              enable = true;
+              servers = [ "vscode-json-language-server" ];
+            };
+          };
+          clang.enable = true;
+          css = {
+            enable = true;
+            format = {
+              enable = true;
+              type = [ "prettier" ];
+            };
+            lsp = {
+              enable = true;
+              servers = [ "vscode-css-language-server" ];
+            };
           };
           java.enable = true;
-          clang.enable = true;
-          css.enable = true;
           lua.enable = true;
           #          lua.treesitter.enable = true;
         };
