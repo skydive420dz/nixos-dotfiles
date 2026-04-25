@@ -1,0 +1,151 @@
+@import "mocha.css";
+* {
+  font-family: FantasqueSansMono Nerd Font;
+  font-size: 16px;
+
+  border: none;
+  border-radius: 0px;
+
+  min-height: 0px;
+  padding: 0px;
+  margin: 0px;
+}
+
+window#waybar {
+  background: transparent;
+}
+
+tooltip {
+  background: @crust;
+  border: 1px solid @surface2;
+  border-radius: 12px;
+}
+
+tooltip label {
+  color: @text;
+  padding: 6px;
+}
+
+#workspaces {
+  background-color: @crust;
+  padding: 5px 3px;
+  margin: 0px 0px 0px 12px;
+  border-radius: 1rem;
+  border: 1px solid @mantle;
+  color: @overlay2;
+}
+
+#workspaces button {
+  padding: 0px 6px;
+  margin: 0px 3px;
+  border-radius: 50px;
+  color: transparent;
+  background-color: @mantle;
+  transition: all 0.3s ease-in-out;
+}
+
+#workspaces button.active,
+#workspaces button.focused {
+  background-color: @lavender;
+  color: @crust;
+  min-width: 50px;
+  transition: all 0.3s ease-in-out;
+  font-size: 13px;
+}
+
+#workspaces button.hover {
+  background-color: @peach;
+  color: @crust;
+  border-radius: 16px;
+  min-width: 50px;
+  background-size: 400% 400%;
+}
+
+#workspaces button.urgent {
+  background-color: @red;
+  color: @crust;
+  border-radius: 16px;
+  min-width: 50px;
+  background-size: 400% 400%;
+  transition: all 0.3s ease-in-out;
+}
+
+/* --- BLOCK 1: Added custom-gpu to the list --- */
+#backlight,
+#cpu,
+#memory,
+#custom-gpu,
+#temperature,
+#disk,
+#calendar,
+#clock {
+  background-color: @crust;
+  padding: 0px 15px;
+  margin: 0px;
+  border-radius: 0px;
+  border: none;
+}
+
+/* Give the GPU its own color (Catppuccin Peach/Green) */
+#custom-gpu {
+  color: @peach;
+}
+
+/* Ensure the outer edges still have their rounding */
+#backlight {
+  margin-left: 12px;
+  border-radius: 50px 0px 0px 50px;
+}
+
+#clock {
+  border-radius: 0px 50px 50px 0px;
+}
+
+/* --- BLOCK 2: Status (Network, Bluetooth, Battery) --- */
+#network,
+#bluetooth,
+#battery {
+  background-color: @crust;
+  padding: 0px 15px;
+  margin: 0px;
+  border-radius: 0px;
+  border: none; /* Removed the border */
+}
+
+#network {
+  margin-left: 30px; /* Space between blocks */
+  border-radius: 50px 0px 0px 50px;
+  color: @teal;
+}
+
+#battery {
+  margin-right: 15px; /* Pushes it away from the display edge */
+  border-radius: 0px 50px 50px 0px;
+  color: @teal;
+}
+
+/* --- States & Extra Colors --- */
+#cpu {
+  color: @green;
+}
+#temperature {
+  color: @green;
+}
+#memory {
+  color: @blue;
+}
+#disk {
+  color: @yellow;
+}
+#bluetooth {
+  color: @blue;
+}
+#battery.charging {
+  color: @green;
+}
+#battery.warning:not(.charging) {
+  color: @yellow;
+}
+#network.disconnected {
+  color: @red;
+}

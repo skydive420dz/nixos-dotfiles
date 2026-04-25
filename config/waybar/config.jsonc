@@ -1,0 +1,190 @@
+//-*- mode: jsonc -*-
+{
+        "layer": "top",
+        "position": "top",
+        "height": 30,
+        "spacing": 4,
+        // Choose the order of the modules
+        "modules-left": [
+                "ext/workspaces",
+                "ext/window",
+        ],
+        "modules-center": [],
+        "modules-right": [
+                "backlight",
+                "temperature",
+                "cpu",
+                "memory",
+                "custom/gpu",
+                "disk",
+                "clock",
+                "tray",
+                "network",
+                "bluetooth",
+                "battery",
+        ],
+        "spacing": 0,
+        // Modules configuration
+        "ext/workspaces": {
+                "disable-scroll": true,
+                "all-outputs": true,
+                "warp-on-scroll": false,
+                "format": "{name}",
+                "persistent-workspaces": {
+                        "*": 9
+                }
+        },
+        "ext/window": {
+                "max-length": 40,
+                "seperate-outputs": false
+        },
+        "tray": {
+                "icon-size": 21,
+                "spacing": 10
+        },
+        "clock": {
+                "min-length": 13,
+                "max-length": 13,
+                "timezone": "America/New_York",
+                "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+                "format-alt": " {:%d/%m/%Y}",
+                "format": " {:%H:%M}"
+        },
+        "custom/gpu": {
+                "exec": "~/.config/scripts/gpu.sh",
+                "return-type": "json",
+                "interval": 5,
+                "format": "    {}",
+                "on-click": "kitty nvtop"
+        },
+        "cpu": {
+                "format": "CPU: {usage}%",
+                "tooltip": false
+        },
+        "memory": {
+                "format": "Mem: {used}GiB",
+                "min-length": 14,
+                "max-length": 14,
+        },
+        "disk": {
+                "interval": 60,
+                "path": "/",
+                "format": "Disk: {free}",
+                "min-length": 14,
+                "max-length": 14,
+        },
+        "temperature": {
+                "thermal-zone": 1,
+                "critical-threshold": 90,
+                "interval": 10,
+                "format-critical": "󰀦 {temperatureC}°C",
+                "format": "{icon} {temperatureC}°C",
+                "format-icons": [
+                        "󱃃",
+                        "󰔏",
+                        "󱃂"
+                ],
+                "min-length": 8,
+                "max-length": 8,
+                "tooltip-format": "Temperature in Fahrenheit: {temperatureF}°F"
+        },
+        "battery": {
+                "min-length": 7,
+                "max-length": 7,
+                "tooltip-format": "<b>Discharging</b>: {time}",
+                "tooltip-format-charging": "<b>Charging</b>: {time}",
+                "states": {
+                        "good": 95,
+                        "warning": 30,
+                        "critical": 15
+                },
+                "format": "{icon} {capacity}%",
+                "format-charging": "  {capacity}%",
+                "format-plugged": "󰉁",
+                "format-alt": "{icon}",
+                "format-icons": [
+                        "󰂎",
+                        "󰁻",
+                        "󰁼",
+                        "󰁽",
+                        "󰁾",
+                        "󰁿",
+                        "󰂀",
+                        "󰂁",
+                        "󰂂",
+                        "󰁹"
+                ],
+                "events": {
+                        "on-discharging-warning": "notify-send 'Battery Low (20%)' -u critical -i 'battery-020' -h string:x-canonical-private-synchronous:battery",
+                        "on-discharging-critical": "notify-send 'Battery Critical (10%)' -u critical -i 'battery-010' -h string:x-canonical-private-synchronous:battery",
+                        "on-charging-100": "notify-send 'Battery Full (100%)' -i 'battery-100-charged' -h string:x-canonical-private-synchronous:battery"
+                }
+        },
+        "network": {
+                "format": "Online",
+                "interval": 10,
+                "format": "󰤨",
+                "format-ethernet": "󰈀",
+                "format-wifi": "{icon}",
+                "format-disconnected": "󰤯",
+                "format-disabled": "󰤮",
+                "format-icons": [
+                        "󰤟",
+                        "󰤢",
+                        "󰤥",
+                        "󰤨"
+                ],
+                "min-length": 2,
+                "max-length": 2,
+                "on-click": "kitty -e ~/nixos-dotfiles/scripts/network",
+                "on-click-right": "~/nixos-dotfiles/scripts/network off",
+                "tooltip-format": "<b>Gateway</b>: {gwaddr}",
+                "tooltip-format-ethernet": "<b>Interface</b>: {ifname}",
+                "tooltip-format-wifi": "<b>Network</b>: {essid}\n<b>IP Addr</b>: {ipaddr}/{cidr}\n<b>Strength</b>: {signalStrength}%\n<b>Frequency</b>: {frequency} GHz",
+                "tooltip-format-disconnected": "Wi-Fi Disconnected",
+                "tooltip-format-disabled": "Wi-Fi Disabled"
+        },
+        "bluetooth": {
+                "format": "󰂯",
+                "format-disabled": "󰂲",
+                "format-off": "󰂲",
+                "format-on": "󰂰",
+                "format-connected": "󰂱",
+                "min-length": 2,
+                "max-length": 2,
+                "on-click": "kitty -e ~/nixos-dotfiles/scripts/bluetooth",
+                "on-click-right": "~/nixos-dotfiles/scripts/bluetooth off",
+                "tooltip-format": "Device Addr: {device_address}",
+                "tooltip-format-disabled": "Bluetooth Disabled",
+                "tooltip-format-off": "Bluetooth Off",
+                "tooltip-format-on": "Bluetooth Disconnected",
+                "tooltip-format-connected": "Device: {device_alias}",
+                "tooltip-format-enumerate-connected": "Device: {device_alias}",
+                "tooltip-format-connected-battery": "Device: {device_alias}\nBattery: {device_battery_percentage}%",
+                "tooltip-format-enumerate-connected-battery": "Device: {device_alias}\nBattery: {device_battery_percentage}%"
+        },
+        "backlight": {
+                // "interval":
+                "format": "{icon} {percent}%",
+                "format-icons": [
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        ""
+                ],
+                "min-length": 7,
+                "max-length": 7,
+                "on-scroll-up": "~/nixos-dotfiles/scripts/backlight up",
+                "on-scroll-down": "~/nixos-dotfiles/scripts/backlight down",
+                "tooltip-format": "Screen Brightness"
+        },
+        "custom/sep": {
+                "format": "|",
+                "interval": 0
+        }
+}
