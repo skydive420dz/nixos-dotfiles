@@ -38,10 +38,39 @@
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
-    history.size = 10000;
+
+    # High-performance history settings
+    history = {
+      size = 10000;
+      path = "${config.home.homeDirectory}/.zsh_history";
+    };
+
+    # Your custom aliases (matching your Bash ones)
     shellAliases = {
+      btw = "echo I use nixos, btw";
       nrs = "sudo nixos-rebuild switch --impure --flake ~/nixos-dotfiles#nixos";
       vim = "nvim";
+      ls = "ls --color=auto";
+      cat = "bat"; # Since you have 'bat' enabled in your config
+    };
+
+    # This part handles the "Look" - we'll use Starship instead of OhMyZsh for speed
+    initExtra = ''
+      # Start Hyprland automatically if on TTY1
+      if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
+        exec start-hyprland
+      fi
+    '';
+  };
+
+  # Starship: A lightning-fast, modular prompt (Matches your Nerd Font)
+  programs.starship = {
+    enable = true;
+    enableZshIntegration = true;
+    # Customizing it to be minimal and clean
+    settings = {
+      add_newline = false;
+      format = "$directory$git_branch$symbol$character";
     };
   };
 

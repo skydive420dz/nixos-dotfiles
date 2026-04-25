@@ -121,12 +121,14 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.skydive420dz = {
     isNormalUser = true;
+    shell = pkgs.zsh; # Set Zsh as default
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       tree
     ];
   };
 
+  programs.zsh.enable = true;
   programs.hyprland = {
     enable = true;
     withUWSM = true;

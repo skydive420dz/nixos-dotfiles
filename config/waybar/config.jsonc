@@ -12,7 +12,7 @@
         "modules-center": [],
         "modules-right": [
                 "backlight",
-                "cpu-status",
+                "custom/cpu-combined",
                 "custom/gpu",
                 "memory",
                 "clock",
@@ -44,7 +44,7 @@
                 "timezone": "America/New_York",
                 "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
                 "format-alt": " {:%d/%m/%Y}",
-                "format": " {:%H:%M}"
+                "format": "󱑂 {:%H:%M}"
         },
         "cpu": {
                 "format": "CPU: {usage}%",
@@ -149,7 +149,7 @@
                         "",
                         ""
                 ],
-                "min-length": 7,
+                "min-length": 4,
                 "on-scroll-up": "~/.config/scripts/backlight up",
                 "on-scroll-down": "~/.config/scripts/backlight down",
                 "tooltip-format": "Screen Brightness"
@@ -158,7 +158,7 @@
                 "exec": "~/.config/scripts/gpu",
                 "return-type": "json",
                 "interval": 10,
-                "format": "GPU: {icon} {text}", // Use {} to pull from the "text" field in your script
+                "format": ": {icon} {text}", // Use {} to pull from the "text" field in your script
                 "format-icons": [
                         "",
                         "",
@@ -177,7 +177,7 @@
                         "",
                         ""
                 ],
-                "min-length": 15,
+                "min-length": 8,
                 "on-click": "kitty btop"
         },
         "custom/sep": {
@@ -185,8 +185,8 @@
                 "interval": 0
         },
         "memory": {
-                "format": "Mem: {used}GiB",
-                "min-length": 14,
+                "format": ": {used}GiB",
+                "min-length": 8,
         },
         "disk": {
                 "interval": 60,
