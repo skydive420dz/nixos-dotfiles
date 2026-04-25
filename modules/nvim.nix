@@ -65,8 +65,8 @@
 
         theme = {
           enable = true;
-          name = "gruvbox";
-          style = "dark";
+          name = "catppuccin";
+          style = "mocha";
         };
 
         languages = {

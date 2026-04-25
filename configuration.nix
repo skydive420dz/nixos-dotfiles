@@ -127,21 +127,6 @@
     ];
   };
 
-  environment.shells = [ pkgs.zsh ];
-  programs.zsh = {
-    enable = true;
-    ohMyZsh = {
-      enable = true;
-      plugins = [
-        "git"
-        "zsh-autosuggestions"
-        "zsh-autocomplete"
-        "zsh-sytax-highlighting"
-      ];
-      theme = "agnoster";
-    };
-  };
-
   programs.hyprland = {
     enable = true;
     withUWSM = true;
@@ -191,9 +176,6 @@
     fzf
     tree-sitter
     c3-lsp
-    lua-language-server
-    rust-analyzer
-    libclang
     wl-clipboard
     protonup-ng
     snip
@@ -203,8 +185,6 @@
     yazi
     wofi
     swaynotificationcenter
-    oh-my-zsh
-    zsh
     qutebrowser
     ffmpeg-full
     mpv
