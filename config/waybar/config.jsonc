@@ -14,9 +14,8 @@
                 "backlight",
                 "temperature",
                 "cpu",
-                "memory",
                 "custom/gpu",
-                "disk",
+                "memory",
                 "clock",
                 "tray",
                 "network",
@@ -35,7 +34,6 @@
                 }
         },
         "ext/window": {
-                "max-length": 40,
                 "seperate-outputs": false
         },
         "tray": {
@@ -44,18 +42,10 @@
         },
         "clock": {
                 "min-length": 13,
-                "max-length": 13,
                 "timezone": "America/New_York",
                 "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
                 "format-alt": " {:%d/%m/%Y}",
                 "format": " {:%H:%M}"
-        },
-        "custom/gpu": {
-                "exec": "~/.config/scripts/gpu.sh",
-                "return-type": "json",
-                "interval": 5,
-                "format": "    {}",
-                "on-click": "kitty nvtop"
         },
         "cpu": {
                 "format": "CPU: {usage}%",
@@ -64,14 +54,12 @@
         "memory": {
                 "format": "Mem: {used}GiB",
                 "min-length": 14,
-                "max-length": 14,
         },
         "disk": {
                 "interval": 60,
                 "path": "/",
                 "format": "Disk: {free}",
                 "min-length": 14,
-                "max-length": 14,
         },
         "temperature": {
                 "thermal-zone": 1,
@@ -85,12 +73,10 @@
                         "󱃂"
                 ],
                 "min-length": 8,
-                "max-length": 8,
                 "tooltip-format": "Temperature in Fahrenheit: {temperatureF}°F"
         },
         "battery": {
                 "min-length": 7,
-                "max-length": 7,
                 "tooltip-format": "<b>Discharging</b>: {time}",
                 "tooltip-format-charging": "<b>Charging</b>: {time}",
                 "states": {
@@ -99,8 +85,8 @@
                         "critical": 15
                 },
                 "format": "{icon} {capacity}%",
-                "format-charging": "  {capacity}%",
-                "format-plugged": "󰉁",
+                "format-charging": "󰉁  {capacity}%",
+                "format-plugged": "",
                 "format-alt": "{icon}",
                 "format-icons": [
                         "󰂎",
@@ -135,7 +121,6 @@
                         "󰤨"
                 ],
                 "min-length": 2,
-                "max-length": 2,
                 "on-click": "kitty -e ~/nixos-dotfiles/scripts/network",
                 "on-click-right": "~/nixos-dotfiles/scripts/network off",
                 "tooltip-format": "<b>Gateway</b>: {gwaddr}",
@@ -151,7 +136,6 @@
                 "format-on": "󰂰",
                 "format-connected": "󰂱",
                 "min-length": 2,
-                "max-length": 2,
                 "on-click": "kitty -e ~/nixos-dotfiles/scripts/bluetooth",
                 "on-click-right": "~/nixos-dotfiles/scripts/bluetooth off",
                 "tooltip-format": "Device Addr: {device_address}",
@@ -178,10 +162,24 @@
                         ""
                 ],
                 "min-length": 7,
-                "max-length": 7,
                 "on-scroll-up": "~/nixos-dotfiles/scripts/backlight up",
                 "on-scroll-down": "~/nixos-dotfiles/scripts/backlight down",
                 "tooltip-format": "Screen Brightness"
+        },
+        "custom/gpu": {
+                "exec": "~/.config/scripts/gpu",
+                "return-type": "json",
+                "interval": 10,
+                "format": "{icon} {}",
+                "format-critical": "   {}",
+                "format-icons": [
+                        "  ",
+                        "  ",
+                        "  "
+                ],
+                "min-length": 8,
+                "max-length": 8,
+                "on-click": "kitty nvtop"
         },
         "custom/sep": {
                 "format": "|",

@@ -1,11 +1,10 @@
 @import "mocha.css";
+
 * {
   font-family: FantasqueSansMono Nerd Font;
   font-size: 16px;
-
   border: none;
   border-radius: 0px;
-
   min-height: 0px;
   padding: 0px;
   margin: 0px;
@@ -70,12 +69,12 @@ tooltip label {
   transition: all 0.3s ease-in-out;
 }
 
-/* --- BLOCK 1: Added custom-gpu to the list --- */
+/* --- BLOCK 1: Brightness to Clock (One solid unit) --- */
 #backlight,
+#temperature,
 #cpu,
 #memory,
 #custom-gpu,
-#temperature,
 #disk,
 #calendar,
 #clock {
@@ -86,19 +85,17 @@ tooltip label {
   border: none;
 }
 
-/* Give the GPU its own color (Catppuccin Peach/Green) */
-#custom-gpu {
-  color: @peach;
-}
-
-/* Ensure the outer edges still have their rounding */
+/* Left edge of Block 1 */
 #backlight {
   margin-left: 12px;
   border-radius: 50px 0px 0px 50px;
+  color: @blue;
 }
 
+/* Right edge of Block 1 */
 #clock {
   border-radius: 0px 50px 50px 0px;
+  color: @blue;
 }
 
 /* --- BLOCK 2: Status (Network, Bluetooth, Battery) --- */
@@ -109,43 +106,67 @@ tooltip label {
   padding: 0px 15px;
   margin: 0px;
   border-radius: 0px;
-  border: none; /* Removed the border */
+  border: none;
 }
 
+/* Left edge of Block 2 + Separation Gap */
 #network {
-  margin-left: 30px; /* Space between blocks */
+  margin-left: 30px;
   border-radius: 50px 0px 0px 50px;
   color: @teal;
 }
 
+/* Right edge of Block 2 + Gap from screen edge */
 #battery {
-  margin-right: 15px; /* Pushes it away from the display edge */
+  margin-right: 15px;
   border-radius: 0px 50px 50px 0px;
   color: @teal;
 }
 
-/* --- States & Extra Colors --- */
+/* --- Individual Module Colors & Tweaks --- */
+#custom-gpu {
+  color: @peach;
+  min-width: 65px; /* Keep the block stable */
+}
+
 #cpu {
   color: @green;
 }
+
 #temperature {
   color: @green;
+  min-width: 65px;
 }
+
 #memory {
   color: @blue;
 }
+
 #disk {
   color: @yellow;
 }
+
 #bluetooth {
   color: @blue;
 }
+
 #battery.charging {
   color: @green;
 }
+
 #battery.warning:not(.charging) {
   color: @yellow;
 }
+
 #network.disconnected {
   color: @red;
+}
+
+/* Tray and Notifications (Separated) */
+#tray,
+#custom-notification {
+  background-color: @crust;
+  padding: 0px 15px;
+  margin-left: 12px;
+  border-radius: 50px;
 }

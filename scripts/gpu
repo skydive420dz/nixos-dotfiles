@@ -1,8 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Get utilization and temperature from nvidia-smi
 GPU_UTIL=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits)
 GPU_TEMP=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits)
 
 # Output JSON for Waybar
 echo "{\"text\": \"$GPU_UTIL% $GPU_TEMP°C\", \"tooltip\": \"GPU: $GPU_UTIL% | Temp: $GPU_TEMP°C\"}"
-

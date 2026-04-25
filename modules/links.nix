@@ -13,6 +13,9 @@ in
     ".config/wofi".source = link "config/wofi";
     ".config/yazi".source = link "config/yazi";
 
+    # Links your scripts folder to ~/.config/scripts
+    ".config/scripts".source = link "scripts";
+
     # Specific sub-files for Hyprland
     ".config/hypr/mocha.conf".source = link "config/hypr/mocha.conf";
     ".config/hypr/hyprpaper.conf".source = link "config/hypr/hyprpaper.conf";
