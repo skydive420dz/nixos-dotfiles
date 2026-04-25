@@ -68,10 +68,10 @@
       enable = true;
       enable32Bit = true;
     };
-    opengl = {
-      enable = true;
-      driSupport32Bit = true;
-    };
+    #    opengl = {
+    #      enable = true;
+    #      driSupport32Bit = true;
+    #    };
     nvidia = {
       modesetting.enable = true;
       open = true;
