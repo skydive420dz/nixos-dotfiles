@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Get CPU utilization (average of all cores)
+CPU_UTIL=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')
+
+# Get CPU Temperature (Package id 0 is usually the best overall sensor)
+CPU_TEMP=$(sensors | grep "Package id 0" | awk '{print $4}' | tr -d '+°C' | cut -d. -f1)
+
+# Default to 0 if sensors fails
+if [ -z "$CPU_TEMP" ]; then CPU_TEMP=0; fi
+
+# Output JSON with percentage for icon logic
+echo "{\"text\": \"$CPU_UTIL% $CPU_TEMP°C\", \"percentage\": $CPU_TEMP, \"tooltip\": \"Usage: $CPU_UTIL% | Temp: $CPU_TEMP°C\"}"

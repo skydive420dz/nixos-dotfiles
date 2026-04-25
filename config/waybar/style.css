@@ -71,8 +71,7 @@ tooltip label {
 
 /* --- BLOCK 1: Brightness to Clock (One solid unit) --- */
 #backlight,
-#temperature,
-#cpu,
+#custom-cpu-combined,
 #memory,
 #custom-gpu,
 #disk,
@@ -127,6 +126,10 @@ tooltip label {
 #custom-gpu {
   color: @peach;
   min-width: 65px; /* Keep the block stable */
+}
+
+#custom-cpu-combined {
+  color: @green;
 }
 
 #cpu {

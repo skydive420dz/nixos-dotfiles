@@ -188,6 +188,8 @@
     qutebrowser
     ffmpeg-full
     mpv
+    nvtopPackages.full
+    lm_sensors
   ];
   programs.bat = {
     enable = true;
