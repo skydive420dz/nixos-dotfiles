@@ -15,10 +15,10 @@
   # --- IMPORTS ---
   imports = [
     ./modules/theme.nix
-    ./modules/links.nix # This now handles all your "Instant Edit" symlinks
+    ./modules/links.nix
   ];
 
-  # --- SHELL CONFIGURATION ---
+  # --- SHELL CONFIGURATION (BASH) ---
   programs.bash = {
     enable = true;
     shellAliases = {
@@ -33,29 +33,28 @@
     '';
   };
 
+  # --- SHELL CONFIGURATION (ZSH) ---
   programs.zsh = {
     enable = true;
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
-    # High-performance history settings
     history = {
       size = 10000;
       path = "${config.home.homeDirectory}/.zsh_history";
     };
 
-    # Your custom aliases (matching your Bash ones)
     shellAliases = {
       btw = "echo I use nixos, btw";
       nrs = "sudo nixos-rebuild switch --impure --flake ~/nixos-dotfiles#nixos";
       vim = "nvim";
       ls = "ls --color=auto";
-      cat = "bat"; # Since you have 'bat' enabled in your config
+      cat = "bat";
     };
 
-    # This part handles the "Look" - we'll use Starship instead of OhMyZsh for speed
-    initExtra = ''
+    # Note: Using initContent for 26.05 Unstable as requested by your build log
+    initContent = ''
       # Start Hyprland automatically if on TTY1
       if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
         exec start-hyprland
@@ -63,14 +62,17 @@
     '';
   };
 
-  # Starship: A lightning-fast, modular prompt (Matches your Nerd Font)
+  # --- STARSHIP PROMPT ---
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
-    # Customizing it to be minimal and clean
     settings = {
       add_newline = false;
-      format = "$directory$git_branch$symbol$character";
+      format = "$directory$git_branch$nix_shell$character";
+      nix_shell = {
+        symbol = "❄️ ";
+        format = "via [$symbol]($style) ";
+      };
     };
   };
 
@@ -104,7 +106,6 @@
     extraConfig = ''
       source = ~/.config/hypr/mocha.conf
       source = ~/.config/hypr/hyprpaper.conf
-      # Direct path to your main config in the dotfiles repo
       source = /home/skydive420dz/nixos-dotfiles/config/hypr/hyprland.conf
     '';
   };
@@ -115,8 +116,10 @@
     LIBVA_DRIVER_NAME = "nvidia";
     XDG_CURRENT_DESKTOP = "Hyprland";
     XDG_SESSION_TYPE = "wayland";
-    GTK_THEME = "Adwaita";
-    GTK_ICON_THEME = "Adwaita";
+
+    GTK_THEME = "catppuccin-mocha-lavender-standard";
+    XCURSOR_THEME = "catppuccin-mocha-dark-cursors";
+    XCURSOR_SIZE = "24";
     HYPRCURSOR_SIZE = "24";
   };
 }

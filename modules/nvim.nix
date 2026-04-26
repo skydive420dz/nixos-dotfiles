@@ -278,6 +278,9 @@
         };
 
         clipboard.enable = true;
+        luaConfigRC.clipboard = ''
+          vim.opt.clipboard = 'unnamedplus'
+        '';
         formatter.conform-nvim.enable = true;
         fzf-lua.enable = true;
         telescope.enable = true;
