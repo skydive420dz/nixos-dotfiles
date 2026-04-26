@@ -18,7 +18,7 @@ in
     ".config/scripts".source = link "scripts";
 
     # Specific sub-files for Hyprland
-    ".config/hypr/mocha.conf".source = link "config/hypr/mocha.conf";
     ".config/hypr/hyprpaper.conf".source = link "config/hypr/hyprpaper.conf";
+    ".config/hypr/mocha.conf".source = link "config/hypr/mocha.conf";
   };
 }

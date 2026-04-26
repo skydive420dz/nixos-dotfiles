@@ -16,6 +16,9 @@
     nvtopPackages.full # Add this for your GPU monitor
     yazi
     qutebrowser
+    hyprpaper
+    psmisc # This provides killall
+    swww
     # ... any other apps you want installed
   ];
 

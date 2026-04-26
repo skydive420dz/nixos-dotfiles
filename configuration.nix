@@ -162,7 +162,6 @@
     kitty
     waybar
     git
-    hyprpaper
     neovim
     ripgrep
     nil
