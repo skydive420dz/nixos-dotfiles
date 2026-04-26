@@ -31,6 +31,11 @@
         exec start-hyprland
       fi
     '';
+
+    initExtra = ''
+      [ -f "$HOME/.openai_key" ] && source "$HOME/.openai_key"
+    '';
+
   };
 
   # --- SHELL CONFIGURATION (ZSH) ---
@@ -54,12 +59,24 @@
     };
 
     # Note: Using initContent for 26.05 Unstable as requested by your build log
-    initContent = ''
-      # Start Hyprland automatically if on TTY1
+
+    # This is the new way to put content at the TOP of the file in 26.05
+    # COMBINED BLOCK: Everything goes in here once
+    initContent = lib.mkBefore ''
+      # 1. Load OpenAI Key secretly (Must be first)
+      if [ -f "$HOME/.openai_key" ]; then
+        . "$HOME/.openai_key"
+      fi
+
+      # 2. Initialize Starship
+      eval "$(starship init zsh)"
+
+      # 3. Start Hyprland automatically if on TTY1
       if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
         exec start-hyprland
       fi
     '';
+
   };
 
   # --- STARSHIP PROMPT ---
@@ -75,6 +92,27 @@
       };
     };
   };
+
+  # --- KITTY TERMINAL ---
+
+  #  programs.kitty = {
+  #    enable = true;
+  #    # On newer Kitty versions, Mocha is built-in
+  #    themeFile = "Catppuccin-Mocha";
+  #
+  #    font = {
+  #      name = "JetBrainsMono Nerd Font";
+  #      size = 12;
+  #    };
+  #
+  #    settings = {
+  #      confirm_os_window_close = 0;
+  #      background_opacity = "0.95"; # Slight transparency to match your bar/blur
+  #      window_padding_width = 10;
+  #      scrollback_lines = 10000;
+  #      enable_audio_bell = false;
+  #    };
+  #  };
 
   # --- HYPRLAND CONFIGURATION ---
   wayland.windowManager.hyprland = {
