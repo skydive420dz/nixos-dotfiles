@@ -18,7 +18,7 @@
     qutebrowser
     hyprpaper
     psmisc # This provides killall
-    swww
+    awww
     # ... any other apps you want installed
   ];
 
