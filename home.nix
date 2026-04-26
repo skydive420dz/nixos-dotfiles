@@ -10,9 +10,15 @@
   home.homeDirectory = "/home/skydive420dz";
   home.stateVersion = "26.05";
 
+  home.packages = with pkgs; [
+    kitty # Add this here
+    btop # Add this for your system monitor
+    nvtopPackages.full # Add this for your GPU monitor
+    # ... any other apps you want installed
+  ];
+
   programs.git.enable = true;
 
-  # --- IMPORTS ---
   imports = [
     ./modules/theme.nix
     ./modules/links.nix
@@ -26,16 +32,14 @@
       nrs = "sudo nixos-rebuild switch --impure --flake ~/nixos-dotfiles#nixos";
       vim = "nvim";
     };
+    initExtra = ''
+      [ -f "$HOME/.openai_key" ] && source "$HOME/.openai_key"
+    '';
     profileExtra = ''
       if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
         exec start-hyprland
       fi
     '';
-
-    initExtra = ''
-      [ -f "$HOME/.openai_key" ] && source "$HOME/.openai_key"
-    '';
-
   };
 
   # --- SHELL CONFIGURATION (ZSH) ---
@@ -56,14 +60,11 @@
       vim = "nvim";
       ls = "ls --color=auto";
       cat = "bat";
+      y = "y"; # Optional: makes the y function feel like a first-class alias
     };
 
-    # Note: Using initContent for 26.05 Unstable as requested by your build log
-
-    # This is the new way to put content at the TOP of the file in 26.05
-    # COMBINED BLOCK: Everything goes in here once
     initContent = lib.mkBefore ''
-      # 1. Load OpenAI Key secretly (Must be first)
+      # 1. Load OpenAI Key secretly
       if [ -f "$HOME/.openai_key" ]; then
         . "$HOME/.openai_key"
       fi
@@ -75,11 +76,19 @@
       if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
         exec start-hyprland
       fi
-    '';
 
+      # 4. Yazi CWD Wrapper (y command)
+      function y() {
+        local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+        yazi "$@" --cwd-file="$tmp"
+        if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+          builtin cd -- "$cwd"
+        fi
+        rm -f -- "$tmp"
+      }
+    '';
   };
 
-  # --- STARSHIP PROMPT ---
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
@@ -93,32 +102,18 @@
     };
   };
 
-  # --- KITTY TERMINAL ---
-
-  #  programs.kitty = {
-  #    enable = true;
-  #    # On newer Kitty versions, Mocha is built-in
-  #    themeFile = "Catppuccin-Mocha";
-  #
-  #    font = {
-  #      name = "JetBrainsMono Nerd Font";
-  #      size = 12;
-  #    };
-  #
-  #    settings = {
-  #      confirm_os_window_close = 0;
-  #      background_opacity = "0.95"; # Slight transparency to match your bar/blur
-  #      window_padding_width = 10;
-  #      scrollback_lines = 10000;
-  #      enable_audio_bell = false;
-  #    };
-  #  };
+  programs.btop = {
+    enable = true;
+    settings = {
+      color_theme = "catppuccin_mocha";
+      theme_background = false; # Set to true if you want a solid background
+    };
+  };
 
   # --- HYPRLAND CONFIGURATION ---
   wayland.windowManager.hyprland = {
     enable = true;
     systemd.enable = true;
-
     settings = {
       monitorv2 = {
         output = "eDP-1";
@@ -133,14 +128,12 @@
         sdr_min_luminance = 0.001;
         sdr_max_luminance = 400;
       };
-
       render = {
         direct_scanout = 1;
         cm_auto_hdr = 1;
         cm_sdr_eotf = 2;
       };
     };
-
     extraConfig = ''
       source = ~/.config/hypr/mocha.conf
       source = ~/.config/hypr/hyprpaper.conf
@@ -148,13 +141,11 @@
     '';
   };
 
-  # --- SESSION VARIABLES ---
   home.sessionVariables = {
     GBM_BACKEND = "nvidia-drm";
     LIBVA_DRIVER_NAME = "nvidia";
     XDG_CURRENT_DESKTOP = "Hyprland";
     XDG_SESSION_TYPE = "wayland";
-
     GTK_THEME = "catppuccin-mocha-lavender-standard";
     XCURSOR_THEME = "catppuccin-mocha-dark-cursors";
     XCURSOR_SIZE = "24";

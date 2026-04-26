@@ -184,7 +184,6 @@
     bluez
     bluez-tools
     brightnessctl
-    yazi
     wofi
     swaynotificationcenter
     qutebrowser
