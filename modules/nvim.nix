@@ -5,23 +5,22 @@
   ...
 }:
 {
+  environment.systemPackages = with pkgs; [ ];
 
-  #  home.packages = with pkgs; [ ];
-
-  environment.systemPackages = with pkgs; [
-  ];
   programs.nvf = {
     enable = true;
     settings = {
       vim = {
-        startPlugins = [
-          "chatgpt-nvim"
-          "nvim-tree-lua"
-          "nvim-treesitter"
-          "nvim-treesitter-context"
-          "nvim-treesitter-textobjects"
-          "nvim-ts-autotag"
+        startPlugins = [ "chatgpt-nvim" ];
+
+        extraPackages = with pkgs; [
+          tree-sitter # Satisfies tree-sitter-cli requirement
+          gcc
+          ripgrep
+          fd
+          lldb # Fixes Rustaceanvim debug warning
         ];
+
         viAlias = false;
         vimAlias = true;
         debugMode = {
@@ -30,17 +29,14 @@
           logFile = "/tmp/nvim.log";
         };
 
-        # vim.opts and vim.options are aliased
-        opts.expandtab = true;
+        opts = {
+          expandtab = true;
+          wrap = false; # Fixes cinnamon.nvim 'wrap' warning
+        };
 
         spellcheck = {
           enable = true;
-          languages = [
-            "en"
-          ];
-          #programmingWordlist.enable = true;
-          #vim-dirtytalk.enable = true;
-
+          languages = [ "en" ];
         };
 
         lsp = {
@@ -50,17 +46,15 @@
           lightbulb.enable = true;
           lspsaga.enable = false;
           trouble.enable = true;
-          lspSignature.enable = !true; # conflicts with blink in maximal
+          lspSignature.enable = false;
           otter-nvim.enable = true;
           nvim-docs-view.enable = true;
           presets.harper.enable = true;
         };
 
-        debugger = {
-          nvim-dap = {
-            enable = true;
-            ui.enable = true;
-          };
+        debugger.nvim-dap = {
+          enable = true;
+          ui.enable = true;
         };
 
         theme = {
@@ -73,8 +67,11 @@
           enableFormat = true;
           enableTreesitter = true;
           enableExtraDiagnostics = true;
-          markdown.enable = true;
 
+          python.enable = true;
+          typescript.enable = true;
+
+          markdown.enable = true;
           nix = {
             enable = true;
             format = {
@@ -97,12 +94,10 @@
               servers = [ "taplo" ];
             };
           };
-
           rust = {
             enable = true;
             extensions.crates-nvim.enable = true;
           };
-
           bash = {
             enable = true;
             format = {
@@ -135,7 +130,6 @@
           };
           java.enable = true;
           lua.enable = true;
-          #          lua.treesitter.enable = true;
         };
 
         visuals = {
@@ -147,49 +141,35 @@
           highlight-undo.enable = true;
           blink-indent.enable = true;
           indent-blankline.enable = true;
-
         };
 
         statusline.lualine.enable = true;
-
-        autocomplete = {
-          nvim-cmp.enable = !true;
-          blink-cmp.enable = true;
-        };
-
+        autocomplete.blink-cmp.enable = true;
         snippets.luasnip.enable = true;
+        filetree.neo-tree.enable = true;
+        tabline.nvimBufferline.enable = true;
 
-        filetree = {
-          neo-tree = {
-            enable = true;
-          };
+        # Added explicit treesitter block to help NixOS healthcheck
+        treesitter = {
+          enable = true;
+          context.enable = true;
+          highlight.enable = true;
+          indent.enable = true;
         };
-
-        tabline = {
-          nvimBufferline.enable = true;
-        };
-
-        #        treesitter.context.enable = true;
 
         binds = {
           whichKey.enable = true;
           cheatsheet.enable = true;
         };
 
-        notify = {
-          nvim-notify.enable = true;
-        };
-
-        projects = {
-          project-nvim.enable = true;
-        };
+        notify.nvim-notify.enable = true;
+        projects.project-nvim.enable = true;
 
         utility = {
           ccc.enable = false;
           vim-wakatime.enable = false;
           diffview-nvim.enable = true;
           yanky-nvim.enable = false;
-          qmk-nvim.enable = false; # requires hardware specific options
           icon-picker.enable = true;
           surround.enable = true;
           leetcode-nvim.enable = true;
@@ -218,18 +198,16 @@
           todo-comments.enable = true;
         };
 
-        terminal = {
-          toggleterm = {
-            enable = true;
-            lazygit.enable = true;
-          };
+        terminal.toggleterm = {
+          enable = true;
+          lazygit.enable = true;
         };
 
         ui = {
           borders.enable = true;
           noice.enable = true;
           colorizer.enable = true;
-          modes-nvim.enable = false; # the theme looks terrible with catppuccin
+          modes-nvim.enable = false;
           illuminate.enable = true;
           breadcrumbs = {
             enable = true;
@@ -251,36 +229,52 @@
           fastaction.enable = true;
         };
 
-        session = {
-          nvim-session-manager.enable = false;
-        };
-
-        gestures = {
-          gesture-nvim.enable = false;
-        };
-
-        comments = {
-          comment-nvim.enable = true;
-        };
-
-        presence = {
-          neocord.enable = false;
-        };
+        session.nvim-session-manager.enable = false;
+        gestures.gesture-nvim.enable = false;
+        comments.comment-nvim.enable = true;
+        presence.neocord.enable = false;
 
         assistant = {
           chatgpt.enable = true;
-          copilot = {
-            enable = false;
-            cmp.enable = false;
-          };
-          codecompanion-nvim.enable = false;
+          copilot.enable = false;
+          codecompanion-nvim.enable = true;
           avante-nvim.enable = false;
         };
 
         clipboard.enable = true;
-        luaConfigRC.clipboard = ''
-          vim.opt.clipboard = 'unnamedplus'
+
+        luaConfigRC.navigation = ''
+                  -- Clipboard fix
+                    vim.opt.clipboard = 'unnamedplus'
+
+                  -- Navigation Hints Toggle
+                    vim.keymap.set("n", "<leader>pt", "<cmd>Precognition toggle<cr>", { desc = "Toggle Hints" })
+
+                  -- Trouble Diagnostics Toggle
+                    vim.keymap.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics" })
+
+          -- CodeCompanion Setup for DeepSeek
+          require("codecompanion").setup({
+            strategies = {
+              chat = { adapter = "ollama" },
+              inline = { adapter = "ollama" },
+            },
+            adapters = {
+              ollama = function()
+                return require("codecompanion.adapters").extend("ollama", {
+                  schema = {
+                    model = {
+                      default = "deepseek-r1:7b",
+                    },
+                  },
+                })
+              end,
+            },
+          })
+
+
         '';
+
         formatter.conform-nvim.enable = true;
         fzf-lua.enable = true;
         telescope.enable = true;

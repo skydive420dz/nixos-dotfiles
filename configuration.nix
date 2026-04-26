@@ -128,6 +128,15 @@
     ];
   };
 
+  services.ollama = {
+    enable = true;
+    # Optional: Automatically pull these models on startup
+    loadModels = [
+      "llama3.2"
+      "deepseek-r1:1.5b"
+      "deepseek-r1:7b"
+    ];
+  };
   programs.zsh.enable = true;
   programs.hyprland = {
     enable = true;
