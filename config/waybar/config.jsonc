@@ -165,7 +165,7 @@
                         ""
                 ],
                 "min-length": 8,
-                "on-click": "kitty nvtop"
+                "on-click": "kitty -T nvtop_float -e nvtop"
         },
         "custom/cpu-combined": {
                 "exec": "~/.config/scripts/cpu-status",
@@ -178,7 +178,7 @@
                         ""
                 ],
                 "min-length": 8,
-                "on-click": "kitty btop"
+                "on-click": "kitty -T btop_float -e btop"
         },
         "custom/sep": {
                 "format": "|",

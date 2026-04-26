@@ -186,7 +186,6 @@
     brightnessctl
     wofi
     swaynotificationcenter
-    qutebrowser
     ffmpeg-full
     mpv
     nvtopPackages.full

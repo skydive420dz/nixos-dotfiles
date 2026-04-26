@@ -14,6 +14,8 @@
     kitty # Add this here
     btop # Add this for your system monitor
     nvtopPackages.full # Add this for your GPU monitor
+    yazi
+    qutebrowser
     # ... any other apps you want installed
   ];
 
@@ -109,6 +111,17 @@
       theme_background = false; # Set to true if you want a solid background
     };
   };
+
+  # --- BROWSER CONFIGURATION ---
+
+  #programs.qutebrowser = {
+  #  enable = true;
+  # Custom settings to keep it minimal
+  #    settings = {
+  #      "colors.webpage.preferred_color_scheme" = "dark";
+  #      "tabs.position" = "left"; # Matches your vertical/minimal vibe
+  #    };
+  #};
 
   # --- HYPRLAND CONFIGURATION ---
   wayland.windowManager.hyprland = {
