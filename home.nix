@@ -154,7 +154,7 @@
     extraConfig = ''
       source = ~/.config/hypr/mocha.conf
       source = ~/.config/hypr/hyprpaper.conf
-      source = /home/skydive420dz/nixos-dotfiles/config/hypr/hyprland.conf
+      source = ~/nixos-dotfiles/config/hypr/hyprland.conf
     '';
   };
 
@@ -173,7 +173,7 @@
     # --- GPU Selection (Aquamarine/Hyprland) ---
     # This tells Hyprland to use the NVIDIA card (card1) as the primary renderer.
     # If you get a black screen, swap the order to "/dev/dri/card0:/dev/dri/card1"
-    AQ_DRM_DEVICES = "/dev/dri/card2:/dev/dri/card1";
+    AQ_DRM_DEVICES = "/dev/dri/card1:/dev/dri/card2";
 
     # --- Wayland Fixes ---
     XDG_SESSION_TYPE = "wayland";

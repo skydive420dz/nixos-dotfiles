@@ -7,7 +7,7 @@
         "margin-left": 10,
         "margin-right": 10,
         "modules-left": [
-                "ext/workspaces",
+                "ext/workspaces"
         ],
         "modules-center": [
                 "hyprland/window"
@@ -34,18 +34,13 @@
                 "separate-outputs": false,
                 "max-length": 40,
                 "rewrite": {
-                        "^$": "   Desktop ",
-                        // Matches Firefox regardless of the separator used
-                        "(.*) — Mozilla Firefox": " $1 ",
-                        "(.*) Mozilla Firefox": " $1 ",
-                        // Catch anything containing 'kitty' anywhere in the title
-                        "(.*)kitty(.*)": "  $1 ",
-                        // If your terminal title changes to your shell (zsh/bash)
-                        "(.*)zsh(.*)": "  $1 ",
-                        "(.*)bash(.*)": "  $1 ",
-                        // Matches Discord anywhere in the string
-                        "(.*)Discord(.*)": "  Discord ",
-                        // Catch-all for anything else to keep the pill looking clean
+                        "^$": "   Desktop",
+                        "(.*) — Mozilla Firefox": " $1 ",
+                        "(.*) Mozilla Firefox": " $1 ",
+                        "(.*)kitty(.*)": "  $1 ",
+                        "(.*)zsh(.*)": "  $1 ",
+                        "(.*)bash(.*)": "  $1 ",
+                        "(.*)Discord(.*)": "  Discord ",
                         "(.*)": "  $1"
                 }
         },
@@ -54,10 +49,10 @@
                 "spacing": 10
         },
         "clock": {
-                "min-length": 13,
+                "min-length": 6,
                 "timezone": "America/New_York",
                 "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-                "format-alt": " {:%d/%m/%Y}",
+                "format-alt": " {:%d/%m/%Y}",
                 "format": "󱑂 {:%H:%M}"
         },
         "cpu": {
@@ -88,7 +83,7 @@
                 },
                 "format": "{icon} {capacity}%",
                 "format-charging": "󰉁  {capacity}%",
-                "format-plugged": "",
+                "format-plugged": "",
                 "format-alt": "{icon}",
                 "format-icons": [
                         "󰂎",
@@ -109,9 +104,8 @@
                 }
         },
         "network": {
-                "format": "Online",
-                "interval": 10,
                 "format": "󰤨",
+                "interval": 10,
                 "format-ethernet": "󰈀",
                 "format-wifi": "{icon}",
                 "format-disconnected": "󰤯",
@@ -150,18 +144,17 @@
                 "tooltip-format-enumerate-connected-battery": "Device: {device_alias}\nBattery: {device_battery_percentage}%"
         },
         "backlight": {
-                // "interval":
                 "format": "{icon} {percent}%",
                 "format-icons": [
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        ""
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        ""
                 ],
                 "min-length": 4,
                 "on-scroll-up": "~/.config/scripts/backlight up",
@@ -172,11 +165,11 @@
                 "exec": "~/.config/scripts/gpu",
                 "return-type": "json",
                 "interval": 10,
-                "format": ": {icon} {text}", // Use {} to pull from the "text" field in your script
+                "format": ": {icon} {text}",
                 "format-icons": [
-                        "",
-                        "",
-                        ""
+                        "",
+                        "",
+                        ""
                 ],
                 "min-length": 8,
                 "on-click": "kitty -T nvtop_float -e nvtop"
@@ -185,11 +178,11 @@
                 "exec": "~/.config/scripts/cpu-status",
                 "return-type": "json",
                 "interval": 5,
-                "format": "  {icon} {text}", // Using a CPU icon for the whole block
+                "format": "  {icon} {text}",
                 "format-icons": [
-                        "",
-                        "",
-                        ""
+                        "",
+                        "",
+                        ""
                 ],
                 "min-length": 8,
                 "on-click": "kitty -T btop_float -e btop"
@@ -199,13 +192,13 @@
                 "interval": 0
         },
         "memory": {
-                "format": ": {used}GiB",
-                "min-length": 8,
+                "format": ": {used}GiB",
+                "min-length": 8
         },
         "disk": {
                 "interval": 60,
                 "path": "/",
                 "format": "Disk: {free}",
-                "min-length": 14,
-        },
+                "min-length": 14
+        }
 }
