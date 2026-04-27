@@ -1,0 +1,15 @@
+
+#!/usr/bin/env bash
+# Get active window title from hyprland
+title=$(hyprctl activewindow -j | jq -r '.title')
+
+# Your rewrite logic (simulating the rewrite object)
+if [[ "$title" == "null" ]] || [[ -z "$title" ]]; then
+    echo "No Active Window"
+elif [[ "$title" == *"Mozilla Firefox"* ]]; then
+    echo "   Firefox"
+elif [[ "$title" == *"kitty"* ]]; then
+    echo " Terminal"
+else
+    echo "$title"
+fi

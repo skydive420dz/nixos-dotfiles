@@ -68,17 +68,20 @@
       enable = true;
       enable32Bit = true;
     };
-    #    opengl = {
-    #      enable = true;
-    #      driSupport32Bit = true;
-    #    };
+    opengl = {
+      enable = true;
+      driSupport32Bit = true;
+    };
     nvidia = {
+      package = config.boot.kernelPackages.nvidiaPackages.stable;
+      powerManagement.enable = true;
       modesetting.enable = true;
-      open = true;
+      open = false;
+      nvidiaSettings = true;
       prime = {
         sync.enable = true;
-        amdgpuBusId = "PCI:5@0:0:0";
-        nvidiaBusId = "PCI:1@0:0:0";
+        amdgpuBusId = "PCI:5:0:0";
+        nvidiaBusId = "PCI:1:0:0";
         offload = {
           enable = false;
           enableOffloadCmd = false;

@@ -1,28 +1,25 @@
-//-*- mode: jsonc -*-
 {
         "layer": "top",
         "position": "top",
         "height": 30,
-        "spacing": 4,
-        // Choose the order of the modules
+        "spacing": 0,
+        "margin-top": 5,
+        "margin-left": 10,
+        "margin-right": 10,
         "modules-left": [
                 "ext/workspaces",
-                "ext/window",
         ],
-        "modules-center": [],
+        "modules-center": [
+                "hyprland/window"
+        ],
         "modules-right": [
                 "backlight",
-                "custom/cpu-combined",
-                "custom/gpu",
-                "memory",
-                "clock",
+                "battery",
                 "tray",
                 "network",
                 "bluetooth",
-                "battery",
+                "clock"
         ],
-        "spacing": 0,
-        // Modules configuration
         "ext/workspaces": {
                 "disable-scroll": true,
                 "all-outputs": true,
@@ -32,8 +29,25 @@
                         "*": 9
                 }
         },
-        "ext/window": {
-                "seperate-outputs": false
+        "hyprland/window": {
+                "format": "{}",
+                "separate-outputs": false,
+                "max-length": 40,
+                "rewrite": {
+                        "^$": "   Desktop ",
+                        // Matches Firefox regardless of the separator used
+                        "(.*) — Mozilla Firefox": " $1 ",
+                        "(.*) Mozilla Firefox": " $1 ",
+                        // Catch anything containing 'kitty' anywhere in the title
+                        "(.*)kitty(.*)": "  $1 ",
+                        // If your terminal title changes to your shell (zsh/bash)
+                        "(.*)zsh(.*)": "  $1 ",
+                        "(.*)bash(.*)": "  $1 ",
+                        // Matches Discord anywhere in the string
+                        "(.*)Discord(.*)": "  Discord ",
+                        // Catch-all for anything else to keep the pill looking clean
+                        "(.*)": "  $1"
+                }
         },
         "tray": {
                 "icon-size": 21,

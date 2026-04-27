@@ -19,6 +19,7 @@
     hyprpaper
     psmisc # This provides killall
     awww
+    libnotify
     # ... any other apps you want installed
   ];
 
@@ -158,13 +159,26 @@
   };
 
   home.sessionVariables = {
-    GBM_BACKEND = "nvidia-drm";
-    LIBVA_DRIVER_NAME = "nvidia";
     XDG_CURRENT_DESKTOP = "Hyprland";
-    XDG_SESSION_TYPE = "wayland";
     GTK_THEME = "catppuccin-mocha-lavender-standard";
     XCURSOR_THEME = "catppuccin-mocha-dark-cursors";
     XCURSOR_SIZE = "24";
     HYPRCURSOR_SIZE = "24";
+
+    # --- NVIDIA Specifics ---
+    LIBVA_DRIVER_NAME = "nvidia";
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+
+    # --- GPU Selection (Aquamarine/Hyprland) ---
+    # This tells Hyprland to use the NVIDIA card (card1) as the primary renderer.
+    # If you get a black screen, swap the order to "/dev/dri/card0:/dev/dri/card1"
+    AQ_DRM_DEVICES = "/dev/dri/card2:/dev/dri/card1";
+
+    # --- Wayland Fixes ---
+    XDG_SESSION_TYPE = "wayland";
+    NVD_BACKEND = "direct"; # Better performance for NVIDIA on Wayland
+    ELECTRON_OZONE_PLATFORM_HINT = "auto"; # Fixes flickering in Discord/VSCode
+
   };
 }
