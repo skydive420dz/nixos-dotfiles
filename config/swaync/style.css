@@ -1,0 +1,49 @@
+@import "../../.config/waybar/mocha.css";
+
+/* --- THE MAIN PANEL --- */
+.control-center {
+  background: rgba(30, 30, 46, 0.9);
+  border: 1px solid rgba(180, 190, 254, 0.2);
+  border-radius: 20px;
+  margin: 10px;
+  /* Matching your Waybar glow precisely */
+  box-shadow: 0px 0px 25px 2px rgba(180, 190, 254, 0.35);
+  color: @text;
+}
+
+/* --- THE NOTIFICATION POPUPS --- */
+.notification {
+  background: rgba(30, 30, 46, 0.75);
+  border: 1px solid rgba(180, 190, 254, 0.2);
+  border-radius: 15px;
+  margin: 8px;
+  color: @text;
+}
+
+/* --- PANEL WIDGETS --- */
+.widget-title {
+  color: @lavender;
+  font-family: "FantasqueSansMono Nerd Font Propo";
+  font-size: 20px;
+  margin: 10px;
+}
+
+/* Match your Workspace Buttons */
+.widget-buttons > button {
+  background: @mantle;
+  border-radius: 15px;
+  color: @text;
+  margin: 5px;
+}
+
+.widget-buttons > button:hover {
+  background: @lavender;
+  color: @crust;
+}
+
+/* --- CRITICAL: THE BLUR SHAPE --- */
+/* This ensures the 'frost' effect follows the rounded corners */
+.control-center,
+.notification {
+  box-shadow: 0px 0px 25px 2px rgba(180, 190, 254, 0.35);
+}

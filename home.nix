@@ -92,7 +92,7 @@
 
       # 3. Start Hyprland with UWSM automatically on TTY1
       if uwsm check may-start; then
-        exec uwsm start hyprland-uwsm.desktop
+        exec uwsm start hyprland-uwsm.desktop > /dev/null 2>&1
       fi
 
       # 4. Yazi CWD Wrapper (y command)

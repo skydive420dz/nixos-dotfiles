@@ -22,7 +22,7 @@
   boot = {
     consoleLogLevel = 0;
     initrd.verbose = false;
-    extraModulePackages = [ pkgs.glibc ];
+    #    extraModulePackages = [ pkgs.glibc ];
 
     # Plymouth boot splash screen
     plymouth = {
@@ -83,6 +83,7 @@
     # NVIDIA GPU with Prime (hybrid graphics)
     nvidia = {
       package = config.boot.kernelPackages.nvidiaPackages.latest;
+      nvidiaPersistenced = true;
       powerManagement = {
         enable = false;
         finegrained = false;
