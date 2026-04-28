@@ -31,6 +31,7 @@
   imports = [
     ./modules/theme.nix
     ./modules/links.nix
+    ./modules/rofi.nix
   ];
 
   # --- SHELL CONFIGURATION (BASH) ---
@@ -121,29 +122,6 @@
     settings = {
       color_theme = "catppuccin_mocha";
       theme_background = false; # Set to true if you want a solid background
-    };
-  };
-
-  # 1. Enable Catppuccin for Rofi (ensure catppuccin nix module is imported)
-  catppuccin.rofi.enable = true;
-  catppuccin.rofi.flavor = "mocha";
-
-  programs.rofi = {
-    enable = true;
-    package = pkgs.rofi; # Better for Hyprland/Wayland
-
-    extraConfig = {
-      modi = "run,drun,window";
-      icon-theme = "Papirus";
-      show-icons = true;
-      drun-display-format = "{icon} {name}";
-      location = 0;
-      disable-history = false;
-      hide-scrollbar = true;
-      display-drun = "     Apps ";
-      display-run = "     Run ";
-      display-window = "     Window ";
-      sidebar-mode = true;
     };
   };
 
