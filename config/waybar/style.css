@@ -1,127 +1,145 @@
 @import "mocha.css";
 
-/* ============================================
-   GLOBAL STYLES
-   ============================================ */
-
+/* --- 1. GLOBAL RESET --- */
 * {
-  font-family: FantasqueSansMono Nerd Font;
-  font-size: 16px;
-  border: none;
-  border-radius: 0px;
-  min-height: 0px;
-  padding: 0px;
-  margin: 0px;
+  font-family: "FantasqueSansMono Nerd Font Propo";
+  font-size: 15px;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
 }
 
 window#waybar {
   background: transparent;
-  padding: 12px; /* Extra padding so the glow isn't cut off by the screen edge */
 }
 
-/* ============================================
-   GLOW EFFECT (All Modules)
-   ============================================ */
-
+/* --- 2. THE PILL BASE --- */
 #workspaces,
 #window,
 #tray,
 #backlight,
+#custom-cpu-combined,
+#memory,
+#custom-gpu,
+#disk,
 #clock,
 #network,
 #bluetooth,
 #battery {
-  border-radius: 50px;
-  background-color: @crust;
-  border: 1px solid @mantle;
+  background-color: rgba(30, 30, 46, 0.75);
+  color: @text;
+  /* Removed 'height' and 'max-height' to satisfy the parser */
+  min-height: 28px;
+  padding: 2px 0px;
+  border-top: 1px solid rgba(180, 190, 254, 0.2);
+  border-bottom: 1px solid rgba(180, 190, 254, 0.2);
 }
 
-/* ============================================
-   LEFT SECTION: Workspaces
-   ============================================ */
-
+/* --- 3. LEFT: WORKSPACES --- */
 #workspaces {
-  padding: 5px 3px;
   margin-left: 12px;
-  color: @overlay2;
+  padding: 0 6px;
+  border-radius: 50px;
+  border-left: 1px solid rgba(180, 190, 254, 0.2);
+  border-right: 1px solid rgba(180, 190, 254, 0.2);
 }
 
 #workspaces button {
-  padding: 0px 6px;
-  margin: 0px 3px;
+  padding: 0 8px;
+  margin: 4px 3px;
   border-radius: 50px;
   color: transparent;
   background-color: @mantle;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
-#workspaces button.active {
+#workspaces button.active,
+#workspaces button.focused {
   background-color: @lavender;
   color: @crust;
-  min-width: 45px;
+  min-width: 55px;
 }
 
-/* ============================================
-   CENTER SECTION: Window Title
-   ============================================ */
-
+/* --- 4. CENTER: WINDOW TITLE --- */
 #window {
-  padding: 0px 20px;
+  padding: 0 25px;
   color: @lavender;
-  min-width: 100px; /* Keeps the pill size stable */
+  border-radius: 50px;
+  border-left: 1px solid rgba(180, 190, 254, 0.2);
+  border-right: 1px solid rgba(180, 190, 254, 0.2);
 }
 
-window#waybar.empty #window {
-  background-color: transparent;
-  border: none;
-}
-
-/* ============================================
-   RIGHT SECTION: Status Indicators
-   ============================================ */
-
-/* --- Block 1: Backlight & Clock (Grouped Pill) --- */
-
+/* --- 5. RIGHT BLOCK 1: SYSTEM PILL --- */
 #backlight {
-  margin-left: 12px;
-  padding: 0px 15px;
-  border-radius: 50px 0px 0px 50px; /* Left rounded */
+  margin-left: 20px;
+  border-radius: 50px 0 0 50px;
+  border-left: 1px solid rgba(180, 190, 254, 0.2);
   color: @blue;
+  padding-left: 15px;
+}
+
+#custom-cpu-combined,
+#memory,
+#custom-gpu,
+#disk {
+  padding: 0 12px;
+}
+
+#custom-cpu-combined {
+  color: @green;
+}
+#custom-gpu {
+  color: @peach;
+}
+#memory {
+  color: @blue;
+}
+#disk {
+  color: @yellow;
 }
 
 #clock {
-  padding: 0px 15px;
-  border-radius: 0px 50px 50px 0px; /* Right rounded */
+  border-radius: 0 50px 50px 0;
+  border-right: 1px solid rgba(180, 190, 254, 0.2);
   color: @blue;
+  padding-right: 15px;
+  padding-left: 10px;
 }
 
-/* --- Block 2: Network & Bluetooth & Battery (Grouped Pill) --- */
-
+/* --- 6. RIGHT BLOCK 2: CONNECTIVITY PILL --- */
 #network {
   margin-left: 20px;
-  padding: 0px 15px;
-  border-radius: 50px 0px 0px 50px; /* Left rounded */
+  border-radius: 50px 0 0 50px;
+  border-left: 1px solid rgba(180, 190, 254, 0.2);
   color: @teal;
+  padding-left: 15px;
 }
 
 #bluetooth {
-  padding: 0px 15px;
-  border-radius: 0px; /* Middle (no rounding) */
+  padding: 0 10px;
   color: @teal;
 }
 
 #battery {
   margin-right: 15px;
-  padding: 0px 15px;
-  border-radius: 0px 50px 50px 0px; /* Right rounded */
+  border-radius: 0 50px 50px 0;
+  border-right: 1px solid rgba(180, 190, 254, 0.2);
   color: @teal;
+  padding-right: 15px;
+  padding-left: 10px;
 }
-
-/* --- Block 3: System Tray (Standalone Pill) --- */
 
 #tray {
   margin-left: 20px;
-  padding: 0px 15px;
+  padding: 0 15px;
   border-radius: 50px;
-  color: @overlay2;
+  border-left: 1px solid rgba(180, 190, 254, 0.2);
+  border-right: 1px solid rgba(180, 190, 254, 0.2);
+}
+
+/* Empty desktop cleanup */
+window#waybar.empty #window {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
 }

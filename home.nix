@@ -22,6 +22,7 @@
     libnotify
     wl-clipboard
     waybar
+    vesktop
     swaynotificationcenter
     # ... any other apps you want installed
   ];
@@ -75,6 +76,8 @@
       # Monitoring aliases that trigger your Hyprland floating rules
       btop = "kitty --title btop_float -e btop";
       nvtop = "kitty --title nvtop_float -e nvtop";
+
+      discord = "vesktop --use-gl=desktop --enable-features=UseOzonePlatform --ozone-platform=wayland";
 
     };
 
@@ -135,6 +138,8 @@
   #      "tabs.position" = "left"; # Matches your vertical/minimal vibe
   #    };
   #};
+
+  # --- DISCORD SETUP ---
 
   # --- HYPRLAND CONFIGURATION ---
 

@@ -172,6 +172,12 @@
   # USER CONFIGURATION
   # ============================================
 
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
+    config.common.default = "*";
+  };
+
   services.getty.autologinUser = "skydive420dz";
 
   users.users.skydive420dz = {

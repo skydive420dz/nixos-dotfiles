@@ -26,11 +26,11 @@
       {
         "*" = {
           # --- PHYSICAL LAYOUT ---
-          width = mkLiteral "450px";
+          width = mkLiteral "650px";
           font = "JetBrainsMono Nerd Font Propo 12";
 
           # --- MOCHA PALETTE ---
-          bg-col = mkLiteral "#1e1e2e";
+          bg-col = mkLiteral "rgba(30, 30, 46, 0.7)";
           bg-col-light = mkLiteral "#1e1e2e";
           border-col = mkLiteral "#b4befe"; # Lavender
           selected-col = mkLiteral "#313244"; # Surface0
