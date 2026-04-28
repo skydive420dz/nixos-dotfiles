@@ -242,14 +242,10 @@
     fd
     tree
     tree-sitter
-    wl-clipboard
 
     # Terminal & UI
     lynx
     kitty
-    waybar
-    rofi
-    swaynotificationcenter
     fzf
 
     # Development tools
@@ -291,5 +287,5 @@
     "flakes"
   ];
 
-  system.stateVersion = "26.05";
+  system.stateVersion = "25.05";
 }

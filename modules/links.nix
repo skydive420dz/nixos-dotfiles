@@ -8,9 +8,7 @@ in
   home.file = {
     # Bulk link whole directories
     ".config/waybar".source = link "config/waybar";
-    ".config/rofi".source = link "config/rofi";
     ".config/kitty".source = link "config/kitty";
-    ".config/wofi".source = link "config/wofi";
     ".config/yazi".source = link "config/yazi";
     ".config/qutebrowser".source = link "config/qutebrowser";
 

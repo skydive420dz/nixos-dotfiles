@@ -8,7 +8,7 @@
 {
   home.username = "skydive420dz";
   home.homeDirectory = "/home/skydive420dz";
-  home.stateVersion = "26.05";
+  home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
     kitty # Add this here
@@ -20,6 +20,9 @@
     psmisc # This provides killall
     awww
     libnotify
+    wl-clipboard
+    waybar
+    swaynotificationcenter
     # ... any other apps you want installed
   ];
 
@@ -42,8 +45,8 @@
       [ -f "$HOME/.openai_key" ] && source "$HOME/.openai_key"
     '';
     profileExtra = ''
-      if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
-        exec start-hyprland
+      if uwsm check may-start; then
+        exec uwsm start hyprland-uwsm.desktop
       fi
     '';
   };
@@ -67,6 +70,11 @@
       ls = "ls --color=auto";
       cat = "bat";
       y = "y"; # Optional: makes the y function feel like a first-class alias
+
+      # Monitoring aliases that trigger your Hyprland floating rules
+      btop = "kitty --title btop_float -e btop";
+      nvtop = "kitty --title nvtop_float -e nvtop";
+
     };
 
     initContent = lib.mkBefore ''
@@ -78,9 +86,9 @@
       # 2. Initialize Starship
       eval "$(starship init zsh)"
 
-      # 3. Start Hyprland automatically if on TTY1
-      if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
-        exec start-hyprland
+      # 3. Start Hyprland with UWSM automatically on TTY1
+      if uwsm check may-start; then
+        exec uwsm start hyprland-uwsm.desktop
       fi
 
       # 4. Yazi CWD Wrapper (y command)
@@ -116,6 +124,29 @@
     };
   };
 
+  # 1. Enable Catppuccin for Rofi (ensure catppuccin nix module is imported)
+  catppuccin.rofi.enable = true;
+  catppuccin.rofi.flavor = "mocha";
+
+  programs.rofi = {
+    enable = true;
+    package = pkgs.rofi; # Better for Hyprland/Wayland
+
+    extraConfig = {
+      modi = "run,drun,window";
+      icon-theme = "Papirus";
+      show-icons = true;
+      drun-display-format = "{icon} {name}";
+      location = 0;
+      disable-history = false;
+      hide-scrollbar = true;
+      display-drun = "     Apps ";
+      display-run = "     Run ";
+      display-window = "     Window ";
+      sidebar-mode = true;
+    };
+  };
+
   # --- BROWSER CONFIGURATION ---
 
   #programs.qutebrowser = {
@@ -128,9 +159,28 @@
   #};
 
   # --- HYPRLAND CONFIGURATION ---
+
+  # Create a systemd service for awww-daemon
+  systemd.user.services.awww-daemon = {
+    Unit = {
+      Description = "Awww Wallpaper Daemon";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      ExecStart = "${pkgs.awww}/bin/awww-daemon";
+      Restart = "on-failure";
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
+
+  programs.waybar.enable = true; # Enable Waybar as a managed service
+
+  services.swaync.enable = true; # For swaynotificationcenter
+
   wayland.windowManager.hyprland = {
     enable = true;
-    systemd.enable = true;
+    systemd.enable = false;
     settings = {
       monitorv2 = {
         output = "eDP-1";
@@ -153,13 +203,11 @@
     };
     extraConfig = ''
       source = ~/.config/hypr/mocha.conf
-      source = ~/.config/hypr/hyprpaper.conf
       source = ~/nixos-dotfiles/config/hypr/hyprland.conf
     '';
   };
 
   home.sessionVariables = {
-    XDG_CURRENT_DESKTOP = "Hyprland";
     GTK_THEME = "catppuccin-mocha-lavender-standard";
     XCURSOR_THEME = "catppuccin-mocha-dark-cursors";
     XCURSOR_SIZE = "24";
@@ -176,7 +224,6 @@
     AQ_DRM_DEVICES = "/dev/dri/card1:/dev/dri/card2";
 
     # --- Wayland Fixes ---
-    XDG_SESSION_TYPE = "wayland";
     NVD_BACKEND = "direct"; # Better performance for NVIDIA on Wayland
     ELECTRON_OZONE_PLATFORM_HINT = "auto"; # Fixes flickering in Discord/VSCode
 
