@@ -152,7 +152,13 @@
     Install.WantedBy = [ "graphical-session.target" ];
   };
 
-  programs.waybar.enable = true; # Enable Waybar as a managed service
+  programs.waybar = {
+    enable = true;
+    systemd = {
+      enable = true;
+      targets = [ "graphical-session.target" ]; # UWSM reaches this target
+    };
+  };
 
   services.swaync.enable = true; # For swaynotificationcenter
 
