@@ -48,7 +48,7 @@
     '';
     profileExtra = ''
       if uwsm check may-start; then
-        exec uwsm start hyprland-uwsm.desktop
+        exec uwsm start hyprland-uwsm.desktop > /dev/null 2>&1
       fi
     '';
   };
@@ -184,11 +184,6 @@
         sdr_min_luminance = 0.001;
         sdr_max_luminance = 400;
       };
-      render = {
-        direct_scanout = 1;
-        cm_auto_hdr = 1;
-        cm_sdr_eotf = 2;
-      };
     };
     extraConfig = ''
       source = ~/.config/hypr/mocha.conf
@@ -210,7 +205,7 @@
     # --- GPU Selection (Aquamarine/Hyprland) ---
     # This tells Hyprland to use the NVIDIA card (card1) as the primary renderer.
     # If you get a black screen, swap the order to "/dev/dri/card0:/dev/dri/card1"
-    AQ_DRM_DEVICES = "/dev/dri/card1:/dev/dri/card2";
+    AQ_DRM_DEVICES = "/dev/dri/card2:/dev/dri/card1";
 
     # --- Wayland Fixes ---
     NVD_BACKEND = "direct"; # Better performance for NVIDIA on Wayland

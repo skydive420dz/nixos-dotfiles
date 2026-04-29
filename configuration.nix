@@ -21,9 +21,16 @@
 
   boot = {
     consoleLogLevel = 0;
-    initrd.verbose = false;
-    #    extraModulePackages = [ pkgs.glibc ];
-
+    initrd = {
+      verbose = false;
+      systemd.enable = true;
+    };
+    kernelModules = [
+      "nvidia"
+      "nvidia_modeset"
+      "nvidia_uvm"
+      "nvidia_drm"
+    ];
     # Plymouth boot splash screen
     plymouth = {
       enable = true;
@@ -35,10 +42,11 @@
 
     # Bootloader configuration
     loader = {
+      timeout = 0;
       systemd-boot = {
         enable = true;
         graceful = true;
-        consoleMode = "max";
+        consoleMode = "max"; # Matches Plymouth resolution to avoid flicker
         editor = false;
       };
       efi.canTouchEfiVariables = true;
@@ -49,22 +57,48 @@
       "video=efifb:1920x1080"
       "quiet"
       "splash"
-      "loglevel=0"
+      "loglevel=0" # Changed from 0 to 3 to effectively hide 'Info/Warning' text
       "acpi_os=linux"
+      "nvidia-drm.modeset=1"
+      "nvidia-drm.fbdev=1" # The flicker killer
       "acpi_enforce_resources=lax"
       "acpi.log_level=0"
       "acpi=ht"
-      "rd.udev.log_level=0"
+      "rd.udev.log_level=2" # Changed from 0 to 3
       "rd.systemd.show_status=false"
-      "udev.log_priority=0"
+      "udev.log_priority=2" # Changed from 0 to 3
       "systemd.show_status=false"
       "vt.global_cursor_default=0"
       "console=tty0"
       "printk.devkmsg=off"
+      "fbcon=vc:2-6" # Ensures splash stays until Hyprland is ready
       "fbcon=nodefer"
+
     ];
   };
 
+  # --- ADDED FOR SILENT TTY ---
+  services.getty = {
+    autologinUser = "skydive420dz";
+    helpLine = ""; # Removes the 'Press Alt+F1' help line
+  };
+
+  # This overrides the TTY1 login to be completely invisible
+  systemd.services."getty@tty1" = {
+    overrideStrategy = "asDropin";
+    serviceConfig.ExecStart = [
+      "" # Clear default
+      "@${pkgs.util-linux}/sbin/agetty agetty --login-program ${config.services.getty.loginProgram} --autologin skydive420dz --skip-login --nonewline --noissue --noclear %I $TERM"
+    ];
+  };
+
+  systemd.services.plymouth-quit = {
+    serviceConfig.ExecStart = [
+      ""
+      # The '|| true' ensures the service doesn't "fail" if Plymouth is already gone
+      "${pkgs.bash}/bin/bash -c '${pkgs.plymouth}/bin/plymouth quit --retain-splash || true'"
+    ];
+  };
   # ============================================
   # HARDWARE CONFIGURATION
   # ============================================
@@ -178,8 +212,6 @@
     extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
     config.common.default = "*";
   };
-
-  services.getty.autologinUser = "skydive420dz";
 
   users.users.skydive420dz = {
     isNormalUser = true;
