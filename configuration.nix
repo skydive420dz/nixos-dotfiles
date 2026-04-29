@@ -74,6 +74,7 @@
       "fbcon=vc:2-6" # Ensures splash stays until Hyprland is ready
       "fbcon=nodefer"
 
+      "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
     ];
   };
 
@@ -109,10 +110,6 @@
       enable = true;
       enable32Bit = true;
     };
-    #    opengl = {
-    #      enable = true;
-    #      driSupport32Bit = true;
-    #    };
 
     # NVIDIA GPU with Prime (hybrid graphics)
     nvidia = {
