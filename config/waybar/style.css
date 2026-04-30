@@ -27,7 +27,7 @@ window#waybar {
 #network,
 #bluetooth,
 #battery {
-  background-color: rgba(30, 30, 46, 0.75);
+  background-color: rgba(30, 30, 46, 0.5);
   color: @text;
   min-height: 28px;
   padding: 2px 0px;

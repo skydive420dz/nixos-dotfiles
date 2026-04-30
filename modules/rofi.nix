@@ -25,21 +25,18 @@
       in
       {
         "*" = {
-          # --- PHYSICAL LAYOUT ---
           width = mkLiteral "650px";
           font = "JetBrainsMono Nerd Font Propo 12";
 
-          # --- MOCHA PALETTE ---
-          bg-col = mkLiteral "rgba(30, 30, 46, 0.7)";
-          bg-col-light = mkLiteral "#1e1e2e";
-          border-col = mkLiteral "#b4befe"; # Lavender
-          selected-col = mkLiteral "#313244"; # Surface0
-          blue = mkLiteral "#89b4fa";
+          bg-col = mkLiteral "rgba(30, 30, 46, 0.2)";
+          bg-col-light = mkLiteral "rgba(49, 50, 68, 0.4)";
+          border-col = mkLiteral "rgba(180, 190, 254, 0.3)";
+          selected-col = mkLiteral "rgba(49, 50, 68, 0.5)";
+          blue = mkLiteral "rgba(137, 180, 250, 0.6)";
           fg-col = mkLiteral "#cdd6f4";
-          fg-col2 = mkLiteral "#f38ba8"; # Red
+          fg-col2 = mkLiteral "#f38ba8";
           grey = mkLiteral "#6c7086";
 
-          # --- INTERNAL RESOLUTION FIXES ---
           background-color = mkLiteral "transparent";
           text-color = mkLiteral "@fg-col";
 
@@ -55,19 +52,19 @@
 
         "window" = {
           height = mkLiteral "500px";
-          border = mkLiteral "3px";
+          border = mkLiteral "2px";
           border-radius = mkLiteral "15px";
           border-color = mkLiteral "@border-col";
           background-color = mkLiteral "@bg-col";
         };
 
         "mainbox" = {
-          background-color = mkLiteral "@bg-col";
+          background-color = mkLiteral "transparent";
         };
 
         "inputbar" = {
           children = mkLiteral "[prompt,entry]";
-          background-color = mkLiteral "@bg-col";
+          background-color = mkLiteral "transparent";
           border-radius = mkLiteral "15px";
           padding = mkLiteral "2px";
         };
@@ -75,7 +72,7 @@
         "prompt" = {
           background-color = mkLiteral "@blue";
           padding = mkLiteral "6px";
-          text-color = mkLiteral "@bg-col";
+          text-color = mkLiteral "#1e1e2e";
           border-radius = mkLiteral "15px";
           margin = mkLiteral "20px 0px 0px 20px";
         };
@@ -84,7 +81,7 @@
           padding = mkLiteral "6px";
           margin = mkLiteral "20px 0px 0px 10px";
           text-color = mkLiteral "@fg-col";
-          background-color = mkLiteral "@bg-col";
+          background-color = mkLiteral "transparent";
         };
 
         "listview" = {
@@ -93,12 +90,12 @@
           margin = mkLiteral "10px 0px 0px 20px";
           columns = 1;
           lines = 10;
-          background-color = mkLiteral "@bg-col";
+          background-color = mkLiteral "transparent";
         };
 
         "element" = {
           padding = mkLiteral "5px";
-          background-color = mkLiteral "@bg-col";
+          background-color = mkLiteral "transparent";
           text-color = mkLiteral "@fg-col";
         };
 
@@ -109,6 +106,7 @@
         "element selected" = {
           background-color = mkLiteral "@selected-col";
           text-color = mkLiteral "@fg-col2";
+          border-radius = mkLiteral "8px";
         };
 
         "mode-switcher" = {
@@ -124,8 +122,8 @@
         };
 
         "button selected" = {
-          background-color = mkLiteral "@bg-col";
-          text-color = mkLiteral "@blue";
+          background-color = mkLiteral "@blue";
+          text-color = mkLiteral "#1e1e2e";
         };
       };
   };

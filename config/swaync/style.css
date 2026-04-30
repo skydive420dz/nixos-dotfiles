@@ -19,8 +19,8 @@
 }
 
 .notification-background {
-  background: rgba(30, 30, 46, 0.85); /* @base with transparency */
-  border: 1px solid rgba(180, 190, 254, 0.2);
+  background: rgba(30, 30, 46, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Soft edge highlight */
   border-radius: var(--border-radius-pill);
   margin: 8px;
   padding: 5px 15px;
@@ -44,9 +44,9 @@
 
 /* --- CONTROL CENTER (The Panel) --- */
 .control-center {
-  background: rgba(24, 24, 37, 0.95); /* @mantle */
+  background: rgba(24, 24, 37, 0.5);
   border-radius: var(--border-radius);
-  border: 1px solid rgba(180, 190, 254, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   margin: 0px; /* Leave at 0; config.json handles the 15px screen margin */
   padding: 10px;
 }
