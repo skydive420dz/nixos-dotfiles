@@ -23,6 +23,7 @@
     waybar
     vesktop
     swaynotificationcenter
+    swayosd
     # ... any other apps you want installed
   ];
 

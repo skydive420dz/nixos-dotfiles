@@ -193,7 +193,7 @@
   # ============================================
 
   services.libinput.enable = true;
-
+  services.udev.packages = [ pkgs.swayosd ];
   # ============================================
   # DISPLAY SERVER & WINDOW MANAGER
   # ============================================
@@ -217,7 +217,11 @@
   users.users.skydive420dz = {
     isNormalUser = true;
     shell = pkgs.zsh;
-    extraGroups = [ "wheel" ]; # sudo access
+    extraGroups = [
+      "wheel"
+      "video"
+      "input"
+    ]; # sudo access
     packages = with pkgs; [
       tree
     ];
