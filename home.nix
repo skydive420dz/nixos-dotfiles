@@ -11,12 +11,11 @@
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
-    kitty # Add this here
-    btop # Add this for your system monitor
-    nvtopPackages.full # Add this for your GPU monitor
+    kitty
+    btop
+    nvtopPackages.full
     yazi
     qutebrowser
-    hyprpaper
     psmisc # This provides killall
     awww
     libnotify
@@ -164,8 +163,6 @@
       targets = [ "graphical-session.target" ]; # UWSM reaches this target
     };
   };
-
-  services.swaync.enable = true; # For swaynotificationcenter
 
   wayland.windowManager.hyprland = {
     enable = true;

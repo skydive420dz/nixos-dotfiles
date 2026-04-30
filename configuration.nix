@@ -134,7 +134,11 @@
     };
 
     # Bluetooth support
-    bluetooth.enable = true;
+    bluetooth = {
+      enable = true;
+      powerOnBoot = true; # Ensures the controller is active for the UI
+      settings.General.Experimental = true; # Often required for modern BLE devices
+    };
   };
 
   services.xserver.videoDrivers = [ "nvidia" ];
@@ -281,7 +285,6 @@
 
     # Terminal & UI
     lynx
-    kitty
     fzf
 
     # Development tools
@@ -292,10 +295,8 @@
     c3-lsp
 
     # System monitoring & info
-    btop
     fastfetch
     nitch
-    nvtopPackages.full
     lm_sensors
 
     # Media & multimedia
@@ -306,6 +307,7 @@
     bluez
     bluez-tools
     brightnessctl
+    bluetui
 
     # System administration
     protonup-ng

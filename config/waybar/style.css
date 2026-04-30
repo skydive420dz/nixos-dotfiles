@@ -1,6 +1,6 @@
 @import "mocha.css";
 
-/* --- 1. GLOBAL RESET --- */
+/* --- 1. GLOBAL RESET & CENTERING --- */
 * {
   font-family: "FantasqueSansMono Nerd Font Propo";
   font-size: 15px;
@@ -11,13 +11,14 @@
 
 window#waybar {
   background: transparent;
+  margin-left: 15px;
+  margin-right: 15px;
 }
 
 /* --- 2. THE PILL BASE --- */
 #workspaces,
 #window,
 #tray,
-#backlight,
 #custom-cpu-combined,
 #memory,
 #custom-gpu,
@@ -28,7 +29,6 @@ window#waybar {
 #battery {
   background-color: rgba(30, 30, 46, 0.75);
   color: @text;
-  /* Removed 'height' and 'max-height' to satisfy the parser */
   min-height: 28px;
   padding: 2px 0px;
   border-top: 1px solid rgba(180, 190, 254, 0.2);
@@ -69,25 +69,21 @@ window#waybar {
   border-right: 1px solid rgba(180, 190, 254, 0.2);
 }
 
-/* --- 5. RIGHT BLOCK 1: SYSTEM PILL --- */
-#backlight {
+/* --- 5. RIGHT BLOCK 1: SYSTEM PILL (CPU to Disk) --- */
+#custom-cpu-combined {
   margin-left: 20px;
   border-radius: 50px 0 0 50px;
   border-left: 1px solid rgba(180, 190, 254, 0.2);
-  color: @blue;
   padding-left: 15px;
+  color: @green;
 }
 
-#custom-cpu-combined,
 #memory,
 #custom-gpu,
 #disk {
   padding: 0 12px;
 }
 
-#custom-cpu-combined {
-  color: @green;
-}
 #custom-gpu {
   color: @peach;
 }
@@ -96,20 +92,15 @@ window#waybar {
 }
 #disk {
   color: @yellow;
-}
-
-#clock {
   border-radius: 0 50px 50px 0;
   border-right: 1px solid rgba(180, 190, 254, 0.2);
-  color: @blue;
   padding-right: 15px;
-  padding-left: 10px;
 }
 
-/* --- 6. RIGHT BLOCK 2: CONNECTIVITY PILL --- */
+/* --- 6. RIGHT BLOCK 2: THE CONNECTIVITY PILL (Network -> BT -> Clock -> Battery) --- */
 #network {
   margin-left: 20px;
-  border-radius: 50px 0 0 50px;
+  border-radius: 50px 0 0 50px; /* Starts the pill */
   border-left: 1px solid rgba(180, 190, 254, 0.2);
   color: @teal;
   padding-left: 15px;
@@ -120,15 +111,20 @@ window#waybar {
   color: @teal;
 }
 
+#clock {
+  padding: 0 10px;
+  color: @blue;
+}
+
 #battery {
-  margin-right: 15px;
-  border-radius: 0 50px 50px 0;
+  border-radius: 0 50px 50px 0; /* Ends the pill */
   border-right: 1px solid rgba(180, 190, 254, 0.2);
   color: @teal;
   padding-right: 15px;
   padding-left: 10px;
 }
 
+/* --- 7. TRAY --- */
 #tray {
   margin-left: 20px;
   padding: 0 15px;

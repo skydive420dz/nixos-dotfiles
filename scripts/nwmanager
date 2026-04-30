@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Wi-Fi Launcher for Hyprland (nmtui version)
+
+LAVENDER="rgb(b4befe)"
+MAUVE="rgb(cba6f7)"
+
+notify() {
+    hyprctl notify 1 2000 "$1" "$2"
+}
+
+switch_on() {
+    state=$(nmcli radio wifi)
+    if [[ $state == "enabled" ]]; then return 0; fi
+
+    nmcli radio wifi on
+    notify "$LAVENDER" "Enabling Wi-Fi..."
+    sleep 2
+}
+
+main() {
+    if [[ $1 == "off" ]]; then
+        nmcli radio wifi off
+        notify "$MAUVE" "Wi-Fi Disabled"
+        exit 0
+    fi
+
+    # Ensure Wi-Fi is powered on first
+    switch_on
+
+    # Launch nmtui directly
+    # The script will wait here until you close nmtui
+    nmtui
+}
+
+main "$@"
+

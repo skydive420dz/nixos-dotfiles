@@ -18,5 +18,10 @@ in
     # Specific sub-files for Hyprland
     ".config/hypr/hyprpaper.conf".source = link "config/hypr/hyprpaper.conf";
     ".config/hypr/mocha.conf".source = link "config/hypr/mocha.conf";
+
+    # Link individual files for SwayNC to avoid the directory conflict
+    ".config/swaync/config.json".source = link "config/swaync/config.json";
+    ".config/swaync/style.css".source = link "config/swaync/style.css";
+
   };
 }

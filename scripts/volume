@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# Integrated control for Brightness and Volume
+# Optimized for Hyprland Native Notifications
+
+TYPE=$1   # brightness | volume
+ACTION=$2 # up | down | mute
+VALUE=${3:-5}
+
+LAVENDER="rgb(b4befe)"
+MAUVE="rgb(cba6f7)"
+
+notify() {
+    # icon 1 = info
+    hyprctl notify 1 1500 "$1" "$2"
+}
+
+case $TYPE in
+    brightness)
+        sign=$([ "$ACTION" == "up" ] && echo "+" || echo "-")
+        brightnessctl -n set "${VALUE}%${sign}" --min-value=1 >/dev/null
+        level=$(brightnessctl -m | awk -F ',' '{print $4}' | tr -d '%')
+        notify "$LAVENDER" "Brightness: ${level}%"
+        ;;
+
+    volume)
+        case $ACTION in
+            up)
+                wpctl set-volume @DEFAULT_AUDIO_SINK@ "${VALUE}%+" -l 1.0
+                ;;
+            down)
+                wpctl set-volume @DEFAULT_AUDIO_SINK@ "${VALUE}%-"
+                ;;
+            mute)
+                wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+                ;;
+        esac
+        
+        status=$(wpctl get-volume @DEFAULT_AUDIO_SINK@)
+        if [[ $status == *"[MUTED]"* ]]; then
+            notify "$MAUVE" "Volume: MUTED"
+        else
+            level=$(echo "$status" | awk '{print int($2 * 100)}')
+            notify "$LAVENDER" "Volume: ${level}%"
+        fi
+        ;;
+esac

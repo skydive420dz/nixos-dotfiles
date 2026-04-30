@@ -1,49 +1,140 @@
+/* Import your actual nix-managed mocha colors */
 @import "../../.config/waybar/mocha.css";
 
-/* --- THE MAIN PANEL --- */
-.control-center {
-  background: rgba(30, 30, 46, 0.9);
-  border: 1px solid rgba(180, 190, 254, 0.2);
-  border-radius: 20px;
-  margin: 10px;
-  /* Matching your Waybar glow precisely */
-  box-shadow: 0px 0px 25px 2px rgba(180, 190, 254, 0.35);
-  color: @text;
-}
-
-/* --- THE NOTIFICATION POPUPS --- */
-.notification {
-  background: rgba(30, 30, 46, 0.75);
-  border: 1px solid rgba(180, 190, 254, 0.2);
-  border-radius: 15px;
-  margin: 8px;
-  color: @text;
-}
-
-/* --- PANEL WIDGETS --- */
-.widget-title {
-  color: @lavender;
+* {
   font-family: "FantasqueSansMono Nerd Font Propo";
-  font-size: 20px;
+  font-weight: 700;
+  all: unset;
+
+  /* Matched to your Waybar Pill aesthetic */
+  --border-radius: 24px;
+  --border-radius-pill: 50px;
+  --border-radius-s: 8px;
+  --shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* --- NOTIFICATIONS (Popups) --- */
+.notification {
+  padding: 5px;
+}
+
+.notification-background {
+  background: rgba(30, 30, 46, 0.85); /* @base with transparency */
+  border: 1px solid rgba(180, 190, 254, 0.2);
+  border-radius: var(--border-radius-pill);
+  margin: 8px;
+  padding: 5px 15px;
+}
+
+.notification-content {
+  color: @text;
   margin: 10px;
 }
 
-/* Match your Workspace Buttons */
-.widget-buttons > button {
-  background: @mantle;
-  border-radius: 15px;
+.notification-content .summary {
+  color: @lavender;
+  font-size: 1.1rem;
+}
+
+.notification-content .body {
+  color: @text;
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+/* --- CONTROL CENTER (The Panel) --- */
+.control-center {
+  background: rgba(24, 24, 37, 0.95); /* @mantle */
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(180, 190, 254, 0.2);
+  margin: 0px; /* Leave at 0; config.json handles the 15px screen margin */
+  padding: 10px;
+}
+
+.control-center .notification-background {
+  background: @surface0;
+  border-radius: var(--border-radius);
+}
+
+/* --- WIDGETS --- */
+.widget-dnd {
+  padding: 10px 15px;
+  border-radius: var(--border-radius);
+  background: @surface0;
   color: @text;
   margin: 5px;
 }
 
-.widget-buttons > button:hover {
+.widget-dnd switch {
+  background: @surface1;
+  border-radius: var(--border-radius-s);
+}
+
+.widget-dnd switch:checked {
+  background-color: @lavender;
+}
+
+/* MPRIS (Media Player) */
+.widget-mpris {
+  background: @surface0;
+  border-radius: var(--border-radius);
+  padding: 10px;
+  margin: 5px;
+}
+
+.widget-mpris-title {
+  color: @lavender;
+  font-size: 1.1rem;
+}
+
+/* Buttons Grid (The Toggles) */
+.widget-buttons-grid {
+  background: @surface0;
+  border-radius: var(--border-radius);
+  padding: 10px;
+  margin: 5px;
+}
+
+.widget-buttons-grid button {
+  background: @surface1;
+  border-radius: 12px;
+  margin: 5px;
+  padding: 10px;
+}
+
+.widget-buttons-grid button:hover {
   background: @lavender;
+}
+
+.widget-buttons-grid button:hover label {
   color: @crust;
 }
 
-/* --- CRITICAL: THE BLUR SHAPE --- */
-/* This ensures the 'frost' effect follows the rounded corners */
-.control-center,
-.notification {
-  box-shadow: 0px 0px 25px 2px rgba(180, 190, 254, 0.35);
+/* Volume/Backlight Sliders */
+.widget-volume,
+.widget-backlight {
+  background: @surface0;
+  border-radius: var(--border-radius);
+  padding: 10px;
+  margin: 5px;
+}
+
+.widget-volume highlight,
+.widget-backlight highlight {
+  background: @lavender;
+}
+
+.widget-volume trough,
+.widget-backlight trough {
+  background: @surface1;
+}
+
+/* Close/Clear Buttons */
+.control-center-list-placeholder {
+  color: @overlay0;
+  font-size: 1.2rem;
+}
+
+.blank-window {
+  background: transparent;
 }

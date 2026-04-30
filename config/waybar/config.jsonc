@@ -4,8 +4,8 @@
         "height": 30,
         "spacing": 0,
         "margin-top": 5,
-        "margin-left": 10,
-        "margin-right": 10,
+        "margin-left": 5,
+        "margin-right": 13,
         "modules-left": [
                 "ext/workspaces"
         ],
@@ -13,12 +13,11 @@
                 "hyprland/window"
         ],
         "modules-right": [
-                "backlight",
-                "battery",
                 "tray",
                 "network",
                 "bluetooth",
-                "clock"
+                "clock",
+                "battery"
         ],
         "ext/workspaces": {
                 "disable-scroll": true,
@@ -117,8 +116,7 @@
                         "󰤨"
                 ],
                 "min-length": 2,
-                "on-click": "kitty -e ~/.config/scripts/network",
-                "on-click-right": "~/.config/scripts/network off",
+                "on-click": "kitty --class nmtui -T nmtui -e nmtui",
                 "tooltip-format": "<b>Gateway</b>: {gwaddr}",
                 "tooltip-format-ethernet": "<b>Interface</b>: {ifname}",
                 "tooltip-format-wifi": "<b>Network</b>: {essid}\n<b>IP Addr</b>: {ipaddr}/{cidr}\n<b>Strength</b>: {signalStrength}%\n<b>Frequency</b>: {frequency} GHz",
@@ -132,8 +130,8 @@
                 "format-on": "󰂰",
                 "format-connected": "󰂱",
                 "min-length": 2,
-                "on-click": "kitty -e ~/.config/scripts/bluetooth",
-                "on-click-right": "~/.config/scripts/bluetooth off",
+                "on-click": "kitty --class bluetui -T bluetui -e bluetui",
+                "on-click-right": "rfkill toggle bluetooth",
                 "tooltip-format": "Device Addr: {device_address}",
                 "tooltip-format-disabled": "Bluetooth Disabled",
                 "tooltip-format-off": "Bluetooth Off",
