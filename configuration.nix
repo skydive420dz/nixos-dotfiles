@@ -12,10 +12,7 @@
 
   imports = [
     /etc/nixos/hardware-configuration.nix
-    ./modules/nvim.nix
-    ./modules/audio-config.nix
-    ./modules/nvidia.nix
-    ./modules/boot.nix
+    ./modules
   ];
 
   # ============================================
