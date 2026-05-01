@@ -228,6 +228,10 @@
           };
           fastaction.enable = true;
         };
+        dashboard = {
+          dashboard-nvim.enable = false;
+          alpha.enable = true;
+        };
 
         session.nvim-session-manager.enable = false;
         gestures.gesture-nvim.enable = false;

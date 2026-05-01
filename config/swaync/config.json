@@ -48,11 +48,11 @@
         },
         {
           "label": "",
-          "command": "kitty --class btop -T btop -e btop; swaync-client -cp"
+          "command": "kitty --class btop_float -T btop_float -e btop; swaync-client -cp"
         },
         {
           "label": "󰍹",
-          "command": "kitty --class nvtop -T nvtop -e nvtop; swaync-client -cp"
+          "command": "kitty --class nvtop_float -T nvtop_float -e nvtop; swaync-client -cp"
         },
         {
           "label": "",
