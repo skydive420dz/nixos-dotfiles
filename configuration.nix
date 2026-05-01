@@ -14,6 +14,7 @@
     /etc/nixos/hardware-configuration.nix
     ./modules/nvim.nix
     ./modules/audio-config.nix
+    ./modules/nvidia.nix
   ];
 
   # ============================================
@@ -26,12 +27,6 @@
       verbose = false;
       systemd.enable = true;
     };
-    kernelModules = [
-      "nvidia"
-      "nvidia_modeset"
-      "nvidia_uvm"
-      "nvidia_drm"
-    ];
     # Plymouth boot splash screen
     plymouth = {
       enable = true;
@@ -60,8 +55,6 @@
       "splash"
       "loglevel=0" # Changed from 0 to 3 to effectively hide 'Info/Warning' text
       "acpi_os=linux"
-      "nvidia-drm.modeset=1"
-      "nvidia-drm.fbdev=1" # The flicker killer
       "acpi_enforce_resources=lax"
       "acpi.log_level=0"
       "acpi=ht"
@@ -74,7 +67,6 @@
       "printk.devkmsg=off"
       "fbcon=vc:2-6" # Ensures splash stays until Hyprland is ready
       "fbcon=nodefer"
-      "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
     ];
   };
 
@@ -104,44 +96,12 @@
   # HARDWARE CONFIGURATION
   # ============================================
 
-  # GPU & Graphics
-  hardware = {
-    graphics = {
-      enable = true;
-      enable32Bit = true;
-    };
-
-    # NVIDIA GPU with Prime (hybrid graphics)
-    nvidia = {
-      package = config.boot.kernelPackages.nvidiaPackages.latest;
-      nvidiaPersistenced = true;
-      powerManagement = {
-        enable = false;
-        finegrained = false;
-      };
-      modesetting.enable = true;
-      open = false;
-      nvidiaSettings = true;
-      prime = {
-        sync.enable = true;
-        amdgpuBusId = "PCI:5:0:0";
-        nvidiaBusId = "PCI:1:0:0";
-        offload = {
-          enable = false;
-          enableOffloadCmd = false;
-        };
-      };
-    };
-
-    # Bluetooth support
-    bluetooth = {
-      enable = true;
-      powerOnBoot = true; # Ensures the controller is active for the UI
-      settings.General.Experimental = true; # Often required for modern BLE devices
-    };
+  # Bluetooth support
+  bluetooth = {
+    enable = true;
+    powerOnBoot = true; # Ensures the controller is active for the UI
+    settings.General.Experimental = true; # Often required for modern BLE devices
   };
-
-  services.xserver.videoDrivers = [ "nvidia" ];
 
   # ============================================
   # POWER MANAGEMENT
