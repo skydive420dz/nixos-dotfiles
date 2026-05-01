@@ -13,6 +13,7 @@
   imports = [
     /etc/nixos/hardware-configuration.nix
     ./modules/nvim.nix
+    ./modules/audio-config.nix
   ];
 
   # ============================================
@@ -73,7 +74,6 @@
       "printk.devkmsg=off"
       "fbcon=vc:2-6" # Ensures splash stays until Hyprland is ready
       "fbcon=nodefer"
-
       "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
     ];
   };
@@ -154,24 +154,6 @@
     settings = {
       STOP_CHARGE_THRESH_BAT1 = 90;
       START_CHARGE_THRESH_BAT1 = 75;
-    };
-  };
-
-  # ============================================
-  # AUDIO CONFIGURATION
-  # ============================================
-
-  security.rtkit.enable = true;
-
-  services.pipewire = {
-    enable = true;
-    pulse.enable = true;
-    extraConfig = {
-      pipewire."99-silent-bell.conf" = {
-        "context.properties" = {
-          "module.x11.bell" = false;
-        };
-      };
     };
   };
 
@@ -301,6 +283,7 @@
 
   environment.systemPackages = with pkgs; [
     # Core utilities
+    alsa-ucm-conf
     libinput
     tmux
     vim
