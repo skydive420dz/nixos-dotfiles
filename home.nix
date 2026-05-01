@@ -11,6 +11,7 @@
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
+    wiremix
     kitty
     btop
     nvtopPackages.full
@@ -164,6 +165,8 @@
       targets = [ "graphical-session.target" ]; # UWSM reaches this target
     };
   };
+
+  services.swayosd.enable = true;
 
   wayland.windowManager.hyprland = {
     enable = true;

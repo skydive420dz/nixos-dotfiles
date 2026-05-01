@@ -192,8 +192,32 @@
   # INPUT DEVICES
   # ============================================
 
-  services.libinput.enable = true;
+  # In your system configuration.nix
+
+  # 1. Ensure the package is available for D-Bus to find its definitions
+  services.dbus.packages = [ pkgs.swayosd ];
+
+  # 2. Add the explicit policy to allow the backend to talk to the server
+  services.dbus.implementation = "broker"; # Optional: 'broker' is more robust for modern NixOS
   services.udev.packages = [ pkgs.swayosd ];
+
+  systemd.services.swayosd-libinput-backend = {
+    description = "SwayOSD Libinput Backend";
+    # Ensures it waits for the hardware and basic system to be ready
+    after = [
+      "udev.service"
+      "multi-user.target"
+    ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.swayosd}/bin/swayosd-libinput-backend";
+      Restart = "on-failure";
+      RestartSec = "3s"; # Wait 5 seconds before retrying to avoid the start-limit-hit
+    };
+  };
+
+  services.libinput.enable = true;
   # ============================================
   # DISPLAY SERVER & WINDOW MANAGER
   # ============================================
@@ -218,6 +242,7 @@
     isNormalUser = true;
     shell = pkgs.zsh;
     extraGroups = [
+      "networkmanager"
       "wheel"
       "video"
       "input"
@@ -276,6 +301,7 @@
 
   environment.systemPackages = with pkgs; [
     # Core utilities
+    libinput
     tmux
     vim
     lshw

@@ -9,6 +9,7 @@ in
     # Bulk link whole directories
     ".config/waybar".source = link "config/waybar";
     ".config/kitty".source = link "config/kitty";
+    ".config/swayosd".source = link "config/swayosd";
     ".config/yazi".source = link "config/yazi";
     ".config/qutebrowser".source = link "config/qutebrowser";
 

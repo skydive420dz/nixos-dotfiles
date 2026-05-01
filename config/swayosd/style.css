@@ -1,0 +1,27 @@
+/* Target the main OSD window and its GTK frame */
+window#osd,
+.window-frame {
+  background: rgba(30, 30, 46, 0.2);
+  border: 2px solid rgba(180, 190, 254, 0.3);
+  border-radius: 15px;
+
+  /* These three lines disable the "bleeding" shadow */
+  box-shadow: none;
+  text-shadow: none;
+  margin: 0;
+}
+
+image,
+label {
+  color: #cdd6f4;
+}
+
+trough {
+  background: rgba(49, 50, 68, 0.3);
+  border-radius: 15px;
+}
+
+highlight {
+  background: rgba(137, 180, 250, 0.3);
+  border-radius: 15px;
+}
