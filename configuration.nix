@@ -20,10 +20,13 @@
   # ============================================
 
   # Bluetooth support
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true; # Ensures the controller is active for the UI
-    settings.General.Experimental = true; # Often required for modern BLE devices
+  hardware = {
+    bluetooth = {
+      enable = true;
+      powerOnBoot = true; # Ensures the controller is active for the UI
+      settings.General.Experimental = true; # Often required for modern BLE devices
+    };
+
   };
 
   # ============================================
@@ -202,6 +205,7 @@
     bluez-tools
     brightnessctl
     bluetui
+    openrazer-daemon
 
     # System administration
     protonup-ng
