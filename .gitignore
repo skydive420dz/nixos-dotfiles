@@ -1,0 +1,14 @@
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor / OS junk
+*.swp
+*.swo
+.DS_Store
+*~
+
+# Build artifacts
+result
+result-*
