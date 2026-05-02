@@ -19,15 +19,19 @@
 #
 # Device priority ladder (session):
 #   4000 — bluetooth output  (wins as default sink when connected)
-#   3500 — pink jack mic + board output  (system defaults when no BT)
+#   3500 — pink jack mic + laptop output  (defaults when no BT)
 #    500 — bluetooth mic  (selectable in WireMix, never auto-steals)
 #
-# Bluetooth control surface:
-#   Volume keys     → follow default sink → follow connected BT device
-#   Device volume   → synced via bluez5.enable-hw-volume (absolute volume)
-#   Tap/squeeze/    → AVRCP → mpris-proxy → MPRIS → media player
-#     skip controls
-#   Battery report  → BlueZ Experimental (AirPods, Sony, etc.)
+# Bluetooth:
+#   GLOBAL properties (codecs, roles, enable-hw-volume) intentionally left
+#   at NixOS / PipeWire defaults. Earlier attempts to set them via
+#   wireplumber.extraConfig broke HFP profile registration on this setup
+#   (failed to get HFP codec 127). Per-node priority overrides (via
+#   monitor.bluez.rules) are safe and used below.
+#
+#   On-device controls (tap/squeeze/skip) are bridged to MPRIS by the
+#   bluez-shipped mpris-proxy.service, enabled per user with
+#   `systemctl --user enable --now mpris-proxy`.
 
 { config, pkgs, ... }:
 
@@ -35,32 +39,10 @@
   hardware.enableAllFirmware = true; # ALC256 / Ryzen HDA firmware blobs
   security.rtkit.enable = true; # Real-time scheduling for PipeWire
 
-  # ── Bluetooth stack ────────────────────────────────────────────────────────
-  # Experimental = battery reporting for AirPods and similar.
-  # KernelExperimental = better codec negotiation and reconnect behaviour.
-  # ControllerMode dual = ensures AVRCP version supporting absolute volume.
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
-    settings = {
-      General = {
-        Experimental = true;
-        KernelExperimental = true;
-        ControllerMode = "dual";
-      };
-    };
   };
-
-  # ── mpris-proxy ────────────────────────────────────────────────────────────
-  # Bridges Bluetooth AVRCP transport commands (tap/squeeze/skip from the
-  # device) to the MPRIS D-Bus interface used by Spotify, Firefox, mpv, etc.
-  # Without this, in-ear/on-ear controls do nothing on Linux.
-  #
-  # bluez already ships a user unit at:
-  #   $out/etc/systemd/user/mpris-proxy.service
-  # so we don't redefine it here (a duplicate ExecStart breaks the unit).
-  # Enable it once per user with:
-  #   systemctl --user enable --now mpris-proxy
 
   services.pipewire = {
     enable = true;
@@ -73,6 +55,10 @@
     wireplumber.extraConfig = {
 
       # ── 10: ALSA device/node rules ─────────────────────────────────────────
+      # Scoped strictly to the ALC256 card. No BT rules here — those would
+      # never match anyway (BT nodes come from monitor.bluez, not monitor.alsa)
+      # and earlier attempts to customize BT via wireplumber.extraConfig broke
+      # HFP profile registration on this hardware.
       "10-hardware-nodes" = {
         "monitor.alsa.rules" = [
 
@@ -98,7 +84,6 @@
           # ── Pink jack — mic input ─────────────────────────────────────────
           # The only mic source on this laptop.
           # Available when a mic or TRRS headset is plugged into the pink jack.
-          # System default source — WireMix shows it at the top of the list.
           {
             matches = [
               { "node.name" = "alsa_input.pci-0000_05_00.6.analog-stereo"; }
@@ -127,34 +112,31 @@
       };
 
       # ── 10: Bluetooth node rules ───────────────────────────────────────────
-      # BlueZ nodes come from monitor.bluez, NOT monitor.alsa — they need
-      # their own rules block. Putting BT matches inside monitor.alsa.rules
-      # silently does nothing (the rules never run against BlueZ nodes),
-      # leaving them at the WirePlumber default priority of ~1010.
-      "10-bluetooth-nodes" = {
+      # BlueZ nodes come from monitor.bluez, NOT monitor.alsa.
+      #
+      # IMPORTANT: this block uses monitor.bluez.RULES (per-node property
+      # overrides) which is safe. Do NOT add monitor.bluez.PROPERTIES here —
+      # that path (used to set bluez5.codecs / bluez5.roles / etc.) broke HFP
+      # profile registration on this hardware. Keep BT global properties at
+      # NixOS / PipeWire defaults.
+      "10-bluetooth-priority" = {
         "monitor.bluez.rules" = [
 
-          # ── Bluetooth audio outputs ───────────────────────────────────────
-          # Priority 4000 — any connected BT output wins as the default sink.
-          # This means volume keys, media controls, and new streams all
-          # automatically follow the BT device. When it disconnects, the
-          # laptop output (priority 3500) takes over again.
-          #
-          # absolute-volume = true → device-side volume (AirPods crown,
-          # headphone +/- buttons) syncs with the system slider.
+          # Any connected BT output wins as the default sink.
+          # Priority 4000 > laptop output's 3500, so volume keys, media
+          # controls, and new streams automatically follow the BT device.
+          # When the BT device disconnects, the laptop output takes over.
           {
             matches = [
               { "node.name" = "~bluez_output.*"; }
             ];
             actions.update-props = {
               "priority.session" = 4000;
-              "bluez5.a2dp.absolute-volume" = true;
             };
           }
 
-          # ── Bluetooth mic inputs ──────────────────────────────────────────
-          # Appear in WireMix when a BT headset connects.
-          # Priority 500 — never auto-steal the default source.
+          # BT mics stay below the pink jack mic so they never auto-steal
+          # the default source. Selectable in WireMix when needed.
           {
             matches = [
               { "node.name" = "~bluez_input.*"; }
@@ -165,53 +147,6 @@
           }
 
         ];
-      };
-
-      # ── 10: Bluetooth codec policy ────────────────────────────────────────
-      "10-bluetooth-codecs" = {
-        "monitor.bluez.properties" = {
-          # Negotiation order: AAC first (best for AirPods), then SBC-XQ,
-          # then standard SBC. mSBC/CVSD are for HFP voice calls only.
-          "bluez5.codecs" = [
-            "aac"
-            "sbc_xq"
-            "sbc"
-            "msbc"
-            "cvsd"
-          ];
-
-          # Sync hardware volume with desktop OSD / volume keys
-          "bluez5.enable-hw-volume" = true;
-
-          "bluez5.roles" = [
-            "a2dp_sink" # receive high-quality stereo (AirPods as output)
-            "a2dp_source" # send audio to a BT speaker
-            "hsp_hs" # headset profile (mono audio + mic)
-            "hsp_ag"
-            "hfp_hf" # hands-free / call mic
-            "hfp_ag"
-          ];
-        };
-      };
-
-      # ── 11: Bluetooth session policy ──────────────────────────────────────
-      "11-bluetooth-policy" = {
-        "wireplumber.settings" = {
-          # Offer headset profile (mic enabled) immediately on BT connect
-          # so the BT mic appears in WireMix without manual profile switching.
-          "bluetooth.autoswitch-to-headset-profile" = true;
-        };
-      };
-
-      # ── 99: Persistent defaults ───────────────────────────────────────────
-      # Uses node NAMES not IDs — stable across reboots.
-      # Pink jack = default source (available when mic plugged in).
-      # Board output = default sink (headphones auto-switch at hardware level).
-      "99-defaults" = {
-        "wireplumber.settings" = {
-          "default.audio.source" = "alsa_input.pci-0000_05_00.6.analog-stereo";
-          "default.audio.sink" = "alsa_output.pci-0000_05_00.6.analog-stereo";
-        };
       };
 
     };

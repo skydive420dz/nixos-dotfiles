@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Usage: waybar-toggle <window-class> <command...>
+# If a window with the given class is open, close it.
+# Otherwise, run the command to open it.
+
+class="$1"
+shift
+
+if hyprctl clients -j | jq -e --arg c "$class" '.[] | select(.class == $c)' >/dev/null; then
+    hyprctl dispatch closewindow "class:$class"
+else
+    "$@" &
+fi
