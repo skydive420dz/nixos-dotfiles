@@ -19,16 +19,6 @@
   # HARDWARE CONFIGURATION
   # ============================================
 
-  # Bluetooth support
-  hardware = {
-    bluetooth = {
-      enable = true;
-      powerOnBoot = true; # Ensures the controller is active for the UI
-      settings.General.Experimental = true; # Often required for modern BLE devices
-    };
-
-  };
-
   # ============================================
   # POWER MANAGEMENT
   # ============================================
@@ -59,8 +49,6 @@
   # ============================================
   # INPUT DEVICES
   # ============================================
-
-  # In your system configuration.nix
 
   # 1. Ensure the package is available for D-Bus to find its definitions
   services.dbus.packages = [ pkgs.swayosd ];
@@ -114,7 +102,7 @@
       "wheel"
       "video"
       "input"
-    ]; # sudo access
+    ];
     packages = with pkgs; [
       tree
     ];
@@ -128,7 +116,7 @@
 
   # Terminal & Shell
   environment.sessionVariables = {
-    STEAM_EXTRA_COMPAT_TOOLS_PATHS = "~./steam/root/compatibilitytools.d";
+    STEAM_EXTRA_COMPAT_TOOLS_PATHS = "~/.steam/root/compatibilitytools.d";
   };
 
   # Gaming

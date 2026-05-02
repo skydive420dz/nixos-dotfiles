@@ -42,6 +42,7 @@
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
+    settings.General.Experimental = true; # Often required for modern BLE devices
   };
 
   services.pipewire = {
