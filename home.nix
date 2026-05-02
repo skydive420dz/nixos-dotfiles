@@ -27,6 +27,7 @@
     vesktop
     swaynotificationcenter
     swayosd
+    powertop
     # ... any other apps you want installed
   ];
 
@@ -37,24 +38,6 @@
     ./modules/links.nix
     ./modules/rofi.nix
   ];
-
-  # --- SHELL CONFIGURATION (BASH) ---
-  programs.bash = {
-    enable = true;
-    shellAliases = {
-      btw = "echo I use nixos, btw";
-      nrs = "sudo nixos-rebuild switch --impure --flake ~/nixos-dotfiles#nixos";
-      vim = "nvim";
-    };
-    initExtra = ''
-      [ -f "$HOME/.openai_key" ] && source "$HOME/.openai_key"
-    '';
-    profileExtra = ''
-      if uwsm check may-start; then
-        exec uwsm start hyprland-uwsm.desktop > /dev/null 2>&1
-      fi
-    '';
-  };
 
   # --- SHELL CONFIGURATION (ZSH) ---
   programs.zsh = {
