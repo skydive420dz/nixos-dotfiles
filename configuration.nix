@@ -167,9 +167,10 @@
     ripgrep
     fd
     tree-sitter
+    wl-clip-persist
+    cliphist
 
     # Terminal & UI
-    lynx
     fzf
 
     # Development tools
