@@ -12,3 +12,4 @@ __pycache__/
 # Build artifacts
 result
 result-*
+./config/qutebrowser/autoconfig.yml
