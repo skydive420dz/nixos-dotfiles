@@ -205,7 +205,6 @@
     bluez-tools
     brightnessctl
     bluetui
-    openrazer-daemon
 
     # System administration
     protonup-ng

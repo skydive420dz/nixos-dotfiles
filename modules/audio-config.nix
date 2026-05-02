@@ -18,14 +18,49 @@
 #   No always-on mic exists on this hardware
 #
 # Device priority ladder (session):
-#   3500 — pink jack mic + board output  (system defaults)
-#    500 — bluetooth in/out              (selectable in WireMix, never auto-steals)
+#   4000 — bluetooth output  (wins as default sink when connected)
+#   3500 — pink jack mic + board output  (system defaults when no BT)
+#    500 — bluetooth mic  (selectable in WireMix, never auto-steals)
+#
+# Bluetooth control surface:
+#   Volume keys     → follow default sink → follow connected BT device
+#   Device volume   → synced via bluez5.enable-hw-volume (absolute volume)
+#   Tap/squeeze/    → AVRCP → mpris-proxy → MPRIS → media player
+#     skip controls
+#   Battery report  → BlueZ Experimental (AirPods, Sony, etc.)
 
 { config, pkgs, ... }:
 
 {
   hardware.enableAllFirmware = true; # ALC256 / Ryzen HDA firmware blobs
   security.rtkit.enable = true; # Real-time scheduling for PipeWire
+
+  # ── Bluetooth stack ────────────────────────────────────────────────────────
+  # Experimental = battery reporting for AirPods and similar.
+  # KernelExperimental = better codec negotiation and reconnect behaviour.
+  # ControllerMode dual = ensures AVRCP version supporting absolute volume.
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = {
+      General = {
+        Experimental = true;
+        KernelExperimental = true;
+        ControllerMode = "dual";
+      };
+    };
+  };
+
+  # ── mpris-proxy ────────────────────────────────────────────────────────────
+  # Bridges Bluetooth AVRCP transport commands (tap/squeeze/skip from the
+  # device) to the MPRIS D-Bus interface used by Spotify, Firefox, mpv, etc.
+  # Without this, in-ear/on-ear controls do nothing on Linux.
+  #
+  # bluez already ships a user unit at:
+  #   $out/etc/systemd/user/mpris-proxy.service
+  # so we don't redefine it here (a duplicate ExecStart breaks the unit).
+  # Enable it once per user with:
+  #   systemctl --user enable --now mpris-proxy
 
   services.pipewire = {
     enable = true;
@@ -88,6 +123,35 @@
             };
           }
 
+        ];
+      };
+
+      # ── 10: Bluetooth node rules ───────────────────────────────────────────
+      # BlueZ nodes come from monitor.bluez, NOT monitor.alsa — they need
+      # their own rules block. Putting BT matches inside monitor.alsa.rules
+      # silently does nothing (the rules never run against BlueZ nodes),
+      # leaving them at the WirePlumber default priority of ~1010.
+      "10-bluetooth-nodes" = {
+        "monitor.bluez.rules" = [
+
+          # ── Bluetooth audio outputs ───────────────────────────────────────
+          # Priority 4000 — any connected BT output wins as the default sink.
+          # This means volume keys, media controls, and new streams all
+          # automatically follow the BT device. When it disconnects, the
+          # laptop output (priority 3500) takes over again.
+          #
+          # absolute-volume = true → device-side volume (AirPods crown,
+          # headphone +/- buttons) syncs with the system slider.
+          {
+            matches = [
+              { "node.name" = "~bluez_output.*"; }
+            ];
+            actions.update-props = {
+              "priority.session" = 4000;
+              "bluez5.a2dp.absolute-volume" = true;
+            };
+          }
+
           # ── Bluetooth mic inputs ──────────────────────────────────────────
           # Appear in WireMix when a BT headset connects.
           # Priority 500 — never auto-steal the default source.
@@ -97,20 +161,6 @@
             ];
             actions.update-props = {
               "priority.session" = 500;
-              "node.description" = "Bluetooth mic";
-            };
-          }
-
-          # ── Bluetooth audio outputs ───────────────────────────────────────
-          # Appear in WireMix when a BT device connects.
-          # Priority 500 — never auto-steal the default sink.
-          {
-            matches = [
-              { "node.name" = "~bluez_output.*"; }
-            ];
-            actions.update-props = {
-              "priority.session" = 500;
-              "node.description" = "Bluetooth audio";
             };
           }
 
