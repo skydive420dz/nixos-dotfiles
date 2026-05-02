@@ -158,19 +158,38 @@
     enable = true;
     systemd.enable = false;
     settings = {
-      monitorv2 = {
-        output = "eDP-1";
-        mode = "1920x1080@144";
-        position = "0x0";
-        scale = 1;
-        bitdepth = 10;
-        cm = "hdr";
-        sdrbrightness = 0.7;
-        sdrsaturation = 1.11;
-        supports_wide_color = 1;
-        sdr_min_luminance = 0.001;
-        sdr_max_luminance = 400;
-      };
+      monitorv2 = [
+        {
+          output = "eDP-1";
+          mode = "1920x1080@144";
+          position = "0x0";
+          scale = 1;
+          bitdepth = 10;
+          cm = "hdr";
+          sdrbrightness = 0.7;
+          sdrsaturation = 1.11;
+          supports_wide_color = 1;
+          sdr_min_luminance = 0.001;
+          sdr_max_luminance = 400;
+          vrr = 1;
+          supports_hdr = 0;
+        }
+        {
+          output = "HDMI-A-1";
+          mode = "3440x1440@100";
+          position = "1920x0";
+          scale = 1;
+          bitdepth = 10;
+          cm = "hdr";
+          sdrbrightness = 0.86;
+          sdrsaturation = 1.3;
+          supports_wide_color = 1;
+          supports_hdr = 1;
+          sdr_min_luminance = 0.001;
+          sdr_max_luminance = 400;
+          vrr = 1;
+        }
+      ];
     };
     extraConfig = ''
       source = ~/.config/hypr/mocha.conf
@@ -192,7 +211,7 @@
     # --- GPU Selection (Aquamarine/Hyprland) ---
     # This tells Hyprland to use the NVIDIA card (card1) as the primary renderer.
     # If you get a black screen, swap the order to "/dev/dri/card0:/dev/dri/card1"
-    AQ_DRM_DEVICES = "/dev/dri/card2:/dev/dri/card1";
+    AQ_DRM_DEVICES = "/dev/dri/card0:/dev/dri/card1";
 
     # --- Wayland Fixes ---
     NVD_BACKEND = "direct"; # Better performance for NVIDIA on Wayland
