@@ -11,6 +11,7 @@
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
+    grimblast
     jq
     wiremix
     kitty
@@ -115,6 +116,7 @@
     settings = {
       add_newline = false;
       format = "$directory$git_branch$nix_shell$character";
+
       nix_shell = {
         symbol = "❄️ ";
         format = "via [$symbol]($style) ";
@@ -213,5 +215,18 @@
     NVD_BACKEND = "direct"; # Better performance for NVIDIA on Wayland
     ELECTRON_OZONE_PLATFORM_HINT = "auto"; # Fixes flickering in Discord/VSCode
 
+  };
+  xdg.userDirs = {
+    enable = true;
+    createDirectories = true;
+    setSessionVariables = true; # keeps legacy behavior, silences warning
+    desktop = "${config.home.homeDirectory}/Desktop";
+    documents = "${config.home.homeDirectory}/Documents";
+    download = "${config.home.homeDirectory}/Downloads";
+    music = "${config.home.homeDirectory}/Music";
+    pictures = "${config.home.homeDirectory}/Pictures";
+    publicShare = "${config.home.homeDirectory}/Public";
+    templates = "${config.home.homeDirectory}/Templates";
+    videos = "${config.home.homeDirectory}/Videos";
   };
 }
