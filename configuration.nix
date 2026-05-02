@@ -30,13 +30,13 @@
   # POWER MANAGEMENT
   # ============================================
 
-  powerManagement.cpuFreqGovernor = "performance";
-
   services.tlp = {
     enable = true;
     settings = {
       STOP_CHARGE_THRESH_BAT1 = 90;
       START_CHARGE_THRESH_BAT1 = 75;
+      CPU_SCALING_GOVERNOR_ON_AC = "performance";
+      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
     };
   };
 
@@ -125,7 +125,7 @@
 
   # Terminal & Shell
   environment.sessionVariables = {
-    STEAM_EXTRA_COMPAT_TOOLS_PATHS = "~.steam/root/compatibilitytools.d";
+    STEAM_EXTRA_COMPAT_TOOLS_PATHS = "~./steam/root/compatibilitytools.d";
   };
 
   # Gaming
@@ -166,7 +166,6 @@
 
   environment.systemPackages = with pkgs; [
     # Core utilities
-    alsa-ucm-conf
     libinput
     tmux
     vim
@@ -176,7 +175,6 @@
     neovim
     ripgrep
     fd
-    tree
     tree-sitter
 
     # Terminal & UI

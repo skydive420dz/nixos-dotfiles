@@ -1,3 +1,8 @@
+// ============================================
+// WAYBAR CONFIGURATION
+// ============================================
+// Unused modules (cpu, temperature, backlight, custom/sep) kept at
+// the bottom as a library — add to modules-right to enable.
 {
         "layer": "top",
         "position": "top",
@@ -6,6 +11,8 @@
         "margin-top": 5,
         "margin-left": 5,
         "margin-right": 13,
+        // asymmetric margins intentional — compensates for visual weight of right pill
+        // ── Layout ───────────────────────────────────────────────────────────────
         "modules-left": [
                 "ext/workspaces"
         ],
@@ -14,11 +21,19 @@
         ],
         "modules-right": [
                 "tray",
+                // System pill — uncomment to enable
+                // "custom/cpu-combined",
+                // "custom/gpu",
+                // "memory",
+                // "disk",
+                "clock",
+                "custom/weather",
                 "network",
                 "bluetooth",
-                "clock",
+                "wireplumber",
                 "battery"
         ],
+        // ── Active modules ────────────────────────────────────────────────────────
         "ext/workspaces": {
                 "disable-scroll": true,
                 "all-outputs": true,
@@ -54,57 +69,17 @@
                 "format-alt": " {:%d/%m/%Y}",
                 "format": "󱑂 {:%H:%M}"
         },
-        "cpu": {
-                "format": "CPU: {usage}%",
-                "tooltip": false
-        },
-        "temperature": {
-                "critical-threshold": 90,
-                "interval": 10,
-                "format-critical": "󰀦 {temperatureC}°C",
-                "format": " {icon} {temperatureC}°C",
-                "format-icons": [
-                        "󱃃",
-                        "󰔏",
-                        "󱃂"
-                ],
+        "custom/weather": {
+                "exec": "~/.config/scripts/weather",
+                "return-type": "json",
+                "interval": 1800,
+                "format": "{}",
                 "min-length": 8,
-                "tooltip-format": "Temperature in Fahrenheit: {temperatureF}°F"
-        },
-        "battery": {
-                "min-length": 7,
-                "tooltip-format": "<b>Discharging</b>: {time}",
-                "tooltip-format-charging": "<b>Charging</b>: {time}",
-                "states": {
-                        "good": 95,
-                        "warning": 30,
-                        "critical": 15
-                },
-                "format": "{icon} {capacity}%",
-                "format-charging": "󰉁  {capacity}%",
-                "format-plugged": "",
-                "format-alt": "{icon}",
-                "format-icons": [
-                        "󰂎",
-                        "󰁻",
-                        "󰁼",
-                        "󰁽",
-                        "󰁾",
-                        "󰁿",
-                        "󰂀",
-                        "󰂁",
-                        "󰂂",
-                        "󰁹"
-                ],
-                "events": {
-                        "on-discharging-warning": "notify-send 'Battery Low (20%)' -u critical -i 'battery-020' -h string:x-canonical-private-synchronous:battery",
-                        "on-discharging-critical": "notify-send 'Battery Critical (10%)' -u critical -i 'battery-010' -h string:x-canonical-private-synchronous:battery",
-                        "on-charging-100": "notify-send 'Battery Full (100%)' -i 'battery-100-charged' -h string:x-canonical-private-synchronous:battery"
-                }
+                "tooltip": true
         },
         "network": {
-                "format": "󰤨",
                 "interval": 10,
+                "format": "󰤨",
                 "format-ethernet": "󰈀",
                 "format-wifi": "{icon}",
                 "format-disconnected": "󰤯",
@@ -141,6 +116,107 @@
                 "tooltip-format-connected-battery": "Device: {device_alias}\nBattery: {device_battery_percentage}%",
                 "tooltip-format-enumerate-connected-battery": "Device: {device_alias}\nBattery: {device_battery_percentage}%"
         },
+        "wireplumber": {
+                "format": "{icon} {volume}%",
+                "format-muted": "󰖁 muted",
+                "format-icons": [
+                        "󰕿",
+                        "󰖀",
+                        "󰕾"
+                ],
+                "min-length": 8,
+                "on-click": "kitty --class wiremix -T wiremix -e wiremix",
+                "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+                "on-scroll-up": "wpctl set-volume --limit 1.0 @DEFAULT_AUDIO_SINK@ 5%+",
+                "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-",
+                "tooltip-format": "Volume: {volume}%\nDevice: {node_name}"
+        },
+        "battery": {
+                "min-length": 7,
+                "states": {
+                        "good": 95,
+                        "warning": 30,
+                        "critical": 15
+                },
+                "format": "{icon} {capacity}%",
+                "format-charging": "󰉁  {capacity}%",
+                "format-plugged": "", // intentionally empty — clean look at 100% plugged
+                "format-alt": "{icon}",
+                "format-icons": [
+                        "󰂎",
+                        "󰁻",
+                        "󰁼",
+                        "󰁽",
+                        "󰁾",
+                        "󰁿",
+                        "󰂀",
+                        "󰂁",
+                        "󰂂",
+                        "󰁹"
+                ],
+                "tooltip-format": "<b>Discharging</b>: {time}",
+                "tooltip-format-charging": "<b>Charging</b>: {time}",
+                "events": {
+                        "on-discharging-warning": "notify-send 'Battery Low (20%)' -u critical -i 'battery-020' -h string:x-canonical-private-synchronous:battery",
+                        "on-discharging-critical": "notify-send 'Battery Critical (10%)' -u critical -i 'battery-010' -h string:x-canonical-private-synchronous:battery",
+                        "on-charging-100": "notify-send 'Battery Full (100%)' -i 'battery-100-charged' -h string:x-canonical-private-synchronous:battery"
+                }
+        },
+        // ── System pill (disabled — uncomment modules-right entries to enable) ───
+        "custom/cpu-combined": {
+                "exec": "~/.config/scripts/cpu-status",
+                "return-type": "json",
+                "interval": 5,
+                "format": "  {icon} {text}",
+                "format-icons": [
+                        "",
+                        "",
+                        ""
+                ],
+                "min-length": 8,
+                "on-click": "kitty -T btop_float -e btop"
+        },
+        "custom/gpu": {
+                "exec": "~/.config/scripts/gpu",
+                "return-type": "json",
+                "interval": 10,
+                "format": ": {icon} {text}",
+                "format-icons": [
+                        "",
+                        "",
+                        ""
+                ],
+                "min-length": 8,
+                "on-click": "kitty -T nvtop_float -e nvtop"
+        },
+        "memory": {
+                "format": ": {used}GiB",
+                "min-length": 8
+        },
+        "disk": {
+                "interval": 60,
+                "path": "/",
+                "format": "Disk: {free}",
+                "min-length": 14
+        },
+        // ── Inactive modules (available, not wired up) ────────────────────────────
+        "cpu": {
+                "format": "CPU: {usage}%",
+                "tooltip": false
+        },
+        "temperature": {
+                "critical-threshold": 90,
+                "interval": 10,
+                "format-critical": "󰀦 {temperatureC}°C",
+                "format": " {icon} {temperatureC}°C",
+                "format-icons": [
+                        "󱃃",
+                        "󰔏",
+                        "󱃂"
+                ],
+                "min-length": 8,
+                "tooltip-format": "Temperature in Fahrenheit: {temperatureF}°F"
+        },
         "backlight": {
                 "format": "{icon} {percent}%",
                 "format-icons": [
@@ -159,44 +235,8 @@
                 "on-scroll-down": "~/.config/scripts/backlight down",
                 "tooltip-format": "Screen Brightness"
         },
-        "custom/gpu": {
-                "exec": "~/.config/scripts/gpu",
-                "return-type": "json",
-                "interval": 10,
-                "format": ": {icon} {text}",
-                "format-icons": [
-                        "",
-                        "",
-                        ""
-                ],
-                "min-length": 8,
-                "on-click": "kitty -T nvtop_float -e nvtop"
-        },
-        "custom/cpu-combined": {
-                "exec": "~/.config/scripts/cpu-status",
-                "return-type": "json",
-                "interval": 5,
-                "format": "  {icon} {text}",
-                "format-icons": [
-                        "",
-                        "",
-                        ""
-                ],
-                "min-length": 8,
-                "on-click": "kitty -T btop_float -e btop"
-        },
         "custom/sep": {
                 "format": "|",
                 "interval": 0
-        },
-        "memory": {
-                "format": ": {used}GiB",
-                "min-length": 8
-        },
-        "disk": {
-                "interval": 60,
-                "path": "/",
-                "format": "Disk: {free}",
-                "min-length": 14
         }
 }

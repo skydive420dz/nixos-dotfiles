@@ -1,0 +1,64 @@
+
+#!/usr/bin/env bash
+#
+# ============================================
+# WEATHER — waybar custom module
+# ============================================
+# Fetches current conditions from wttr.in and outputs JSON for waybar.
+# wttr.in returns data in ~1s — interval of 1800s (30 min) is plenty.
+#
+# Requires: curl, jq
+# Output: {"text": "icon temp", "tooltip": "full forecast", "class": "weather"}
+
+LOCATION=""  # leave empty to auto-detect from IP, or set e.g. "Atlanta"
+
+DATA=$(curl -sf "https://wttr.in/${LOCATION}?format=j1" 2>/dev/null)
+
+if [[ -z "$DATA" ]]; then
+    echo '{"text": "󰼯 --", "tooltip": "Weather unavailable", "class": "weather-unavailable"}'
+    exit 0
+fi
+
+# Current conditions
+TEMP_C=$(echo "$DATA" | jq -r '.current_condition[0].temp_C')
+TEMP_F=$(echo "$DATA" | jq -r '.current_condition[0].temp_F')
+FEELS_C=$(echo "$DATA" | jq -r '.current_condition[0].FeelsLikeC')
+FEELS_F=$(echo "$DATA" | jq -r '.current_condition[0].FeelsLikeF')
+HUMIDITY=$(echo "$DATA" | jq -r '.current_condition[0].humidity')
+DESC=$(echo "$DATA" | jq -r '.current_condition[0].weatherDesc[0].value')
+WIND_MPH=$(echo "$DATA" | jq -r '.current_condition[0].windspeedMiles')
+CODE=$(echo "$DATA" | jq -r '.current_condition[0].weatherCode')
+
+# Map weather code to icon
+case $CODE in
+    113)           ICON="󰖙" ;;  # Sunny
+    116)           ICON="󰖕" ;;  # Partly cloudy
+    119|122)       ICON="󰖔" ;;  # Cloudy/Overcast
+    143|248|260)   ICON="󰖑" ;;  # Fog/Mist
+    176|293|296|263|266) ICON="󰖗" ;;  # Light rain/drizzle
+    179|323|326)   ICON="󰖘" ;;  # Light snow
+    182|185|281|284|311|314|317|350|377) ICON="󰙿" ;;  # Sleet/freezing
+    200|386|389)   ICON="󰖓" ;;  # Thunder
+    227|230|335|338|371|374) ICON="󰖒" ;;  # Snow
+    299|302|305|308) ICON="󰖖" ;;  # Heavy rain
+    353|356|359|362|365|368) ICON="󰖗" ;;  # Showers
+    395)           ICON="󰖒" ;;  # Heavy snow/thunder
+    *)             ICON="󰖐" ;;  # Unknown
+esac
+
+# 3-day forecast for tooltip
+TOOLTIP="${DESC} — ${TEMP_F}°F (feels ${FEELS_F}°F)\n"
+TOOLTIP+="Humidity: ${HUMIDITY}%   Wind: ${WIND_MPH} mph\n\n"
+TOOLTIP+="Forecast:\n"
+
+for i in 0 1 2; do
+    DAY_DESC=$(echo "$DATA" | jq -r ".weather[$i].hourly[4].weatherDesc[0].value")
+    MAX_F=$(echo "$DATA"   | jq -r ".weather[$i].maxtempF")
+    MIN_F=$(echo "$DATA"   | jq -r ".weather[$i].mintempF")
+    if [[ $i -eq 0 ]]; then DAY="Today";
+    elif [[ $i -eq 1 ]]; then DAY="Tomorrow";
+    else DAY=$(echo "$DATA" | jq -r ".weather[$i].date"); fi
+    TOOLTIP+="${DAY}: ${DAY_DESC} ${MAX_F}°F / ${MIN_F}°F\n"
+done
+
+echo "{\"text\": \"${ICON} ${TEMP_F}°F\", \"tooltip\": \"${TOOLTIP}\", \"class\": \"weather\"}"

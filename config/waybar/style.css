@@ -24,15 +24,17 @@ window#waybar {
 #custom-gpu,
 #disk,
 #clock,
+#custom-weather,
 #network,
 #bluetooth,
+#wireplumber,
 #battery {
-  background-color: rgba(30, 30, 46, 0.5);
+  background-color: alpha(@base, 0.5);
   color: @text;
   min-height: 28px;
   padding: 2px 0px;
-  border-top: 1px solid rgba(180, 190, 254, 0.2);
-  border-bottom: 1px solid rgba(180, 190, 254, 0.2);
+  border-top: 1px solid alpha(@lavender, 0.2);
+  border-bottom: 1px solid alpha(@lavender, 0.2);
 }
 
 /* --- 3. LEFT: WORKSPACES --- */
@@ -40,8 +42,8 @@ window#waybar {
   margin-left: 12px;
   padding: 0 6px;
   border-radius: 50px;
-  border-left: 1px solid rgba(180, 190, 254, 0.2);
-  border-right: 1px solid rgba(180, 190, 254, 0.2);
+  border-left: 1px solid alpha(@lavender, 0.2);
+  border-right: 1px solid alpha(@lavender, 0.2);
 }
 
 #workspaces button {
@@ -65,15 +67,15 @@ window#waybar {
   padding: 0 25px;
   color: @lavender;
   border-radius: 50px;
-  border-left: 1px solid rgba(180, 190, 254, 0.2);
-  border-right: 1px solid rgba(180, 190, 254, 0.2);
+  border-left: 1px solid alpha(@lavender, 0.2);
+  border-right: 1px solid alpha(@lavender, 0.2);
 }
 
-/* --- 5. RIGHT BLOCK 1: SYSTEM PILL (CPU to Disk) --- */
+/* --- 5. RIGHT BLOCK 1: SYSTEM PILL (CPU → GPU → Memory → Disk) --- */
 #custom-cpu-combined {
   margin-left: 20px;
   border-radius: 50px 0 0 50px;
-  border-left: 1px solid rgba(180, 190, 254, 0.2);
+  border-left: 1px solid alpha(@lavender, 0.2);
   padding-left: 15px;
   color: @green;
 }
@@ -87,23 +89,36 @@ window#waybar {
 #custom-gpu {
   color: @peach;
 }
+
 #memory {
   color: @blue;
 }
+
 #disk {
   color: @yellow;
   border-radius: 0 50px 50px 0;
-  border-right: 1px solid rgba(180, 190, 254, 0.2);
+  border-right: 1px solid alpha(@lavender, 0.2);
   padding-right: 15px;
 }
 
-/* --- 6. RIGHT BLOCK 2: THE CONNECTIVITY PILL (Network -> BT -> Clock -> Battery) --- */
-#network {
+/* --- 6. RIGHT BLOCK 2: CONNECTIVITY PILL (Clock → Network → BT → Wiremix → Battery) --- */
+#clock {
   margin-left: 20px;
-  border-radius: 50px 0 0 50px; /* Starts the pill */
-  border-left: 1px solid rgba(180, 190, 254, 0.2);
-  color: @teal;
+  border-radius: 50px 0 0 50px;
+  border-left: 1px solid alpha(@lavender, 0.2);
+  color: @blue;
   padding-left: 15px;
+  padding-right: 10px;
+}
+
+#custom-weather {
+  padding: 0 10px;
+  color: @sky;
+}
+
+#network {
+  padding: 0 10px;
+  color: @teal;
 }
 
 #bluetooth {
@@ -111,14 +126,14 @@ window#waybar {
   color: @teal;
 }
 
-#clock {
+#wireplumber {
   padding: 0 10px;
-  color: @blue;
+  color: @mauve;
 }
 
 #battery {
-  border-radius: 0 50px 50px 0; /* Ends the pill */
-  border-right: 1px solid rgba(180, 190, 254, 0.2);
+  border-radius: 0 50px 50px 0;
+  border-right: 1px solid alpha(@lavender, 0.2);
   color: @teal;
   padding-right: 15px;
   padding-left: 10px;
@@ -129,11 +144,25 @@ window#waybar {
   margin-left: 20px;
   padding: 0 15px;
   border-radius: 50px;
-  border-left: 1px solid rgba(180, 190, 254, 0.2);
-  border-right: 1px solid rgba(180, 190, 254, 0.2);
+  border-left: 1px solid alpha(@lavender, 0.2);
+  border-right: 1px solid alpha(@lavender, 0.2);
 }
 
-/* Empty desktop cleanup */
+/* --- 8. TOOLTIPS --- */
+tooltip {
+  background-color: alpha(@base, 0.9);
+  border: 1px solid alpha(@lavender, 0.2);
+  border-radius: 12px;
+}
+
+tooltip label {
+  font-family: "FantasqueSansMono Nerd Font Propo";
+  font-size: 13px;
+  color: @text;
+  padding: 4px 8px;
+}
+
+/* --- 9. EMPTY DESKTOP CLEANUP --- */
 window#waybar.empty #window {
   background-color: transparent;
   border: none;
