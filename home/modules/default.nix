@@ -5,5 +5,6 @@
     ./theme.nix
     ./email.nix
     ./starship.nix
+    ./firefox.nix
   ];
 }

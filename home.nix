@@ -11,6 +11,7 @@
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
+    python3
     grimblast
     jq
     wiremix
