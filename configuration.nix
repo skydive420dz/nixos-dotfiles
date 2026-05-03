@@ -146,6 +146,7 @@
 
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
+    nerd-fonts.symbols-only
     nerd-fonts.commit-mono
     nerd-fonts.fantasque-sans-mono
     font-awesome

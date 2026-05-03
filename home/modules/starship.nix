@@ -114,23 +114,23 @@
       git_branch = {
         symbol = " ";
         style = "bg:#cba6f7 fg:#1e1e2e";
-        format = "[ $symbol$branch ]($style)";
+        format = "[ $symbol$branch ]($style)";
       };
 
       git_status = {
         style = "bg:#cba6f7 fg:#1e1e2e";
         format = "[ $all_status$ahead_behind]($style)";
-        conflicted = "󱓊 ";
-        ahead = "󱓋 \${count}";
-        behind = "󱓊 \${count}";
-        diverged = "󱓋 \${ahead_count} 󱓊 \${behind_count}";
+        conflicted = "󰞇 ";
+        ahead = "󱓊 \${count}";
+        behind = "󱓋 \${count}";
+        diverged = "󰜘 \${ahead_count} 󰜙 \${behind_count}";
         up_to_date = "󱓏 ";
-        untracked = "󱓋 ";
-        stashed = "󱓊 ";
-        modified = "󱓋 ";
-        staged = "󱓍 ";
-        renamed = "󱓋 ";
-        deleted = "󱓋 ";
+        untracked = "󰋖 ";
+        stashed = "󰉓 ";
+        modified = "󰷈 ";
+        staged = "󰐗 ";
+        renamed = "󰑕 ";
+        deleted = "󰗨 ";
       };
 
       character = {
