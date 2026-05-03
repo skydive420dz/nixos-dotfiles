@@ -167,8 +167,6 @@
     ripgrep
     fd
     tree-sitter
-    wl-clip-persist
-    cliphist
 
     # Terminal & UI
     fzf

@@ -4,5 +4,6 @@
     ./rofi.nix
     ./theme.nix
     ./email.nix
+    ./starship.nix
   ];
 }

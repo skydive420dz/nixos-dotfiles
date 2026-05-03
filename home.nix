@@ -23,6 +23,8 @@
     awww
     libnotify
     wl-clipboard
+    wl-clip-persist
+    cliphist
     waybar
     vesktop
     swaynotificationcenter
@@ -89,20 +91,6 @@
         rm -f -- "$tmp"
       }
     '';
-  };
-
-  programs.starship = {
-    enable = true;
-    enableZshIntegration = true;
-    settings = {
-      add_newline = false;
-      format = "$directory$git_branch$nix_shell$character";
-
-      nix_shell = {
-        symbol = "❄️ ";
-        format = "via [$symbol]($style) ";
-      };
-    };
   };
 
   programs.btop = {
@@ -180,11 +168,11 @@
           bitdepth = 10;
           cm = "hdr";
           sdrbrightness = 0.86;
-          sdrsaturation = 1.3;
+          sdrsaturation = 1.5;
           supports_wide_color = 1;
           supports_hdr = 1;
           sdr_min_luminance = 0.001;
-          sdr_max_luminance = 400;
+          sdr_max_luminance = 250;
           vrr = 1;
         }
       ];
