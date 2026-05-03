@@ -12,6 +12,7 @@ in
     ".config/swayosd".source = link "config/swayosd";
     ".config/yazi".source = link "config/yazi";
     ".config/qutebrowser".source = link "config/qutebrowser";
+    ".config/aerc".source = link "config/aerc";
 
     # Links your scripts folder to ~/.config/scripts
     ".config/scripts".source = link "scripts";

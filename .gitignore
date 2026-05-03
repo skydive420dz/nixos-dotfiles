@@ -12,4 +12,13 @@ __pycache__/
 # Build artifacts
 result
 result-*
-./config/qutebrowser/autoconfig.yml
+
+
+config/qutebrowser/autoconfig.yml
+
+# aerc runtime data
+config/aerc/cache/
+config/aerc/.cache/
+config/aerc/sent/
+config/aerc/postpone/
+config/aerc/state
