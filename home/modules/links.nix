@@ -23,8 +23,5 @@ in
     # Link individual files for SwayNC to avoid the directory conflict
     ".config/swaync/config.json".source = link "config/swaync/config.json";
     ".config/swaync/style.css".source = link "config/swaync/style.css";
-
-    # Link individual files for Zsh to avoid the directory conflict
-    #    ".config/zsh/prompt.zsh".source = link "config/zsh/prompt.zsh";
   };
 }

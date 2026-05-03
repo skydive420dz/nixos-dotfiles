@@ -34,9 +34,7 @@
   programs.git.enable = true;
 
   imports = [
-    ./modules/theme.nix
-    ./modules/links.nix
-    ./modules/rofi.nix
+    ./home/modules
   ];
 
   # --- SHELL CONFIGURATION (ZSH) ---
