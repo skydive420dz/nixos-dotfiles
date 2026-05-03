@@ -31,25 +31,25 @@
 
       format = lib.concatStrings [
         # ── Top row: os | shell | user@host ───────────────────────────────
-        "[](#a6e3a1)"
+        "[](#a6e3a1)"
         "$os"
-        "[](bg:#313244 fg:#a6e3a1)"
+        "[](bg:#313244 fg:#a6e3a1)"
         "$shell"
-        "[](bg:#fab387 fg:#313244)"
+        "[](bg:#fab387 fg:#313244)"
         "$username"
         "$hostname"
-        "[](fg:#fab387)"
+        "[](fg:#fab387)"
 
         # ── Newline before directory pill ─────────────────────────────────
         "\n"
 
         # ── Second row: directory + git ───────────────────────────────────
-        "[](#89b4fa)"
+        "[](#89b4fa)"
         "$directory"
-        "[](fg:#89b4fa bg:#cba6f7)"
+        "[](fg:#89b4fa bg:#cba6f7)"
         "$git_branch"
         "$git_status"
-        "[](fg:#cba6f7)"
+        "[](fg:#cba6f7)"
 
         # ── Newline before prompt character ───────────────────────────────
         "\n"

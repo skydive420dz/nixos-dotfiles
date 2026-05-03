@@ -22,9 +22,6 @@
     psmisc # This provides killall
     awww
     libnotify
-    wl-clipboard
-    wl-clip-persist
-    cliphist
     waybar
     vesktop
     swaynotificationcenter
@@ -100,19 +97,6 @@
       theme_background = false; # Set to true if you want a solid background
     };
   };
-
-  # --- BROWSER CONFIGURATION ---
-
-  #programs.qutebrowser = {
-  #  enable = true;
-  # Custom settings to keep it minimal
-  #    settings = {
-  #      "colors.webpage.preferred_color_scheme" = "dark";
-  #      "tabs.position" = "left"; # Matches your vertical/minimal vibe
-  #    };
-  #};
-
-  # --- DISCORD SETUP ---
 
   # --- HYPRLAND CONFIGURATION ---
 
