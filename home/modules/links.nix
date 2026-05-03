@@ -1,28 +1,53 @@
-{ config, ... }:
+# ============================================
+# DOTFILE LINKS — home-manager
+# ============================================
+# Three tiers:
+#   1. Native home-manager modules → see other home/modules/*.nix
+#      (programs.aerc, programs.kitty, programs.qutebrowser, etc.)
+#   2. xdg.configFile (Nix store, declarative)
+#      Used for stable configs that don't change often. Read-only.
+#      Editing requires rebuild but is fully reproducible.
+#   3. mkOutOfStoreSymlink (live edits, no rebuild)
+#      For files you tweak constantly — keybinds, themes-in-progress,
+#      anything where the rebuild loop slows you down.
+
+{ config, lib, ... }:
 
 let
-  # A helper function to make links cleaner
-  link = path: config.lib.file.mkOutOfStoreSymlink "/home/skydive420dz/nixos-dotfiles/${path}";
+  # Repo root path. Defined once so renames are a one-line change.
+  repoRoot = "/home/skydive420dz/nixos-dotfiles";
+
+  # Helper for live-editable links.
+  link = path: config.lib.file.mkOutOfStoreSymlink "${repoRoot}/${path}";
 in
 {
+  # ── Tier 2: declarative, copied to Nix store ──────────────────────────────
+  # Use `xdg.configFile` instead of `home.file.".config/X"` — it does the
+  # same thing but more idiomatically (XDG-aware path).
+  #
+  # `recursive = true` means each file gets symlinked individually rather
+  # than the whole directory — meaning the *directory itself* stays
+  # writable, so apps that need to write cache/state into it can do so.
+  xdg.configFile = {
+    "swaync/config.json".source = ../../config/swaync/config.json;
+    "swaync/style.css".source = ../../config/swaync/style.css;
+    "hypr/hyprpaper.conf".source = ../../config/hypr/hyprpaper.conf;
+    "hypr/mocha.conf".source = ../../config/hypr/mocha.conf;
+    "swayosd".source = ../../config/swayosd;
+    "rofi".source = ../../config/rofi;
+    "wofi".source = ../../config/wofi;
+    "foot".source = ../../config/foot;
+  };
+
+  # ── Tier 3: live-editable, point at the live repo dir ─────────────────────
+  # Anything you actively iterate on. Edit the file → it's live.
+  # No rebuild needed.
   home.file = {
-    # Bulk link whole directories
     ".config/waybar".source = link "config/waybar";
     ".config/kitty".source = link "config/kitty";
-    ".config/swayosd".source = link "config/swayosd";
     ".config/yazi".source = link "config/yazi";
     ".config/qutebrowser".source = link "config/qutebrowser";
     ".config/aerc".source = link "config/aerc";
-
-    # Links your scripts folder to ~/.config/scripts
     ".config/scripts".source = link "scripts";
-
-    # Specific sub-files for Hyprland
-    ".config/hypr/hyprpaper.conf".source = link "config/hypr/hyprpaper.conf";
-    ".config/hypr/mocha.conf".source = link "config/hypr/mocha.conf";
-
-    # Link individual files for SwayNC to avoid the directory conflict
-    ".config/swaync/config.json".source = link "config/swaync/config.json";
-    ".config/swaync/style.css".source = link "config/swaync/style.css";
   };
 }
