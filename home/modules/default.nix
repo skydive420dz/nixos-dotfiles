@@ -6,5 +6,6 @@
     ./email.nix
     ./starship.nix
     ./firefox.nix
+    ./gnupg.nix
   ];
 }

@@ -23,16 +23,5 @@
     pass
     notmuch
     abook
-    pinentry-curses # ensure a TUI pinentry exists for gpg-agent
   ];
-
-  # gpg-agent under home-manager. Uses curses pinentry so passphrase
-  # prompts stay inside the terminal — no GUI popups required.
-  services.gpg-agent = {
-    enable = true;
-    pinentry.package = pkgs.pinentry-curses;
-    enableSshSupport = false;
-    defaultCacheTtl = 7200; # 2 hours — type passphrase once per session
-    maxCacheTtl = 28800; # 8 hours absolute max
-  };
 }

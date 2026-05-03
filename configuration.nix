@@ -49,11 +49,8 @@
   # ============================================
   # INPUT DEVICES
   # ============================================
-
-  # 1. Ensure the package is available for D-Bus to find its definitions
   services.dbus.packages = [ pkgs.swayosd ];
 
-  # 2. Add the explicit policy to allow the backend to talk to the server
   services.dbus.implementation = "broker"; # Optional: 'broker' is more robust for modern NixOS
   services.udev.packages = [ pkgs.swayosd ];
 
@@ -87,7 +84,6 @@
   # ============================================
   # USER CONFIGURATION
   # ============================================
-
   xdg.portal = {
     enable = true;
     extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
@@ -116,7 +112,7 @@
 
   # Terminal & Shell
   environment.sessionVariables = {
-    STEAM_EXTRA_COMPAT_TOOLS_PATHS = "~/.steam/root/compatibilitytools.d";
+    STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/skydive420dz/.steam/root/compatibilitytools.d";
   };
 
   # Gaming
@@ -127,7 +123,6 @@
   programs.gamemode.enable = true;
 
   # Utilities
-  programs.firefox.enable = true;
   programs.bat.enable = true;
 
   # AI/ML
@@ -183,6 +178,7 @@
     bluetui
 
     # System administration
+    pinentry-gnome3
     protonup-ng
     snip
   ];
