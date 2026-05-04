@@ -11,7 +11,7 @@
 #      For files you tweak constantly — keybinds, themes-in-progress,
 #      anything where the rebuild loop slows you down.
 
-{ config, lib, ... }:
+{ config, ... }:
 
 let
   # Repo root path. Defined once so renames are a one-line change.
@@ -31,12 +31,9 @@ in
   xdg.configFile = {
     "swaync/config.json".source = ../../config/swaync/config.json;
     "swaync/style.css".source = ../../config/swaync/style.css;
-    "hypr/hyprpaper.conf".source = ../../config/hypr/hyprpaper.conf;
     "hypr/mocha.conf".source = ../../config/hypr/mocha.conf;
     "swayosd".source = ../../config/swayosd;
     "rofi".source = ../../config/rofi;
-    "wofi".source = ../../config/wofi;
-    "foot".source = ../../config/foot;
   };
 
   # ── Tier 3: live-editable, point at the live repo dir ─────────────────────

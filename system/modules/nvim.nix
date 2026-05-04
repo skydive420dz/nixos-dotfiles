@@ -1,12 +1,8 @@
 {
-  config,
   pkgs,
-  lib,
   ...
 }:
 {
-  environment.systemPackages = with pkgs; [ ];
-
   programs.nvf = {
     enable = true;
     settings = {

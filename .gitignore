@@ -13,6 +13,7 @@ __pycache__/
 result
 result-*
 
+*.backup
 
 config/qutebrowser/autoconfig.yml
 

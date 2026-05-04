@@ -6,35 +6,36 @@
 }:
 
 {
-  home.username = "skydive420dz";
-  home.homeDirectory = "/home/skydive420dz";
-  home.stateVersion = "25.05";
-
-  home.packages = with pkgs; [
-    python3
-    grimblast
-    jq
-    wiremix
-    kitty
-    btop
-    nvtopPackages.full
-    yazi
-    qutebrowser
-    psmisc # This provides killall
-    awww
-    libnotify
-    waybar
-    vesktop
-    swaynotificationcenter
-    swayosd
-    powertop
-  ];
-
-  programs.git.enable = true;
-
   imports = [
     ./home/modules
   ];
+
+  home = {
+    username = "skydive420dz";
+    homeDirectory = "/home/skydive420dz";
+    stateVersion = "25.05";
+
+    packages = with pkgs; [
+      python3
+      grimblast
+      jq
+      wiremix
+      kitty
+      btop
+      nvtopPackages.full
+      yazi
+      qutebrowser
+      psmisc # This provides killall
+      awww
+      libnotify
+      waybar
+      vesktop
+      swaynotificationcenter
+      swayosd
+      powertop
+    ];
+  };
+  programs.git.enable = true;
 
   # --- SHELL CONFIGURATION (ZSH) ---
   programs.zsh = {
