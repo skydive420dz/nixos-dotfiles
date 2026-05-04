@@ -28,7 +28,6 @@
     swaynotificationcenter
     swayosd
     powertop
-    # ... any other apps you want installed
   ];
 
   programs.git.enable = true;
@@ -55,7 +54,6 @@
       vim = "nvim";
       ls = "ls --color=auto";
       cat = "bat";
-      y = "y"; # Optional: makes the y function feel like a first-class alias
 
       # Monitoring aliases that trigger your Hyprland floating rules
       btop = "kitty --title btop_float -e btop";
@@ -70,9 +68,6 @@
       if [ -f "$HOME/.openai_key" ]; then
         . "$HOME/.openai_key"
       fi
-
-      # 2. Initialize Starship
-      eval "$(starship init zsh)"
 
       # 3. Start Hyprland with UWSM automatically on TTY1
       if uwsm check may-start; then

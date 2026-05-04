@@ -16,10 +16,6 @@
   ];
 
   # ============================================
-  # HARDWARE CONFIGURATION
-  # ============================================
-
-  # ============================================
   # POWER MANAGEMENT
   # ============================================
 
@@ -110,12 +106,11 @@
   # APPLICATIONS & PROGRAMS
   # ============================================
 
-  # Terminal & Shell
+  # Gaming
   environment.sessionVariables = {
     STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/skydive420dz/.steam/root/compatibilitytools.d";
   };
 
-  # Gaming
   programs.steam = {
     enable = true;
     gamescopeSession.enable = true;
@@ -147,10 +142,8 @@
     lshw
     wget
     git
-    neovim
     ripgrep
     fd
-    tree-sitter
 
     # Terminal & UI
     fzf
@@ -178,7 +171,6 @@
     bluetui
 
     # System administration
-    pinentry-gnome3
     protonup-ng
     snip
   ];
