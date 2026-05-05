@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
-import "./theme"
-import "./components"
 
 PanelWindow {
     id: root

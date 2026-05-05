@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell.Io
-import "../theme"
 
 Item {
     id: root

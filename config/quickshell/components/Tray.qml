@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Services.SystemTray
-import "../theme"
 
 Rectangle {
     id: root

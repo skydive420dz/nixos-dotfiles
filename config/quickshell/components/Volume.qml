@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell.Io
 import Quickshell.Services.Pipewire
-import "../theme"
 
 Item {
     id: root
