@@ -133,6 +133,7 @@
           scale = 1;
           bitdepth = 10;
           cm = "hdr";
+          sdr_eotf = "gamma22";
           sdrbrightness = 0.7;
           sdrsaturation = 1.11;
           supports_wide_color = 1;
@@ -148,12 +149,13 @@
           scale = 1;
           bitdepth = 10;
           cm = "hdr";
+          sdr_eotf = "gamma22";
           sdrbrightness = 0.86;
-          sdrsaturation = 1.5;
+          sdrsaturation = 1.6;
           supports_wide_color = 1;
           supports_hdr = 1;
-          sdr_min_luminance = 0.001;
-          sdr_max_luminance = 250;
+          sdr_min_luminance = 0.005;
+          sdr_max_luminance = 450;
           vrr = 1;
         }
       ];

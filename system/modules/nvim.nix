@@ -78,6 +78,9 @@
               enable = true;
               servers = [ "nixd" ];
             };
+            treesitter = {
+              enable = true;
+            };
           };
           toml = {
             enable = true;
@@ -88,6 +91,9 @@
             lsp = {
               enable = true;
               servers = [ "taplo" ];
+            };
+            treesitter = {
+              enable = true;
             };
           };
           rust = {
@@ -111,6 +117,9 @@
               enable = true;
               servers = [ "vscode-json-language-server" ];
             };
+            treesitter = {
+              enable = true;
+            };
           };
           clang.enable = true;
           css = {
@@ -123,6 +132,24 @@
               enable = true;
               servers = [ "vscode-css-language-server" ];
             };
+            treesitter = {
+              enable = true;
+            };
+          };
+          qml = {
+            enable = true;
+            format = {
+              enable = true;
+              type = [ "qmlformat" ];
+            };
+            lsp = {
+              enable = true;
+              servers = [ "qmlls" ];
+            };
+            treesitter = {
+              enable = true;
+            };
+
           };
           java.enable = true;
           lua.enable = true;

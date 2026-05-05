@@ -60,13 +60,13 @@
         disabled = false;
         style = "bg:#a6e3a1 fg:#1e1e2e";
         symbols = {
-          NixOS = "󰜗 NixOS";
-          Macos = " macOS";
-          Ubuntu = " Ubuntu";
-          Arch = " Arch";
-          Debian = " Debian";
-          Fedora = " Fedora";
-          Linux = " Linux";
+          NixOS = " ";
+          Macos = " ";
+          Ubuntu = " ";
+          Arch = "󰣇 ";
+          Debian = " ";
+          Fedora = " ";
+          Linux = " ";
         };
         format = "[ $symbol ]($style)";
       };
@@ -75,7 +75,7 @@
         disabled = false;
         style = "bg:#313244 fg:#cdd6f4";
         bash_indicator = " bash";
-        zsh_indicator = " zsh";
+        zsh_indicator = " zsh";
         fish_indicator = "󰈺 fish";
         unknown_indicator = " sh";
         format = "[ $indicator ]($style)";
@@ -89,7 +89,7 @@
       };
 
       hostname = {
-        ssh_only = false;
+        ssh_only = true;
         style = "bg:#fab387 fg:#1e1e2e";
         format = "[@$hostname ]($style)";
       };
@@ -99,11 +99,10 @@
         format = "[ $path ]($style)";
         truncation_length = 3;
         truncation_symbol = "…/";
-        home_symbol = "󰋜 ~";
+        home_symbol = " ~";
         substitutions = {
-          "/" = "  /";
           "Documents" = " 󰈙 ";
-          "Downloads" = " 󰛀 ";
+          "Downloads" = "  ";
           "Music" = " 󰝚 ";
           "Pictures" = "  ";
           "Videos" = " 󰕧 ";
@@ -114,7 +113,7 @@
       git_branch = {
         symbol = " ";
         style = "bg:#cba6f7 fg:#1e1e2e";
-        format = "[ $symbol$branch ]($style)";
+        format = "[ 󰊢 $symbol$branch ]($style)";
       };
 
       git_status = {

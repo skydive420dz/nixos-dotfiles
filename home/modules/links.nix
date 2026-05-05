@@ -42,6 +42,7 @@ in
   home.file = {
     ".config/waybar".source = link "config/waybar";
     ".config/kitty".source = link "config/kitty";
+    ".config/quickshell".source = link "config/quickshell";
     ".config/yazi".source = link "config/yazi";
     ".config/qutebrowser".source = link "config/qutebrowser";
     ".config/aerc".source = link "config/aerc";

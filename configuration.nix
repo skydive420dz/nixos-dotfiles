@@ -147,6 +147,7 @@
 
     # Terminal & UI
     fzf
+    quickshell
 
     # Development tools
     nil
