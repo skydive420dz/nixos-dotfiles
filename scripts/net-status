@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 dev=$(nmcli -t -f DEVICE,TYPE,STATE device status | grep -E 'wifi|ethernet' | head -1)
 iface=$(echo "$dev" | cut -d: -f1)
-type=$(echo "$dev"  | cut -d: -f2)
+type=$(echo "$dev" | cut -d: -f2)
 state=$(echo "$dev" | cut -d: -f3)
 ip=$(ip -4 addr show "$iface" 2>/dev/null | awk '/inet / {print $2}' | cut -d/ -f1 | head -1)
 ssid=""
 signal=0
 if [ "$type" = "wifi" ] && [ "$state" = "connected" ]; then
-    wifi=$(nmcli -t -f IN-USE,SSID,SIGNAL device wifi 2>/dev/null | grep '^\*' | head -1)
-    ssid=$(echo "$wifi" | cut -d: -f2)
-    signal=$(echo "$wifi" | cut -d: -f3 | tr -d '[:space:]')
+        wifi=$(nmcli -t -f IN-USE,SSID,SIGNAL device wifi 2>/dev/null | grep '^\*' | head -1)
+        ssid=$(echo "$wifi" | cut -d: -f2)
+        signal=$(echo "$wifi" | cut -d: -f3 | tr -d '[:space:]')
 fi
 printf '{"iface":"%s","type":"%s","state":"%s","ip":"%s","ssid":"%s","signal":%s}\n' \
-    "$iface" "$type" "$state" "${ip:-}" "${ssid:-}" "${signal:-0}"
+        "$iface" "$type" "$state" "${ip:-}" "${ssid:-}" "${signal:-0}"

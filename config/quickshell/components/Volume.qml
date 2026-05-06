@@ -10,6 +10,7 @@ Item {
     implicitHeight: Style.pillHeight
     property bool hovered: hover.containsMouse
 
+    // ── Pipewire native binding for current volume/mute ───────────────────────
     property PwNode sink: Pipewire.defaultAudioSink
     PwObjectTracker {
         objects: [root.sink]
@@ -19,8 +20,9 @@ Item {
     readonly property real volume: sink?.audio?.volume ?? 0.0
     readonly property string icon: muted ? "󰖁" : volume < 0.33 ? "󰕿" : volume < 0.67 ? "󰖀" : "󰕾"
 
+    // ── Sink list from wpctl ──────────────────────────────────────────────────
     property var sinkList: []
-    property string defaultSinkName: ""
+    property int defaultSinkId: -1
 
     Text {
         id: volText
@@ -41,8 +43,10 @@ Item {
         }
         onPressAndHold: wiremixToggle.toggle()
         onWheel: {
-            if (root.sink?.audio)
-                root.sink.audio.volume = Math.max(0.0, Math.min(1.5, root.sink.audio.volume + (wheel.angleDelta.y > 0 ? 0.05 : -0.05)));
+            if (!root.sink?.audio)
+                return;
+            var delta = wheel.angleDelta.y > 0 ? 0.05 : -0.05;
+            root.sink.audio.volume = Math.max(0.0, Math.min(1.5, root.sink.audio.volume + delta));
         }
     }
 
@@ -52,61 +56,58 @@ Item {
         launchCommand: ["kitty", "--class", "wiremix", "-T", "wiremix", "-e", "wiremix"]
     }
 
+    // ── Sink list parsing ─────────────────────────────────────────────────────
     Process {
         id: sinksProc
-        command: ["bash", "-c", "pactl list sinks | awk '/Name:/ {name=$2} /Description:/ {desc=substr($0,index($0,$2)); print name \"|\" desc}'"]
+        command: ["bash", "-c", "wpctl status | sed -n '/├─ Sinks:/,/├─ Sources:/p'"]
         stdout: SplitParser {
             property string buffer: ""
             onRead: data => {
-                buffer += data;
+                buffer += data + "\n";
             }
         }
         onExited: {
-            var lines = sinksProc.stdout.buffer.trim().split("\n");
-            var result = [];
-            lines.forEach(function (line) {
-                var parts = line.split("|");
-                if (parts.length >= 2)
-                    result.push({
-                        name: parts[0].trim(),
-                        desc: parts[1].trim()
+            var lines = sinksProc.stdout.buffer.split("\n");
+            var sinks = [];
+            var defaultId = -1;
+            for (var i = 0; i < lines.length; i++) {
+                // Match: " │  *   86. Bose Mini II SoundLink              [vol: 0.73]"
+                // or:    " │      52. Laptop audio out                     [vol: 1.00]"
+                var m = lines[i].match(/^\s*│\s*(\*?)\s*(\d+)\.\s+(.+?)\s*\[vol:/);
+                if (m) {
+                    var id = parseInt(m[2]);
+                    var name = m[3].trim();
+                    var isDefault = m[1] === "*";
+                    sinks.push({
+                        id: id,
+                        name: name
                     });
-            });
-            root.sinkList = result;
+                    if (isDefault)
+                        defaultId = id;
+                }
+            }
+            root.sinkList = sinks;
+            root.defaultSinkId = defaultId;
             sinksProc.stdout.buffer = "";
         }
     }
 
-    Process {
-        id: defaultSinkProc
-        command: ["bash", "-c", "pactl get-default-sink"]
-        stdout: SplitParser {
-            property string buffer: ""
-            onRead: data => {
-                buffer += data;
-            }
-        }
-        onExited: {
-            root.defaultSinkName = defaultSinkProc.stdout.buffer.trim();
-            defaultSinkProc.stdout.buffer = "";
-        }
-    }
-
+    // Refresh sinks every 5 seconds and on demand.
+    // Pipewire doesn't expose sink list changes via the native binding,
+    // so this is the simplest reliable approach.
     Timer {
         interval: 5000
         running: true
         repeat: true
         triggeredOnStart: true
-        onTriggered: {
-            sinksProc.running = true;
-            defaultSinkProc.running = true;
-        }
+        onTriggered: sinksProc.running = true
     }
 
+    // ── Popover ───────────────────────────────────────────────────────────────
     Popover {
         showing: root.hovered
         side: "right"
-        popWidth: 280
+        popWidth: 320
         popHeight: volPopCol.implicitHeight + 28
 
         ColumnLayout {
@@ -114,6 +115,7 @@ Item {
             anchors.fill: parent
             spacing: 10
 
+            // Volume header
             RowLayout {
                 Text {
                     text: root.icon
@@ -151,6 +153,7 @@ Item {
                 }
             }
 
+            // Volume slider
             Item {
                 Layout.fillWidth: true
                 height: 16
@@ -204,9 +207,10 @@ Item {
                     Layout.fillWidth: true
                     height: 28
                     radius: 8
-                    color: modelData.name === root.defaultSinkName ? Qt.rgba(Mocha.mauve.r, Mocha.mauve.g, Mocha.mauve.b, 0.2) : "transparent"
-                    border.color: modelData.name === root.defaultSinkName ? Mocha.mauve : "transparent"
+                    color: modelData.id === root.defaultSinkId ? Qt.rgba(Mocha.mauve.r, Mocha.mauve.g, Mocha.mauve.b, 0.2) : "transparent"
+                    border.color: modelData.id === root.defaultSinkId ? Mocha.mauve : "transparent"
                     border.width: 1
+
                     RowLayout {
                         anchors {
                             fill: parent
@@ -214,13 +218,13 @@ Item {
                             rightMargin: 8
                         }
                         Text {
-                            text: modelData.name === root.defaultSinkName ? "󰓃 " : "  "
+                            text: modelData.id === root.defaultSinkId ? "󰓃 " : "  "
                             color: Mocha.mauve
                             font.pixelSize: 12
                             font.family: Style.font
                         }
                         Text {
-                            text: modelData.desc
+                            text: modelData.name
                             color: Mocha.text
                             font.pixelSize: Style.fontSizeS
                             font.family: Style.font
@@ -228,14 +232,22 @@ Item {
                             elide: Text.ElideRight
                         }
                     }
+
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            Qt.createQmlObject('import Quickshell.Io; Process { command: ["pactl","set-default-sink","' + modelData.name + '"]; running: true }', root);
-                            root.defaultSinkName = modelData.name;
+                            Qt.createQmlObject('import Quickshell.Io; Process { command: ["wpctl", "set-default", "' + modelData.id + '"]; running: true }', root);
+                            root.defaultSinkId = modelData.id;
+                            sinksProc.running = true;
                         }
                     }
                 }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                height: 1
+                color: Mocha.pillBorder
             }
 
             Text {

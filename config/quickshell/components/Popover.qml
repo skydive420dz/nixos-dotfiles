@@ -48,7 +48,7 @@ PanelWindow {
         id: panel
         anchors.fill: parent
 
-        color: Qt.rgba(0.118, 0.118, 0.180, 0.95)
+        color: Qt.rgba(0.118, 0.118, 0.180, 0.85)
         radius: Style.pillRadius
         border.color: Mocha.pillBorder
         border.width: 1

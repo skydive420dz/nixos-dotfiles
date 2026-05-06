@@ -12,13 +12,15 @@ Item {
     property int capacity: 100
     property string status: "Unknown"
     property bool charging: false
-    property string timeRemain: ""
-    property string powerDraw: ""
-    property string cycleCount: ""
+    property bool plugged: false
+    property int cycleCount: 0
+    property int health: 100
 
     readonly property string icon: {
         if (charging)
             return "󰉁";
+        if (plugged)
+            return "󰚥";
         if (capacity >= 91)
             return "󰁹";
         if (capacity >= 81)
@@ -40,7 +42,19 @@ Item {
         return "󰂎";
     }
 
-    readonly property color iconColor: charging ? Mocha.green : capacity <= 15 ? Mocha.red : capacity <= 30 ? Mocha.yellow : Mocha.teal
+    readonly property color iconColor: charging || plugged ? Mocha.green : capacity <= 15 ? Mocha.red : capacity <= 30 ? Mocha.yellow : Mocha.teal
+
+    readonly property string statusLabel: {
+        if (charging)
+            return "Charging";
+        if (status === "Full")
+            return "Full";
+        if (status === "Not charging")
+            return "Plugged in";
+        if (status === "Discharging")
+            return "Discharging";
+        return status;
+    }
 
     Text {
         id: battText
@@ -62,39 +76,89 @@ Item {
         hoverEnabled: true
     }
 
-    Process {
-        id: battProc
-        command: ["bash", "$HOME/.config/scripts/battery-status"]
+    // ── Single-file sysfs reads ───────────────────────────────────────────────
+    function refresh() {
+        capProc.running = true;
+        statusProc.running = true;
+    }
 
+    Process {
+        id: capProc
+        command: ["cat", "/sys/class/power_supply/BAT1/capacity"]
         stdout: SplitParser {
-            property string buffer: ""
             onRead: data => {
-                buffer += data;
+                root.capacity = parseInt(data.trim()) || 100;
             }
         }
+    }
 
-        onExited: {
-            try {
-                var j = JSON.parse(battProc.stdout.buffer.trim());
-                root.capacity = j.cap ?? 100;
-                root.status = j.sta ?? "Unknown";
-                root.cycleCount = j.cyc ?? "";
-                root.powerDraw = j.pwr ?? "";
-                root.timeRemain = j.tim ?? "";
-                root.charging = root.status === "Charging" || root.status === "Full";
-            } catch (e) {}
-            battProc.stdout.buffer = "";
+    Process {
+        id: statusProc
+        command: ["cat", "/sys/class/power_supply/BAT1/status"]
+        stdout: SplitParser {
+            onRead: data => {
+                root.status = data.trim();
+                root.charging = root.status === "Charging";
+                root.plugged = root.status === "Full" || root.status === "Not charging";
+            }
         }
+    }
+
+    Process {
+        id: cycleProc
+        command: ["cat", "/sys/class/power_supply/BAT1/cycle_count"]
+        stdout: SplitParser {
+            onRead: data => {
+                root.cycleCount = parseInt(data.trim()) || 0;
+            }
+        }
+    }
+
+    Process {
+        id: healthProc
+        command: ["bash", "-c", "full=$(cat /sys/class/power_supply/BAT1/charge_full); " + "design=$(cat /sys/class/power_supply/BAT1/charge_full_design); " + "echo $full $design"]
+        stdout: SplitParser {
+            onRead: data => {
+                var p = data.trim().split(" ");
+                var full = parseInt(p[0]);
+                var design = parseInt(p[1]);
+                if (full > 0 && design > 0)
+                    root.health = Math.round((full / design) * 100);
+            }
+        }
+    }
+
+    // ── Event-driven via udev — fires instantly on plug/unplug ────────────────
+    Process {
+        id: udevMonitor
+        command: ["udevadm", "monitor", "--kernel", "--subsystem-match=power_supply"]
+        running: true
+        stdout: SplitParser {
+            onRead: data => {
+                if (data.includes("power_supply"))
+                    root.refresh();
+            }
+        }
+    }
+
+    // ── Initial load + slow refresh for cycles/health ─────────────────────────
+    Component.onCompleted: {
+        root.refresh();
+        cycleProc.running = true;
+        healthProc.running = true;
     }
 
     Timer {
-        interval: 30000
+        interval: 300000   // 5 min for cycles/health
         running: true
         repeat: true
-        triggeredOnStart: true
-        onTriggered: battProc.running = true
+        onTriggered: {
+            cycleProc.running = true;
+            healthProc.running = true;
+        }
     }
 
+    // ── Popover ───────────────────────────────────────────────────────────────
     Popover {
         showing: root.hovered
         side: "right"
@@ -116,18 +180,11 @@ Item {
                 ColumnLayout {
                     spacing: 1
                     Text {
-                        text: root.capacity + "%  " + root.status
+                        text: root.capacity + "%  " + root.statusLabel
                         font.pixelSize: Style.fontSize
                         font.family: Style.font
                         font.bold: true
                         color: Mocha.text
-                    }
-                    Text {
-                        visible: root.timeRemain !== ""
-                        text: root.charging ? "Full in " + root.timeRemain : root.timeRemain + " remaining"
-                        font.pixelSize: Style.fontSizeS
-                        font.family: Style.font
-                        color: Mocha.subtext0
                     }
                 }
             }
@@ -162,20 +219,16 @@ Item {
             }
 
             Repeater {
-                model: {
-                    var rows = [];
-                    if (root.powerDraw)
-                        rows.push({
-                            label: "⚡ Power",
-                            value: root.powerDraw
-                        });
-                    if (root.cycleCount)
-                        rows.push({
-                            label: "🔄 Cycles",
-                            value: root.cycleCount
-                        });
-                    return rows;
-                }
+                model: [
+                    {
+                        label: "🔋 Health",
+                        value: root.health + "%"
+                    },
+                    {
+                        label: "🔄 Cycles",
+                        value: root.cycleCount.toString()
+                    }
+                ]
                 RowLayout {
                     Layout.fillWidth: true
                     Text {

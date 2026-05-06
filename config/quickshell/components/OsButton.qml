@@ -30,10 +30,10 @@ Rectangle {
         color: Mocha.blue
     }
 
-    WindowToggle {
-        id: rofiToggle
-        windowClass: "rofi"
-        launchCommand: ["rofi", "-show", "drun"]
+    Process {
+        id: rofiProc
+        command: ["sh", "-c", "pkill rofi || uwsm app -- rofi -show drun"]
+        running: false
     }
 
     MouseArea {
@@ -41,6 +41,6 @@ Rectangle {
         hoverEnabled: true
         onEntered: root.hovered = true
         onExited: root.hovered = false
-        onClicked: rofiToggle.toggle()
+        onClicked: rofiProc.running = true
     }
 }

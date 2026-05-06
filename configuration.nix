@@ -91,6 +91,7 @@
     shell = pkgs.zsh;
     extraGroups = [
       "networkmanager"
+      "bluetooth"
       "wheel"
       "video"
       "input"

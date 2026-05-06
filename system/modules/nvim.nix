@@ -15,6 +15,7 @@
           ripgrep
           fd
           lldb # Fixes Rustaceanvim debug warning
+          qt6.qtdeclarative
         ];
 
         viAlias = false;
