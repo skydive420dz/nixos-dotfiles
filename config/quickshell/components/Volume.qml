@@ -1,6 +1,8 @@
+import ".."
 import QtQuick
 import Quickshell.Io
 import Quickshell.Services.Pipewire
+import QtQuick.Controls
 
 Item {
     id: root

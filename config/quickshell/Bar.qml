@@ -1,3 +1,4 @@
+import "."
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -8,7 +9,7 @@ PanelWindow {
 
     // ── Layer shell ───────────────────────────────────────────────────────────
     WlrLayershell.layer: WlrLayer.Top
-    WlrLayershell.exclusiveZone: height + 5   // reserve bar + top margin
+    WlrLayershell.exclusiveZone: implicitHeight + 5   // reserve bar + top margin
     WlrLayershell.namespace: "qs-bar"
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
@@ -21,11 +22,11 @@ PanelWindow {
     margins {
         top: 5
         left: 5
-        right: 13
+        right: 5
         bottom: 0
     }
 
-    height: Style.barHeight
+    implicitHeight: Style.barHeight
     color: "transparent"
 
     // ── Layout ───────────────────────────────────────────────────────────────
@@ -41,7 +42,7 @@ PanelWindow {
         OsButton {}
 
         Item {
-            width: 8
+            width: 6
         }
 
         Workspaces {}

@@ -1,3 +1,4 @@
+import ".."
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Hyprland
@@ -12,16 +13,51 @@ Rectangle {
     border.width: 1
     implicitWidth: wsRow.implicitWidth + 12
 
-    // Active workspace id on the focused monitor
-    readonly property int activeId: Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1
+    property int activeId: 1
 
-    // Ids of workspaces that currently have windows
-    readonly property var occupiedIds: {
+    // Track which workspaces have windows
+    property var occupiedIds: ({})
+
+    function refreshOccupied() {
         var ids = {};
         var ws = Hyprland.workspaces.values;
         for (var i = 0; i < ws.length; i++)
             ids[ws[i].id] = true;
-        return ids;
+        occupiedIds = {};       // force change detection
+        occupiedIds = ids;
+    }
+
+    Component.onCompleted: {
+        activeId = Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1;
+    }
+
+    Timer {
+        id: refreshTimer
+        interval: 300
+        repeat: false
+        running: true
+        onTriggered: {
+            console.log("ws count:", Hyprland.workspaces.values.length);
+            refreshOccupied();
+        }
+    }
+
+    Connections {
+        target: Hyprland
+        function onRawEvent(event) {
+            if (event.name === "workspace") {
+                root.activeId = parseInt(event.data) || root.activeId;
+                root.refreshOccupied();   // refresh every time you switch
+            }
+            if (event.name === "focusedmon") {
+                var parts = event.data.split(",");
+                root.activeId = parseInt(parts[1]) || root.activeId;
+                root.refreshOccupied();
+            }
+            if (event.name === "openwindow" || event.name === "closewindow" || event.name === "movewindow") {
+                root.refreshOccupied();
+            }
+        }
     }
 
     RowLayout {
@@ -30,7 +66,7 @@ Rectangle {
         spacing: 4
 
         Repeater {
-            model: 9   // persistent workspaces 1-9
+            model: 9
 
             delegate: Rectangle {
                 required property int index
@@ -40,9 +76,8 @@ Rectangle {
 
                 height: 20
                 radius: 50
-                color: isActive ? Mocha.lavender : isOccupied ? Mocha.surface1 : Mocha.mantle
-
                 implicitWidth: isActive ? 55 : 20
+                color: isActive ? Mocha.lavender : isOccupied ? Mocha.surface1 : Mocha.mantle
 
                 Behavior on implicitWidth {
                     NumberAnimation {
@@ -50,7 +85,6 @@ Rectangle {
                         easing.type: Easing.OutCubic
                     }
                 }
-
                 Behavior on color {
                     ColorAnimation {
                         duration: 150
@@ -64,7 +98,6 @@ Rectangle {
                     font.family: Style.font
                     font.bold: true
                     color: parent.isActive ? Mocha.crust : "transparent"
-
                     Behavior on color {
                         ColorAnimation {
                             duration: 150

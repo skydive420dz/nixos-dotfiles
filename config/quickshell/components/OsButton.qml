@@ -1,10 +1,11 @@
+import ".."
 import QtQuick
 import Quickshell.Hyprland
 
 Rectangle {
     id: root
 
-    implicitWidth: Style.pillPadH * 2 + label.implicitWidth
+    implicitWidth: Style.pillPadH * 1 + label.implicitWidth
     height: Style.pillHeight
     radius: Style.pillRadius
     color: hovered ? Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.5) : Mocha.pillBg
@@ -22,8 +23,8 @@ Rectangle {
     Text {
         id: label
         anchors.centerIn: parent
-        text: ""    // nf-linux-nixos
-        font.pixelSize: 18
+        text: " 󱄅 "    // nf-linux-nixos
+        font.pixelSize: 26
         font.family: Style.font
         color: Mocha.blue
     }

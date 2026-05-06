@@ -1,5 +1,7 @@
+import ".."
 import QtQuick
 import Quickshell.Io
+import QtQuick.Controls
 
 Item {
     id: root

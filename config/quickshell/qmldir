@@ -1,2 +1,13 @@
-singleton Mocha 1.0 theme/Mocha.qml
-singleton Style 1.0 theme/Style.qml
+Bar         1.0 Bar.qml
+singleton Mocha 1.0 Mocha.qml
+singleton Style 1.0 Style.qml
+OsButton    1.0 components/OsButton.qml
+Workspaces  1.0 components/Workspaces.qml
+WindowTitle 1.0 components/WindowTitle.qml
+Clock       1.0 components/Clock.qml
+Weather     1.0 components/Weather.qml
+Network     1.0 components/Network.qml
+Bluetooth   1.0 components/Bluetooth.qml
+Volume      1.0 components/Volume.qml
+Battery     1.0 components/Battery.qml
+Tray        1.0 components/Tray.qml

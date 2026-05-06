@@ -1,5 +1,6 @@
+import ".."
 import QtQuick
-import Quickshell.Io
+import Quickshell.Hyprland
 
 Rectangle {
     id: root
@@ -40,32 +41,21 @@ Rectangle {
         elide: Text.ElideRight
     }
 
-    // Poll hyprctl for the active window every 500ms.
-    // Once we confirm the working Hyprland API we can switch this to
-    // a reactive Connections { target: Hyprland } block instead.
-    Process {
-        id: winProc
-        command: ["hyprctl", "activewindow", "-j"]
+    // Reactive — responds to Hyprland socket events instantly, no polling
+    Connections {
+        target: Hyprland
 
-        stdout: SplitParser {
-            onRead: data => {
-                try {
-                    var obj = JSON.parse(data.trim());
-                    root.windowClass = obj.class || "";
-                    root.windowTitle = obj.title || "";
-                } catch (_) {
-                    root.windowClass = "";
-                    root.windowTitle = "";
-                }
+        function onRawEvent(event) {
+            if (event.name === "activewindow") {
+                // payload: "class,title" — title may contain commas
+                var parts = event.data.split(",");
+                root.windowClass = parts[0] ?? "";
+                root.windowTitle = parts.slice(1).join(",") ?? "";
+            }
+            if (event.name === "closewindow") {
+                root.windowClass = "";
+                root.windowTitle = "";
             }
         }
-    }
-
-    Timer {
-        interval: 500
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: winProc.running = true
     }
 }
