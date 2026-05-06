@@ -1,6 +1,7 @@
 import ".."
 import QtQuick
 import Quickshell.Hyprland
+import Quickshell.Io
 
 Rectangle {
     id: root
@@ -23,10 +24,16 @@ Rectangle {
     Text {
         id: label
         anchors.centerIn: parent
-        text: " 󱄅 "    // nf-linux-nixos
+        text: " 󱄅 "
         font.pixelSize: 26
         font.family: Style.font
         color: Mocha.blue
+    }
+
+    WindowToggle {
+        id: rofiToggle
+        windowClass: "rofi"
+        launchCommand: ["rofi", "-show", "drun"]
     }
 
     MouseArea {
@@ -34,7 +41,6 @@ Rectangle {
         hoverEnabled: true
         onEntered: root.hovered = true
         onExited: root.hovered = false
-        // Opens rofi app launcher — same as your keybind
-        onClicked: Hyprland.dispatch("exec rofi -show drun")
+        onClicked: rofiToggle.toggle()
     }
 }

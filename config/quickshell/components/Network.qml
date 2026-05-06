@@ -1,16 +1,20 @@
 import ".."
 import QtQuick
+import QtQuick.Layouts
 import Quickshell.Io
-import QtQuick.Controls
 
 Item {
     id: root
-
     implicitWidth: netText.implicitWidth + 8
     implicitHeight: Style.pillHeight
+    property bool hovered: hover.containsMouse
 
     property string icon: "󰤟"
-    property string tip: "Network"
+    property string ssid: ""
+    property string ipAddr: ""
+    property string iface: ""
+    property int signal: 0
+    property string connType: ""
 
     Text {
         id: netText
@@ -19,92 +23,140 @@ Item {
         font.pixelSize: Style.fontSize
         font.family: Style.font
         color: Mocha.teal
-
-        ToolTip.visible: hover.containsMouse
-        ToolTip.text: root.tip
-        ToolTip.delay: 400
     }
 
     MouseArea {
         id: hover
         anchors.fill: parent
         hoverEnabled: true
-        // Click opens nmtui in a floating kitty window
-        onClicked: nmtuiProc.running = true
+        onClicked: nmtuiToggle.toggle()
     }
 
-    // ── Data fetching ─────────────────────────────────────────────────────────
+    WindowToggle {
+        id: nmtuiToggle
+        windowClass: "nmtui"
+        launchCommand: ["kitty", "--class", "nmtui", "-T", "nmtui", "-e", "nmtui"]
+    }
 
-    // Step 1 — get connection type and state
     Process {
-        id: netStatusProc
-        command: ["bash", "-c", "nmcli -t -f DEVICE,TYPE,STATE,CONNECTION device status" + " | grep -E 'wifi|ethernet' | head -1"]
+        id: netProc
+        command: ["bash", "$HOME/.config/scripts/net-status"]
 
         stdout: SplitParser {
+            property string buffer: ""
             onRead: data => {
-                // Format: DEVICE:TYPE:STATE:CONNECTION
-                var parts = data.trim().split(":");
-                if (parts.length < 4) {
-                    root.icon = "󰤯";
-                    root.tip = "Disconnected";
-                    return;
-                }
-                var type = parts[1];
-                var state = parts[2];
-                var conn = parts[3];
+                buffer += data;
+            }
+        }
 
-                if (state === "connected") {
-                    if (type === "ethernet") {
-                        root.icon = "󰈀";
-                        root.tip = "Ethernet: " + conn;
-                    } else {
-                        wifiProc.running = true;   // get signal strength
-                    }
+        onExited: {
+            try {
+                var j = JSON.parse(netProc.stdout.buffer.trim());
+                root.iface = j.iface ?? "";
+                root.connType = j.type ?? "";
+                root.ipAddr = j.ip ?? "";
+                root.ssid = j.ssid ?? "";
+                root.signal = j.signal ?? 0;
+                if (j.state !== "connected") {
+                    root.icon = "󰤯";
+                    root.connType = "disconnected";
+                } else if (j.type === "ethernet") {
+                    root.icon = "󰈀";
                 } else {
-                    root.icon = "󰤯";
-                    root.tip = "Disconnected";
+                    root.icon = root.signal > 75 ? "󰤨" : root.signal > 50 ? "󰤥" : root.signal > 25 ? "󰤢" : "󰤟";
                 }
-            }
+            } catch (e) {}
+            netProc.stdout.buffer = "";
         }
-    }
-
-    // Step 2 — get Wi-Fi SSID + signal (only runs when connected to wifi)
-    Process {
-        id: wifiProc
-        command: ["bash", "-c", "nmcli -t -f IN-USE,SSID,SIGNAL device wifi 2>/dev/null" + " | grep '^\\*' | head -1"]
-
-        stdout: SplitParser {
-            onRead: data => {
-                // Format: *:SSID:SIGNAL
-                var parts = data.trim().replace(/^\*:/, "").split(":");
-                var ssid = parts[0] ?? "";
-                var signal = parseInt(parts[1] ?? "0");
-
-                if (signal > 75)
-                    root.icon = "󰤨";
-                else if (signal > 50)
-                    root.icon = "󰤥";
-                else if (signal > 25)
-                    root.icon = "󰤢";
-                else
-                    root.icon = "󰤟";
-
-                root.tip = "Wi-Fi: " + ssid + " (" + signal + "%)";
-            }
-        }
-    }
-
-    Process {
-        id: nmtuiProc
-        command: ["kitty", "--class", "nmtui", "-T", "nmtui", "-e", "nmtui"]
-        running: false
     }
 
     Timer {
-        interval: 10000   // 10s — same as your waybar interval
+        interval: 10000
         running: true
         repeat: true
         triggeredOnStart: true
-        onTriggered: netStatusProc.running = true
+        onTriggered: netProc.running = true
+    }
+
+    Popover {
+        showing: root.hovered
+        side: "right"
+        popWidth: 240
+        popHeight: netPopCol.implicitHeight + 28
+
+        ColumnLayout {
+            id: netPopCol
+            anchors.fill: parent
+            spacing: 8
+
+            RowLayout {
+                Text {
+                    text: root.connType === "wifi" ? "󰤨" : root.connType === "ethernet" ? "󰈀" : "󰤯"
+                    font.pixelSize: 20
+                    font.family: Style.font
+                    color: Mocha.teal
+                }
+                Text {
+                    text: root.connType === "wifi" ? root.ssid : root.connType === "ethernet" ? "Ethernet" : "Disconnected"
+                    font.pixelSize: Style.fontSize
+                    font.family: Style.font
+                    font.bold: true
+                    color: Mocha.text
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                height: 1
+                color: Mocha.pillBorder
+            }
+
+            Repeater {
+                model: {
+                    var rows = [];
+                    if (root.ipAddr)
+                        rows.push({
+                            label: "IP",
+                            value: root.ipAddr
+                        });
+                    if (root.iface)
+                        rows.push({
+                            label: "Interface",
+                            value: root.iface
+                        });
+                    if (root.connType === "wifi")
+                        rows.push({
+                            label: "Signal",
+                            value: root.signal + "%"
+                        });
+                    return rows;
+                }
+                RowLayout {
+                    Layout.fillWidth: true
+                    Text {
+                        text: modelData.label
+                        color: Mocha.subtext0
+                        font.pixelSize: Style.fontSizeS
+                        font.family: Style.font
+                        Layout.preferredWidth: 70
+                    }
+                    Text {
+                        text: modelData.value
+                        color: Mocha.text
+                        font.pixelSize: Style.fontSizeS
+                        font.family: Style.font
+                        Layout.fillWidth: true
+                    }
+                }
+            }
+
+            Text {
+                text: "Click to open nmtui"
+                color: Mocha.overlay0
+                font.pixelSize: Style.fontSizeS
+                font.family: Style.font
+                Layout.alignment: Qt.AlignHCenter
+            }
+        }
     }
 }

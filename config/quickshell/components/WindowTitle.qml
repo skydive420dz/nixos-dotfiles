@@ -18,15 +18,15 @@ Rectangle {
 
     readonly property string displayTitle: {
         if (!windowTitle)
-            return "   Desktop";
+            return " Desktop";
         var c = windowClass.toLowerCase();
         var t = windowTitle;
-        if (c === "firefox")
+        if (c === " firefox")
             return "  " + t.replace(/ [—–] Mozilla Firefox$/, "").replace(/ Mozilla Firefox$/, "");
         if (c === "kitty" || c === "alacritty")
-            return "  Terminal";
+            return " Terminal";
         if (c === "vesktop" || c === "discord")
-            return "  Discord";
+            return " Discord";
         return "  " + t;
     }
 

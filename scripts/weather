@@ -1,63 +1,141 @@
+
 #!/usr/bin/env bash
 #
 # ============================================
-# WEATHER — waybar custom module
+# WEATHER — quickshell data source
 # ============================================
-# Fetches current conditions from wttr.in and outputs JSON for waybar.
-# wttr.in returns data in ~1s — interval of 1800s (30 min) is plenty.
-#
+# Outputs JSON with both a display string and a structured data object.
 # Requires: curl, jq
-# Output: {"text": "icon temp", "tooltip": "full forecast", "class": "weather"}
 
-LOCATION=""  # leave empty to auto-detect from IP, or set e.g. "Atlanta"
+LOCATION=""   # leave empty for IP-based auto-detect, or set e.g. "Atlanta"
 
 DATA=$(curl -sf "https://wttr.in/${LOCATION}?format=j1" 2>/dev/null)
 
 if [[ -z "$DATA" ]]; then
-    echo '{"text": "󰼯 --", "tooltip": "Weather unavailable", "class": "weather-unavailable"}'
+    echo '{"text":"󰼯 --","class":"weather-unavailable","data":null}'
     exit 0
 fi
 
-# Current conditions
-TEMP_C=$(echo "$DATA" | jq -r '.current_condition[0].temp_C')
-TEMP_F=$(echo "$DATA" | jq -r '.current_condition[0].temp_F')
-FEELS_C=$(echo "$DATA" | jq -r '.current_condition[0].FeelsLikeC')
-FEELS_F=$(echo "$DATA" | jq -r '.current_condition[0].FeelsLikeF')
+# ── Current conditions ────────────────────────────────────────────────────────
+TEMP_F=$(echo "$DATA"   | jq -r '.current_condition[0].temp_F')
+TEMP_C=$(echo "$DATA"   | jq -r '.current_condition[0].temp_C')
+FEELS_F=$(echo "$DATA"  | jq -r '.current_condition[0].FeelsLikeF')
+FEELS_C=$(echo "$DATA"  | jq -r '.current_condition[0].FeelsLikeC')
 HUMIDITY=$(echo "$DATA" | jq -r '.current_condition[0].humidity')
-DESC=$(echo "$DATA" | jq -r '.current_condition[0].weatherDesc[0].value')
+DESC=$(echo "$DATA"     | jq -r '.current_condition[0].weatherDesc[0].value')
 WIND_MPH=$(echo "$DATA" | jq -r '.current_condition[0].windspeedMiles')
-CODE=$(echo "$DATA" | jq -r '.current_condition[0].weatherCode')
+WIND_DIR=$(echo "$DATA" | jq -r '.current_condition[0].winddir16Point')
+CODE=$(echo "$DATA"     | jq -r '.current_condition[0].weatherCode')
+UV=$(echo "$DATA"       | jq -r '.current_condition[0].uvIndex')
 
-# Map weather code to icon
+# ── Astronomy ─────────────────────────────────────────────────────────────────
+SUNRISE=$(echo "$DATA"    | jq -r '.weather[0].astronomy[0].sunrise')
+SUNSET=$(echo "$DATA"     | jq -r '.weather[0].astronomy[0].sunset')
+MOON_PHASE=$(echo "$DATA" | jq -r '.weather[0].astronomy[0].moon_phase')
+MOON_ILLUM=$(echo "$DATA" | jq -r '.weather[0].astronomy[0].moon_illumination')
+
+# ── Weather icon ──────────────────────────────────────────────────────────────
 case $CODE in
-    113)           ICON="󰖙" ;;  # Sunny
-    116)           ICON="󰖕" ;;  # Partly cloudy
-    119|122)       ICON="󰖔" ;;  # Cloudy/Overcast
-    143|248|260)   ICON="󰖑" ;;  # Fog/Mist
-    176|293|296|263|266) ICON="󰖗" ;;  # Light rain/drizzle
-    179|323|326)   ICON="󰖘" ;;  # Light snow
-    182|185|281|284|311|314|317|350|377) ICON="󰙿" ;;  # Sleet/freezing
-    200|386|389)   ICON="󰖓" ;;  # Thunder
-    227|230|335|338|371|374) ICON="󰖒" ;;  # Snow
-    299|302|305|308) ICON="󰖖" ;;  # Heavy rain
-    353|356|359|362|365|368) ICON="󰖗" ;;  # Showers
-    395)           ICON="󰖒" ;;  # Heavy snow/thunder
-    *)             ICON="󰖐" ;;  # Unknown
+    113)                     ICON="󰖙" ;;
+    116)                     ICON="󰖕" ;;
+    119|122)                 ICON="󰖔" ;;
+    143|248|260)             ICON="󰖑" ;;
+    176|263|266|293|296)     ICON="󰖗" ;;
+    179|323|326)             ICON="󰖘" ;;
+    182|185|281|284|311|314|317|350|377) ICON="󰙿" ;;
+    200|386|389)             ICON="󰖓" ;;
+    227|230|335|338|371|374) ICON="󰖒" ;;
+    299|302|305|308)         ICON="󰖖" ;;
+    353|356|359|362|365|368) ICON="󰖗" ;;
+    395)                     ICON="󰖒" ;;
+    *)                       ICON="󰖐" ;;
 esac
 
-# 3-day forecast for tooltip
-TOOLTIP="${DESC} — ${TEMP_F}°F (feels ${FEELS_F}°F)\n"
-TOOLTIP+="Humidity: ${HUMIDITY}%   Wind: ${WIND_MPH} mph\n\n"
-TOOLTIP+="Forecast:\n"
+# ── Moon icon ─────────────────────────────────────────────────────────────────
+case "$MOON_PHASE" in
+    "New Moon")        MOON_ICON="🌑" ;;
+    "Waxing Crescent") MOON_ICON="🌒" ;;
+    "First Quarter")   MOON_ICON="🌓" ;;
+    "Waxing Gibbous")  MOON_ICON="🌔" ;;
+    "Full Moon")       MOON_ICON="🌕" ;;
+    "Waning Gibbous")  MOON_ICON="🌖" ;;
+    "Last Quarter")    MOON_ICON="🌗" ;;
+    "Waning Crescent") MOON_ICON="🌘" ;;
+    *)                 MOON_ICON="🌙" ;;
+esac
 
-for i in 0 1 2; do
-    DAY_DESC=$(echo "$DATA" | jq -r ".weather[$i].hourly[4].weatherDesc[0].value")
-    MAX_F=$(echo "$DATA"   | jq -r ".weather[$i].maxtempF")
-    MIN_F=$(echo "$DATA"   | jq -r ".weather[$i].mintempF")
-    if [[ $i -eq 0 ]]; then DAY="Today";
-    elif [[ $i -eq 1 ]]; then DAY="Tomorrow";
-    else DAY=$(echo "$DATA" | jq -r ".weather[$i].date"); fi
-    TOOLTIP+="${DAY}: ${DAY_DESC} ${MAX_F}°F / ${MIN_F}°F\n"
-done
+# ── 3-day forecast ────────────────────────────────────────────────────────────
+FORECAST=$(jq -n \
+    --argjson d0 "$(echo "$DATA" | jq '.weather[0]')" \
+    --argjson d1 "$(echo "$DATA" | jq '.weather[1]')" \
+    --argjson d2 "$(echo "$DATA" | jq '.weather[2]')" \
+    '[
+        {
+            "day":   "Today",
+            "desc":  $d0.hourly[4].weatherDesc[0].value,
+            "max_f": ($d0.maxtempF | tonumber),
+            "min_f": ($d0.mintempF | tonumber),
+            "max_c": ($d0.maxtempC | tonumber),
+            "min_c": ($d0.mintempC | tonumber)
+        },
+        {
+            "day":   "Tomorrow",
+            "desc":  $d1.hourly[4].weatherDesc[0].value,
+            "max_f": ($d1.maxtempF | tonumber),
+            "min_f": ($d1.mintempF | tonumber),
+            "max_c": ($d1.maxtempC | tonumber),
+            "min_c": ($d1.mintempC | tonumber)
+        },
+        {
+            "day":   $d2.date,
+            "desc":  $d2.hourly[4].weatherDesc[0].value,
+            "max_f": ($d2.maxtempF | tonumber),
+            "min_f": ($d2.mintempF | tonumber),
+            "max_c": ($d2.maxtempC | tonumber),
+            "min_c": ($d2.mintempC | tonumber)
+        }
+    ]')
 
-echo "{\"text\": \"${ICON} ${TEMP_F}°F\", \"tooltip\": \"${TOOLTIP}\", \"class\": \"weather\"}"
+# ── Output ────────────────────────────────────────────────────────────────────
+jq -n \
+    --arg text       "${ICON} ${TEMP_F}°F" \
+    --arg icon       "$ICON" \
+    --arg moon_icon  "$MOON_ICON" \
+    --argjson temp_f  "$TEMP_F" \
+    --argjson temp_c  "$TEMP_C" \
+    --argjson feels_f "$FEELS_F" \
+    --argjson feels_c "$FEELS_C" \
+    --argjson humidity "$HUMIDITY" \
+    --argjson wind_mph "$WIND_MPH" \
+    --arg wind_dir   "$WIND_DIR" \
+    --arg desc       "$DESC" \
+    --argjson uv      "$UV" \
+    --argjson code    "$CODE" \
+    --arg sunrise    "$SUNRISE" \
+    --arg sunset     "$SUNSET" \
+    --arg moon_phase "$MOON_PHASE" \
+    --arg moon_illum "$MOON_ILLUM" \
+    --argjson forecast "$FORECAST" \
+    '{
+        text: $text,
+        class: "weather",
+        data: {
+            icon:       $icon,
+            moon_icon:  $moon_icon,
+            temp_f:     $temp_f,
+            temp_c:     $temp_c,
+            feels_f:    $feels_f,
+            feels_c:    $feels_c,
+            humidity:   $humidity,
+            wind_mph:   $wind_mph,
+            wind_dir:   $wind_dir,
+            desc:       $desc,
+            uv:         $uv,
+            code:       $code,
+            sunrise:    $sunrise,
+            sunset:     $sunset,
+            moon_phase: $moon_phase,
+            moon_illum: $moon_illum,
+            forecast:   $forecast
+        }
+    }'

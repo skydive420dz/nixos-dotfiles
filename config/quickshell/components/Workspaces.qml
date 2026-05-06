@@ -37,7 +37,6 @@ Rectangle {
         repeat: false
         running: true
         onTriggered: {
-            console.log("ws count:", Hyprland.workspaces.values.length);
             refreshOccupied();
         }
     }
