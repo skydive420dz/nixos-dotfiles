@@ -9,6 +9,22 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Upstream Hyprland
+    hyprland = {
+      url = "github:hyprwm/Hyprland";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Upstream Quickshell
+    quickshell = {
+      # add ?ref=<tag> to track a tag
+      url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
+
+      # THIS IS IMPORTANT
+      # Mismatched system dependencies will lead to crashes and other issues.
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Catppuccin theming
     catppuccin.url = "github:catppuccin/nix";
 
@@ -29,14 +45,17 @@
       self,
       nixpkgs,
       home-manager,
+      hyprland,
       nvf,
       catppuccin,
       firefox-addons,
+      quickshell,
       ...
     }@inputs:
     {
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
+
         modules = [
           nvf.nixosModules.default
           catppuccin.nixosModules.catppuccin
@@ -45,17 +64,21 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
+
               # Pass all flake inputs (including firefox-addons) to home modules
               extraSpecialArgs = { inherit inputs; };
+
               users.skydive420dz = {
                 imports = [
                   ./home.nix
                   catppuccin.homeModules.catppuccin
                 ];
               };
+
               backupFileExtension = "backup";
             };
           }
+
           ./configuration.nix
         ];
       };

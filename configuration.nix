@@ -73,6 +73,8 @@
 
   programs.hyprland = {
     enable = true;
+    package = pkgs.hyprland;
+    portalPackage = pkgs.xdg-desktop-portal-hyprland;
     withUWSM = true;
     xwayland.enable = true;
   };
@@ -144,6 +146,9 @@
     git
     ripgrep
     fd
+    qt6.qtdeclarative
+    qt6.qtbase
+    qt6.qtlanguageserver
 
     # Terminal & UI
     fzf
@@ -159,7 +164,6 @@
     # System monitoring & info
     fastfetch
     nitch
-    lm_sensors
 
     # Media & multimedia
     ffmpeg-full

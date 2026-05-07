@@ -33,6 +33,13 @@
       swaynotificationcenter
       swayosd
       powertop
+      (pkgs.writeShellScriptBin "qmlls" ''
+        exec ${pkgs.qt6.qtlanguageserver}/bin/qmlls \
+          -I ${pkgs.qt6.qtdeclarative}/lib/qt-6/qml \
+          -I ${pkgs.quickshell}/lib/qt-6/qml \
+          -I /etc/profiles/per-user/${config.home.username}/lib/qt-6/qml \
+          "$@"
+      '')
     ];
   };
   programs.git.enable = true;
@@ -186,6 +193,14 @@
     XCURSOR_THEME = "catppuccin-mocha-dark-cursors";
     XCURSOR_SIZE = "24";
     HYPRCURSOR_SIZE = "24";
+    QML2_IMPORT_PATH = lib.makeSearchPath "lib/qt-6/qml" [
+      pkgs.qt6.qtdeclarative
+      pkgs.quickshell
+    ];
+    QT_PLUGIN_PATH = lib.makeSearchPath "lib/qt-6/plugins" [
+      pkgs.qt6.qtbase
+      pkgs.quickshell
+    ];
 
     # --- NVIDIA Specifics ---
     LIBVA_DRIVER_NAME = "nvidia";
