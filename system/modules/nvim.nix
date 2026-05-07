@@ -1,5 +1,7 @@
 {
+  config,
   pkgs,
+  lib,
   ...
 }:
 {
@@ -47,6 +49,17 @@
           otter-nvim.enable = true;
           nvim-docs-view.enable = true;
           presets.harper.enable = true;
+          servers.qmlls = {
+            cmd = lib.mkForce [
+              "${pkgs.writeShellScriptBin "qmlls-wrapped" ''
+                exec ${pkgs.qt6.qtdeclarative}/bin/qmlls \
+                  -I ${pkgs.qt6.qtdeclarative}/lib/qt-6/qml \
+                  -I ${pkgs.quickshell}/lib/qt-6/qml \
+                  "$@"
+              ''}/bin/qmlls-wrapped"
+            ];
+
+          };
         };
 
         debugger.nvim-dap = {
@@ -299,7 +312,6 @@
               end,
             },
           })
-
 
         '';
 

@@ -41,6 +41,9 @@
           "$@"
       '')
     ];
+    sessionPath = [
+      "${config.home.profileDirectory}/bin"
+    ];
   };
   programs.git.enable = true;
 
