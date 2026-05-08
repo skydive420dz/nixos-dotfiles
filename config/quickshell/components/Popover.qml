@@ -27,7 +27,7 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.exclusiveZone: -1
     WlrLayershell.namespace: "qs-popover"
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
     anchors.top: true
     anchors.right: side === "right"
@@ -72,6 +72,7 @@ PanelWindow {
             }
         }
 
+        MouseArea { anchors.fill: parent; hoverEnabled: true }
         // Content slot
         Item {
             id: inner

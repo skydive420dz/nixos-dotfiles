@@ -2,6 +2,7 @@ Bar           1.0 Bar.qml
 singleton Mocha       1.0 Mocha.qml
 singleton Style       1.0 Style.qml
 singleton WeatherData 1.0 components/WeatherData.qml
+Media         1.0 components/Media.qml
 Popover       1.0 components/Popover.qml
 WindowToggle  1.0 components/WindowToggle.qml
 OsButton      1.0 components/OsButton.qml

@@ -23,3 +23,4 @@ config/aerc/.cache/
 config/aerc/sent/
 config/aerc/postpone/
 config/aerc/state
+.qmlls.ini

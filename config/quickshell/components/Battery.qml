@@ -15,6 +15,8 @@ Item {
     property bool plugged: false
     property int cycleCount: 0
     property int health: 100
+    property int chargeNow: 0
+    property int currentNow: 0
 
     readonly property string icon: {
         if (charging)
@@ -56,6 +58,25 @@ Item {
         return status;
     }
 
+    readonly property string timeRemaining: {
+        if (currentNow <= 0)
+            return "";
+        var hours;
+        if (charging)
+            hours = (health / 100 * 4253000 - chargeNow) / currentNow;
+        else if (!plugged)
+            hours = chargeNow / currentNow;
+        else
+            return "";
+        if (hours < 0)
+            return "";
+        var h = Math.floor(hours);
+        var m = Math.round((hours - h) * 60);
+        if (h === 0)
+            return m + "m";
+        return h + "h " + m + "m";
+    }
+
     Text {
         id: battText
         anchors.centerIn: parent
@@ -76,12 +97,15 @@ Item {
         hoverEnabled: true
     }
 
-    // ── Single-file sysfs reads ───────────────────────────────────────────────
+    // ── Refresh function ──────────────────────────────────────────────────────
     function refresh() {
         capProc.running = true;
         statusProc.running = true;
+        chargeNowProc.running = true;
+        currentNowProc.running = true;
     }
 
+    // ── sysfs reads ───────────────────────────────────────────────────────────
     Process {
         id: capProc
         command: ["cat", "/sys/class/power_supply/BAT1/capacity"]
@@ -100,6 +124,26 @@ Item {
                 root.status = data.trim();
                 root.charging = root.status === "Charging";
                 root.plugged = root.status === "Full" || root.status === "Not charging";
+            }
+        }
+    }
+
+    Process {
+        id: chargeNowProc
+        command: ["cat", "/sys/class/power_supply/BAT1/charge_now"]
+        stdout: SplitParser {
+            onRead: data => {
+                root.chargeNow = parseInt(data.trim()) || 0;
+            }
+        }
+    }
+
+    Process {
+        id: currentNowProc
+        command: ["cat", "/sys/class/power_supply/BAT1/current_now"]
+        stdout: SplitParser {
+            onRead: data => {
+                root.currentNow = parseInt(data.trim()) || 0;
             }
         }
     }
@@ -128,7 +172,7 @@ Item {
         }
     }
 
-    // ── Event-driven via udev — fires instantly on plug/unplug ────────────────
+    // ── udev monitor — instant plug/unplug events ─────────────────────────────
     Process {
         id: udevMonitor
         command: ["udevadm", "monitor", "--kernel", "--subsystem-match=power_supply"]
@@ -141,15 +185,24 @@ Item {
         }
     }
 
-    // ── Initial load + slow refresh for cycles/health ─────────────────────────
+    // ── Initial load ──────────────────────────────────────────────────────────
     Component.onCompleted: {
         root.refresh();
         cycleProc.running = true;
         healthProc.running = true;
     }
 
+    // ── 60s timer for capacity during discharge ───────────────────────────────
     Timer {
-        interval: 300000   // 5 min for cycles/health
+        interval: 60000
+        running: true
+        repeat: true
+        onTriggered: root.refresh()
+    }
+
+    // ── 5 min timer for cycles/health (barely change) ─────────────────────────
+    Timer {
+        interval: 300000
         running: true
         repeat: true
         onTriggered: {
@@ -159,93 +212,4 @@ Item {
     }
 
     // ── Popover ───────────────────────────────────────────────────────────────
-    Popover {
-        showing: root.hovered
-        side: "right"
-        popWidth: 240
-        popHeight: battPopCol.implicitHeight + 28
-
-        ColumnLayout {
-            id: battPopCol
-            anchors.fill: parent
-            spacing: 8
-
-            RowLayout {
-                Text {
-                    text: root.icon
-                    font.pixelSize: 22
-                    font.family: Style.font
-                    color: root.iconColor
-                }
-                ColumnLayout {
-                    spacing: 1
-                    Text {
-                        text: root.capacity + "%  " + root.statusLabel
-                        font.pixelSize: Style.fontSize
-                        font.family: Style.font
-                        font.bold: true
-                        color: Mocha.text
-                    }
-                }
-            }
-
-            Item {
-                Layout.fillWidth: true
-                height: 10
-                Rectangle {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width
-                    height: 6
-                    radius: 3
-                    color: Mocha.surface1
-                    Rectangle {
-                        width: parent.width * (root.capacity / 100)
-                        height: parent.height
-                        radius: parent.radius
-                        color: root.iconColor
-                        Behavior on width {
-                            NumberAnimation {
-                                duration: 500
-                            }
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                height: 1
-                color: Mocha.pillBorder
-            }
-
-            Repeater {
-                model: [
-                    {
-                        label: "🔋 Health",
-                        value: root.health + "%"
-                    },
-                    {
-                        label: "🔄 Cycles",
-                        value: root.cycleCount.toString()
-                    }
-                ]
-                RowLayout {
-                    Layout.fillWidth: true
-                    Text {
-                        text: modelData.label
-                        color: Mocha.subtext0
-                        font.pixelSize: Style.fontSizeS
-                        font.family: Style.font
-                        Layout.preferredWidth: 80
-                    }
-                    Text {
-                        text: modelData.value
-                        color: Mocha.text
-                        font.pixelSize: Style.fontSizeS
-                        font.family: Style.font
-                    }
-                }
-            }
-        }
-    }
 }
