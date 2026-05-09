@@ -36,6 +36,9 @@ PanelWindow {
         Region {
             item: mediaModule
         }
+        Region {
+            item: trayModule
+        }   // tray now in mask so menu mouse events work
     }
 
     property string hoveredModule: ""
@@ -794,13 +797,22 @@ PanelWindow {
         anchors.topMargin: (Style.barHeight - Style.pillHeight) / 2
     }
 
+    // ── Tray — sibling of barRow so it can expand downward freely ─────────────
+    Tray {
+        id: trayModule
+        anchors.top: parent.top
+        anchors.right: pill.left
+        anchors.topMargin: (Style.barHeight - Style.pillHeight) / 2
+        anchors.rightMargin: Style.groupSpacing
+    }
+
     // ── Bar row ───────────────────────────────────────────────────────────────
     RowLayout {
         id: barRow
         anchors {
             top: parent.top
             left: parent.left
-            right: pill.left
+            right: trayModule.left   // stops at tray, not at pill
             leftMargin: 4
             rightMargin: Style.groupSpacing
         }
@@ -819,6 +831,5 @@ PanelWindow {
         Item {
             Layout.fillWidth: true
         }
-        Tray {}
     }
 }

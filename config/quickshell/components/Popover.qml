@@ -72,7 +72,10 @@ PanelWindow {
             }
         }
 
-        MouseArea { anchors.fill: parent; hoverEnabled: true }
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+        }
         // Content slot
         Item {
             id: inner
