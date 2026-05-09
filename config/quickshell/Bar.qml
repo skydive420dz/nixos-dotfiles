@@ -25,7 +25,7 @@ PanelWindow {
         bottom: 0
     }
 
-    implicitHeight: Style.barHeight + 280
+    implicitHeight: Style.barHeight + 300
     color: "transparent"
 
     // The mask defines which pixels of the surface accept mouse input.
@@ -68,10 +68,9 @@ PanelWindow {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onPressed: mouse => {
-            // Translate click into trayModule's coordinate space and check
-            // whether the cursor is inside the tray pill's bounds.
-            var inside = trayModule.mapFromItem(root, mouse.x, mouse.y);
+            var inside = mapToItem(trayModule, mouse.x, mouse.y);
             var hitTray = inside.x >= 0 && inside.x <= trayModule.width && inside.y >= 0 && inside.y <= trayModule.height;
+
             if (!hitTray)
                 trayModule.activeItem = null;
             // Always let the event propagate so the underlying handler runs.
@@ -91,7 +90,7 @@ PanelWindow {
         anchors.rightMargin: 5
 
         implicitWidth: connectRow.implicitWidth + Style.pillPadH * 2
-        implicitHeight: root.hoveredModule !== "" ? Style.pillHeight + 280 : Style.pillHeight
+        implicitHeight: root.hoveredModule !== "" ? Style.pillHeight + 300 : Style.pillHeight
         Behavior on implicitHeight {
             NumberAnimation {
                 duration: 200
@@ -518,8 +517,8 @@ PanelWindow {
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
-                                var action = modelData.addr === btModule.deviceAddr ? "disconnect" : "connect";
-                                Qt.createQmlObject('import Quickshell.Io; Process { command: ["bluetoothctl", "' + action + '", "' + modelData.addr + '"]; running: true }', root);
+                                if (modelData.device)
+                                    modelData.device.connected = !modelData.device.connected;
                             }
                         }
                     }
