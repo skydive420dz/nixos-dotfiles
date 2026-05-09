@@ -28,6 +28,9 @@ PanelWindow {
     implicitHeight: Style.barHeight + 280
     color: "transparent"
 
+    // The mask defines which pixels of the surface accept mouse input.
+    // We add clickCatcher conditionally — when the tray menu is open,
+    // it covers the full panel so any click outside the tray pill closes it.
     mask: Region {
         item: pill
         Region {
@@ -38,10 +41,45 @@ PanelWindow {
         }
         Region {
             item: trayModule
-        }   // tray now in mask so menu mouse events work
+        }
+        Region {
+            item: clickCatcher
+        }
     }
 
     property string hoveredModule: ""
+
+    // ── Click catcher ─────────────────────────────────────────────────────────
+    // Sits on top of everything when the tray menu is open. Catches every
+    // click anywhere in the panel, closes the tray menu if the click was
+    // outside the tray pill, then lets the click propagate to whatever is
+    // beneath so workspaces, the right pill, etc. still respond normally.
+    MouseArea {
+        id: clickCatcher
+        // Geometry is zero-sized when the menu isn't open, so the mask doesn't
+        // include the full panel during normal operation.
+        width: trayModule.menuOpen ? root.width : 0
+        height: trayModule.menuOpen ? root.height : 0
+        x: 0
+        y: 0
+        z: 1000   // above all other elements
+        visible: trayModule.menuOpen
+        propagateComposedEvents: true
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+        onPressed: mouse => {
+            // Translate click into trayModule's coordinate space and check
+            // whether the cursor is inside the tray pill's bounds.
+            var inside = trayModule.mapFromItem(root, mouse.x, mouse.y);
+            var hitTray = inside.x >= 0 && inside.x <= trayModule.width && inside.y >= 0 && inside.y <= trayModule.height;
+            if (!hitTray)
+                trayModule.activeItem = null;
+            // Always let the event propagate so the underlying handler runs.
+            mouse.accepted = false;
+        }
+        onClicked: mouse => mouse.accepted = false
+        onReleased: mouse => mouse.accepted = false
+    }
 
     // ── Connectivity pill ─────────────────────────────────────────────────────
     Rectangle {
@@ -109,7 +147,6 @@ PanelWindow {
                 topMargin: 10
             }
 
-            // ── Clock ─────────────────────────────────────────────────────────
             ColumnLayout {
                 anchors {
                     top: parent.top
@@ -179,7 +216,6 @@ PanelWindow {
                 }
             }
 
-            // ── Weather ───────────────────────────────────────────────────────
             ColumnLayout {
                 anchors {
                     top: parent.top
@@ -308,7 +344,6 @@ PanelWindow {
                 }
             }
 
-            // ── Network ───────────────────────────────────────────────────────
             ColumnLayout {
                 anchors {
                     top: parent.top
@@ -391,7 +426,6 @@ PanelWindow {
                 }
             }
 
-            // ── Bluetooth ─────────────────────────────────────────────────────
             ColumnLayout {
                 anchors {
                     top: parent.top
@@ -505,7 +539,6 @@ PanelWindow {
                 }
             }
 
-            // ── Volume ────────────────────────────────────────────────────────
             ColumnLayout {
                 anchors {
                     top: parent.top
@@ -658,7 +691,6 @@ PanelWindow {
                 }
             }
 
-            // ── Battery ───────────────────────────────────────────────────────
             ColumnLayout {
                 anchors {
                     top: parent.top
@@ -757,7 +789,6 @@ PanelWindow {
             }
         }
 
-        // ── Hover detection ───────────────────────────────────────────────────
         MouseArea {
             z: 1
             anchors.fill: parent
@@ -812,7 +843,7 @@ PanelWindow {
         anchors {
             top: parent.top
             left: parent.left
-            right: trayModule.left   // stops at tray, not at pill
+            right: trayModule.left
             leftMargin: 4
             rightMargin: Style.groupSpacing
         }

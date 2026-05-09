@@ -7,7 +7,9 @@ import Quickshell.Services.SystemTray
 Item {
     id: root
 
-    // Root mirrors pill so the mask in Bar.qml covers the real expanded area
+    // Mirror the inner pill's size so the mask in Bar.qml correctly covers the
+    // expanded area. Without this, mouse events disappear when the cursor moves
+    // into the menu region.
     implicitWidth: pill.implicitWidth
     implicitHeight: pill.implicitHeight
 
@@ -33,7 +35,10 @@ Item {
             }
         }
 
-        implicitHeight: root.menuOpen ? Style.pillHeight + Math.min(menuCol.implicitHeight + 20, 320) : Style.pillHeight
+        // The 280 cap matches the PanelWindow's expansion budget defined in
+        // Bar.qml (implicitHeight: Style.barHeight + 280). Going higher would
+        // make the pill exceed the panel and clip at the bottom.
+        implicitHeight: root.menuOpen ? Style.pillHeight + Math.min(menuCol.implicitHeight + 20, 280) : Style.pillHeight
         Behavior on implicitHeight {
             NumberAnimation {
                 duration: 200
@@ -129,11 +134,11 @@ Item {
 
                         Layout.fillWidth: true
 
-                        // ⬇ THIS is the key fix: declare what width we'd like to be
-                        // based on inner content. ColumnLayout will pick up the
-                        // maximum across all menu items, which propagates up
-                        // through menuCol.implicitWidth → pill.implicitWidth.
-                        implicitWidth: menuItemRect.modelData.isSeparator ? 0 : itemRow.implicitWidth + 16   // 8px left + 8px right margin
+                        // Declare the width we'd prefer to be based on inner content.
+                        // ColumnLayout takes the maximum across all menu items, which
+                        // propagates up through menuCol.implicitWidth → pill.implicitWidth,
+                        // letting the pill grow leftward to fit the longest menu entry.
+                        implicitWidth: menuItemRect.modelData.isSeparator ? 0 : itemRow.implicitWidth + 16
 
                         height: menuItemRect.modelData.isSeparator ? 1 : 28
                         radius: menuItemRect.modelData.isSeparator ? 0 : 6
@@ -144,7 +149,7 @@ Item {
                         }
 
                         RowLayout {
-                            id: itemRow                          // ← give it an id so Rectangle can read implicitWidth
+                            id: itemRow
                             anchors {
                                 fill: parent
                                 leftMargin: 8
@@ -169,7 +174,6 @@ Item {
                                 color: menuItemRect.modelData.enabled ? Mocha.text : Mocha.overlay0
                                 font.pixelSize: Style.fontSizeS
                                 font.family: Style.font
-                                // No elide — pill grows to fit
                             }
 
                             Text {
