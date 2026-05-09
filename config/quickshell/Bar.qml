@@ -25,7 +25,7 @@ PanelWindow {
         bottom: 0
     }
 
-    implicitHeight: Style.barHeight + 300
+    implicitHeight: Style.barHeight + 320
     color: "transparent"
 
     // The mask defines which pixels of the surface accept mouse input.

@@ -157,7 +157,8 @@
           position = "0x0";
           scale = 1;
           bitdepth = 10;
-          cm = "hdr";
+          #cm = "hdr";
+          #supports_hdr = 0;
           sdr_eotf = "gamma22";
           sdrbrightness = 0.7;
           sdrsaturation = 1.11;
@@ -165,7 +166,6 @@
           sdr_min_luminance = 0.001;
           sdr_max_luminance = 400;
           vrr = 1;
-          supports_hdr = 0;
         }
         {
           output = "HDMI-A-1";
@@ -217,20 +217,13 @@
 
     # --- Wayland Fixes ---
     NVD_BACKEND = "direct"; # Better performance for NVIDIA on Wayland
+    NIXOS_OZONE_WL = "1";
     ELECTRON_OZONE_PLATFORM_HINT = "auto"; # Fixes flickering in Discord/VSCode
 
   };
   xdg.userDirs = {
     enable = true;
     createDirectories = true;
-    setSessionVariables = true; # keeps legacy behavior, silences warning
-    desktop = "${config.home.homeDirectory}/Desktop";
-    documents = "${config.home.homeDirectory}/Documents";
-    download = "${config.home.homeDirectory}/Downloads";
-    music = "${config.home.homeDirectory}/Music";
-    pictures = "${config.home.homeDirectory}/Pictures";
-    publicShare = "${config.home.homeDirectory}/Public";
-    templates = "${config.home.homeDirectory}/Templates";
-    videos = "${config.home.homeDirectory}/Videos";
+    setSessionVariables = true;
   };
 }

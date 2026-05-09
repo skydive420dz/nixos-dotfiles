@@ -18,6 +18,7 @@
     "nvidia_modeset"
     "nvidia_uvm"
     "nvidia_drm"
+    "amdgpu"
   ];
 
   # ── Kernel parameters ─────────────────────────────────────────────────────
@@ -42,10 +43,10 @@
     modesetting.enable = true;
     open = false; # use proprietary driver (better perf + compatibility)
     nvidiaSettings = true; # install nvidia-settings GUI tool
-    nvidiaPersistenced = true; # keep GPU initialized — avoids cold-start latency
+    nvidiaPersistenced = false; # keep GPU initialized — avoids cold-start latency
 
     powerManagement = {
-      enable = false; # set true if you need suspend/resume on NVIDIA
+      enable = true; # set true if you need suspend/resume on NVIDIA
       finegrained = false; # fine-grained power management (Turing+ only)
     };
 

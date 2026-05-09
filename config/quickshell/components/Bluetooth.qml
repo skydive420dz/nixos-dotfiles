@@ -2,6 +2,7 @@ import ".."
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Bluetooth
+import Quickshell.Io
 
 Item {
     id: root
@@ -42,12 +43,17 @@ Item {
         font.family: Style.font
         color: root.adapter?.enabled ? Mocha.teal : Mocha.overlay0
     }
+    Process {
+        id: bluetuiLauncher
+        command: ["uwsm", "app", "--", "kitty", "--class=bluetui", "-e", "bluetui"]
+        running: false
+    }
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onClicked: mouse => {
             if (mouse.button === Qt.LeftButton) {
-                Qt.createQmlObject('import Quickshell.Io; Process { command: ["uwsm", "app", "--", "kitty", "-e, bluetui"]; running: true}', root);
+                bluetuiLauncher.running = true;
             } else if (mouse.button === Qt.RightButton && root.adapter) {
                 root.adapter.enabled = !root.adapter.enabled;
             }

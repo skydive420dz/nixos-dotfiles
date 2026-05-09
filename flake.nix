@@ -54,9 +54,8 @@
     }@inputs:
     {
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-
         modules = [
+          { nixpkgs.hostPlatform = "x86_64-linux"; }
           nvf.nixosModules.default
           catppuccin.nixosModules.catppuccin
           home-manager.nixosModules.home-manager
