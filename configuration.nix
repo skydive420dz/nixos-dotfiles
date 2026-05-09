@@ -103,6 +103,10 @@
   };
 
   programs.zsh.enable = true;
+  services.fstrim = {
+    enable = true;
+    interval = "weekly";
+  };
 
   # ============================================
   # APPLICATIONS & PROGRAMS
