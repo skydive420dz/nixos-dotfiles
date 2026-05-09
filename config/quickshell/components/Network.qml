@@ -2,136 +2,100 @@ import ".."
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Io
+import Quickshell.Networking
 
 Item {
     id: root
-    implicitWidth: netText.implicitWidth + 8
-    implicitHeight: Style.pillHeight
-    property bool hovered: hover.containsMouse
 
-    property string icon: "󰤟"
-    property string ssid: ""
-    property string ipAddr: ""
-    property string iface: ""
-    property int signal: 0
-    property string connType: ""
+    implicitWidth: 28
+    implicitHeight: Style.pillHeight
+
+    readonly property var device: {
+        if (!Networking.devices)
+            return null;
+        const all = Networking.devices.values;
+        for (let i = 0; i < all.length; i++) {
+            if (all[i].connected)
+                return all[i];
+        }
+        return null;
+    }
+
+    readonly property var activeNetwork: {
+        if (!device || device.type !== DeviceType.Wifi)
+            return null;
+        if (!device.networks)
+            return null;
+        const nets = device.networks.values;
+        for (let i = 0; i < nets.length; i++) {
+            if (nets[i].connected)
+                return nets[i];
+        }
+        return null;
+    }
+
+    readonly property string connType: {
+        if (!device)
+            return "";
+        if (device.type === DeviceType.Wifi)
+            return "wifi";
+        if (device.type === DeviceType.Wired)
+            return "ethernet";
+        return "";
+    }
+
+    readonly property string iface: device?.name ?? ""
+    readonly property string ipAddr: device?.address ?? ""
+    readonly property string ssid: activeNetwork?.name ?? ""
+
+    readonly property int signal: {
+        if (!device)
+            return 0;
+        if (device.type === DeviceType.Wired)
+            return 100;
+        if (!activeNetwork)
+            return 0;
+        return Math.round(activeNetwork.signalStrength * 100);
+    }
+
+    readonly property string icon: {
+        if (!device)
+            return "󰤭";          // no connection
+        if (connType === "ethernet")
+            return "󰈁";
+        if (signal >= 75)
+            return "󰤨";     // full bars
+        if (signal >= 50)
+            return "󰤥";     // three bars
+        if (signal >= 25)
+            return "󰤢";     // two bars
+        if (signal > 0)
+            return "󰤟";     // one bar
+        return "󰤯";                        // wifi but no signal
+    }
+
+    readonly property color iconColor: {
+        if (!device)
+            return Mocha.overlay0;
+        return Mocha.teal;
+    }
 
     Text {
-        id: netText
         anchors.centerIn: parent
         text: root.icon
         font.pixelSize: Style.fontSize
         font.family: Style.font
-        color: Mocha.teal
+        color: root.iconColor
+    }
+
+    Process {
+        id: nmtuiLauncher
+        command: ["uwsm", "app", "--", "kitty", "--class=nmtui", "-e", "nmtui"]
+        running: false
     }
 
     MouseArea {
-        id: hover
         anchors.fill: parent
-        hoverEnabled: true
-        onClicked: nmtuiToggle.toggle()
+        onClicked: nmtuiLauncher.running = true
     }
-
-    WindowToggle {
-        id: nmtuiToggle
-        windowClass: "nmtui"
-        launchCommand: ["kitty", "--class", "nmtui", "-T", "nmtui", "-e", "nmtui"]
-    }
-
-    // ── Status fetch — runs on demand ─────────────────────────────────────────
-    function refresh() {
-        netStatusProc.running = true;
-    }
-
-    Process {
-        id: netStatusProc
-        command: ["nmcli", "-t", "-f", "DEVICE,TYPE,STATE,CONNECTION", "device", "status"]
-        stdout: SplitParser {
-            // Track whether we found a connected interface across all lines
-            property bool anyConnected: false
-
-            onRead: data => {
-                var line = data.trim();
-                var parts = line.split(":");
-                if (parts.length < 4)
-                    return;
-
-                // Strict match — only "wifi" or "ethernet", not "wifi-p2p" etc.
-                if (parts[1] !== "wifi" && parts[1] !== "ethernet")
-                    return;
-
-                // Skip interfaces that aren't actually connected
-                if (parts[2] !== "connected")
-                    return;
-
-                // Found a connected interface — populate state
-                anyConnected = true;
-                root.iface = parts[0];
-                root.connType = parts[1];
-                if (parts[1] === "ethernet") {
-                    root.icon = "󰈀";
-                    ipProc.running = true;
-                } else {
-                    wifiProc.running = true;
-                }
-            }
-        }
-
-        // After process exits, if no connected interface was found, set disconnected
-        onExited: {
-            if (!netStatusProc.stdout.anyConnected) {
-                root.icon = "󰤯";
-                root.connType = "disconnected";
-                root.iface = "";
-                root.ipAddr = "";
-                root.ssid = "";
-                root.signal = 0;
-            }
-            netStatusProc.stdout.anyConnected = false;
-        }
-    }
-
-    Process {
-        id: wifiProc
-        command: ["nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL", "device", "wifi"]
-        stdout: SplitParser {
-            onRead: data => {
-                if (!data.startsWith("*"))
-                    return;
-                var parts = data.trim().replace(/^\*:/, "").split(":");
-                root.ssid = parts[0] ?? "";
-                root.signal = parseInt(parts[1] ?? "0");
-                root.icon = root.signal > 75 ? "󰤨" : root.signal > 50 ? "󰤥" : root.signal > 25 ? "󰤢" : "󰤟";
-                ipProc.running = true;
-            }
-        }
-    }
-
-    Process {
-        id: ipProc
-        command: ["bash", "-c", "ip -4 addr show " + root.iface + " 2>/dev/null | awk '/inet / {print $2}' | cut -d/ -f1 | head -1"]
-        stdout: SplitParser {
-            onRead: data => {
-                root.ipAddr = data.trim();
-            }
-        }
-    }
-
-    // ── Event-driven — nmcli monitor reacts to connection changes ─────────────
-    Process {
-        id: nmMonitor
-        command: ["nmcli", "monitor"]
-        running: true
-        stdout: SplitParser {
-            onRead: data => {
-                // Any line from nmcli monitor means something changed
-                if (data.trim().length > 0)
-                    root.refresh();
-            }
-        }
-    }
-
-    Component.onCompleted: root.refresh()
-
-    // ── Popover ───────────────────────────────────────────────────────────────
 }
