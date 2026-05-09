@@ -7,9 +7,7 @@ import Quickshell.Services.SystemTray
 Item {
     id: root
 
-    // Root tracks the pill's actual size so the mask in Bar.qml
-    // covers the full expanded area — this is the critical fix for
-    // mouse events disappearing when you move into the menu.
+    // Root mirrors pill so the mask in Bar.qml covers the real expanded area
     implicitWidth: pill.implicitWidth
     implicitHeight: pill.implicitHeight
 
@@ -26,9 +24,7 @@ Item {
         anchors.top: parent.top
         anchors.right: parent.right
 
-        // Width grows to fit whichever is wider: icon row or menu content.
-        // Because the pill is right-anchored, it expands leftward — the icons
-        // stay in place on the right while the menu fills the wider bottom area.
+        // Right-anchored, so growing implicitWidth expands LEFT — gives L-shape effect
         implicitWidth: root.menuOpen ? Math.max(iconRow.implicitWidth, menuCol.implicitWidth) + Style.pillPadH * 2 : iconRow.implicitWidth + Style.pillPadH * 2
         Behavior on implicitWidth {
             NumberAnimation {
@@ -68,7 +64,6 @@ Item {
                 delegate: Item {
                     id: trayItem
                     required property SystemTrayItem modelData
-
                     width: 20
                     height: 20
 
@@ -89,7 +84,6 @@ Item {
                                 root.activeItem = null;
                                 trayItem.modelData.activate();
                             } else if (mouse.button === Qt.RightButton && trayItem.modelData.hasMenu) {
-                                // Toggle: same icon again closes
                                 root.activeItem = root.activeItem === trayItem.modelData ? null : trayItem.modelData;
                             }
                         }
@@ -134,6 +128,13 @@ Item {
                         required property QsMenuEntry modelData
 
                         Layout.fillWidth: true
+
+                        // ⬇ THIS is the key fix: declare what width we'd like to be
+                        // based on inner content. ColumnLayout will pick up the
+                        // maximum across all menu items, which propagates up
+                        // through menuCol.implicitWidth → pill.implicitWidth.
+                        implicitWidth: menuItemRect.modelData.isSeparator ? 0 : itemRow.implicitWidth + 16   // 8px left + 8px right margin
+
                         height: menuItemRect.modelData.isSeparator ? 1 : 28
                         radius: menuItemRect.modelData.isSeparator ? 0 : 6
                         color: {
@@ -143,6 +144,7 @@ Item {
                         }
 
                         RowLayout {
+                            id: itemRow                          // ← give it an id so Rectangle can read implicitWidth
                             anchors {
                                 fill: parent
                                 leftMargin: 8
@@ -154,8 +156,8 @@ Item {
                             Image {
                                 visible: menuItemRect.modelData.icon !== ""
                                 source: menuItemRect.modelData.icon
-                                width: 14
-                                height: 14
+                                Layout.preferredWidth: 14
+                                Layout.preferredHeight: 14
                                 smooth: true
                                 mipmap: true
                                 fillMode: Image.PreserveAspectFit
@@ -167,7 +169,7 @@ Item {
                                 color: menuItemRect.modelData.enabled ? Mocha.text : Mocha.overlay0
                                 font.pixelSize: Style.fontSizeS
                                 font.family: Style.font
-                                // No elide — pill grows to fit text now
+                                // No elide — pill grows to fit
                             }
 
                             Text {
