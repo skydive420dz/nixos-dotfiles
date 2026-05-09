@@ -43,7 +43,7 @@
     modesetting.enable = true;
     open = false; # use proprietary driver (better perf + compatibility)
     nvidiaSettings = true; # install nvidia-settings GUI tool
-    nvidiaPersistenced = false; # keep GPU initialized — avoids cold-start latency
+    nvidiaPersistenced = true; # on/off GPU initialized — avoids cold-start latency if on
 
     powerManagement = {
       enable = true; # set true if you need suspend/resume on NVIDIA

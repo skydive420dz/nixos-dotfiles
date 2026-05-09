@@ -763,10 +763,6 @@ PanelWindow {
                             label: "🔋 Health",
                             value: battModule.health + "%"
                         },
-                        {
-                            label: "🔄 Cycles",
-                            value: battModule.cycleCount.toString()
-                        }
                     ]
                     RowLayout {
                         Layout.fillWidth: true

@@ -42,5 +42,5 @@ QtObject {
     // Pill background: base at 15% opacity
     readonly property color pillBg: Qt.rgba(0.118, 0.118, 0.180, 0.6)
     // Pill border: lavender at 10% opacity
-    readonly property color pillBorder: Qt.rgba(0.706, 0.749, 0.996, 0.18)
+    readonly property color pillBorder: Qt.rgba(0.706, 0.749, 0.996, 0.12)
 }
