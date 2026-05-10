@@ -30,19 +30,19 @@
       add_newline = true;
 
       format = lib.concatStrings [
-        # ── Top row: os | shell | user@host ───────────────────────────────
-        "[](#a6e3a1)"
-        "$os"
-        "[](bg:#313244 fg:#a6e3a1)"
-        "$shell"
-        "[](bg:#fab387 fg:#313244)"
-        "$username"
-        "$hostname"
-        "[](fg:#fab387)"
-
-        # ── Newline before directory pill ─────────────────────────────────
-        "\n"
-
+        #        # ── Top row: os | shell | user@host ───────────────────────────────
+        #        "[](#a6e3a1)"
+        #        "$os"
+        #        "[](bg:#313244 fg:#a6e3a1)"
+        #        "$shell"
+        #        "[](bg:#fab387 fg:#313244)"
+        #        "$username"
+        #        "$hostname"
+        #        "[](fg:#fab387)"
+        #
+        #        # ── Newline before directory pill ─────────────────────────────────
+        #        "\n"
+        #
         # ── Second row: directory + git ───────────────────────────────────
         "[](#89b4fa)"
         "$directory"

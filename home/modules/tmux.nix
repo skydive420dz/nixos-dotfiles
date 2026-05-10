@@ -59,9 +59,9 @@
       set -g window-status-current-format ""
       set -g window-status-separator ""
 
-      set -g status-left "#[fg=#cba6f7,bg=#1e1e2e]#[fg=#1e1e2e,bg=#cba6f7] #S #[fg=#cba6f7,bg=#1e1e2e] #[fg=#89b4fa,bg=#1e1e2e]#[fg=#1e1e2e,bg=#89b4fa] #{b:pane_current_path} #[fg=#89b4fa,bg=#1e1e2e]"
+      set -g status-left "#[fg=#cba6f7,bg=#1e1e2e]#[fg=#1e1e2e,bg=#cba6f7]  #S #[fg=#cba6f7,bg=#1e1e2e] #[fg=#89b4fa,bg=#1e1e2e]#[fg=#1e1e2e,bg=#89b4fa] 󰉓 #{b:pane_current_path} #[fg=#89b4fa,bg=#1e1e2e]"
 
-      set -g status-right "#[fg=#a6e3a1,bg=#1e1e2e]#[fg=#1e1e2e,bg=#a6e3a1] #{user} #[fg=#a6e3a1,bg=#1e1e2e] #[fg=#89b4fa,bg=#1e1e2e]#[fg=#1e1e2e,bg=#89b4fa] #H #[fg=#89b4fa,bg=#1e1e2e] #[fg=#f9e2af,bg=#1e1e2e]#[fg=#1e1e2e,bg=#f9e2af] %H:%M #[fg=#f9e2af,bg=#1e1e2e]"
+      set -g status-right "#[fg=#a6e3a1,bg=#1e1e2e]#[fg=#1e1e2e,bg=#a6e3a1]  #{user} #[fg=#a6e3a1,bg=#1e1e2e] #[fg=#89b4fa,bg=#1e1e2e]#[fg=#1e1e2e,bg=#89b4fa]  #H #[fg=#89b4fa,bg=#1e1e2e] #[fg=#f9e2af,bg=#1e1e2e]#[fg=#1e1e2e,bg=#f9e2af] %H:%M #[fg=#f9e2af,bg=#1e1e2e]"
 
       # =========================================
       # PANE BORDERS
