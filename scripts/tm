@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# Directories to search
+PROJECT_DIRS=(
+  "$HOME"
+  "$HOME/projects"
+)
+
+# Find candidate folders
+selected=$(
+  find "${PROJECT_DIRS[@]}" \
+    -mindepth 1 \
+    -maxdepth 2 \
+    -type d 2>/dev/null |
+    fzf
+)
+
+# Exit if nothing selected
+[ -z "$selected" ] && exit 0
+
+# Session name = folder name
+session=$(basename "$selected" | tr . _)
+
+# Create session if it doesn't exist
+if ! tmux has-session -t="$session" 2>/dev/null; then
+  tmux new-session -ds "$session" -c "$selected"
+fi
+
+# Attach/switch
+if [ -n "$TMUX" ]; then
+  tmux switch-client -t "$session"
+else
+  tmux attach -t "$session"
+fi

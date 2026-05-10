@@ -29,6 +29,7 @@ in
   # than the whole directory — meaning the *directory itself* stays
   # writable, so apps that need to write cache/state into it can do so.
   xdg.configFile = {
+    "tmux/tmux.conf".source = ../../config/tmux/tmux.conf;
     "swaync/config.json".source = ../../config/swaync/config.json;
     "swaync/style.css".source = ../../config/swaync/style.css;
     "hypr/mocha.conf".source = ../../config/hypr/mocha.conf;
@@ -40,7 +41,6 @@ in
   # Anything you actively iterate on. Edit the file → it's live.
   # No rebuild needed.
   home.file = {
-    ".config/waybar".source = link "config/waybar";
     ".config/kitty".source = link "config/kitty";
     ".config/quickshell".source = link "config/quickshell";
     ".config/yazi".source = link "config/yazi";

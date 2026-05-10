@@ -7,5 +7,6 @@
     ./starship.nix
     ./firefox.nix
     ./gnupg.nix
+    ./tmux.nix
   ];
 }

@@ -75,17 +75,22 @@
     };
 
     initContent = lib.mkBefore ''
-      # 1. Load OpenAI Key secretly
-      if [ -f "$HOME/.openai_key" ]; then
-        . "$HOME/.openai_key"
+       # 1. Load OpenAI Key secretly
+       if [ -f "$HOME/.openai_key" ]; then
+         . "$HOME/.openai_key"
+       fi
+
+       # 3. Start Hyprland with UWSM automatically on TTY1
+       if uwsm check may-start; then
+         exec uwsm start hyprland-uwsm.desktop > /dev/null 2>&1
+       fi
+
+      # 4. Auto-start tmux
+      if [ -z "$TMUX" ]; then
+        tmux new -A -s main
       fi
 
-      # 3. Start Hyprland with UWSM automatically on TTY1
-      if uwsm check may-start; then
-        exec uwsm start hyprland-uwsm.desktop > /dev/null 2>&1
-      fi
-
-      # 4. Yazi CWD Wrapper (y command)
+      # 5. Yazi CWD Wrapper (y command)
       function y() {
         local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
         yazi "$@" --cwd-file="$tmp"
