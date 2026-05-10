@@ -43,6 +43,7 @@
     ];
     sessionPath = [
       "${config.home.profileDirectory}/bin"
+      "$HOME/.config/scripts"
     ];
   };
   programs.git.enable = true;
