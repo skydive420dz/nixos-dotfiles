@@ -490,9 +490,9 @@ PanelWindow {
                         Layout.fillWidth: true
                         height: 28
                         radius: 8
-                        color: modelData.addr === btModule.deviceAddr ? Qt.rgba(Mocha.teal.r, Mocha.teal.g, Mocha.teal.b, 0.2) : "transparent"
-                        border.color: modelData.addr === btModule.deviceAddr ? Mocha.teal : "transparent"
-                        border.width: 1
+                        color: "transparent"
+                        border.color: "transparent"
+                        border.width: 0
                         RowLayout {
                             anchors {
                                 fill: parent
@@ -500,7 +500,7 @@ PanelWindow {
                                 rightMargin: 8
                             }
                             Text {
-                                text: modelData.addr === btModule.deviceAddr ? "󰂱 " : "󰂯 "
+                                text: modelData.device.connected ? "󰂱 " : "󰂯 "
                                 color: Mocha.teal
                                 font.pixelSize: 12
                                 font.family: Style.font
@@ -512,6 +512,14 @@ PanelWindow {
                                 font.family: Style.font
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
+                            }
+
+                            Text {
+                                visible: modelData.battery >= 0 && modelData.device.connected
+                                text: "󰁹 " + modelData.battery + "%"
+                                color: Mocha.overlay0
+                                font.pixelSize: Style.fontSizeS
+                                font.family: Style.font
                             }
                         }
                         MouseArea {
