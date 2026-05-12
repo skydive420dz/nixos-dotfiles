@@ -30,7 +30,7 @@
       swayosd
       powertop
       (pkgs.writeShellScriptBin "qmlls" ''
-        exec ${pkgs.qt6.qtlanguageserver}/bin/qmlls \
+        exec ${pkgs.qt6.qtdeclarative}/bin/qmlls \
           -I ${pkgs.qt6.qtdeclarative}/lib/qt-6/qml \
           -I ${pkgs.quickshell}/lib/qt-6/qml \
           -I /etc/profiles/per-user/${config.home.username}/lib/qt-6/qml \
