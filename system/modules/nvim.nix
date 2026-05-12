@@ -396,6 +396,12 @@ in
             vim.g.smart_splits_multiplexer_integration = "tmux"
           end
 
+          -- Load portable runtime tweaks linked through XDG.
+          local navigation_lua = vim.fn.stdpath("config") .. "/lua/user/navigation.lua"
+          if vim.uv.fs_stat(navigation_lua) then
+            dofile(navigation_lua)
+          end
+
           -- Spelling
           vim.opt.spell = true
           vim.opt.spelllang = { "en_us" }
