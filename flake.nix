@@ -9,31 +9,19 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Upstream Hyprland
     hyprland = {
       url = "github:hyprwm/Hyprland";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Upstream Quickshell
     quickshell = {
-      # add ?ref=<tag> to track a tag
       url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
-
-      # THIS IS IMPORTANT
-      # Mismatched system dependencies will lead to crashes and other issues.
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Catppuccin theming
     catppuccin.url = "github:catppuccin/nix";
-
-    # Neovim configuration framework
     nvf.url = "github:notashelf/nvf";
 
-    # Firefox addons via NUR (rycee's repo). Provides extensions as
-    # Nix packages so they can be installed declaratively.
-    # See: https://nur.nix-community.org/repos/rycee/
     firefox-addons = {
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -42,20 +30,34 @@
 
   outputs =
     {
-      self,
       nixpkgs,
       home-manager,
-      hyprland,
       nvf,
       catppuccin,
-      firefox-addons,
-      quickshell,
       ...
     }@inputs:
+    let
+      username = "skydive420dz";
+      hostname = "nixos";
+      system = "x86_64-linux";
+      homeDirectory = "/home/${username}";
+      repoPath = "${homeDirectory}/nixos-dotfiles";
+
+      specialArgs = {
+        inherit
+          inputs
+          username
+          hostname
+          homeDirectory
+          repoPath
+          ;
+      };
+    in
     {
-      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
+        inherit system specialArgs;
+
         modules = [
-          { nixpkgs.hostPlatform = "x86_64-linux"; }
           nvf.nixosModules.default
           catppuccin.nixosModules.catppuccin
           home-manager.nixosModules.home-manager
@@ -63,22 +65,16 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-
-              # Pass all flake inputs (including firefox-addons) to home modules
-              extraSpecialArgs = { inherit inputs; };
-
-              users.skydive420dz = {
-                imports = [
-                  ./home.nix
-                  catppuccin.homeModules.catppuccin
-                ];
-              };
-
+              extraSpecialArgs = specialArgs;
               backupFileExtension = "backup";
+
+              users.${username}.imports = [
+                ./home
+                catppuccin.homeModules.catppuccin
+              ];
             };
           }
-
-          ./configuration.nix
+          ./hosts/nixos
         ];
       };
     };

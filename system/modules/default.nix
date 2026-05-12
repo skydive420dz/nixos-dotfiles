@@ -1,5 +1,15 @@
 {
   imports = [
+    ./base.nix
+    ./networking.nix
+    ./power.nix
+    ./input.nix
+    ./users.nix
+    ./gaming.nix
+    ./packages.nix
+    ./programs/bat.nix
+    ./services/ollama.nix
+    ./desktop/hyprland.nix
     ./nvim.nix
     ./audio-config.nix
     ./nvidia.nix

@@ -11,11 +11,11 @@
 #      For files you tweak constantly — keybinds, themes-in-progress,
 #      anything where the rebuild loop slows you down.
 
-{ config, ... }:
+{ config, repoPath, ... }:
 
 let
   # Repo root path. Defined once so renames are a one-line change.
-  repoRoot = "/home/skydive420dz/nixos-dotfiles";
+  repoRoot = repoPath;
 
   # Helper for live-editable links.
   link = path: config.lib.file.mkOutOfStoreSymlink "${repoRoot}/${path}";
