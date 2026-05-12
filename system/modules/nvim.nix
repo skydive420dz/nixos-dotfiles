@@ -4,21 +4,41 @@
   lib,
   ...
 }:
+let
+  inherit (lib.generators) mkLuaInline;
+
+  qmlImportPaths = [
+    "${pkgs.qt6.qtdeclarative}/lib/qt-6/qml"
+  ]
+  ++ lib.optionals pkgs.stdenv.isLinux [
+    "${pkgs.quickshell}/lib/qt-6/qml"
+  ];
+  qmlImportArgs = lib.concatMapStringsSep " " (path: "-I ${path}") qmlImportPaths;
+in
 {
   programs.nvf = {
     enable = true;
     settings = {
       vim = {
-        startPlugins = [ "chatgpt-nvim" ];
+        startPlugins = [ ];
 
-        extraPackages = with pkgs; [
-          tree-sitter # Satisfies tree-sitter-cli requirement
-          gcc
-          ripgrep
-          fd
-          lldb # Fixes Rustaceanvim debug warning
-          qt6.qtdeclarative
-        ];
+        extraPackages =
+          with pkgs;
+          [
+            tree-sitter # Satisfies tree-sitter-cli requirement
+            gcc
+            ripgrep
+            fd
+            lldb # Fixes Rustaceanvim debug warning
+            qt6.qtdeclarative
+            qt6.qttools
+          ]
+          ++ lib.optionals stdenv.isDarwin [
+            pngpaste
+          ]
+          ++ lib.optionals stdenv.isLinux [
+            quickshell
+          ];
 
         viAlias = false;
         vimAlias = true;
@@ -35,7 +55,10 @@
 
         spellcheck = {
           enable = true;
-          languages = [ "en" ];
+          languages = [
+            "en"
+            "en_us"
+          ];
         };
 
         lsp = {
@@ -52,13 +75,9 @@
           servers.qmlls = {
             cmd = lib.mkForce [
               "${pkgs.writeShellScriptBin "qmlls-wrapped" ''
-                exec ${pkgs.qt6.qtdeclarative}/bin/qmlls \
-                  -I ${pkgs.qt6.qtdeclarative}/lib/qt-6/qml \
-                  -I ${pkgs.quickshell}/lib/qt-6/qml \
-                  "$@"
+                exec ${pkgs.qt6.qtdeclarative}/bin/qmlls ${qmlImportArgs} "$@"
               ''}/bin/qmlls-wrapped"
             ];
-
           };
         };
 
@@ -163,7 +182,6 @@
             treesitter = {
               enable = true;
             };
-
           };
           java.enable = true;
           lua.enable = true;
@@ -177,11 +195,24 @@
           fidget-nvim.enable = true;
           highlight-undo.enable = true;
           blink-indent.enable = true;
-          indent-blankline.enable = true;
+          indent-blankline.enable = false;
         };
+        mini.icons.enable = true;
 
         statusline.lualine.enable = true;
-        autocomplete.blink-cmp.enable = true;
+        autocomplete.blink-cmp = {
+          enable = true;
+          setupOpts.keymap = {
+            "<Up>" = [
+              "select_prev"
+              "fallback"
+            ];
+            "<Down>" = [
+              "select_next"
+              "fallback"
+            ];
+          };
+        };
         snippets.luasnip.enable = true;
         filetree.neo-tree.enable = true;
         tabline.nvimBufferline.enable = true;
@@ -230,7 +261,6 @@
 
         notes = {
           neorg.enable = false;
-          obsidian.enable = false;
           orgmode.enable = false;
           todo-comments.enable = true;
         };
@@ -240,7 +270,6 @@
           lazygit.enable = true;
         };
 
-        mini.icons.enable = true;
         ui = {
           borders.enable = true;
           noice.enable = true;
@@ -270,57 +299,142 @@
           dashboard-nvim.enable = false;
           alpha = {
             enable = true;
-            theme = "theta";
+            theme = null;
+            layout = [
+              {
+                type = "padding";
+                val = 2;
+              }
+              {
+                type = "text";
+                val = [
+                  "                                                        "
+                  "             ████  ████                            "
+                  "             █████ █████                           "
+                  "              ██████████                          "
+                  "      ███████████████████                         "
+                  "     █████████████████████                        "
+                  "    ██████████████████████                       "
+                  "   ████████████████████████                      "
+                  "  ██████████████████████████                     "
+                  "  ██████████████████████████                     "
+                  "   ███████████████████████                       "
+                  "    █████████████████████                        "
+                  "        ███████████████                          "
+                  "          ████████████                              "
+                  "                                                        "
+                  "             N E O V I M   /   skydive420dz            "
+                  "                                                        "
+                ];
+                opts = {
+                  position = "center";
+                  hl = "Type";
+                };
+              }
+              {
+                type = "padding";
+                val = 1;
+              }
+              {
+                type = "group";
+                val = mkLuaInline ''
+                  (function()
+                    local dashboard = require("alpha.themes.dashboard")
+                    return {
+                      dashboard.button("f", "  Find file", "<cmd>Telescope find_files<cr>"),
+                      dashboard.button("g", "󰱼  Live grep", "<cmd>Telescope live_grep<cr>"),
+                      dashboard.button("r", "  Recent files", "<cmd>Telescope oldfiles<cr>"),
+                      dashboard.button("s", "󰆓  Load session", "<cmd>SessionManager load_session<cr>"),
+                      dashboard.button("q", "  Quit", "<cmd>qa<cr>"),
+                    }
+                  end)()
+                '';
+                opts = {
+                  spacing = 1;
+                };
+              }
+            ];
           };
-          startify.enable = false;
         };
 
-        minimap = {
-          codewindow.enable = true;
+        session.nvim-session-manager = {
+          enable = true;
+          setupOpts.autoload_mode = "Disabled";
+          mappings = {
+            saveCurrentSession = "<leader>Ss";
+            loadSession = "<leader>Sl";
+            loadLastSession = "<leader>Sr";
+            deleteSession = "<leader>Sd";
+          };
         };
-
-        session.nvim-session-manager.enable = false;
         gestures.gesture-nvim.enable = false;
         comments.comment-nvim.enable = true;
         presence.neocord.enable = false;
 
         assistant = {
-          chatgpt.enable = true;
+          chatgpt.enable = false;
           copilot.enable = false;
-          codecompanion-nvim.enable = true;
+          codecompanion-nvim.enable = false;
           avante-nvim.enable = false;
         };
 
         clipboard.enable = true;
 
         luaConfigRC.navigation = ''
-                  -- Clipboard fix
-                    vim.opt.clipboard = 'unnamedplus'
+          -- Health check path fixes
+          vim.opt.runtimepath:append(vim.fn.stdpath("data") .. "/site")
+          vim.opt.packpath:append(vim.fn.stdpath("data") .. "/site")
 
-                  -- Navigation Hints Toggle
-                    vim.keymap.set("n", "<leader>pt", "<cmd>Precognition toggle<cr>", { desc = "Toggle Hints" })
+          -- Clipboard fix
+          vim.opt.clipboard = 'unnamedplus'
 
-                  -- Trouble Diagnostics Toggle
-                    vim.keymap.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics" })
+          -- Spelling
+          vim.opt.spell = true
+          vim.opt.spelllang = { "en_us" }
+          vim.keymap.set("n", "]s", "]s", { desc = "Next spelling error" })
+          vim.keymap.set("n", "[s", "[s", { desc = "Previous spelling error" })
+          vim.keymap.set("n", "<leader>zg", "zg", { desc = "Add word to dictionary" })
+          vim.keymap.set("n", "<leader>zw", "zw", { desc = "Mark word wrong" })
+          vim.keymap.set("n", "<leader>z=", "z=", { desc = "Spelling suggestions" })
 
-          -- CodeCompanion Setup for DeepSeek
-          require("codecompanion").setup({
-            strategies = {
-              chat = { adapter = "ollama" },
-              inline = { adapter = "ollama" },
-            },
-            adapters = {
-              ollama = function()
-                return require("codecompanion.adapters").extend("ollama", {
-                  schema = {
-                    model = {
-                      default = "deepseek-r1:7b",
-                    },
-                  },
-                })
-              end,
-            },
+          -- Autosave changed normal file buffers after 3 seconds idle in normal mode
+          vim.opt.updatetime = 3000
+          local autosave_group = vim.api.nvim_create_augroup("NormalModeAutosave", { clear = true })
+          local autosave_pending = false
+
+          local function can_autosave()
+            return vim.bo.modified
+              and vim.bo.modifiable
+              and not vim.bo.readonly
+              and vim.bo.buftype == ""
+              and vim.fn.expand("%") ~= ""
+              and vim.fn.mode() == "n"
+          end
+
+          vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
+            group = autosave_group,
+            callback = function()
+              autosave_pending = true
+            end,
           })
+
+          vim.api.nvim_create_autocmd("CursorHold", {
+            group = autosave_group,
+            callback = function()
+              if autosave_pending and can_autosave() then
+                local filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":t")
+                autosave_pending = false
+                vim.cmd("silent! update")
+                vim.notify("Saved " .. filename, vim.log.levels.INFO, { title = "Autosave" })
+              end
+            end,
+          })
+
+          -- Navigation Hints Toggle
+          vim.keymap.set("n", "<leader>pt", "<cmd>Precognition toggle<cr>", { desc = "Toggle Hints" })
+
+          -- Trouble Diagnostics Toggle
+          vim.keymap.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics" })
 
         '';
 
