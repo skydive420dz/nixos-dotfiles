@@ -24,3 +24,7 @@ config/aerc/sent/
 config/aerc/postpone/
 config/aerc/state
 .qmlls.ini
+
+# Neovim logs
+nvim.log
+*.log
