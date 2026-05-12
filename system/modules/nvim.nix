@@ -230,8 +230,8 @@
 
         notes = {
           neorg.enable = false;
+          obsidian.enable = false;
           orgmode.enable = false;
-          mind-nvim.enable = true;
           todo-comments.enable = true;
         };
 
@@ -240,6 +240,7 @@
           lazygit.enable = true;
         };
 
+        mini.icons.enable = true;
         ui = {
           borders.enable = true;
           noice.enable = true;
@@ -267,7 +268,15 @@
         };
         dashboard = {
           dashboard-nvim.enable = false;
-          alpha.enable = true;
+          alpha = {
+            enable = true;
+            theme = "theta";
+          };
+          startify.enable = false;
+        };
+
+        minimap = {
+          codewindow.enable = true;
         };
 
         session.nvim-session-manager.enable = false;
