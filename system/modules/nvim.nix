@@ -242,7 +242,10 @@ in
           surround.enable = true;
           leetcode-nvim.enable = true;
           multicursors.enable = true;
-          smart-splits.enable = true;
+          smart-splits = {
+            enable = true;
+            setupOpts.multiplexer_integration = mkLuaInline ''vim.env.TMUX and "tmux" or nil'';
+          };
           undotree.enable = true;
           nvim-biscuits.enable = true;
           grug-far-nvim.enable = true;
@@ -388,6 +391,11 @@ in
           -- Clipboard fix
           vim.opt.clipboard = 'unnamedplus'
 
+          -- Smart-splits should talk to tmux when Neovim is running inside tmux.
+          if vim.env.TMUX then
+            vim.g.smart_splits_multiplexer_integration = "tmux"
+          end
+
           -- Spelling
           vim.opt.spell = true
           vim.opt.spelllang = { "en_us" }
@@ -429,6 +437,10 @@ in
               end
             end,
           })
+
+          -- Pane and Neo-tree navigation
+          vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle reveal_force_cwd<cr>", { desc = "Toggle Neo-tree" })
+          vim.keymap.set("n", "<leader>E", "<cmd>Neotree reveal_force_cwd<cr>", { desc = "Focus Neo-tree" })
 
           -- Navigation Hints Toggle
           vim.keymap.set("n", "<leader>pt", "<cmd>Precognition toggle<cr>", { desc = "Toggle Hints" })
