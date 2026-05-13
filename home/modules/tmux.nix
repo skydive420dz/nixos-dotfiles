@@ -1,5 +1,10 @@
 { config, pkgs, ... }:
 
+let
+  theme = import ../../config/theme/tokens.nix;
+  semantic = theme.semantic;
+in
+
 {
   programs.tmux = {
     enable = true;
@@ -50,7 +55,7 @@
 
       set -g status-position top
       set -g status-interval 5
-      set -g status-style "bg=#1e1e2e,fg=#cdd6f4"
+      set -g status-style "bg=${semantic.background},fg=${semantic.foreground}"
 
       set -g status-left-length 100
       set -g status-right-length 100
@@ -59,16 +64,16 @@
       set -g window-status-current-format ""
       set -g window-status-separator ""
 
-      set -g status-left "#[fg=#cba6f7,bg=#1e1e2e]#[fg=#1e1e2e,bg=#cba6f7]  #S #[fg=#cba6f7,bg=#1e1e2e] #[fg=#89b4fa,bg=#1e1e2e]#[fg=#1e1e2e,bg=#89b4fa] 󰉓 #{b:pane_current_path} #[fg=#89b4fa,bg=#1e1e2e]"
+      set -g status-left "#[fg=${semantic.accentAlt},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.accentAlt}]  #S #[fg=${semantic.accentAlt},bg=${semantic.background}] #[fg=${semantic.borderActive},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.borderActive}] 󰉓 #{b:pane_current_path} #[fg=${semantic.borderActive},bg=${semantic.background}]"
 
-      set -g status-right "#[fg=#a6e3a1,bg=#1e1e2e]#[fg=#1e1e2e,bg=#a6e3a1]  #{user} #[fg=#a6e3a1,bg=#1e1e2e] #[fg=#89b4fa,bg=#1e1e2e]#[fg=#1e1e2e,bg=#89b4fa]  #H #[fg=#89b4fa,bg=#1e1e2e] #[fg=#f9e2af,bg=#1e1e2e]#[fg=#1e1e2e,bg=#f9e2af] %H:%M #[fg=#f9e2af,bg=#1e1e2e]"
+      set -g status-right "#[fg=${semantic.success},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.success}]  #{user} #[fg=${semantic.success},bg=${semantic.background}] #[fg=${semantic.borderActive},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.borderActive}]  #H #[fg=${semantic.borderActive},bg=${semantic.background}] #[fg=${semantic.warning},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.warning}] %H:%M #[fg=${semantic.warning},bg=${semantic.background}]"
 
       # =========================================
       # PANE BORDERS
       # =========================================
 
-      set -g pane-border-style fg=#45475a
-      set -g pane-active-border-style fg=#89b4fa
+      set -g pane-border-style fg=${semantic.border}
+      set -g pane-active-border-style fg=${semantic.borderActive}
 
       # =========================================
       # SPLITS
