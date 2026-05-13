@@ -214,7 +214,15 @@ in
           };
         };
         snippets.luasnip.enable = true;
-        filetree.neo-tree.enable = true;
+        filetree.neo-tree = {
+          enable = true;
+          setupOpts = {
+            enable_git_status = true;
+            enable_refresh_on_write = true;
+            git_status_async = true;
+            filesystem.use_libuv_file_watcher = true;
+          };
+        };
         tabline.nvimBufferline.enable = true;
 
         # Added explicit treesitter block to help NixOS healthcheck
@@ -226,7 +234,14 @@ in
         };
 
         binds = {
-          whichKey.enable = true;
+          whichKey = {
+            enable = true;
+            setupOpts = {
+              preset = "helix";
+              notify = false;
+              delay = 500;
+            };
+          };
           cheatsheet.enable = true;
         };
 
@@ -344,6 +359,8 @@ in
                   (function()
                     local dashboard = require("alpha.themes.dashboard")
                     return {
+                      dashboard.button("n", "  New file", "<cmd>ene <bar> startinsert<cr>"),
+                      dashboard.button("e", "  Explorer", "<cmd>Neotree toggle<cr>"),
                       dashboard.button("f", "  Find file", "<cmd>Telescope find_files<cr>"),
                       dashboard.button("g", "󰱼  Live grep", "<cmd>Telescope live_grep<cr>"),
                       dashboard.button("r", "  Recent files", "<cmd>Telescope oldfiles<cr>"),
