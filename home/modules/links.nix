@@ -40,7 +40,6 @@ in
   # Anything you actively iterate on. Edit the file → it's live.
   # No rebuild needed.
   home.file = {
-    ".config/kitty".source = link "config/kitty";
     ".config/quickshell".source = link "config/quickshell";
     ".config/yazi".source = link "config/yazi";
     ".config/qutebrowser".source = link "config/qutebrowser";
