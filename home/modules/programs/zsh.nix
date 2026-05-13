@@ -25,6 +25,8 @@
       cat = "bat";
       btop = "kitty --title btop_float -e btop";
       nvtop = "kitty --title nvtop_float -e nvtop";
+      tm = "tmux new -A -s main";
+      tmd = "tmux new -A -s dots";
       discord = "vesktop --use-gl=desktop --enable-features=UseOzonePlatform --ozone-platform=wayland";
     };
 
@@ -35,10 +37,6 @@
 
       if uwsm check may-start; then
         exec uwsm start hyprland-uwsm.desktop > /dev/null 2>&1
-      fi
-
-      if [ -z "$TMUX" ]; then
-        tmux new -A -s main
       fi
 
       function y() {
