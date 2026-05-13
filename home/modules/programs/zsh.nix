@@ -39,6 +39,13 @@
         exec uwsm start hyprland-uwsm.desktop > /dev/null 2>&1
       fi
 
+      if [[ -o interactive ]] \
+        && [ -z "$TMUX" ] \
+        && [ -z "$NO_TMUX_AUTO" ] \
+        && { [ "$TERM" = "xterm-kitty" ] || [ -n "$KITTY_WINDOW_ID" ]; }; then
+        tmux new -A -s main
+      fi
+
       function y() {
         local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
         yazi "$@" --cwd-file="$tmp"
