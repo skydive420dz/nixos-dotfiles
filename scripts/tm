@@ -9,7 +9,6 @@ selected=$(
                 printf '%s\n' \
                         "$HOME/nixos-dotfiles/config/quickshell" \
                         "$HOME/nixos-dotfiles/config/hypr" \
-                        "$HOME/nixos-dotfiles/config/kitty" \
                         "$HOME/nixos-dotfiles/config/tmux" \
                         "$HOME/nixos-dotfiles/config/yazi" \
                         "$HOME/nixos-dotfiles/home/modules" \

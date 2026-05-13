@@ -95,12 +95,8 @@ in
       "alt+n" = "kitten hints --type path --program nvim";
       "alt+c" = "copy_to_clipboard";
       "alt+v" = "paste_from_clipboard";
-      "ctrl+shift+l" = "clear_terminal Last_command active";
+      "ctrl+shift+l" = "clear_terminal last_command active";
     };
   };
 
-  xdg.configFile = {
-    "kitty/sessions/dots.conf".source = ../../config/kitty/sessions/dots.conf;
-    "kitty/tab-styles.py".source = ../../config/kitty/tab-styles.py;
-  };
 }
