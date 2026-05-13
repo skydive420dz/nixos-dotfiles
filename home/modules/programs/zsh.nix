@@ -20,7 +20,6 @@
     shellAliases = {
       btw = "echo I use nixos, btw";
       nrs = "sudo nixos-rebuild switch --impure --flake ${repoPath}#nixos";
-      ncheck = "nix eval --no-write-lock-file ${repoPath}#nixosConfigurations.nixos-check.config.system.build.toplevel.drvPath";
       vim = "nvim";
       ls = "ls --color=auto";
       cat = "bat";
