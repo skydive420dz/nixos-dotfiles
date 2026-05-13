@@ -1,6 +1,8 @@
+{ hardwareConfiguration ? /etc/nixos/hardware-configuration.nix, ... }:
+
 {
   imports = [
-    /etc/nixos/hardware-configuration.nix
+    hardwareConfiguration
     ../../system/modules
   ];
 }

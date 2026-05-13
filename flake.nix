@@ -52,30 +52,41 @@
           repoPath
           ;
       };
+
+      mkNixosConfiguration =
+        hardwareConfiguration:
+        nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = specialArgs // {
+            inherit hardwareConfiguration;
+          };
+
+          modules = [
+            nvf.nixosModules.default
+            catppuccin.nixosModules.catppuccin
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                extraSpecialArgs = specialArgs;
+                backupFileExtension = "backup";
+
+                users.${username}.imports = [
+                  ./home
+                  catppuccin.homeModules.catppuccin
+                ];
+              };
+            }
+            ./hosts/nixos
+          ];
+        };
     in
     {
-      nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
-        inherit system specialArgs;
+      nixosConfigurations.${hostname} =
+        mkNixosConfiguration /etc/nixos/hardware-configuration.nix;
 
-        modules = [
-          nvf.nixosModules.default
-          catppuccin.nixosModules.catppuccin
-          home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = specialArgs;
-              backupFileExtension = "backup";
-
-              users.${username}.imports = [
-                ./home
-                catppuccin.homeModules.catppuccin
-              ];
-            };
-          }
-          ./hosts/nixos
-        ];
-      };
+      nixosConfigurations.nixos-check =
+        mkNixosConfiguration ./hosts/nixos/hardware-check.nix;
     };
 }
