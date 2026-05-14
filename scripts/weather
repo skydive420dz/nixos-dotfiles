@@ -16,126 +16,77 @@ if [[ -z "$DATA" ]]; then
     exit 0
 fi
 
-# ── Current conditions ────────────────────────────────────────────────────────
-TEMP_F=$(echo "$DATA"   | jq -r '.current_condition[0].temp_F')
-TEMP_C=$(echo "$DATA"   | jq -r '.current_condition[0].temp_C')
-FEELS_F=$(echo "$DATA"  | jq -r '.current_condition[0].FeelsLikeF')
-FEELS_C=$(echo "$DATA"  | jq -r '.current_condition[0].FeelsLikeC')
-HUMIDITY=$(echo "$DATA" | jq -r '.current_condition[0].humidity')
-DESC=$(echo "$DATA"     | jq -r '.current_condition[0].weatherDesc[0].value')
-WIND_MPH=$(echo "$DATA" | jq -r '.current_condition[0].windspeedMiles')
-WIND_DIR=$(echo "$DATA" | jq -r '.current_condition[0].winddir16Point')
-CODE=$(echo "$DATA"     | jq -r '.current_condition[0].weatherCode')
-UV=$(echo "$DATA"       | jq -r '.current_condition[0].uvIndex')
-
-# ── Astronomy ─────────────────────────────────────────────────────────────────
-SUNRISE=$(echo "$DATA"    | jq -r '.weather[0].astronomy[0].sunrise')
-SUNSET=$(echo "$DATA"     | jq -r '.weather[0].astronomy[0].sunset')
-MOON_PHASE=$(echo "$DATA" | jq -r '.weather[0].astronomy[0].moon_phase')
-MOON_ILLUM=$(echo "$DATA" | jq -r '.weather[0].astronomy[0].moon_illumination')
-
-# ── Weather icon ──────────────────────────────────────────────────────────────
-case $CODE in
-    113)                     ICON="󰖙" ;;
-    116)                     ICON="󰖕" ;;
-    119|122)                 ICON="󰖔" ;;
-    143|248|260)             ICON="󰖑" ;;
-    176|263|266|293|296)     ICON="󰖗" ;;
-    179|323|326)             ICON="󰖘" ;;
-    182|185|281|284|311|314|317|350|377) ICON="󰙿" ;;
-    200|386|389)             ICON="󰖓" ;;
-    227|230|335|338|371|374) ICON="󰖒" ;;
-    299|302|305|308)         ICON="󰖖" ;;
-    353|356|359|362|365|368) ICON="󰖗" ;;
-    395)                     ICON="󰖒" ;;
-    *)                       ICON="󰖐" ;;
-esac
-
-# ── Moon icon ─────────────────────────────────────────────────────────────────
-case "$MOON_PHASE" in
-    "New Moon")        MOON_ICON="🌑" ;;
-    "Waxing Crescent") MOON_ICON="🌒" ;;
-    "First Quarter")   MOON_ICON="🌓" ;;
-    "Waxing Gibbous")  MOON_ICON="🌔" ;;
-    "Full Moon")       MOON_ICON="🌕" ;;
-    "Waning Gibbous")  MOON_ICON="🌖" ;;
-    "Last Quarter")    MOON_ICON="🌗" ;;
-    "Waning Crescent") MOON_ICON="🌘" ;;
-    *)                 MOON_ICON="🌙" ;;
-esac
-
-# ── 3-day forecast ────────────────────────────────────────────────────────────
-FORECAST=$(jq -n \
-    --argjson d0 "$(echo "$DATA" | jq '.weather[0]')" \
-    --argjson d1 "$(echo "$DATA" | jq '.weather[1]')" \
-    --argjson d2 "$(echo "$DATA" | jq '.weather[2]')" \
-    '[
-        {
-            "day":   "Today",
-            "desc":  $d0.hourly[4].weatherDesc[0].value,
-            "max_f": ($d0.maxtempF | tonumber),
-            "min_f": ($d0.mintempF | tonumber),
-            "max_c": ($d0.maxtempC | tonumber),
-            "min_c": ($d0.mintempC | tonumber)
-        },
-        {
-            "day":   "Tomorrow",
-            "desc":  $d1.hourly[4].weatherDesc[0].value,
-            "max_f": ($d1.maxtempF | tonumber),
-            "min_f": ($d1.mintempF | tonumber),
-            "max_c": ($d1.maxtempC | tonumber),
-            "min_c": ($d1.mintempC | tonumber)
-        },
-        {
-            "day":   $d2.date,
-            "desc":  $d2.hourly[4].weatherDesc[0].value,
-            "max_f": ($d2.maxtempF | tonumber),
-            "min_f": ($d2.mintempF | tonumber),
-            "max_c": ($d2.maxtempC | tonumber),
-            "min_c": ($d2.mintempC | tonumber)
-        }
-    ]')
-
 # ── Output ────────────────────────────────────────────────────────────────────
-jq -n \
-    --arg text       "${ICON} ${TEMP_F}°F" \
-    --arg icon       "$ICON" \
-    --arg moon_icon  "$MOON_ICON" \
-    --argjson temp_f  "$TEMP_F" \
-    --argjson temp_c  "$TEMP_C" \
-    --argjson feels_f "$FEELS_F" \
-    --argjson feels_c "$FEELS_C" \
-    --argjson humidity "$HUMIDITY" \
-    --argjson wind_mph "$WIND_MPH" \
-    --arg wind_dir   "$WIND_DIR" \
-    --arg desc       "$DESC" \
-    --argjson uv      "$UV" \
-    --argjson code    "$CODE" \
-    --arg sunrise    "$SUNRISE" \
-    --arg sunset     "$SUNSET" \
-    --arg moon_phase "$MOON_PHASE" \
-    --arg moon_illum "$MOON_ILLUM" \
-    --argjson forecast "$FORECAST" \
-    '{
-        text: $text,
+jq '
+    def num: tonumber? // 0;
+    def weather_icon($code):
+        if $code == 113 then "󰖙"
+        elif $code == 116 then "󰖕"
+        elif $code == 119 or $code == 122 then "󰖔"
+        elif $code == 143 or $code == 248 or $code == 260 then "󰖑"
+        elif $code == 176 or $code == 263 or $code == 266 or $code == 293 or $code == 296 then "󰖗"
+        elif $code == 179 or $code == 323 or $code == 326 then "󰖘"
+        elif $code == 182 or $code == 185 or $code == 281 or $code == 284 or $code == 311 or $code == 314 or $code == 317 or $code == 350 or $code == 377 then "󰙿"
+        elif $code == 200 or $code == 386 or $code == 389 then "󰖓"
+        elif $code == 227 or $code == 230 or $code == 335 or $code == 338 or $code == 371 or $code == 374 then "󰖒"
+        elif $code == 299 or $code == 302 or $code == 305 or $code == 308 then "󰖖"
+        elif $code == 353 or $code == 356 or $code == 359 or $code == 362 or $code == 365 or $code == 368 then "󰖗"
+        elif $code == 395 then "󰖒"
+        else "󰖐"
+        end;
+    def moon_icon($phase):
+        if $phase == "New Moon" then "🌑"
+        elif $phase == "Waxing Crescent" then "🌒"
+        elif $phase == "First Quarter" then "🌓"
+        elif $phase == "Waxing Gibbous" then "🌔"
+        elif $phase == "Full Moon" then "🌕"
+        elif $phase == "Waning Gibbous" then "🌖"
+        elif $phase == "Last Quarter" then "🌗"
+        elif $phase == "Waning Crescent" then "🌘"
+        else "🌙"
+        end;
+    def day($name; $d):
+        {
+            day: $name,
+            desc: ($d.hourly[4].weatherDesc[0].value // ""),
+            max_f: ($d.maxtempF | num),
+            min_f: ($d.mintempF | num),
+            max_c: ($d.maxtempC | num),
+            min_c: ($d.mintempC | num)
+        };
+
+    .current_condition[0] as $c
+    | .weather[0] as $w0
+    | .weather[1] as $w1
+    | .weather[2] as $w2
+    | ($c.weatherCode | num) as $code
+    | ($w0.astronomy[0].moon_phase // "") as $moon_phase
+    | weather_icon($code) as $icon
+    | ($c.temp_F | num) as $temp_f
+    | {
+        text: "\($icon) \($temp_f)°F",
         class: "weather",
         data: {
-            icon:       $icon,
-            moon_icon:  $moon_icon,
-            temp_f:     $temp_f,
-            temp_c:     $temp_c,
-            feels_f:    $feels_f,
-            feels_c:    $feels_c,
-            humidity:   $humidity,
-            wind_mph:   $wind_mph,
-            wind_dir:   $wind_dir,
-            desc:       $desc,
-            uv:         $uv,
-            code:       $code,
-            sunrise:    $sunrise,
-            sunset:     $sunset,
+            icon: $icon,
+            moon_icon: moon_icon($moon_phase),
+            temp_f: $temp_f,
+            temp_c: ($c.temp_C | num),
+            feels_f: ($c.FeelsLikeF | num),
+            feels_c: ($c.FeelsLikeC | num),
+            humidity: ($c.humidity | num),
+            wind_mph: ($c.windspeedMiles | num),
+            wind_dir: ($c.winddir16Point // ""),
+            desc: ($c.weatherDesc[0].value // ""),
+            uv: ($c.uvIndex | num),
+            code: $code,
+            sunrise: ($w0.astronomy[0].sunrise // ""),
+            sunset: ($w0.astronomy[0].sunset // ""),
             moon_phase: $moon_phase,
-            moon_illum: $moon_illum,
-            forecast:   $forecast
+            moon_illum: ($w0.astronomy[0].moon_illumination | num),
+            forecast: [
+                day("Today"; $w0),
+                day("Tomorrow"; $w1),
+                day(($w2.date // "Later"); $w2)
+            ]
         }
-    }'
+    }' <<< "$DATA"
