@@ -27,10 +27,11 @@ Item {
     readonly property string artist: player?.trackArtist || ""
     readonly property string artUrl: player?.trackArtUrl || ""
     readonly property real trackWidth: 180
+    readonly property bool hasProgress: player !== null && player.length > 0
     property real progress: 0
 
     function refreshProgress() {
-        if (!player || player.length <= 0) {
+        if (!hasProgress) {
             progress = 0;
             return;
         }
@@ -72,7 +73,14 @@ Item {
         height: pill.height
         radius: Style.pillRadius
         color: "transparent"
+        opacity: root.hasProgress ? 1 : 0
         z: 0   // behind pill
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 150
+            }
+        }
 
         Rectangle {
             anchors.bottom: parent.bottom
