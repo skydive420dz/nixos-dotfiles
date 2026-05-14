@@ -15,4 +15,5 @@ Bluetooth     1.0 components/Bluetooth.qml
 Volume        1.0 components/Volume.qml
 VolumePopover 1.0 components/VolumePopover.qml
 Battery       1.0 components/Battery.qml
+BatteryPopover 1.0 components/BatteryPopover.qml
 Tray          1.0 components/Tray.qml
