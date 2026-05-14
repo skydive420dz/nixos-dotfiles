@@ -4,6 +4,7 @@ singleton Style       1.0 Style.qml
 singleton WeatherData 1.0 components/WeatherData.qml
 Media         1.0 components/Media.qml
 Popover       1.0 components/Popover.qml
+ConnectivityPill 1.0 components/ConnectivityPill.qml
 WindowToggle  1.0 components/WindowToggle.qml
 OsButton      1.0 components/OsButton.qml
 Workspaces    1.0 components/Workspaces.qml
