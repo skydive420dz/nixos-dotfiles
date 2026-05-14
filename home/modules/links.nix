@@ -32,6 +32,7 @@ in
     "swaync/config.json".source = ../../config/swaync/config.json;
     "swaync/style.css".source = ../../config/swaync/style.css;
     "hypr/mocha.conf".source = ../../config/hypr/mocha.conf;
+    "waybar/mocha.css".source = ../../config/waybar/mocha.css;
     "swayosd".source = ../../config/swayosd;
     "rofi".source = ../../config/rofi;
   };

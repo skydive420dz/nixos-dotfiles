@@ -25,7 +25,6 @@
       awww
       libnotify
       waybar
-      vesktop
       swaynotificationcenter
       swayosd
       powertop

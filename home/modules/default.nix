@@ -9,5 +9,6 @@
     ./firefox.nix
     ./gnupg.nix
     ./tmux.nix
+    ./vesktop.nix
   ];
 }
