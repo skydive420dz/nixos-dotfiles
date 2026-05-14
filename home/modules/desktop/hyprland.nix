@@ -40,7 +40,7 @@
     };
     extraConfig = ''
       source = ~/.config/hypr/mocha.conf
-      source = ~/.config/hypr/hyprland.conf
+      source = ~/.config/hypr/live.conf
     '';
   };
 }

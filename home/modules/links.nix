@@ -35,7 +35,7 @@ in
     ".config/quickshell".source = link "config/quickshell";
     ".config/aerc".source = link "config/aerc";
     ".config/scripts".source = link "scripts";
-    ".config/hypr/hyprland.conf".source = link "config/hypr/hyprland.conf";
+    ".config/hypr/live.conf".source = link "config/hypr/hyprland.conf";
     ".config/hypr/mocha.conf".source = link "config/hypr/mocha.conf";
     ".config/nvf/lua/user/navigation.lua".source = link "config/nvf/lua/user/navigation.lua";
     ".config/qutebrowser/config.py".source = link "config/qutebrowser/config.py";
