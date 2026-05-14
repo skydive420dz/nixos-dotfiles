@@ -8,15 +8,43 @@
 # Requires: curl, jq
 
 LOCATION=""   # leave empty for IP-based auto-detect, or set e.g. "Atlanta"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/quickshell"
+CACHE_FILE="$CACHE_DIR/weather.json"
+CACHE_TTL=1800
+
+cache_mtime() {
+    stat -c %Y "$CACHE_FILE" 2>/dev/null || stat -f %m "$CACHE_FILE" 2>/dev/null || echo 0
+}
+
+cache_is_fresh() {
+    [[ -s "$CACHE_FILE" ]] || return 1
+
+    local now mtime
+    now=$(date +%s)
+    mtime=$(cache_mtime)
+    ((now - mtime < CACHE_TTL))
+}
+
+if cache_is_fresh; then
+    cat "$CACHE_FILE"
+    exit 0
+fi
 
 DATA=$(curl -sf "https://wttr.in/${LOCATION}?format=j1" 2>/dev/null)
 
 if [[ -z "$DATA" ]]; then
+    if [[ -s "$CACHE_FILE" ]]; then
+        cat "$CACHE_FILE"
+        exit 0
+    fi
+
     echo '{"text":"󰼯 --","class":"weather-unavailable","data":null}'
     exit 0
 fi
 
 # ── Output ────────────────────────────────────────────────────────────────────
+mkdir -p "$CACHE_DIR"
+
 jq '
     def num: tonumber? // 0;
     def weather_icon($code):
@@ -89,4 +117,4 @@ jq '
                 day(($w2.date // "Later"); $w2)
             ]
         }
-    }' <<< "$DATA"
+    }' <<< "$DATA" | tee "$CACHE_FILE"
