@@ -28,10 +28,6 @@ in
   # `recursive = true` means each file gets symlinked individually rather
   # than the whole directory — meaning the *directory itself* stays
   # writable, so apps that need to write cache/state into it can do so.
-  xdg.configFile = {
-    "hypr/mocha.conf".source = ../../config/hypr/mocha.conf;
-  };
-
   # ── Tier 3: live-editable, point at the live repo dir ─────────────────────
   # Anything you actively iterate on. Edit the file → it's live.
   # No rebuild needed.
@@ -39,5 +35,12 @@ in
     ".config/quickshell".source = link "config/quickshell";
     ".config/aerc".source = link "config/aerc";
     ".config/scripts".source = link "scripts";
+    ".config/hypr/hyprland.conf".source = link "config/hypr/hyprland.conf";
+    ".config/hypr/mocha.conf".source = link "config/hypr/mocha.conf";
+    ".config/nvf/lua/user/navigation.lua".source = link "config/nvf/lua/user/navigation.lua";
+    ".config/qutebrowser/config.py".source = link "config/qutebrowser/config.py";
+    ".config/qutebrowser/userstyles.css".source = link "config/qutebrowser/userstyles.css";
+    ".config/qutebrowser/quickmarks".source = link "config/qutebrowser/quickmarks";
+    ".config/qutebrowser/bookmarks/urls".source = link "config/qutebrowser/bookmarks/urls";
   };
 }

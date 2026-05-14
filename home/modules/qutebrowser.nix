@@ -10,11 +10,6 @@ in
   ];
 
   xdg.configFile = {
-    "qutebrowser/config.py".source = ../../config/qutebrowser/config.py;
-    "qutebrowser/userstyles.css".source = ../../config/qutebrowser/userstyles.css;
-    "qutebrowser/quickmarks".source = ../../config/qutebrowser/quickmarks;
-    "qutebrowser/bookmarks/urls".source = ../../config/qutebrowser/bookmarks/urls;
-
     "qutebrowser/catppuccin.py".text = ''
       def setup(c, flavor="mocha", statusbar_bold=False):
           palette = {

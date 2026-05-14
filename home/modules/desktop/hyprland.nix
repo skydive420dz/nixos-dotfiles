@@ -1,5 +1,3 @@
-{ repoPath, ... }:
-
 {
   wayland.windowManager.hyprland = {
     enable = true;
@@ -42,7 +40,7 @@
     };
     extraConfig = ''
       source = ~/.config/hypr/mocha.conf
-      source = ${repoPath}/config/hypr/hyprland.conf
+      source = ~/.config/hypr/hyprland.conf
     '';
   };
 }
