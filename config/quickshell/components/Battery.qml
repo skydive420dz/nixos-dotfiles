@@ -76,6 +76,8 @@ Item {
     readonly property string icon: {
         const cap = root.capacity;
         const isCharging = root.charging;
+        if (root.plugged && !isCharging)
+            return "󰚥";
         if (isCharging) {
             if (cap >= 90)
                 return "󰂅";
