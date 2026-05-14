@@ -7,6 +7,7 @@ ConnectivityPill 1.0 components/ConnectivityPill.qml
 Divider       1.0 components/Divider.qml
 InfoRow       1.0 components/InfoRow.qml
 SectionLabel  1.0 components/SectionLabel.qml
+SelectableRow 1.0 components/SelectableRow.qml
 WindowToggle  1.0 components/WindowToggle.qml
 OsButton      1.0 components/OsButton.qml
 Workspaces    1.0 components/Workspaces.qml

@@ -89,44 +89,16 @@ PopoverPanel {
 
     Repeater {
         model: Pipewire.nodes.values.filter(n => n.isSink && n.audio !== null && !n.isStream)
-        delegate: Rectangle {
+        delegate: SelectableRow {
             id: sinkDelegate
             required property PwNode modelData
             readonly property bool isDefault: modelData.id === Pipewire.defaultAudioSink?.id
 
-            Layout.fillWidth: true
-            height: 28
-            radius: 8
-            color: isDefault ? Qt.rgba(Mocha.mauve.r, Mocha.mauve.g, Mocha.mauve.b, 0.2) : "transparent"
-            border.color: isDefault ? Mocha.mauve : "transparent"
-            border.width: 1
-
-            RowLayout {
-                anchors {
-                    fill: parent
-                    leftMargin: 8
-                    rightMargin: 8
-                }
-                Text {
-                    text: sinkDelegate.isDefault ? "󰓃 " : "  "
-                    color: Mocha.mauve
-                    font.pixelSize: 12
-                    font.family: Style.font
-                }
-                Text {
-                    text: sinkDelegate.modelData.description || sinkDelegate.modelData.name
-                    color: Mocha.text
-                    font.pixelSize: Style.fontSizeS
-                    font.family: Style.font
-                    Layout.fillWidth: true
-                    elide: Text.ElideRight
-                }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: Pipewire.preferredDefaultAudioSink = sinkDelegate.modelData
-            }
+            selected: isDefault
+            icon: isDefault ? "󰓃" : ""
+            label: modelData.description || modelData.name
+            accent: Mocha.mauve
+            onActivated: Pipewire.preferredDefaultAudioSink = sinkDelegate.modelData
         }
     }
 }
