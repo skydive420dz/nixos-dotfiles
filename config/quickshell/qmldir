@@ -4,6 +4,7 @@ singleton Style       1.0 theme/Style.qml
 singleton WeatherData 1.0 services/WeatherData.qml
 Media         1.0 components/Media.qml
 ConnectivityPill 1.0 components/ConnectivityPill.qml
+Divider       1.0 components/Divider.qml
 WindowToggle  1.0 components/WindowToggle.qml
 OsButton      1.0 components/OsButton.qml
 Workspaces    1.0 components/Workspaces.qml

@@ -81,11 +81,7 @@ PopoverPanel {
         }
     }
 
-    Rectangle {
-        Layout.fillWidth: true
-        height: 1
-        color: Mocha.pillBorder
-    }
+    Divider {}
 
     Text {
         text: "Output devices"

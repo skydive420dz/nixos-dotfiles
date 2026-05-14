@@ -45,11 +45,8 @@ PopoverPanel {
         }
     }
 
-    Rectangle {
+    Divider {
         visible: root.btModule.pairedDevices.length > 0
-        Layout.fillWidth: true
-        height: 1
-        color: Mocha.pillBorder
     }
 
     Text {
@@ -113,9 +110,5 @@ PopoverPanel {
         }
     }
 
-    Rectangle {
-        Layout.fillWidth: true
-        height: 1
-        color: Mocha.pillBorder
-    }
+    Divider {}
 }
