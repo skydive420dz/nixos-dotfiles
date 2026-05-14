@@ -269,14 +269,6 @@ PanelWindow {
                     height: 1
                     color: Mocha.pillBorder
                 }
-                Text {
-                    text: "Click icon — bluetui   •   Hold icon — toggle power"
-                    color: Mocha.overlay0
-                    font.pixelSize: Style.fontSizeS
-                    font.family: Style.font
-                    Layout.alignment: Qt.AlignHCenter
-                    horizontalAlignment: Text.AlignHCenter
-                }
             }
 
             VolumePopover {

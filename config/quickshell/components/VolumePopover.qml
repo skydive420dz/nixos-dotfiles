@@ -150,19 +150,4 @@ ColumnLayout {
             }
         }
     }
-
-    Rectangle {
-        Layout.fillWidth: true
-        height: 1
-        color: Mocha.pillBorder
-    }
-
-    Text {
-        text: "Click icon — mute   •   Scroll — volume\nHold icon — wiremix"
-        color: Mocha.overlay0
-        font.pixelSize: Style.fontSizeS
-        font.family: Style.font
-        Layout.alignment: Qt.AlignHCenter
-        horizontalAlignment: Text.AlignHCenter
-    }
 }

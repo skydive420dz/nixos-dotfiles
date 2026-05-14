@@ -87,12 +87,4 @@ ColumnLayout {
             }
         }
     }
-
-    Text {
-        text: "Click icon to open nmtui"
-        color: Mocha.overlay0
-        font.pixelSize: Style.fontSizeS
-        font.family: Style.font
-        Layout.alignment: Qt.AlignHCenter
-    }
 }

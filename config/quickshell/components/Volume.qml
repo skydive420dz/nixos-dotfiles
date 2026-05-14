@@ -33,11 +33,11 @@ Item {
         id: hover
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: {
+        onClicked: wiremixToggle.toggle()
+        onPressAndHold: {
             if (root.sink?.audio)
                 root.sink.audio.muted = !root.sink.audio.muted;
         }
-        onPressAndHold: wiremixToggle.toggle()
         onWheel: {
             if (!root.sink?.audio)
                 return;

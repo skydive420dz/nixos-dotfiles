@@ -96,13 +96,10 @@ Item {
 
     MouseArea {
         anchors.fill: parent
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
-        onClicked: mouse => {
-            if (mouse.button === Qt.LeftButton) {
-                bluetuiLauncher.running = true;
-            } else if (mouse.button === Qt.RightButton && root.adapter) {
+        onClicked: bluetuiLauncher.running = true
+        onPressAndHold: {
+            if (root.adapter)
                 root.adapter.enabled = !root.adapter.enabled;
-            }
         }
     }
 }
