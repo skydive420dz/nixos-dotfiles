@@ -83,11 +83,8 @@ PopoverPanel {
 
     Divider {}
 
-    Text {
-        text: "Output devices"
-        color: Mocha.subtext0
-        font.pixelSize: Style.fontSizeS
-        font.family: Style.font
+    SectionLabel {
+        label: "Output devices"
     }
 
     Repeater {

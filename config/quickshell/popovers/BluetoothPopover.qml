@@ -49,12 +49,9 @@ PopoverPanel {
         visible: root.btModule.pairedDevices.length > 0
     }
 
-    Text {
+    SectionLabel {
         visible: root.btModule.pairedDevices.length > 0
-        text: "Paired devices"
-        color: Mocha.subtext0
-        font.pixelSize: Style.fontSizeS
-        font.family: Style.font
+        label: "Paired devices"
     }
 
     Repeater {
