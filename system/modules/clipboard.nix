@@ -7,7 +7,6 @@
 #   wl-clip-persist — keep clipboard contents alive after source app closes
 #   wl-clipboard    — provides wl-copy / wl-paste, used by cliphist + scripts
 #   cliphist-wipe   — small wrapper: clears history + shows a toast notification
-#   wtype           — synthesize Ctrl+C / Ctrl+V for system-wide yank/paste binds
 #
 # Hyprland integration (must live in hyprland.conf — needs $WAYLAND_DISPLAY):
 #
@@ -15,8 +14,8 @@
 #   exec-once = wl-paste --type image --watch cliphist store
 #   exec-once = wl-clip-persist --clipboard regular
 #
-#   bind = $mainMod, Y, exec, wtype -M ctrl c -m ctrl
-#   bind = $mainMod, P, exec, wtype -M ctrl v -m ctrl
+#   bind = $mainMod, Y, sendshortcut, CTRL, C, activewindow
+#   bind = $mainMod, P, sendshortcut, CTRL, V, activewindow
 #   bind = $mainMod, X, exec, cliphist list | rofi -dmenu -p "Clipboard" | cliphist decode | wl-copy
 #
 # Privacy:
@@ -41,7 +40,6 @@ in
     cliphist
     wl-clip-persist
     wl-clipboard
-    wtype
     cliphist-wipe
   ];
 }
