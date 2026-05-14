@@ -15,8 +15,8 @@
 #   exec-once = wl-paste --type image --watch cliphist store
 #   exec-once = wl-clip-persist --clipboard regular
 #
-#   bind = $mainMod, Y, exec, wtype -M ctrl -k c -m ctrl
-#   bind = $mainMod, P, exec, wtype -M ctrl -k v -m ctrl
+#   bind = $mainMod, Y, exec, wtype -M ctrl c -m ctrl
+#   bind = $mainMod, P, exec, wtype -M ctrl v -m ctrl
 #   bind = $mainMod, X, exec, cliphist list | rofi -dmenu -p "Clipboard" | cliphist decode | wl-copy
 #
 # Privacy:

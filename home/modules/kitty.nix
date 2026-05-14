@@ -95,6 +95,8 @@ in
       "alt+n" = "kitten hints --type path --program nvim";
       "alt+c" = "copy_to_clipboard";
       "alt+v" = "paste_from_clipboard";
+      "ctrl+c" = "copy_or_interrupt";
+      "ctrl+v" = "paste_from_clipboard";
     };
   };
 
