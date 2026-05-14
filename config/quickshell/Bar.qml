@@ -27,6 +27,8 @@ PanelWindow {
     implicitHeight: Style.barHeight + 320
     color: "transparent"
 
+    property var launcher: null
+
     // The mask defines which pixels of the surface accept mouse input.
     // We add clickCatcher conditionally — when the tray menu is open,
     // it covers the full panel so any click outside the tray pill closes it.
@@ -116,7 +118,9 @@ PanelWindow {
         height: Style.barHeight
         spacing: 0
 
-        OsButton {}
+        OsButton {
+            launcher: launcher
+        }
         Item {
             width: 6
         }

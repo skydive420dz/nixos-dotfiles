@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+runtime_dir=${XDG_RUNTIME_DIR:-/tmp}
+state_file="$runtime_dir/qs-osd.json"
+signal_file="$runtime_dir/qs-osd-signal"
+
+wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+status=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@)
+
+if [[ "$status" == *"[MUTED]"* ]]; then
+    icon="󰍭"
+    title="Mic muted"
+    kind="mute"
+else
+    icon="󰍬"
+    title="Mic active"
+    kind="volume"
+fi
+
+printf '{"kind":"%s","icon":"%s","title":"%s","value":-1}\n' "$kind" "$icon" "$title" > "$state_file"
+printf '%s\n' "$(date +%s%N)" > "$signal_file"

@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+action=${1:-}
+step=${2:-5}
+runtime_dir=${XDG_RUNTIME_DIR:-/tmp}
+state_file="$runtime_dir/qs-osd.json"
+signal_file="$runtime_dir/qs-osd-signal"
+
+case "$action" in
+up)
+    wpctl set-volume --limit 1.0 @DEFAULT_AUDIO_SINK@ "${step}%+"
+    ;;
+down)
+    wpctl set-volume @DEFAULT_AUDIO_SINK@ "${step}%-"
+    ;;
+mute)
+    wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+    ;;
+*)
+    echo "Usage: ${0##*/} {up|down|mute} [step]" >&2
+    exit 1
+    ;;
+esac
+
+status=$(wpctl get-volume @DEFAULT_AUDIO_SINK@)
+muted=false
+if [[ "$status" == *"[MUTED]"* ]]; then
+    muted=true
+fi
+
+level=$(awk '{ printf "%d", $2 * 100 }' <<<"$status")
+if [[ "$muted" == true ]]; then
+    icon="󰖁"
+    title="Muted"
+    kind="mute"
+else
+    kind="volume"
+    title="Volume"
+    if (( level < 33 )); then
+        icon="󰕿"
+    elif (( level < 67 )); then
+        icon="󰖀"
+    else
+        icon="󰕾"
+    fi
+fi
+
+printf '{"kind":"%s","icon":"%s","title":"%s","value":%d}\n' "$kind" "$icon" "$title" "$level" > "$state_file"
+printf '%s\n' "$(date +%s%N)" > "$signal_file"

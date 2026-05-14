@@ -34,7 +34,6 @@ in
     "hypr/mocha.conf".source = ../../config/hypr/mocha.conf;
     "waybar/mocha.css".source = ../../config/waybar/mocha.css;
     "swayosd".source = ../../config/swayosd;
-    "rofi".source = ../../config/rofi;
   };
 
   # ── Tier 3: live-editable, point at the live repo dir ─────────────────────
@@ -43,7 +42,6 @@ in
   home.file = {
     ".config/quickshell".source = link "config/quickshell";
     ".config/yazi".source = link "config/yazi";
-    ".config/qutebrowser".source = link "config/qutebrowser";
     ".config/aerc".source = link "config/aerc";
     ".config/scripts".source = link "scripts";
   };

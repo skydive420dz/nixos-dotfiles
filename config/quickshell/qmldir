@@ -1,4 +1,6 @@
 Bar           1.0 Bar.qml
+Launcher      1.0 Launcher.qml
+Osd           1.0 Osd.qml
 singleton Mocha       1.0 theme/Mocha.qml
 singleton Style       1.0 theme/Style.qml
 singleton WeatherData 1.0 services/WeatherData.qml

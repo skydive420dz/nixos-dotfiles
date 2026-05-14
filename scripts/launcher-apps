@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+import configparser
+import json
+import os
+import re
+import shlex
+from pathlib import Path
+
+
+def app_dirs():
+    seen = set()
+    roots = [Path.home() / ".local/share"]
+    roots += [Path(p) for p in os.environ.get("XDG_DATA_DIRS", "").split(":") if p]
+    for root in roots:
+        path = root / "applications"
+        if path not in seen and path.is_dir():
+            seen.add(path)
+            yield path
+
+
+def clean_exec(value):
+    value = " ".join(value.splitlines())
+    value = value.replace("%%", "__PERCENT__")
+    value = re.sub(r"%[fFuUdDnNickvm]", "", value)
+    value = value.replace("__PERCENT__", "%")
+
+    try:
+        parts = shlex.split(value)
+    except ValueError:
+        return value.strip()
+
+    return shlex.join([part for part in parts if part]).strip()
+
+
+def read_entry(path):
+    parser = configparser.ConfigParser(interpolation=None, strict=False)
+    parser.optionxform = str
+    try:
+        parser.read(path, encoding="utf-8")
+    except Exception:
+        return None
+
+    if "Desktop Entry" not in parser:
+        return None
+
+    entry = parser["Desktop Entry"]
+    if entry.get("Type") != "Application":
+        return None
+    if entry.get("NoDisplay", "false").lower() == "true":
+        return None
+    if entry.get("Hidden", "false").lower() == "true":
+        return None
+
+    name = entry.get("Name", "").strip()
+    exec_cmd = clean_exec(entry.get("Exec", ""))
+    if not name or not exec_cmd:
+        return None
+
+    return {
+        "name": name,
+        "generic": entry.get("GenericName", "").strip(),
+        "comment": entry.get("Comment", "").strip(),
+        "icon": entry.get("Icon", "").strip(),
+        "exec": exec_cmd,
+        "terminal": entry.get("Terminal", "false").lower() == "true",
+        "desktop": path.name,
+    }
+
+
+apps = {}
+for directory in app_dirs():
+    for path in directory.glob("*.desktop"):
+        app = read_entry(path)
+        if app and app["name"].casefold() not in apps:
+            apps[app["name"].casefold()] = app
+
+print(json.dumps(sorted(apps.values(), key=lambda app: app["name"].casefold())))

@@ -20,7 +20,6 @@
       btop
       nvtopPackages.full
       yazi
-      qutebrowser
       psmisc
       awww
       libnotify

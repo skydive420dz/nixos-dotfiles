@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+action=${1:-}
+step=${2:-5}
+runtime_dir=${XDG_RUNTIME_DIR:-/tmp}
+state_file="$runtime_dir/qs-osd.json"
+signal_file="$runtime_dir/qs-osd-signal"
+
+case "$action" in
+up)
+    brightnessctl -n set "${step}%+" >/dev/null
+    ;;
+down)
+    brightnessctl -n set "${step}%-" --min-value=1 >/dev/null
+    ;;
+*)
+    echo "Usage: ${0##*/} {up|down} [step]" >&2
+    exit 1
+    ;;
+esac
+
+level=$(brightnessctl -m | awk -F ',' '{print int($4)}')
+
+printf '{"kind":"brightness","icon":"󰃠","title":"Brightness","value":%d}\n' "$level" > "$state_file"
+printf '%s\n' "$(date +%s%N)" > "$signal_file"

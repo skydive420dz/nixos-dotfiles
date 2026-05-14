@@ -1,112 +1,134 @@
 { config, pkgs, ... }:
 
+let
+  tokens = import ../../config/theme/tokens.nix;
+  palette = tokens.palette;
+  semantic = tokens.semantic;
+in
 {
   programs.rofi = {
     enable = true;
     package = pkgs.rofi;
 
     extraConfig = {
-      modi = "run,drun,window";
+      modi = "combi,drun,run,window";
+      combi-modi = "drun,run,window";
       icon-theme = "Papirus";
       show-icons = true;
-      drun-display-format = "{icon} {name}";
+      drun-display-format = "{name}";
       location = 0;
+      matching = "fuzzy";
+      sort = true;
       disable-history = false;
       hide-scrollbar = true;
-      display-drun = "     Apps ";
-      display-run = "     Run ";
-      display-window = "     Window ";
-      sidebar-mode = true;
+      display-drun = "";
+      display-run = "";
+      display-window = "󰖲";
+      display-combi = "";
+      sidebar-mode = false;
     };
 
     theme =
       let
         inherit (config.lib.formats.rasi) mkLiteral;
+        transparent = color: alpha: mkLiteral "${color}${alpha}";
       in
       {
         "*" = {
-          width = mkLiteral "650px";
-          font = "JetBrainsMono Nerd Font Propo 12";
+          width = mkLiteral "680px";
+          font = "JetBrainsMono Nerd Font Propo 13";
 
-          bg-col = mkLiteral "rgba(30, 30, 46, 0.2)";
-          bg-col-light = mkLiteral "rgba(49, 50, 68, 0.4)";
-          border-col = mkLiteral "rgba(180, 190, 254, 0.3)";
-          selected-col = mkLiteral "rgba(49, 50, 68, 0.5)";
-          blue = mkLiteral "rgba(137, 180, 250, 0.6)";
-          fg-col = mkLiteral "#cdd6f4";
-          fg-col2 = mkLiteral "#f38ba8";
-          grey = mkLiteral "#6c7086";
+          bg-col = transparent palette.base "d9";
+          bg-col-light = transparent palette.surface0 "a8";
+          border-col = transparent semantic.accent "33";
+          selected-col = transparent palette.surface1 "bd";
+          input-col = transparent palette.mantle "e6";
+          accent-col = transparent semantic.borderActive "dc";
+          fg-col = mkLiteral semantic.foreground;
+          fg-col2 = mkLiteral palette.subtext1;
+          muted-col = mkLiteral semantic.muted;
 
           background-color = mkLiteral "transparent";
           text-color = mkLiteral "@fg-col";
 
-          active-foreground = mkLiteral "@blue";
+          active-foreground = mkLiteral "@accent-col";
           active-background = mkLiteral "@bg-col";
-          selected-active-background = mkLiteral "@blue";
+          selected-active-background = mkLiteral "@accent-col";
           selected-active-foreground = mkLiteral "@bg-col";
-          alternate-active-foreground = mkLiteral "@blue";
+          alternate-active-foreground = mkLiteral "@accent-col";
           alternate-active-background = mkLiteral "@bg-col";
 
           spacing = 0;
         };
 
         "window" = {
-          height = mkLiteral "500px";
-          border = mkLiteral "2px";
-          border-radius = mkLiteral "15px";
+          height = mkLiteral "360px";
+          border = mkLiteral "1px";
+          border-radius = mkLiteral "20px";
           border-color = mkLiteral "@border-col";
           background-color = mkLiteral "@bg-col";
         };
 
         "mainbox" = {
           background-color = mkLiteral "transparent";
+          padding = mkLiteral "16px";
+          spacing = mkLiteral "10px";
         };
 
         "inputbar" = {
           children = mkLiteral "[prompt,entry]";
-          background-color = mkLiteral "transparent";
+          background-color = mkLiteral "@input-col";
+          border = mkLiteral "1px";
           border-radius = mkLiteral "15px";
-          padding = mkLiteral "2px";
+          border-color = mkLiteral "@border-col";
+          padding = mkLiteral "12px 15px";
+          spacing = mkLiteral "11px";
         };
 
         "prompt" = {
-          background-color = mkLiteral "@blue";
-          padding = mkLiteral "6px";
-          text-color = mkLiteral "#1e1e2e";
-          border-radius = mkLiteral "15px";
-          margin = mkLiteral "20px 0px 0px 20px";
+          background-color = mkLiteral "transparent";
+          padding = mkLiteral "0px 2px 0px 0px";
+          text-color = mkLiteral "@accent-col";
+          border-radius = mkLiteral "0px";
+          margin = mkLiteral "0px";
         };
 
         "entry" = {
-          padding = mkLiteral "6px";
-          margin = mkLiteral "20px 0px 0px 10px";
+          padding = mkLiteral "0px";
+          margin = mkLiteral "0px";
           text-color = mkLiteral "@fg-col";
           background-color = mkLiteral "transparent";
         };
 
         "listview" = {
           border = mkLiteral "0px 0px 0px";
-          padding = mkLiteral "6px 0px 0px";
-          margin = mkLiteral "10px 0px 0px 20px";
+          padding = mkLiteral "0px";
+          margin = mkLiteral "0px";
           columns = 1;
-          lines = 10;
+          lines = 6;
+          spacing = mkLiteral "3px";
           background-color = mkLiteral "transparent";
         };
 
         "element" = {
-          padding = mkLiteral "5px";
+          padding = mkLiteral "8px 11px";
+          border-radius = mkLiteral "11px";
           background-color = mkLiteral "transparent";
           text-color = mkLiteral "@fg-col";
         };
 
         "element-icon" = {
-          size = mkLiteral "25px";
+          size = mkLiteral "24px";
+          margin = mkLiteral "0px 12px 0px 0px";
         };
 
         "element selected" = {
           background-color = mkLiteral "@selected-col";
-          text-color = mkLiteral "@fg-col2";
-          border-radius = mkLiteral "8px";
+          text-color = mkLiteral "@fg-col";
+        };
+
+        "element selected element-icon" = {
+          text-color = mkLiteral "@accent-col";
         };
 
         "mode-switcher" = {
@@ -114,16 +136,16 @@
         };
 
         "button" = {
-          padding = mkLiteral "10px";
-          background-color = mkLiteral "@bg-col-light";
-          text-color = mkLiteral "@grey";
+          padding = mkLiteral "8px";
+          background-color = mkLiteral "transparent";
+          text-color = mkLiteral "@muted-col";
           vertical-align = mkLiteral "0.5";
           horizontal-align = mkLiteral "0.5";
         };
 
         "button selected" = {
-          background-color = mkLiteral "@blue";
-          text-color = mkLiteral "#1e1e2e";
+          background-color = mkLiteral "@bg-col-light";
+          text-color = mkLiteral "@fg-col";
         };
       };
   };

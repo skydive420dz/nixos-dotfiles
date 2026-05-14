@@ -14,6 +14,7 @@ Rectangle {
     border.width: 1
 
     property bool hovered: false
+    property var launcher: null
 
     Behavior on color {
         ColorAnimation {
@@ -32,7 +33,7 @@ Rectangle {
 
     Process {
         id: rofiProc
-        command: ["sh", "-c", "pkill rofi || uwsm app -- rofi -show drun"]
+        command: ["sh", "-c", "pkill rofi || uwsm app -- rofi -show combi"]
         running: false
     }
 
@@ -41,6 +42,11 @@ Rectangle {
         hoverEnabled: true
         onEntered: root.hovered = true
         onExited: root.hovered = false
-        onClicked: rofiProc.running = true
+        onClicked: {
+            if (root.launcher)
+                root.launcher.toggle();
+            else
+                rofiProc.running = true;
+        }
     }
 }
