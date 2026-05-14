@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 let
-  tokens = import ../../config/theme/tokens.nix;
+  tokens = import ../../theme/tokens.nix;
   p = tokens.palette;
 in
 {

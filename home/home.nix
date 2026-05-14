@@ -19,13 +19,9 @@
       kitty
       btop
       nvtopPackages.full
-      yazi
       psmisc
       awww
       libnotify
-      waybar
-      swaynotificationcenter
-      swayosd
       powertop
       (pkgs.writeShellScriptBin "qmlls" ''
         exec ${pkgs.qt6.qtdeclarative}/bin/qmlls \

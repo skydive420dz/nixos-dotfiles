@@ -6,7 +6,7 @@
 }:
 let
   inherit (lib.generators) mkLuaInline;
-  theme = import ../../config/theme/tokens.nix;
+  theme = import ../../theme/tokens.nix;
   semantic = theme.semantic;
 
   qmlImportPaths = [

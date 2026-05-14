@@ -1,7 +1,5 @@
 import ".."
 import QtQuick
-import Quickshell.Hyprland
-import Quickshell.Io
 
 Rectangle {
     id: root
@@ -31,22 +29,11 @@ Rectangle {
         color: Mocha.blue
     }
 
-    Process {
-        id: rofiProc
-        command: ["sh", "-c", "pkill rofi || uwsm app -- rofi -show combi"]
-        running: false
-    }
-
     MouseArea {
         anchors.fill: parent
         hoverEnabled: true
         onEntered: root.hovered = true
         onExited: root.hovered = false
-        onClicked: {
-            if (root.launcher)
-                root.launcher.toggle();
-            else
-                rofiProc.running = true;
-        }
+        onClicked: root.launcher?.toggle()
     }
 }

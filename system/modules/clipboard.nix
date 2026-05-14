@@ -15,7 +15,6 @@
 #   exec-once = wl-clip-persist --clipboard regular
 #
 #   Caps+Y and Caps+P are emitted by keyd as Ctrl+C and Ctrl+V.
-#   bind = $mainMod, X, exec, cliphist list | rofi -dmenu -p "Clipboard" | cliphist decode | wl-copy
 #
 # Privacy:
 #   Password managers that set "x-kde-passwordManagerHint: secret" MIME hint

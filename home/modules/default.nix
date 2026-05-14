@@ -2,7 +2,6 @@
   imports = [
     ./links.nix
     ./kitty.nix
-    ./rofi.nix
     ./theme.nix
     ./email.nix
     ./fzf.nix
@@ -11,6 +10,7 @@
     ./gnupg.nix
     ./qutebrowser.nix
     ./tmux.nix
+    ./yazi.nix
     ./vesktop.nix
   ];
 }

@@ -1,8 +1,6 @@
 { repoPath, ... }:
 
 {
-  services.swayosd.enable = true;
-
   wayland.windowManager.hyprland = {
     enable = true;
     package = null;

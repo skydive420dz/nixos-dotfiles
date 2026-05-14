@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  theme = import ../../config/theme/tokens.nix;
+  theme = import ../../theme/tokens.nix;
   semantic = theme.semantic;
 in
 

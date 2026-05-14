@@ -8,12 +8,24 @@ __pycache__/
 *.swo
 .DS_Store
 *~
+.direnv/
+.env
+.env.*
+!.env.example
+.mind/
 
 # Build artifacts
 result
 result-*
 
 *.backup
+*.bak
+*.orig
+*.rej
+*.tmp
+*.sqlite
+*.sqlite-*
+*.db
 
 config/qutebrowser/autoconfig.yml
 

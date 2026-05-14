@@ -29,11 +29,7 @@ in
   # than the whole directory — meaning the *directory itself* stays
   # writable, so apps that need to write cache/state into it can do so.
   xdg.configFile = {
-    "swaync/config.json".source = ../../config/swaync/config.json;
-    "swaync/style.css".source = ../../config/swaync/style.css;
     "hypr/mocha.conf".source = ../../config/hypr/mocha.conf;
-    "waybar/mocha.css".source = ../../config/waybar/mocha.css;
-    "swayosd".source = ../../config/swayosd;
   };
 
   # ── Tier 3: live-editable, point at the live repo dir ─────────────────────
@@ -41,7 +37,6 @@ in
   # No rebuild needed.
   home.file = {
     ".config/quickshell".source = link "config/quickshell";
-    ".config/yazi".source = link "config/yazi";
     ".config/aerc".source = link "config/aerc";
     ".config/scripts".source = link "scripts";
   };
