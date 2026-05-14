@@ -817,9 +817,9 @@ PanelWindow {
                 root.hoveredModule = "";
             }
             onExited: root.hoveredModule = ""
-            onClicked: mouse.accepted = false
-            onPressed: mouse.accepted = false
-            onReleased: mouse.accepted = false
+            onClicked: mouse => mouse.accepted = false
+            onPressed: mouse => mouse.accepted = false
+            onReleased: mouse => mouse.accepted = false
         }
     }
 

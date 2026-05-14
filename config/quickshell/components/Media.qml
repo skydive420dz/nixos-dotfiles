@@ -23,7 +23,23 @@ Item {
 
     readonly property bool active: player !== null
     readonly property bool playing: player?.playbackState === MprisPlaybackState.Playing
+    readonly property string title: player?.trackTitle || "Unknown"
+    readonly property string artist: player?.trackArtist || ""
+    readonly property string artUrl: player?.trackArtUrl || ""
+    readonly property real trackWidth: 180
     property real progress: 0
+
+    function refreshProgress() {
+        if (!player || player.length <= 0) {
+            progress = 0;
+            return;
+        }
+
+        progress = Math.max(0, Math.min(player.position / player.length, 1.0));
+    }
+
+    onPlayerChanged: refreshProgress()
+    onPlayingChanged: refreshProgress()
 
     implicitWidth: active ? pill.implicitWidth : 0
     Behavior on implicitWidth {
@@ -45,11 +61,7 @@ Item {
         running: root.playing
         repeat: true
         triggeredOnStart: true
-        onTriggered: {
-            if (!root.player || root.player.length <= 0)
-                return;
-            root.progress = Math.min(root.player.position / root.player.length, 1.0);
-        }
+        onTriggered: root.refreshProgress()
     }
 
     // Progress bar — sits flush under the pill, same width, peeks out like an underline
@@ -154,7 +166,9 @@ Item {
             // Track info
             Item {
                 Layout.fillWidth: true
-                implicitWidth: 180
+                Layout.preferredWidth: root.trackWidth
+                Layout.maximumWidth: root.trackWidth
+                implicitWidth: root.trackWidth
                 implicitHeight: Style.pillHeight
                 clip: true
 
@@ -164,22 +178,22 @@ Item {
 
                     Text {
                         Layout.alignment: Qt.AlignHCenter
-                        text: root.player?.trackTitle || "Unknown"
+                        text: root.title
                         color: Mocha.text
                         font.pixelSize: Style.fontSizeS + 1
                         font.family: Style.font
                         font.bold: true
                         elide: Text.ElideRight
-                        Layout.maximumWidth: 180
+                        Layout.maximumWidth: root.trackWidth
                     }
                     Text {
                         Layout.alignment: Qt.AlignHCenter
-                        text: root.player?.trackArtist || ""
+                        text: root.artist
                         color: Mocha.subtext0
                         font.pixelSize: Style.fontSizeS
                         font.family: Style.font
                         elide: Text.ElideRight
-                        Layout.maximumWidth: 180
+                        Layout.maximumWidth: root.trackWidth
                         visible: text !== ""
                     }
                 }
@@ -198,11 +212,11 @@ Item {
                 radius: 4
                 color: Mocha.surface1
                 clip: true
-                visible: (root.player?.trackArtUrl ?? "") !== ""
+                visible: root.artUrl !== ""
 
                 Image {
                     anchors.fill: parent
-                    source: root.player?.trackArtUrl ?? ""
+                    source: root.artUrl
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
                 }
