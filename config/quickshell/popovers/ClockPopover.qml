@@ -2,29 +2,15 @@ import ".."
 import QtQuick
 import QtQuick.Layouts
 
-ColumnLayout {
+PopoverPanel {
     id: root
 
-    property string hoveredModule: ""
     property date now: new Date()
     readonly property int todayDate: now.getDate()
     readonly property int firstDay: new Date(now.getFullYear(), now.getMonth(), 1).getDay()
     readonly property int daysInMonth: new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
-
-    anchors {
-        top: parent.top
-        left: parent.left
-        right: parent.right
-    }
+    moduleName: "clock"
     spacing: 10
-    opacity: hoveredModule === "clock" ? 1 : 0
-    visible: opacity > 0
-
-    Behavior on opacity {
-        NumberAnimation {
-            duration: 150
-        }
-    }
 
     Text {
         Layout.alignment: Qt.AlignHCenter

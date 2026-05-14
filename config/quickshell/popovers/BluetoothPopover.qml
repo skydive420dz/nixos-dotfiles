@@ -2,26 +2,12 @@ import ".."
 import QtQuick
 import QtQuick.Layouts
 
-ColumnLayout {
+PopoverPanel {
     id: root
 
-    property string hoveredModule: ""
     property var btModule
-
-    anchors {
-        top: parent.top
-        left: parent.left
-        right: parent.right
-    }
+    moduleName: "bluetooth"
     spacing: 8
-    opacity: hoveredModule === "bluetooth" ? 1 : 0
-    visible: opacity > 0
-
-    Behavior on opacity {
-        NumberAnimation {
-            duration: 150
-        }
-    }
 
     RowLayout {
         Text {

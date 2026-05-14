@@ -3,26 +3,12 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Services.Pipewire
 
-ColumnLayout {
+PopoverPanel {
     id: root
 
-    property string hoveredModule: ""
     property var volModule
-
-    anchors {
-        top: parent.top
-        left: parent.left
-        right: parent.right
-    }
+    moduleName: "volume"
     spacing: 10
-    opacity: hoveredModule === "volume" ? 1 : 0
-    visible: opacity > 0
-
-    Behavior on opacity {
-        NumberAnimation {
-            duration: 150
-        }
-    }
 
     RowLayout {
         Text {

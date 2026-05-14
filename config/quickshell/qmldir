@@ -9,6 +9,7 @@ OsButton      1.0 components/OsButton.qml
 Workspaces    1.0 components/Workspaces.qml
 WindowTitle   1.0 components/WindowTitle.qml
 Clock         1.0 components/Clock.qml
+PopoverPanel 1.0 popovers/PopoverPanel.qml
 ClockPopover 1.0 popovers/ClockPopover.qml
 Weather       1.0 components/Weather.qml
 WeatherPopover 1.0 popovers/WeatherPopover.qml
