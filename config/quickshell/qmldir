@@ -1,24 +1,23 @@
 Bar           1.0 Bar.qml
 singleton Mocha       1.0 Mocha.qml
 singleton Style       1.0 Style.qml
-singleton WeatherData 1.0 components/WeatherData.qml
+singleton WeatherData 1.0 services/WeatherData.qml
 Media         1.0 components/Media.qml
-Popover       1.0 components/Popover.qml
 ConnectivityPill 1.0 components/ConnectivityPill.qml
 WindowToggle  1.0 components/WindowToggle.qml
 OsButton      1.0 components/OsButton.qml
 Workspaces    1.0 components/Workspaces.qml
 WindowTitle   1.0 components/WindowTitle.qml
 Clock         1.0 components/Clock.qml
-ClockPopover 1.0 components/ClockPopover.qml
+ClockPopover 1.0 popovers/ClockPopover.qml
 Weather       1.0 components/Weather.qml
-WeatherPopover 1.0 components/WeatherPopover.qml
+WeatherPopover 1.0 popovers/WeatherPopover.qml
 Network       1.0 components/Network.qml
-NetworkPopover 1.0 components/NetworkPopover.qml
+NetworkPopover 1.0 popovers/NetworkPopover.qml
 Bluetooth     1.0 components/Bluetooth.qml
-BluetoothPopover 1.0 components/BluetoothPopover.qml
+BluetoothPopover 1.0 popovers/BluetoothPopover.qml
 Volume        1.0 components/Volume.qml
-VolumePopover 1.0 components/VolumePopover.qml
+VolumePopover 1.0 popovers/VolumePopover.qml
 Battery       1.0 components/Battery.qml
-BatteryPopover 1.0 components/BatteryPopover.qml
+BatteryPopover 1.0 popovers/BatteryPopover.qml
 Tray          1.0 components/Tray.qml
