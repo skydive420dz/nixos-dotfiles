@@ -15,6 +15,7 @@ WeatherPopover 1.0 components/WeatherPopover.qml
 Network       1.0 components/Network.qml
 NetworkPopover 1.0 components/NetworkPopover.qml
 Bluetooth     1.0 components/Bluetooth.qml
+BluetoothPopover 1.0 components/BluetoothPopover.qml
 Volume        1.0 components/Volume.qml
 VolumePopover 1.0 components/VolumePopover.qml
 Battery       1.0 components/Battery.qml
