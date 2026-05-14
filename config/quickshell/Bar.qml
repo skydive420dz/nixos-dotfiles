@@ -677,7 +677,6 @@ PanelWindow {
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
-                                console.log("sink:", sinkDelegate.modelData.description);
                                 Pipewire.preferredDefaultAudioSink = sinkDelegate.modelData;
                             }
                         }
