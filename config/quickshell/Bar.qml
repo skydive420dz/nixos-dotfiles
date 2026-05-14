@@ -145,73 +145,8 @@ PanelWindow {
                 topMargin: 10
             }
 
-            ColumnLayout {
-                anchors {
-                    top: parent.top
-                    left: parent.left
-                    right: parent.right
-                }
-                spacing: 10
-                opacity: root.hoveredModule === "clock" ? 1 : 0
-                visible: opacity > 0
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: 150
-                    }
-                }
-
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: Qt.formatDate(new Date(), "MMMM yyyy")
-                    color: Mocha.lavender
-                    font.pixelSize: Style.fontSize
-                    font.family: Style.font
-                    font.bold: true
-                }
-                Grid {
-                    Layout.alignment: Qt.AlignHCenter
-                    columns: 7
-                    rowSpacing: 2
-                    columnSpacing: 0
-                    property var now: new Date()
-                    property int todayDate: now.getDate()
-                    property int firstDay: new Date(now.getFullYear(), now.getMonth(), 1).getDay()
-                    property int daysInMonth: new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
-                    Repeater {
-                        model: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
-                        Text {
-                            width: 38
-                            text: modelData
-                            color: Mocha.subtext0
-                            font.pixelSize: 10
-                            font.family: Style.font
-                            horizontalAlignment: Text.AlignHCenter
-                        }
-                    }
-                    Repeater {
-                        model: parent.firstDay
-                        Item {
-                            width: 38
-                            height: 22
-                        }
-                    }
-                    Repeater {
-                        model: parent.daysInMonth
-                        Rectangle {
-                            width: 38
-                            height: 22
-                            radius: 11
-                            color: (index + 1) === parent.parent.todayDate ? Mocha.lavender : "transparent"
-                            Text {
-                                anchors.centerIn: parent
-                                text: (index + 1).toString()
-                                color: (index + 1) === parent.parent.todayDate ? Mocha.crust : Mocha.text
-                                font.pixelSize: 11
-                                font.family: Style.font
-                            }
-                        }
-                    }
-                }
+            ClockPopover {
+                hoveredModule: root.hoveredModule
             }
 
             ColumnLayout {
