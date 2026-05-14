@@ -1,6 +1,6 @@
 Bar           1.0 Bar.qml
-singleton Mocha       1.0 Mocha.qml
-singleton Style       1.0 Style.qml
+singleton Mocha       1.0 theme/Mocha.qml
+singleton Style       1.0 theme/Style.qml
 singleton WeatherData 1.0 services/WeatherData.qml
 Media         1.0 components/Media.qml
 ConnectivityPill 1.0 components/ConnectivityPill.qml
