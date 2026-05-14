@@ -7,7 +7,6 @@ Item {
     id: root
     implicitWidth: volText.implicitWidth + 8
     implicitHeight: Style.pillHeight
-    property bool hovered: hover.containsMouse
 
     // ── Pipewire native bindings — fully reactive, no polling ─────────────────
     property PwNode sink: Pipewire.defaultAudioSink
@@ -30,7 +29,6 @@ Item {
     }
 
     MouseArea {
-        id: hover
         anchors.fill: parent
         hoverEnabled: true
         onClicked: wiremixToggle.toggle()
@@ -50,6 +48,4 @@ Item {
         windowClass: "wiremix"
         launchCommand: ["kitty", "--class", "wiremix", "-T", "wiremix", "-e", "wiremix"]
     }
-
-    // ── Popover ───────────────────────────────────────────────────────────────
 }

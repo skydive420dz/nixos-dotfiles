@@ -8,9 +8,6 @@ Item {
     implicitWidth: col.implicitWidth + 8
     implicitHeight: Style.pillHeight
 
-    property bool hovered: hover.containsMouse
-    property bool popupHovered: false
-
     ColumnLayout {
         id: col
         anchors.centerIn: parent
@@ -31,13 +28,6 @@ Item {
             font.family: Style.font
             color: Mocha.subtext0
         }
-    }
-
-    MouseArea {
-        id: hover
-        anchors.fill: parent
-        hoverEnabled: true
-        onExited: root.popupHovered = false
     }
 
     Timer {
