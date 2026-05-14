@@ -11,6 +11,7 @@ WindowTitle   1.0 components/WindowTitle.qml
 Clock         1.0 components/Clock.qml
 ClockPopover 1.0 components/ClockPopover.qml
 Weather       1.0 components/Weather.qml
+WeatherPopover 1.0 components/WeatherPopover.qml
 Network       1.0 components/Network.qml
 Bluetooth     1.0 components/Bluetooth.qml
 Volume        1.0 components/Volume.qml
