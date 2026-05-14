@@ -13,6 +13,7 @@ ClockPopover 1.0 components/ClockPopover.qml
 Weather       1.0 components/Weather.qml
 WeatherPopover 1.0 components/WeatherPopover.qml
 Network       1.0 components/Network.qml
+NetworkPopover 1.0 components/NetworkPopover.qml
 Bluetooth     1.0 components/Bluetooth.qml
 Volume        1.0 components/Volume.qml
 VolumePopover 1.0 components/VolumePopover.qml
