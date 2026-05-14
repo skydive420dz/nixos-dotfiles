@@ -13,13 +13,14 @@ PopoverPanel {
 
         Text {
             text: WeatherData.icon
-            font.pixelSize: 24
+            font.pixelSize: 28
             font.family: Style.font
             color: Mocha.sky
         }
 
         ColumnLayout {
             spacing: 2
+            Layout.fillWidth: true
 
             Text {
                 text: WeatherData.desc
@@ -38,10 +39,10 @@ PopoverPanel {
         }
     }
 
-    Grid {
+    GridLayout {
         columns: 2
         rowSpacing: 4
-        columnSpacing: 16
+        columnSpacing: 10
         Layout.fillWidth: true
 
         Repeater {
@@ -72,30 +73,23 @@ PopoverPanel {
                 }
             ]
 
-            RowLayout {
-                spacing: 4
-
-                Text {
-                    text: modelData.label
-                    color: Mocha.subtext0
-                    font.pixelSize: Style.fontSizeS
-                    font.family: Style.font
-                }
-
-                Text {
-                    text: modelData.value
-                    color: Mocha.text
-                    font.pixelSize: Style.fontSizeS
-                    font.family: Style.font
-                }
+            InfoRow {
+                label: modelData.label
+                value: modelData.value
+                labelWidth: 74
+                valueFills: false
             }
         }
     }
 
     Divider {}
 
+    SectionLabel {
+        label: "Forecast"
+    }
+
     ColumnLayout {
-        spacing: 4
+        spacing: 2
         Layout.fillWidth: true
 
         Repeater {
@@ -103,14 +97,14 @@ PopoverPanel {
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: 0
+                spacing: 8
 
                 Text {
                     text: modelData.day
                     color: Mocha.lavender
                     font.pixelSize: Style.fontSizeS
                     font.family: Style.font
-                    Layout.preferredWidth: 70
+                    Layout.preferredWidth: 56
                 }
 
                 Text {
@@ -127,6 +121,8 @@ PopoverPanel {
                     color: Mocha.subtext0
                     font.pixelSize: Style.fontSizeS
                     font.family: Style.font
+                    horizontalAlignment: Text.AlignRight
+                    Layout.preferredWidth: 52
                 }
             }
         }
