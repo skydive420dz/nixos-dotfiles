@@ -49,24 +49,9 @@ PopoverPanel {
             return rows;
         }
 
-        RowLayout {
-            Layout.fillWidth: true
-
-            Text {
-                text: modelData.label
-                color: Mocha.subtext0
-                font.pixelSize: Style.fontSizeS
-                font.family: Style.font
-                Layout.preferredWidth: 70
-            }
-
-            Text {
-                text: modelData.value
-                color: Mocha.text
-                font.pixelSize: Style.fontSizeS
-                font.family: Style.font
-                Layout.fillWidth: true
-            }
+        InfoRow {
+            label: modelData.label
+            value: modelData.value
         }
     }
 }

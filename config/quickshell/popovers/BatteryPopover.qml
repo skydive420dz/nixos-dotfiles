@@ -67,21 +67,11 @@ PopoverPanel {
                 value: root.battModule.health + "%"
             },
         ]
-        RowLayout {
-            Layout.fillWidth: true
-            Text {
-                text: modelData.label
-                color: Mocha.subtext0
-                font.pixelSize: Style.fontSizeS
-                font.family: Style.font
-                Layout.preferredWidth: 80
-            }
-            Text {
-                text: modelData.value
-                color: Mocha.text
-                font.pixelSize: Style.fontSizeS
-                font.family: Style.font
-            }
+        InfoRow {
+            label: modelData.label
+            value: modelData.value
+            labelWidth: 80
+            valueFills: false
         }
     }
 }
