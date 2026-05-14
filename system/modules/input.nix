@@ -36,7 +36,10 @@
           capslock = "overload(controlalt, esc)";
         };
 
-        "controlalt:C-A" = { };
+        "controlalt:C-A" = {
+          y = "C-c";
+          p = "C-v";
+        };
       };
     };
   };

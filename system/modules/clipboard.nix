@@ -14,8 +14,7 @@
 #   exec-once = wl-paste --type image --watch cliphist store
 #   exec-once = wl-clip-persist --clipboard regular
 #
-#   bind = $mainMod, Y, sendshortcut, CTRL, C, activewindow
-#   bind = $mainMod, P, sendshortcut, CTRL, V, activewindow
+#   Caps+Y and Caps+P are emitted by keyd as Ctrl+C and Ctrl+V.
 #   bind = $mainMod, X, exec, cliphist list | rofi -dmenu -p "Clipboard" | cliphist decode | wl-copy
 #
 # Privacy:
