@@ -26,12 +26,14 @@ Item {
         if (!device)
             return false;
         const s = device.state;
-        return s === UPowerDeviceState.Charging || s === UPowerDeviceState.PendingCharge;
+        return s === UPowerDeviceState.Charging;
     }
 
     readonly property string statusLabel: {
         if (!device)
             return "";
+        if (root.plugged && !root.charging)
+            return "Plugged in";
         switch (device.state) {
         case UPowerDeviceState.Charging:
             return "Charging";
@@ -44,8 +46,10 @@ Item {
         case UPowerDeviceState.PendingCharge:
             return "Plugged in";
         case UPowerDeviceState.PendingDischarge:
-            return "Pending";
+            return "Plugged in";
         default:
+            if (root.plugged)
+                return "Plugged in";
             return "";
         }
     }
