@@ -26,23 +26,11 @@ PopoverPanel {
         }
     }
 
-    RowLayout {
+    InfoRow {
         visible: root.btModule.deviceBatt >= 0
-
-        Text {
-            text: "🔋 Battery"
-            color: Mocha.subtext0
-            font.pixelSize: Style.fontSizeS
-            font.family: Style.font
-            Layout.preferredWidth: 70
-        }
-
-        Text {
-            text: root.btModule.deviceBatt + "%"
-            color: Mocha.text
-            font.pixelSize: Style.fontSizeS
-            font.family: Style.font
-        }
+        label: "🔋 Battery"
+        value: root.btModule.deviceBatt + "%"
+        valueFills: false
     }
 
     Divider {
