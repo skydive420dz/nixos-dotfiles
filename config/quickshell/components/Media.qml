@@ -26,6 +26,12 @@ Item {
     readonly property string title: player?.trackTitle || "Unknown"
     readonly property string artist: player?.trackArtist || ""
     readonly property string artUrl: player?.trackArtUrl || ""
+    readonly property var metadata: player?.metadata ?? ({})
+    readonly property string mediaUrl: metadata["xesam:url"] ?? ""
+    readonly property string playerSource: ((player?.desktopEntry || "") + " " + (player?.identity || "")).toLowerCase()
+    readonly property bool isYoutube: mediaUrl.indexOf("youtube.com") >= 0 || mediaUrl.indexOf("youtu.be") >= 0
+    readonly property bool isBrowserMedia: isYoutube || playerSource.indexOf("firefox") >= 0
+    readonly property string contentIcon: isYoutube ? "" : isBrowserMedia ? "󰕧" : ""
     readonly property real trackWidth: 180
     readonly property bool hasProgress: player !== null && player.length > 0
     property real progress: 0
@@ -153,15 +159,28 @@ Item {
                     anchors.centerIn: parent
                     spacing: 1
 
-                    Text {
+                    RowLayout {
                         Layout.alignment: Qt.AlignHCenter
-                        text: root.title
-                        color: Mocha.text
-                        font.pixelSize: Style.fontSizeS + 1
-                        font.family: Style.font
-                        font.bold: true
-                        elide: Text.ElideRight
+                        spacing: 4
                         Layout.maximumWidth: root.trackWidth
+
+                        Text {
+                            visible: root.contentIcon !== ""
+                            text: root.contentIcon
+                            color: root.isYoutube ? Mocha.red : Mocha.mauve
+                            font.pixelSize: Style.fontSizeS + 1
+                            font.family: Style.font
+                        }
+
+                        Text {
+                            text: root.title
+                            color: Mocha.text
+                            font.pixelSize: Style.fontSizeS + 1
+                            font.family: Style.font
+                            font.bold: true
+                            elide: Text.ElideRight
+                            Layout.maximumWidth: root.trackWidth - (root.contentIcon !== "" ? 18 : 0)
+                        }
                     }
                     Text {
                         Layout.alignment: Qt.AlignHCenter
