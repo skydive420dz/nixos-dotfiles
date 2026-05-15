@@ -13,6 +13,6 @@ Item {
         text: WeatherData.display
         font.pixelSize: Style.fontSize
         font.family: Style.font
-        color: Mocha.sky
+        color: Mocha.blue
     }
 }

@@ -10,10 +10,11 @@ Item {
     // Mirror the inner pill's size so the mask in Bar.qml correctly covers the
     // expanded area. Without this, mouse events disappear when the cursor moves
     // into the menu region.
-    implicitWidth: pill.implicitWidth
-    implicitHeight: pill.implicitHeight
+    implicitWidth: hasItems || menuOpen ? pill.implicitWidth : 0
+    implicitHeight: hasItems || menuOpen ? pill.implicitHeight : 0
 
     property SystemTrayItem activeItem: null
+    readonly property bool hasItems: SystemTray.items.values.length > 0
     readonly property bool menuOpen: activeItem !== null
 
     QsMenuOpener {
@@ -25,6 +26,7 @@ Item {
         id: pill
         anchors.top: parent.top
         anchors.right: parent.right
+        visible: root.hasItems || root.menuOpen
 
         // Right-anchored, so growing implicitWidth expands LEFT — gives L-shape effect
         implicitWidth: root.menuOpen ? Math.max(iconRow.implicitWidth, menuCol.implicitWidth) + Style.pillPadH * 2 : iconRow.implicitWidth + Style.pillPadH * 2

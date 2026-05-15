@@ -25,7 +25,7 @@ Item {
         text: root.muted ? root.icon + " muted" : root.icon + " " + Math.round(root.volume * 100) + "%"
         font.pixelSize: Style.fontSize
         font.family: Style.font
-        color: Mocha.mauve
+        color: root.muted ? Mocha.overlay0 : Mocha.blue
     }
 
     MouseArea {
@@ -46,6 +46,6 @@ Item {
     WindowToggle {
         id: wiremixToggle
         windowClass: "wiremix"
-        launchCommand: ["kitty", "--class", "wiremix", "-T", "wiremix", "-e", "wiremix"]
+        launchCommand: ["uwsm-at-cursor", "kitty", "--class", "wiremix", "-T", "wiremix", "-e", "wiremix"]
     }
 }

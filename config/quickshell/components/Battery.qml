@@ -105,12 +105,12 @@ Item {
     readonly property color iconColor: {
         const cap = root.capacity;
         if (root.plugged || root.charging)
-            return Mocha.green;
+            return Mocha.blue;
         if (cap <= 15)
             return Mocha.red;
         if (cap <= 30)
             return Mocha.yellow;
-        return Mocha.teal;
+        return Mocha.blue;
     }
 
     RowLayout {

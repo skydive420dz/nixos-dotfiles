@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cursor_json="$(hyprctl cursorpos -j 2>/dev/null || true)"
+
+if jq -e '.x and .y' >/dev/null 2>&1 <<<"$cursor_json"; then
+  cursor_x="$(jq -r '.x' <<<"$cursor_json")"
+  cursor_y="$(jq -r '.y' <<<"$cursor_json")"
+else
+  cursor_text="$(hyprctl cursorpos 2>/dev/null || true)"
+  cursor_x="${cursor_text%%,*}"
+  cursor_y="${cursor_text#*,}"
+  cursor_x="${cursor_x//[!0-9-]/}"
+  cursor_y="${cursor_y//[!0-9-]/}"
+fi
+
+if [[ -n "${cursor_x:-}" && -n "${cursor_y:-}" ]]; then
+  monitor="$(
+    hyprctl monitors -j 2>/dev/null | jq -r \
+      --argjson x "$cursor_x" \
+      --argjson y "$cursor_y" \
+      '.[] | select($x >= .x and $x < (.x + .width) and $y >= .y and $y < (.y + .height)) | .name' \
+      | head -n 1
+  )"
+
+  if [[ -n "${monitor:-}" ]]; then
+    hyprctl dispatch focusmonitor "$monitor" >/dev/null 2>&1 || true
+  fi
+fi
+
+exec uwsm app -- "$@"

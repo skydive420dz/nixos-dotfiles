@@ -102,7 +102,7 @@ PanelWindow {
         anchors.top: parent.top
         anchors.right: pill.left
         anchors.topMargin: (Style.barHeight - Style.pillHeight) / 2
-        anchors.rightMargin: Style.groupSpacing
+        anchors.rightMargin: implicitWidth > 0 ? Style.groupSpacing : 0
     }
 
     // ── Bar row ───────────────────────────────────────────────────────────────
@@ -113,7 +113,7 @@ PanelWindow {
             left: parent.left
             right: trayModule.left
             leftMargin: 4
-            rightMargin: Style.groupSpacing
+            rightMargin: trayModule.implicitWidth > 0 ? Style.groupSpacing : 0
         }
         height: Style.barHeight
         spacing: 0

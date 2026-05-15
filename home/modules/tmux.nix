@@ -33,7 +33,7 @@ in
     # CORE
     # =========================
 
-    prefix = "C-a";
+    prefix = "C-Space";
     baseIndex = 1;
     escapeTime = 0;
     keyMode = "vi";
@@ -62,6 +62,8 @@ in
       setw -g pane-base-index 1
       set -g history-limit 100000
       set -ga update-environment " WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP HYPRLAND_INSTANCE_SIGNATURE"
+      unbind C-a
+      bind C-Space send-prefix
 
       # =========================================
       # KITTY / TRUECOLOR
@@ -101,17 +103,14 @@ in
       # SPLITS
       # =========================================
 
-      bind | split-window -h -c "#{pane_current_path}"
-      bind - split-window -v -c "#{pane_current_path}"
-
-      bind '"' split-window -v -c "#{pane_current_path}"
-      bind % split-window -h -c "#{pane_current_path}"
+      bind v split-window -h -c "#{pane_current_path}"
+      bind h split-window -v -c "#{pane_current_path}"
+      bind Enter new-window -c "#{pane_current_path}"
 
       # =========================================
       # PANE NAVIGATION
       # =========================================
 
-      bind -r h select-pane -L
       bind -r j select-pane -D
       bind -r k select-pane -U
       bind -r l select-pane -R

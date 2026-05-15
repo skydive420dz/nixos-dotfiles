@@ -3,44 +3,42 @@ import QtQuick
 
 QtObject {
     // ── Base ──────────────────────────────────────────────────────────────────
-    readonly property color base: "#1e1e2e"
-    readonly property color mantle: "#181825"
-    readonly property color crust: "#11111b"
+    readonly property color base: "#171923"
+    readonly property color mantle: "#13151d"
+    readonly property color crust: "#0d0f15"
 
     // ── Surface ───────────────────────────────────────────────────────────────
-    readonly property color surface0: "#313244"
-    readonly property color surface1: "#45475a"
-    readonly property color surface2: "#585b70"
+    readonly property color surface0: "#242734"
+    readonly property color surface1: "#303442"
+    readonly property color surface2: "#3d4252"
 
     // ── Overlay ───────────────────────────────────────────────────────────────
-    readonly property color overlay0: "#6c7086"
-    readonly property color overlay1: "#7f849c"
-    readonly property color overlay2: "#9399b2"
+    readonly property color overlay0: "#5d6374"
+    readonly property color overlay1: "#737a8b"
+    readonly property color overlay2: "#8991a0"
 
     // ── Text ──────────────────────────────────────────────────────────────────
-    readonly property color text: "#cdd6f4"
-    readonly property color subtext0: "#a6adc8"
-    readonly property color subtext1: "#bac2de"
+    readonly property color text: "#d6d9e3"
+    readonly property color subtext0: "#a2a8b6"
+    readonly property color subtext1: "#bbc0cb"
 
     // ── Accent ────────────────────────────────────────────────────────────────
-    readonly property color lavender: "#b4befe"
-    readonly property color blue: "#89b4fa"
-    readonly property color sapphire: "#74c7ec"
-    readonly property color sky: "#89dceb"
-    readonly property color teal: "#94e2d5"
-    readonly property color green: "#a6e3a1"
-    readonly property color yellow: "#f9e2af"
-    readonly property color peach: "#fab387"
-    readonly property color maroon: "#eba0ac"
-    readonly property color red: "#f38ba8"
-    readonly property color mauve: "#cba6f7"
-    readonly property color pink: "#f5c2e7"
-    readonly property color flamingo: "#f2cdcd"
-    readonly property color rosewater: "#f5e0dc"
+    readonly property color lavender: "#9da8cf"
+    readonly property color blue: "#8ca6c9"
+    readonly property color sapphire: "#7fa8b6"
+    readonly property color sky: "#8bb9c2"
+    readonly property color teal: "#8fb9aa"
+    readonly property color green: "#9abf9d"
+    readonly property color yellow: "#d4be86"
+    readonly property color peach: "#d1a07b"
+    readonly property color maroon: "#c08a95"
+    readonly property color red: "#c98795"
+    readonly property color mauve: "#b59ac7"
+    readonly property color pink: "#c5a4bd"
+    readonly property color flamingo: "#c9aaa7"
+    readonly property color rosewater: "#d7b8ad"
 
     // ── Derived / utility ─────────────────────────────────────────────────────
-    // Pill background: base at 15% opacity
-    readonly property color pillBg: Qt.rgba(0.118, 0.118, 0.180, 0.6)
-    // Pill border: lavender at 10% opacity
-    readonly property color pillBorder: Qt.rgba(0.706, 0.749, 0.996, 0.12)
+    readonly property color pillBg: Qt.rgba(0.090, 0.098, 0.135, 0.58)
+    readonly property color pillBorder: Qt.rgba(0.616, 0.659, 0.812, 0.10)
 }

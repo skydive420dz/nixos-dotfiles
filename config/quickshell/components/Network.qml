@@ -77,7 +77,7 @@ Item {
     readonly property color iconColor: {
         if (!device)
             return Mocha.overlay0;
-        return Mocha.teal;
+        return Mocha.blue;
     }
 
     Text {
@@ -90,7 +90,7 @@ Item {
 
     Process {
         id: nmtuiLauncher
-        command: ["uwsm", "app", "--", "kitty", "--class=nmtui", "-e", "nmtui"]
+        command: ["uwsm-at-cursor", "kitty", "--class=nmtui", "-e", "nmtui"]
         running: false
     }
 

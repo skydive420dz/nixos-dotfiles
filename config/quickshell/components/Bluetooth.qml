@@ -85,12 +85,12 @@ Item {
         text: root.icon
         font.pixelSize: Style.fontSize
         font.family: Style.font
-        color: root.adapter?.enabled ? Mocha.teal : Mocha.overlay0
+        color: root.adapter?.enabled ? Mocha.blue : Mocha.overlay0
     }
 
     Process {
         id: bluetuiLauncher
-        command: ["uwsm", "app", "--", "kitty", "--class=bluetui", "-e", "bluetui"]
+        command: ["uwsm-at-cursor", "kitty", "--class=bluetui", "-e", "bluetui"]
         running: false
     }
 
