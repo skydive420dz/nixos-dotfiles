@@ -60,9 +60,10 @@ in
       set -g status-left-length 100
       set -g status-right-length 100
 
-      set -g window-status-format ""
-      set -g window-status-current-format ""
-      set -g window-status-separator ""
+      set -g status-justify centre
+      set -g window-status-separator " "
+      set -g window-status-format "#[fg=${semantic.muted},bg=${semantic.background}] #I:#W "
+      set -g window-status-current-format "#[fg=${semantic.accentAlt},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.accentAlt},bold] #I:#W #[fg=${semantic.accentAlt},bg=${semantic.background}]"
 
       set -g status-left "#[fg=${semantic.accentAlt},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.accentAlt}]  #S #[fg=${semantic.accentAlt},bg=${semantic.background}] #[fg=${semantic.borderActive},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.borderActive}] 󰉓 #{b:pane_current_path} #[fg=${semantic.borderActive},bg=${semantic.background}]"
 
