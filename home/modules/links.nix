@@ -27,6 +27,7 @@ let
   };
 
   liveFiles = {
+    ".config/hypr/hyprland.lua" = "config/hypr/hyprland.lua";
     ".config/hypr/live.conf" = "config/hypr/hyprland.conf";
     ".config/hypr/mocha.conf" = "config/hypr/mocha.conf";
     ".config/nvf/lua/user/navigation.lua" = "config/nvf/lua/user/navigation.lua";

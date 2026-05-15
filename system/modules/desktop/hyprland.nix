@@ -1,10 +1,14 @@
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
+
+let
+  hyprlandPkgs = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system};
+in
 
 {
   programs.hyprland = {
     enable = true;
-    package = pkgs.hyprland;
-    portalPackage = pkgs.xdg-desktop-portal-hyprland;
+    package = hyprlandPkgs.hyprland;
+    portalPackage = hyprlandPkgs.xdg-desktop-portal-hyprland;
     withUWSM = true;
     xwayland.enable = true;
   };
@@ -12,7 +16,7 @@
   xdg.portal = {
     enable = true;
     extraPortals = [
-      pkgs.xdg-desktop-portal-hyprland
+      hyprlandPkgs.xdg-desktop-portal-hyprland
       pkgs.xdg-desktop-portal-gtk
     ];
     config.hyprland.default = [
