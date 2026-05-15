@@ -3,6 +3,26 @@
 let
   theme = import ../../theme/tokens.nix;
   semantic = theme.semantic;
+  tmuxDirName = pkgs.writeShellScript "tmux-dir-name" ''
+    path="''${1:-$PWD}"
+    name="''${path##*/}"
+
+    case "$path" in
+      "$HOME") printf ' ~' ;;
+      /) printf '/' ;;
+      *)
+        case "$name" in
+          Documents) printf '󰈙' ;;
+          Downloads) printf '' ;;
+          Music) printf '󰝚' ;;
+          Pictures) printf '' ;;
+          Videos) printf '󰕧' ;;
+          nixos-dotfiles) printf '' ;;
+          *) printf '󰉓 %s' "$name" ;;
+        esac
+        ;;
+    esac
+  '';
 in
 
 {
@@ -41,6 +61,7 @@ in
 
       setw -g pane-base-index 1
       set -g history-limit 100000
+      set -ga update-environment " WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP HYPRLAND_INSTANCE_SIGNATURE"
 
       # =========================================
       # KITTY / TRUECOLOR
@@ -61,13 +82,13 @@ in
       set -g status-right-length 100
 
       set -g status-justify centre
-      set -g window-status-separator " "
-      set -g window-status-format "#[fg=${semantic.muted},bg=${semantic.background}] #I:#W "
-      set -g window-status-current-format "#[fg=${semantic.accentAlt},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.accentAlt},bold] #I:#W #[fg=${semantic.accentAlt},bg=${semantic.background}]"
+      set -g window-status-separator ""
+      set -g window-status-format "#[fg=${semantic.muted},bg=${semantic.background}]  #I "
+      set -g window-status-current-format "#[fg=${semantic.background},bg=${semantic.accent},bold] #I #[fg=${semantic.accent},bg=${semantic.background}]"
 
-      set -g status-left "#[fg=${semantic.accentAlt},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.accentAlt}]  #S #[fg=${semantic.accentAlt},bg=${semantic.background}] #[fg=${semantic.borderActive},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.borderActive}] 󰉓 #{b:pane_current_path} #[fg=${semantic.borderActive},bg=${semantic.background}]"
+      set -g status-left "#[fg=${semantic.muted},bg=${semantic.surface}]  #S #[fg=${semantic.muted},bg=${semantic.background}] #[fg=${semantic.foreground},bg=${semantic.surface}] #(${tmuxDirName} '#{pane_current_path}') #[fg=${semantic.muted},bg=${semantic.background}] "
 
-      set -g status-right "#[fg=${semantic.success},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.success}]  #{user} #[fg=${semantic.success},bg=${semantic.background}] #[fg=${semantic.borderActive},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.borderActive}]  #H #[fg=${semantic.borderActive},bg=${semantic.background}] #[fg=${semantic.warning},bg=${semantic.background}]#[fg=${semantic.background},bg=${semantic.warning}] %H:%M #[fg=${semantic.warning},bg=${semantic.background}]"
+      set -g status-right "#[fg=${semantic.muted},bg=${semantic.background}]  #{user}   #H  #[fg=${semantic.background},bg=${semantic.accent},bold] %H:%M "
 
       # =========================================
       # PANE BORDERS
