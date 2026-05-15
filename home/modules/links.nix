@@ -30,7 +30,6 @@ let
     ".config/hypr/hyprland.lua" = "config/hypr/hyprland.lua";
     ".config/hypr/live.conf" = "config/hypr/hyprland.conf";
     ".config/hypr/mocha.conf" = "config/hypr/mocha.conf";
-    ".config/nvf/lua/user/navigation.lua" = "config/nvf/lua/user/navigation.lua";
     ".config/qutebrowser/bookmarks/urls" = "config/qutebrowser/bookmarks/urls";
     ".config/qutebrowser/config.py" = "config/qutebrowser/config.py";
     ".config/qutebrowser/quickmarks" = "config/qutebrowser/quickmarks";
