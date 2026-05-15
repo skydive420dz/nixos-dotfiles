@@ -22,6 +22,7 @@
       psmisc
       awww
       libnotify
+      mako
       powertop
       (pkgs.writeShellScriptBin "qmlls" ''
         exec ${pkgs.qt6.qtdeclarative}/bin/qmlls \

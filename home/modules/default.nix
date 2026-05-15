@@ -8,6 +8,7 @@
     ./starship.nix
     ./firefox.nix
     ./gnupg.nix
+    ./notifications.nix
     ./qutebrowser.nix
     ./tmux.nix
     ./yazi.nix

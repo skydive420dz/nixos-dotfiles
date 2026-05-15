@@ -31,7 +31,6 @@ in
       tab_title_template = "{index} {title}";
       cursor_trail = 10;
 
-      fps_limit = 144;
       input_delay = 3;
       cursor_blink_interval = 0;
       repaint_delay = 10;
@@ -42,7 +41,6 @@ in
 
       shell_integration = "enabled";
       allow_remote_control = "yes";
-      title = "Terminal";
 
       foreground = semantic.foreground;
       background = semantic.background;
