@@ -33,8 +33,9 @@ PanelWindow {
     property int selectedIndex: 0
     property var entries: []
     readonly property var results: filteredResults()
-    readonly property int rowHeight: 50
+    readonly property int rowHeight: 58
     readonly property int visibleRows: Math.min(results.length, 8)
+    readonly property string previewDir: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-clipboard-previews"
 
     function toggle() {
         open ? close() : show();
@@ -61,14 +62,30 @@ PanelWindow {
         return (text ?? "").toString().toLowerCase();
     }
 
+    function isImagePreview(preview) {
+        var text = normalize(preview);
+        return text.indexOf("image/") >= 0
+            || text.indexOf("binary data") >= 0
+            || text.indexOf(".png") >= 0
+            || text.indexOf(".jpg") >= 0
+            || text.indexOf(".jpeg") >= 0
+            || text.indexOf(".webp") >= 0
+            || text.indexOf(".gif") >= 0;
+    }
+
     function parseEntry(line, index) {
         var tab = line.indexOf("\t");
         var id = tab >= 0 ? line.slice(0, tab) : line;
         var preview = tab >= 0 ? line.slice(tab + 1) : line;
+        var cleanPreview = preview.replace(/\s+/g, " ").trim();
+        var image = isImagePreview(cleanPreview);
 
         return {
             "id": id,
-            "preview": preview.replace(/\s+/g, " ").trim(),
+            "preview": image ? "Image" : cleanPreview,
+            "detail": image ? cleanPreview : "",
+            "isImage": image,
+            "thumb": previewDir + "/" + id + ".img",
             "raw": line,
             "index": index
         };
@@ -134,6 +151,24 @@ PanelWindow {
         selectedIndex = Math.min(selectedIndex, Math.max(results.length - 2, 0));
     }
 
+    function scrollResults(delta) {
+        if (root.results.length <= root.visibleRows)
+            return;
+
+        var maxY = Math.max(0, resultList.contentHeight - resultList.height);
+        resultList.contentY = Math.max(0, Math.min(maxY, resultList.contentY + delta));
+    }
+
+    function selectResult(index) {
+        if (root.results.length === 0) {
+            selectedIndex = 0;
+            return;
+        }
+
+        selectedIndex = Math.max(0, Math.min(index, root.results.length - 1));
+        resultList.positionViewAtIndex(selectedIndex, ListView.Contain);
+    }
+
     FileView {
         id: toggleSignal
         path: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-clipboard-toggle"
@@ -193,13 +228,13 @@ PanelWindow {
     Rectangle {
         id: panel
         visible: root.open || root.closing
-        width: Math.min(560, root.width - 48)
-        height: searchBox.height + (root.visibleRows > 0 ? resultList.height + 8 : 0)
+        width: Math.min(620, root.width - 48)
+        height: searchBox.height + (root.visibleRows > 0 ? resultList.height + 10 : emptyState.height + 10)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: Style.barHeight + 20
-        radius: Style.pillRadius
-        color: Qt.rgba(Mocha.base.r, Mocha.base.g, Mocha.base.b, 0.92)
+        radius: 16
+        color: Qt.rgba(Mocha.mantle.r, Mocha.mantle.g, Mocha.mantle.b, 0.94)
         border.color: Mocha.pillBorder
         border.width: 1
         clip: true
@@ -222,14 +257,14 @@ PanelWindow {
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: 0
-            spacing: 8
+            spacing: 10
 
             Rectangle {
                 id: searchBox
                 Layout.fillWidth: true
-                height: Style.pillHeight
-                radius: Style.pillRadius
-                color: "transparent"
+                height: 44
+                radius: 14
+                color: Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.58)
                 clip: true
 
                 RowLayout {
@@ -240,9 +275,9 @@ PanelWindow {
 
                     Text {
                         text: ""
-                        color: Mocha.blue
+                        color: Mocha.lavender
                         font.family: Style.font
-                        font.pixelSize: 24
+                        font.pixelSize: 18
                     }
 
                     TextInput {
@@ -253,7 +288,7 @@ PanelWindow {
                         selectionColor: Mocha.surface2
                         selectedTextColor: Mocha.text
                         font.family: Style.font
-                        font.pixelSize: 24
+                        font.pixelSize: 18
                         clip: true
                         focus: root.open
 
@@ -278,10 +313,10 @@ PanelWindow {
                                 root.close();
                                 event.accepted = true;
                             } else if (event.key === Qt.Key_Down || (event.key === Qt.Key_J && (event.modifiers & Qt.ControlModifier))) {
-                                root.selectedIndex = Math.min(root.selectedIndex + 1, root.results.length - 1);
+                                root.selectResult(root.selectedIndex + 1);
                                 event.accepted = true;
                             } else if (event.key === Qt.Key_Up || (event.key === Qt.Key_K && (event.modifiers & Qt.ControlModifier))) {
-                                root.selectedIndex = Math.max(root.selectedIndex - 1, 0);
+                                root.selectResult(root.selectedIndex - 1);
                                 event.accepted = true;
                             } else if (event.key === Qt.Key_Delete || event.key === Qt.Key_Backspace) {
                                 root.remove(root.selectedIndex);
@@ -291,6 +326,35 @@ PanelWindow {
                                 event.accepted = true;
                             }
                         }
+                    }
+                }
+            }
+
+            Rectangle {
+                id: emptyState
+                Layout.fillWidth: true
+                height: 92
+                visible: root.visibleRows === 0
+                color: "transparent"
+
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    spacing: 6
+
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: root.query.length > 0 ? "No matches" : "Clipboard is quiet"
+                        color: Mocha.subtext0
+                        font.family: Style.font
+                        font.pixelSize: 14
+                    }
+
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: root.query.length > 0 ? "Try a softer search." : "Copy something and it will land here."
+                        color: Mocha.overlay1
+                        font.family: Style.font
+                        font.pixelSize: 11
                     }
                 }
             }
@@ -308,56 +372,90 @@ PanelWindow {
                 delegate: Rectangle {
                     required property var modelData
                     required property int index
+                    property bool previewReady: false
 
                     width: ListView.view.width
                     height: root.rowHeight
-                    radius: 12
-                    color: index === root.selectedIndex ? Qt.rgba(Mocha.surface1.r, Mocha.surface1.g, Mocha.surface1.b, 0.72) : "transparent"
+                    radius: 10
+                    color: index === root.selectedIndex ? Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.78) : "transparent"
+                    border.color: index === root.selectedIndex ? Qt.rgba(Mocha.lavender.r, Mocha.lavender.g, Mocha.lavender.b, 0.18) : "transparent"
+                    border.width: 1
+
+                    Component.onCompleted: {
+                        if (modelData.isImage)
+                            previewProc.running = true;
+                    }
+
+                    Process {
+                        id: previewProc
+                        command: ["bash", "-lc", "mkdir -p \"$2\" && [ -s \"$3\" ] || printf '%s' \"$1\" | cliphist decode > \"$3\"", "clipboard-preview", modelData.raw, root.previewDir, modelData.thumb]
+                        running: false
+                        onExited: previewReady = true
+                    }
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: 12
-                        anchors.rightMargin: 12
-                        spacing: 12
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 10
+                        spacing: 10
 
                         Rectangle {
-                            Layout.preferredWidth: 30
-                            Layout.preferredHeight: 30
-                            radius: 9
-                            color: Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.55)
+                            Layout.preferredWidth: 42
+                            Layout.preferredHeight: 42
+                            radius: 10
+                            color: Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.62)
+                            clip: true
+
+                            Image {
+                                anchors.fill: parent
+                                anchors.margins: 2
+                                visible: modelData.isImage && previewReady
+                                source: visible ? "file://" + modelData.thumb : ""
+                                fillMode: Image.PreserveAspectCrop
+                                asynchronous: true
+                                cache: false
+                            }
 
                             Text {
                                 anchors.centerIn: parent
-                                text: ""
-                                color: index === root.selectedIndex ? Mocha.blue : Mocha.subtext0
+                                visible: !modelData.isImage || !previewReady
+                                text: modelData.isImage ? "" : ""
+                                color: index === root.selectedIndex ? Mocha.lavender : Mocha.subtext0
                                 font.family: Style.font
-                                font.pixelSize: 15
+                                font.pixelSize: 16
+                            }
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 1
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: modelData.preview
+                                color: Mocha.text
+                                font.family: Style.font
+                                font.pixelSize: 14
+                                elide: Text.ElideRight
+                                maximumLineCount: 1
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: modelData.isImage ? modelData.detail : "Text"
+                                color: Mocha.overlay1
+                                font.family: Style.font
+                                font.pixelSize: 11
+                                elide: Text.ElideRight
+                                maximumLineCount: 1
                             }
                         }
 
                         Text {
-                            Layout.fillWidth: true
-                            text: modelData.preview
-                            color: Mocha.text
+                            text: "↵"
+                            color: Mocha.overlay1
                             font.family: Style.font
                             font.pixelSize: 14
-                            elide: Text.ElideRight
-                            maximumLineCount: 1
-                        }
-
-                        Rectangle {
-                            Layout.preferredWidth: 54
-                            Layout.preferredHeight: 22
-                            radius: 8
-                            color: Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.55)
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: "Enter"
-                                color: Mocha.overlay1
-                                font.family: Style.font
-                                font.pixelSize: 10
-                            }
                         }
                     }
 
@@ -366,6 +464,10 @@ PanelWindow {
                         hoverEnabled: true
                         onEntered: root.selectedIndex = index
                         onClicked: root.activate(index)
+                        onWheel: wheel => {
+                            root.scrollResults(wheel.angleDelta.y > 0 ? -root.rowHeight * 2 : root.rowHeight * 2);
+                            wheel.accepted = true;
+                        }
                     }
                 }
             }
