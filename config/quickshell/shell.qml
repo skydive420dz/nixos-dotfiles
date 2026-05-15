@@ -5,6 +5,8 @@ ShellRoot {
         id: launcher
     }
 
+    Clipboard {}
+
     Osd {}
 
     Variants {
