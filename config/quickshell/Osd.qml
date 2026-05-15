@@ -24,6 +24,10 @@ PanelWindow {
     visible: true
     color: "transparent"
 
+    mask: Region {
+        item: pill
+    }
+
     property bool showing: false
     property string kind: "volume"
     property string icon: "󰕾"

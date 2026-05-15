@@ -23,6 +23,10 @@ PanelWindow {
     visible: true
     color: "transparent"
 
+    mask: Region {
+        item: panel
+    }
+
     property bool open: false
     property bool closing: false
     property string query: ""
