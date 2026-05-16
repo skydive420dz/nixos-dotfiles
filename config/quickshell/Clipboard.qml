@@ -259,13 +259,6 @@ PanelWindow {
         clip: true
         opacity: root.open ? 1 : 0
 
-        Behavior on height {
-            NumberAnimation {
-                duration: 220
-                easing.type: Easing.OutCubic
-            }
-        }
-
         Behavior on opacity {
             NumberAnimation {
                 duration: 120
