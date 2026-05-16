@@ -1,7 +1,7 @@
 import ".."
 import QtQuick
+import Quickshell
 import Quickshell.Io
-import Quickshell.Hyprland
 
 // Drop this as a child of any component that needs to toggle a floating window.
 // Usage:
@@ -24,7 +24,9 @@ QtObject {
         stdout: SplitParser {
             onRead: data => {
                 if (data.trim() === "exists") {
-                    Hyprland.dispatch("closewindow class:" + root.windowClass);
+                    var selector = "class:" + root.windowClass;
+                    var expression = "hl.dsp.window.close({ window = " + JSON.stringify(selector) + " })";
+                    Quickshell.execDetached(["hyprctl", "dispatch", expression]);
                 } else {
                     _launchProc.running = true;
                 }

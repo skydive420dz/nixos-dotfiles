@@ -23,6 +23,22 @@ Rectangle {
     border.width: 1
     clip: true
 
+    function show(moduleName) {
+        hideTimer.stop();
+        hoveredModule = moduleName;
+    }
+
+    function hideSoon() {
+        hideTimer.restart();
+    }
+
+    Timer {
+        id: hideTimer
+        interval: 120
+        repeat: false
+        onTriggered: root.hoveredModule = ""
+    }
+
     RowLayout {
         id: connectRow
         anchors {
@@ -37,25 +53,44 @@ Rectangle {
 
         Clock {
             id: clockModule
+            HoverHandler {
+                onHoveredChanged: hovered ? root.show("clock") : root.hideSoon()
+            }
         }
         Weather {
             id: weatherModule
+            HoverHandler {
+                onHoveredChanged: hovered ? root.show("weather") : root.hideSoon()
+            }
         }
         Network {
             id: netModule
+            HoverHandler {
+                onHoveredChanged: hovered ? root.show("network") : root.hideSoon()
+            }
         }
         Bluetooth {
             id: btModule
+            HoverHandler {
+                onHoveredChanged: hovered ? root.show("bluetooth") : root.hideSoon()
+            }
         }
         Volume {
             id: volModule
+            HoverHandler {
+                onHoveredChanged: hovered ? root.show("volume") : root.hideSoon()
+            }
         }
         Battery {
             id: battModule
+            HoverHandler {
+                onHoveredChanged: hovered ? root.show("battery") : root.hideSoon()
+            }
         }
     }
 
     Item {
+        id: popoverArea
         anchors {
             top: connectRow.bottom
             left: parent.left
@@ -63,6 +98,10 @@ Rectangle {
             bottom: parent.bottom
             margins: 12
             topMargin: 10
+        }
+
+        HoverHandler {
+            onHoveredChanged: hovered ? hideTimer.stop() : root.hideSoon()
         }
 
         ClockPopover {
@@ -92,35 +131,5 @@ Rectangle {
             hoveredModule: root.hoveredModule
             battModule: battModule
         }
-    }
-
-    MouseArea {
-        z: 1
-        anchors.fill: parent
-        hoverEnabled: true
-        propagateComposedEvents: true
-
-        onPositionChanged: {
-            if (mouseY > Style.pillHeight)
-                return;
-            var localX = mouseX - Style.pillPadH;
-            var modules = [clockModule, weatherModule, netModule, btModule, volModule, battModule];
-            var names = ["clock", "weather", "network", "bluetooth", "volume", "battery"];
-            var cx = 0;
-            for (var i = 0; i < modules.length; i++) {
-                if (i > 0)
-                    cx += Style.pillSpacing;
-                cx += modules[i].implicitWidth;
-                if (localX < cx) {
-                    root.hoveredModule = names[i];
-                    return;
-                }
-            }
-            root.hoveredModule = "";
-        }
-        onExited: root.hoveredModule = ""
-        onClicked: mouse => mouse.accepted = false
-        onPressed: mouse => mouse.accepted = false
-        onReleased: mouse => mouse.accepted = false
     }
 }

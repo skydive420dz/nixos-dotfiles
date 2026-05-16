@@ -16,12 +16,6 @@ local function centered_float(opts)
 	hl.window_rule(opts)
 end
 
-local function cursor_float(opts)
-	opts.float = true
-	opts.move = { "cursor_x-(window_w*0.5)", "cursor_y-(window_h*0.5)" }
-	hl.window_rule(opts)
-end
-
 local terminal = "uwsm app -- kitty"
 local file_manager = "uwsm app -- kitty -e yazi"
 local browser = "uwsm app -- firefox"
@@ -271,22 +265,21 @@ centered_float({
 	opacity = opacity.solid,
 })
 
--- Bar applets are launched plainly; Hyprland keeps them near the mouse.
-cursor_float({
+centered_float({
 	name = "bluetooth_applet",
 	match = { class = "^(bluetui)$" },
 	size = { 600, 600 },
 	opacity = opacity.solid,
 })
 
-cursor_float({
+centered_float({
 	name = "wifi_applet",
 	match = { class = "^(nmtui)$" },
 	size = { 600, 600 },
 	opacity = opacity.solid,
 })
 
-cursor_float({
+centered_float({
 	name = "sound_applet",
 	match = { class = "^(wiremix)$" },
 	size = { 700, 500 },

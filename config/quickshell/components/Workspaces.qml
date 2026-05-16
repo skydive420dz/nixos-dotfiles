@@ -1,6 +1,7 @@
 import ".."
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
 
@@ -128,7 +129,7 @@ Rectangle {
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: Hyprland.dispatch("workspace " + wsId)
+                    onClicked: Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({ workspace = " + wsId + " })"])
                 }
             }
         }
