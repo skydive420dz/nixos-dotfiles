@@ -90,7 +90,7 @@ Item {
 
     Process {
         id: bluetuiLauncher
-        command: ["uwsm-at-cursor", "kitty", "--class=bluetui", "-e", "bluetui"]
+        command: ["uwsm", "app", "--", "kitty", "--class=bluetui", "-e", "bluetui"]
         running: false
     }
 

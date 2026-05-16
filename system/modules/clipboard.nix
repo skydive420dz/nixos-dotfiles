@@ -8,11 +8,12 @@
 #   wl-clipboard    — provides wl-copy / wl-paste, used by cliphist + scripts
 #   cliphist-wipe   — small wrapper: clears history + shows a toast notification
 #
-# Hyprland integration (must live in hyprland.conf — needs $WAYLAND_DISPLAY):
+# Hyprland integration lives in config/hypr/hyprland.lua because it needs
+# the active Wayland/Hyprland session environment:
 #
-#   exec-once = wl-paste --type text  --watch cliphist store
-#   exec-once = wl-paste --type image --watch cliphist store
-#   exec-once = wl-clip-persist --clipboard regular
+#   hl.exec_cmd("uwsm app -- wl-paste --type text --watch cliphist store")
+#   hl.exec_cmd("uwsm app -- wl-paste --type image --watch cliphist store")
+#   hl.exec_cmd("uwsm app -- wl-clip-persist --clipboard regular")
 #
 #   Caps+Y and Caps+P are emitted by keyd as Ctrl+C and Ctrl+V.
 #

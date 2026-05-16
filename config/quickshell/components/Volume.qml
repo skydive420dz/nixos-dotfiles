@@ -46,6 +46,6 @@ Item {
     WindowToggle {
         id: wiremixToggle
         windowClass: "wiremix"
-        launchCommand: ["uwsm-at-cursor", "kitty", "--class", "wiremix", "-T", "wiremix", "-e", "wiremix"]
+        launchCommand: ["uwsm", "app", "--", "kitty", "--class", "wiremix", "-T", "wiremix", "-e", "wiremix"]
     }
 }

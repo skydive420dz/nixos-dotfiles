@@ -1,5 +1,4 @@
 -- Hyprland Lua config.
--- Hyprland prefers this file over hyprland.conf when both exist.
 
 local colors = {
 	surface1 = 0xff45475a,
@@ -14,6 +13,12 @@ local opacity = {
 local function centered_float(opts)
 	opts.float = true
 	opts.center = true
+	hl.window_rule(opts)
+end
+
+local function cursor_float(opts)
+	opts.float = true
+	opts.move = { "cursor_x-(window_w*0.5)", "cursor_y-(window_h*0.5)" }
 	hl.window_rule(opts)
 end
 
@@ -264,21 +269,22 @@ centered_float({
 	opacity = opacity.solid,
 })
 
-centered_float({
+-- Bar applets are launched plainly; Hyprland keeps them near the mouse.
+cursor_float({
 	name = "bluetooth_applet",
 	match = { class = "^(bluetui)$" },
 	size = { 600, 600 },
 	opacity = opacity.solid,
 })
 
-centered_float({
+cursor_float({
 	name = "wifi_applet",
 	match = { class = "^(nmtui)$" },
 	size = { 600, 600 },
 	opacity = opacity.solid,
 })
 
-centered_float({
+cursor_float({
 	name = "sound_applet",
 	match = { class = "^(wiremix)$" },
 	size = { 700, 500 },

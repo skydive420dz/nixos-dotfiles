@@ -90,7 +90,7 @@ Item {
 
     Process {
         id: nmtuiLauncher
-        command: ["uwsm-at-cursor", "kitty", "--class=nmtui", "-e", "nmtui"]
+        command: ["uwsm", "app", "--", "kitty", "--class=nmtui", "-e", "nmtui"]
         running: false
     }
 

@@ -2,6 +2,7 @@ import "."
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 
@@ -58,11 +59,21 @@ PanelWindow {
     readonly property int visibleRows: Math.min(results.length, 8)
     readonly property string previewDir: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-clipboard-previews"
 
+    function focusedScreen() {
+        var monitorName = Hyprland.focusedMonitor?.name ?? "";
+        for (var i = 0; i < Quickshell.screens.length; i++) {
+            if (Quickshell.screens[i].name === monitorName)
+                return Quickshell.screens[i];
+        }
+        return root.screen;
+    }
+
     function toggle() {
         open ? close() : show();
     }
 
     function show() {
+        root.screen = focusedScreen();
         closing = false;
         open = true;
         query = "";

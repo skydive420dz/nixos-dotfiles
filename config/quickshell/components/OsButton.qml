@@ -13,6 +13,7 @@ Rectangle {
 
     property bool hovered: false
     property var launcher: null
+    property var targetScreen: null
 
     Behavior on color {
         ColorAnimation {
@@ -34,6 +35,6 @@ Rectangle {
         hoverEnabled: true
         onEntered: root.hovered = true
         onExited: root.hovered = false
-        onClicked: root.launcher?.toggle()
+        onClicked: root.launcher?.toggle(root.targetScreen)
     }
 }

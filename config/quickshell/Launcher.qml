@@ -2,6 +2,7 @@ import "."
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
@@ -60,11 +61,21 @@ PanelWindow {
     readonly property int rowHeight: Style.overlayRowHeight
     readonly property int visibleRows: Math.min(results.length, 8)
 
-    function toggle() {
-        open ? close() : show();
+    function focusedScreen() {
+        var monitorName = Hyprland.focusedMonitor?.name ?? "";
+        for (var i = 0; i < Quickshell.screens.length; i++) {
+            if (Quickshell.screens[i].name === monitorName)
+                return Quickshell.screens[i];
+        }
+        return root.screen;
     }
 
-    function show() {
+    function toggle(targetScreen) {
+        open ? close() : show(targetScreen);
+    }
+
+    function show(targetScreen) {
+        root.screen = targetScreen ?? focusedScreen();
         closing = false;
         open = true;
         query = "";

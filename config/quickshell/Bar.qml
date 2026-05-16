@@ -120,6 +120,7 @@ PanelWindow {
 
         OsButton {
             launcher: launcher
+            targetScreen: root.screen
         }
         Item {
             width: 6
