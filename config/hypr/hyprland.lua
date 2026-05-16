@@ -64,10 +64,10 @@ hl.monitor({
 hl.on("hyprland.start", function()
 	hl.exec_cmd("uwsm finalize HYPRLAND_INSTANCE_SIGNATURE")
 	hl.exec_cmd(
-		"uwsm app -- awww img --output eDP-1 ~/nixos-dotfiles/wallpapers/wallpaper-010.jpg --transition-type fade"
+		"uwsm app -- awww img --outputs eDP-1 /home/skydive420dz/nixos-dotfiles/wallpapers/wallpaper-010.jpg --transition-type fade"
 	)
 	hl.exec_cmd(
-		"uwsm app -- awww img --output HDMI-A-1 ~/nixos-dotfiles/wallpapers/wallpaper-010.jpg --transition-type fade"
+		"uwsm app -- awww img --outputs HDMI-A-1 /home/skydive420dz/nixos-dotfiles/wallpapers/wallpaper-010.jpg --transition-type fade"
 	)
 	hl.exec_cmd("uwsm app -- vesktop -m")
 	hl.exec_cmd("uwsm app -- wl-paste --type text --watch cliphist store")
