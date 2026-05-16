@@ -8,7 +8,7 @@ PanelWindow {
     id: root
 
     WlrLayershell.layer: WlrLayer.Top
-    WlrLayershell.exclusiveZone: Style.barHeight + 5
+    WlrLayershell.exclusiveZone: Style.barHeight + 1
     WlrLayershell.namespace: "qs-bar"
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
@@ -85,7 +85,7 @@ PanelWindow {
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.topMargin: (Style.barHeight - Style.pillHeight) / 2
-        anchors.rightMargin: 2
+        anchors.rightMargin: 1
     }
 
     // ── Media — truly centered in the full bar ────────────────────────────────
@@ -112,7 +112,7 @@ PanelWindow {
             top: parent.top
             left: parent.left
             right: trayModule.left
-            leftMargin: 2
+            leftMargin: 1
             rightMargin: trayModule.implicitWidth > 0 ? Style.groupSpacing : 0
         }
         height: Style.barHeight

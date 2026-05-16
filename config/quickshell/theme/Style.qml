@@ -2,7 +2,7 @@ pragma Singleton
 import QtQuick
 
 QtObject {
-    readonly property int barHeight: 39
+    readonly property int barHeight: 38
     readonly property int barTopMargin: 5
     readonly property int popoverTop: barHeight + barTopMargin   // 43 — flush below bar
     readonly property int pillHeight: 38
