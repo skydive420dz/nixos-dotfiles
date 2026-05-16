@@ -245,6 +245,8 @@ centered_float({
 hl.window_rule({
 	name = "firefox",
 	match = { class = "^(firefox)$" },
+	opaque = true,
+	force_rgbx = true,
 	opacity = opacity.solid_fullscreen,
 })
 
