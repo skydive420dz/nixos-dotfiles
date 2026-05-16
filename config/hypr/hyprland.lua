@@ -58,15 +58,17 @@ hl.monitor({
 	supports_hdr = 1,
 	sdr_min_luminance = 0.001,
 	sdr_max_luminance = 450,
-	vrr = 1,
+	vrr = 0,
 })
 
 hl.on("hyprland.start", function()
 	hl.exec_cmd("uwsm finalize HYPRLAND_INSTANCE_SIGNATURE")
 	hl.exec_cmd(
-		"uwsm app -- awww img --output eDP-1 ~/Pictures/nasa-hubble-space-telescope-17hchodU6sA-unsplash.jpg --transition-type fade"
+		"uwsm app -- awww img --output eDP-1 ~/nixos-dotfiles/wallpapers/wallpaper-010.jpg --transition-type fade"
 	)
-	hl.exec_cmd("uwsm app -- awww img --output HDMI-A-1 ~/Pictures/wp12215877.jpg")
+	hl.exec_cmd(
+		"uwsm app -- awww img --output HDMI-A-1 ~/nixos-dotfiles/wallpapers/wallpaper-010.jpg --transition-type fade"
+	)
 	hl.exec_cmd("uwsm app -- vesktop -m")
 	hl.exec_cmd("uwsm app -- wl-paste --type text --watch cliphist store")
 	hl.exec_cmd("uwsm app -- wl-paste --type image --watch cliphist store")
