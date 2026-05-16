@@ -13,7 +13,7 @@ Rectangle {
 
     Layout.fillWidth: true
     height: 28
-    radius: 8
+    radius: Style.rowRadius
     color: connected ? Qt.rgba(Mocha.teal.r, Mocha.teal.g, Mocha.teal.b, 0.12) : itemHover.containsMouse ? Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.5) : "transparent"
     border.color: connected ? Qt.rgba(Mocha.teal.r, Mocha.teal.g, Mocha.teal.b, 0.35) : "transparent"
     border.width: 1

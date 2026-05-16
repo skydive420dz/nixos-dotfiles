@@ -14,7 +14,7 @@ Rectangle {
 
     Layout.fillWidth: true
     height: 28
-    radius: 8
+    radius: Style.rowRadius
     color: selected ? Qt.rgba(accent.r, accent.g, accent.b, 0.2) : itemHover.containsMouse ? Mocha.rowHover : "transparent"
 
     RowLayout {
