@@ -58,7 +58,7 @@ hl.monitor({
 	supports_hdr = 1,
 	sdr_min_luminance = 0.001,
 	sdr_max_luminance = 450,
-	vrr = 0,
+	vrr = 1,
 })
 
 hl.on("hyprland.start", function()
@@ -103,8 +103,8 @@ hl.config({
 		},
 
 		shadow = {
-			enabled = true,
-			range = 2,
+			enabled = false,
+			range = 1,
 			render_power = 6,
 			color = colors.surface1,
 			color_inactive = colors.surface1,

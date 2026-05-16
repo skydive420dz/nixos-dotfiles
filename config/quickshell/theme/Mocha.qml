@@ -41,7 +41,7 @@ QtObject {
     // ── Derived / utility ─────────────────────────────────────────────────────
     readonly property color accent: blue
     readonly property color pillBg: Qt.rgba(0.090, 0.098, 0.135, 0.58)
-    readonly property color pillBorder: Qt.rgba(0.616, 0.659, 0.812, 0.10)
+    readonly property color pillBorder: Qt.rgba(0.616, 0.659, 0.812, 0.0)
     readonly property color panelBg: Qt.rgba(base.r, base.g, base.b, 0.92)
     readonly property color panelBorder: pillBorder
     readonly property color controlBg: Qt.rgba(surface0.r, surface0.g, surface0.b, 0.58)
