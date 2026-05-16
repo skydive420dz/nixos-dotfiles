@@ -14,10 +14,12 @@ RowLayout {
         text: "󰒮"
         font.pixelSize: Style.fontSize
         font.family: Style.font
-        color: root.player?.canGoPrevious ? Mocha.text : Mocha.overlay0
+        color: root.player?.canGoPrevious ? (prevHover.containsMouse ? Mocha.text : Mocha.subtext0) : Mocha.overlay0
 
         MouseArea {
+            id: prevHover
             anchors.fill: parent
+            hoverEnabled: true
             onClicked: root.player?.previous()
         }
     }
@@ -26,7 +28,7 @@ RowLayout {
         text: root.playing ? "󰏤" : "󰐊"
         font.pixelSize: Style.fontSize
         font.family: Style.font
-        color: Mocha.blue
+        color: Mocha.accent
 
         MouseArea {
             anchors.fill: parent
@@ -38,10 +40,12 @@ RowLayout {
         text: "󰒭"
         font.pixelSize: Style.fontSize
         font.family: Style.font
-        color: root.player?.canGoNext ? Mocha.text : Mocha.overlay0
+        color: root.player?.canGoNext ? (nextHover.containsMouse ? Mocha.text : Mocha.subtext0) : Mocha.overlay0
 
         MouseArea {
+            id: nextHover
             anchors.fill: parent
+            hoverEnabled: true
             onClicked: root.player?.next()
         }
     }

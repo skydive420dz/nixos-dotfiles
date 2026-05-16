@@ -30,7 +30,7 @@ Item {
             Text {
                 visible: root.contentIcon !== ""
                 text: root.contentIcon
-                color: root.isYoutube ? Mocha.red : Mocha.blue
+                color: root.isYoutube ? Mocha.red : Mocha.accent
                 font.pixelSize: Style.fontSizeS + 1
                 font.family: Style.font
             }
