@@ -88,9 +88,9 @@ in
       set -g window-status-format "#[fg=${semantic.muted},bg=${semantic.background}]  #I "
       set -g window-status-current-format "#[fg=${semantic.background},bg=${semantic.accent},bold] #I #[fg=${semantic.accent},bg=${semantic.background}]"
 
-      set -g status-left "#[fg=${semantic.muted},bg=${semantic.surface}]  #S #[fg=${semantic.muted},bg=${semantic.background}] #[fg=${semantic.foreground},bg=${semantic.surface}] #(${tmuxDirName} '#{pane_current_path}') #[fg=${semantic.muted},bg=${semantic.background}] "
+      set -g status-left "#[fg=${semantic.muted},bg=${semantic.surface}]  #S #[fg=${semantic.muted},bg=${semantic.background}] #[fg=${semantic.foreground},bg=${semantic.surface}] #(${tmuxDirName} '#{pane_current_path}') #[fg=${semantic.muted},bg=${semantic.background}] "
 
-      set -g status-right "#[fg=${semantic.muted},bg=${semantic.background}]  #{user}   #H  #[fg=${semantic.background},bg=${semantic.accent},bold] %H:%M "
+      set -g status-right "#[fg=${semantic.muted},bg=${semantic.background}]  #{user}   #H "
 
       # =========================================
       # PANE BORDERS

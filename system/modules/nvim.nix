@@ -216,7 +216,10 @@ in
           blink-indent.enable = true;
           indent-blankline.enable = false;
         };
-        mini.icons.enable = true;
+        mini = {
+          icons.enable = true;
+          ai.enable = true;
+        };
 
         statusline.lualine.enable = true;
         autocomplete.blink-cmp = {
@@ -247,7 +250,7 @@ in
         # Added explicit treesitter block to help NixOS healthcheck
         treesitter = {
           enable = true;
-          context.enable = true;
+          context.enable = false;
           highlight.enable = true;
           indent.enable = true;
         };
