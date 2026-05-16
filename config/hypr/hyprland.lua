@@ -58,16 +58,16 @@ end)
 
 hl.config({
 	general = {
-		gaps_in = 4,
-		gaps_out = 8,
+		gaps_in = 2,
+		gaps_out = 1,
 		border_size = 0,
 		resize_on_border = false,
 		allow_tearing = false,
-		layout = "dwindle",
+		layout = "master",
 	},
 
 	decoration = {
-		rounding = 15,
+		rounding = 10,
 		rounding_power = 10,
 		active_opacity = 1.0,
 		inactive_opacity = 0.80,
@@ -85,8 +85,8 @@ hl.config({
 
 		shadow = {
 			enabled = true,
-			range = 16,
-			render_power = 3,
+			range = 2,
+			render_power = 6,
 			color = colors.surface1,
 			color_inactive = colors.surface1,
 		},
@@ -205,7 +205,7 @@ hl.window_rule({
 	name = "multimedia_opaque",
 	match = { tag = "multimedia_video" },
 	no_blur = true,
-	opacity = "1.0",
+	opacity = "1.0 override 1.0 override 1.0 override",
 })
 
 hl.window_rule({
@@ -237,8 +237,7 @@ hl.window_rule({
 hl.window_rule({
 	name = "firefox",
 	match = { class = "^(firefox)$" },
-	center = true,
-	opacity = "1.0",
+	opacity = "1.0 override 1.0 override 1.0 override",
 })
 
 hl.window_rule({
@@ -247,7 +246,7 @@ hl.window_rule({
 	float = true,
 	size = { 1000, 600 },
 	center = true,
-	opacity = "0.85 0.85",
+	opacity = "0.85 override 0.85 override",
 })
 
 hl.window_rule({
@@ -256,6 +255,7 @@ hl.window_rule({
 	float = true,
 	size = { 1000, 600 },
 	center = true,
+	opacity = "1.0 override 1.0 override",
 })
 
 hl.window_rule({
@@ -264,7 +264,7 @@ hl.window_rule({
 	float = true,
 	size = { 600, 600 },
 	center = true,
-	opacity = "1.0",
+	opacity = "1.0 override 1.0 override",
 })
 
 hl.window_rule({
@@ -273,7 +273,7 @@ hl.window_rule({
 	float = true,
 	size = { 600, 600 },
 	center = true,
-	opacity = "1.0",
+	opacity = "1.0 override 1.0 override",
 })
 
 hl.window_rule({
@@ -282,7 +282,7 @@ hl.window_rule({
 	float = true,
 	size = { 700, 500 },
 	center = true,
-	opacity = "1.0",
+	opacity = "1.0 override 1.0 override",
 })
 
 hl.layer_rule({

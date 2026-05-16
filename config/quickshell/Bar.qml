@@ -18,9 +18,9 @@ PanelWindow {
         right: true
     }
     margins {
-        top: 5
-        left: 5
-        right: 5
+        top: 0
+        left: 0
+        right: 0
         bottom: 0
     }
 
@@ -85,7 +85,7 @@ PanelWindow {
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.topMargin: (Style.barHeight - Style.pillHeight) / 2
-        anchors.rightMargin: 5
+        anchors.rightMargin: 2
     }
 
     // ── Media — truly centered in the full bar ────────────────────────────────
@@ -112,7 +112,7 @@ PanelWindow {
             top: parent.top
             left: parent.left
             right: trayModule.left
-            leftMargin: 4
+            leftMargin: 2
             rightMargin: trayModule.implicitWidth > 0 ? Style.groupSpacing : 0
         }
         height: Style.barHeight

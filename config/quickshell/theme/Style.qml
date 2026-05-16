@@ -5,7 +5,7 @@ QtObject {
     readonly property int barHeight: 39
     readonly property int barTopMargin: 5
     readonly property int popoverTop: barHeight + barTopMargin   // 43 — flush below bar
-    readonly property int pillHeight: 36
+    readonly property int pillHeight: 38
     readonly property int pillRadius: 10
     readonly property int pillRadiusS: 8
     readonly property int pillPadH: 15
