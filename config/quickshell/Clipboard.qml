@@ -397,8 +397,6 @@ PanelWindow {
                     height: root.rowHeight
                     radius: Style.rowRadius
                     color: index === root.selectedIndex ? Mocha.rowSelected : "transparent"
-                    border.color: index === root.selectedIndex ? Qt.rgba(Mocha.accent.r, Mocha.accent.g, Mocha.accent.b, 0.18) : "transparent"
-                    border.width: 1
 
                     Component.onCompleted: {
                         if (modelData.isImage)
