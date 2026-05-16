@@ -5,6 +5,18 @@ local colors = {
 	surface1 = 0xff45475a,
 }
 
+local opacity = {
+	solid = "1.0 override 1.0 override",
+	solid_fullscreen = "1.0 override 1.0 override 1.0 override",
+	dim_tool = "0.85 override 0.85 override",
+}
+
+local function centered_float(opts)
+	opts.float = true
+	opts.center = true
+	hl.window_rule(opts)
+end
+
 local terminal = "uwsm app -- kitty"
 local file_manager = "uwsm app -- kitty -e yazi"
 local browser = "uwsm app -- firefox"
@@ -205,7 +217,7 @@ hl.window_rule({
 	name = "multimedia_opaque",
 	match = { tag = "multimedia_video" },
 	no_blur = true,
-	opacity = "1.0 override 1.0 override 1.0 override",
+	opacity = opacity.solid_fullscreen,
 })
 
 hl.window_rule({
@@ -215,74 +227,60 @@ hl.window_rule({
 	idle_inhibit = "fullscreen",
 })
 
-hl.window_rule({
+centered_float({
 	name = "floating_pickers",
 	match = {
 		title = "^(.*Open File.*|.*Open Folder.*|.*Open.*|.*Save.*|.*Save As.*|.*Export.*|.*Import.*|.*Choose File.*|.*Rename.*|.*script-fu.*|.*Authentication Required.*)$",
 		class = "^(.*xdg-desktop-portal-gtk.*|.*xdg-desktop-portal-hyprland.*)$",
 	},
 	size = { 800, 450 },
-	float = true,
-	center = true,
 })
 
-hl.window_rule({
+centered_float({
 	name = "steam_friends",
 	match = { class = "^Steam$", title = "^(Friends List)$" },
-	float = true,
 	size = { 450, 800 },
-	center = true,
 })
 
 hl.window_rule({
 	name = "firefox",
 	match = { class = "^(firefox)$" },
-	opacity = "1.0 override 1.0 override 1.0 override",
+	opacity = opacity.solid_fullscreen,
 })
 
-hl.window_rule({
+centered_float({
 	name = "nvtop_float",
 	match = { title = "^(nvtop_float)$" },
-	float = true,
 	size = { 1000, 600 },
-	center = true,
-	opacity = "0.85 override 0.85 override",
+	opacity = opacity.dim_tool,
 })
 
-hl.window_rule({
+centered_float({
 	name = "btop_float",
 	match = { title = "^(btop_float)$" },
-	float = true,
 	size = { 1000, 600 },
-	center = true,
-	opacity = "1.0 override 1.0 override",
+	opacity = opacity.solid,
 })
 
-hl.window_rule({
+centered_float({
 	name = "bluetooth_applet",
 	match = { class = "^(bluetui)$" },
-	float = true,
 	size = { 600, 600 },
-	center = true,
-	opacity = "1.0 override 1.0 override",
+	opacity = opacity.solid,
 })
 
-hl.window_rule({
+centered_float({
 	name = "wifi_applet",
 	match = { class = "^(nmtui)$" },
-	float = true,
 	size = { 600, 600 },
-	center = true,
-	opacity = "1.0 override 1.0 override",
+	opacity = opacity.solid,
 })
 
-hl.window_rule({
+centered_float({
 	name = "sound_applet",
 	match = { class = "^(wiremix)$" },
-	float = true,
 	size = { 700, 500 },
-	center = true,
-	opacity = "1.0 override 1.0 override",
+	opacity = opacity.solid,
 })
 
 hl.layer_rule({
