@@ -189,7 +189,21 @@ in
             };
           };
           java.enable = true;
-          lua.enable = true;
+
+          lua = {
+            enable = true;
+            lsp = {
+              enable = true;
+            };
+            format = {
+              enable = true;
+            };
+            treesitter = {
+              enable = true;
+            };
+
+          };
+
         };
 
         visuals = {
