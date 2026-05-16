@@ -37,8 +37,8 @@ Item {
             }
         }
 
-        // The 280 cap matches the PanelWindow's expansion budget defined in
-        // Bar.qml (implicitHeight: Style.barHeight + 280). Going higher would
+        // The 320 cap matches the PanelWindow's expansion budget defined in
+        // Bar.qml. Going higher would
         // make the pill exceed the panel and clip at the bottom.
         implicitHeight: root.menuOpen ? Style.pillHeight + Math.min(menuCol.implicitHeight + 20, 320) : Style.pillHeight
         Behavior on implicitHeight {

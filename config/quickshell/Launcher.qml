@@ -22,13 +22,13 @@ PanelWindow {
         right: true
     }
 
-    visible: true
+    visible: root.open || root.closing
     color: "transparent"
 
     mask: Region {
         item: outsideClickCatcher
         Region {
-            item: panel
+            item: panelMask
         }
     }
 
@@ -60,6 +60,14 @@ PanelWindow {
     readonly property var results: filteredResults()
     readonly property int rowHeight: Style.overlayRowHeight
     readonly property int visibleRows: Math.min(results.length, 8)
+
+    Item {
+        id: panelMask
+        x: panel.x
+        y: panel.y
+        width: panel.visible ? panel.width : 0
+        height: panel.visible ? panel.height : 0
+    }
 
     function focusedScreen() {
         var monitorName = Hyprland.focusedMonitor?.name ?? "";

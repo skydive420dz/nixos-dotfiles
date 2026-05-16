@@ -18,7 +18,7 @@ Rectangle {
     property var occupiedIds: ({})
 
     function refreshOccupied() {
-        wsListProc.running = true;
+        refreshTimer.restart();
     }
 
     // ── Initial state via hyprctl one-shot ────────────────────────────────────
@@ -45,6 +45,16 @@ Rectangle {
         }
     }
 
+    Timer {
+        id: refreshTimer
+        interval: 200
+        repeat: false
+        onTriggered: {
+            if (!wsListProc.running)
+                wsListProc.running = true;
+        }
+    }
+
     Component.onCompleted: {
         activeId = Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1;
         refreshOccupied();
@@ -65,7 +75,6 @@ Rectangle {
                 }
             case "openwindow":
             case "closewindow":
-            case "movewindow":
             case "movewindowv2":
                 root.refreshOccupied();
                 break;

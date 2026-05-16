@@ -21,11 +21,11 @@ PanelWindow {
         right: true
     }
 
-    visible: true
+    visible: root.showing
     color: "transparent"
 
     mask: Region {
-        item: pill
+        item: pillMask
     }
 
     property bool showing: false
@@ -36,6 +36,14 @@ PanelWindow {
     property color accent: Mocha.accent
     property bool initializedBattery: false
     property bool lastOnBattery: UPower.onBattery
+
+    Item {
+        id: pillMask
+        x: pill.x
+        y: pill.y
+        width: root.showing ? pill.width : 0
+        height: root.showing ? pill.height : 0
+    }
 
     function accentFor(kindName) {
         if (kindName === "brightness")

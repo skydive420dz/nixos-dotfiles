@@ -24,7 +24,7 @@ PanelWindow {
         bottom: 0
     }
 
-    implicitHeight: Style.barHeight + 320
+    implicitHeight: Style.barHeight + ((trayModule.menuOpen || pill.hoveredModule !== "") ? 320 : 0)
     color: "transparent"
 
     property var launcher: null
