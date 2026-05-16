@@ -7,8 +7,8 @@ Rectangle {
     implicitWidth: Style.pillPadH * 1 + label.implicitWidth
     height: Style.pillHeight
     radius: Style.pillRadius
-    color: hovered ? Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.5) : Mocha.pillBg
-    border.color: Mocha.pillBorder
+    color: hovered ? Mocha.rowHover : Mocha.pillBg
+    border.color: Mocha.panelBorder
     border.width: 1
 
     property bool hovered: false
@@ -27,7 +27,7 @@ Rectangle {
         text: " 󱄅 "
         font.pixelSize: 26
         font.family: Style.font
-        color: Mocha.blue
+        color: Mocha.accent
     }
 
     MouseArea {

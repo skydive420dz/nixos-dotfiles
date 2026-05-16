@@ -15,7 +15,7 @@ PopoverPanel {
     Text {
         Layout.alignment: Qt.AlignHCenter
         text: Qt.formatDate(root.now, "MMMM yyyy")
-        color: Mocha.blue
+        color: Mocha.accent
         font.pixelSize: Style.fontSize
         font.family: Style.font
         font.bold: true
@@ -53,7 +53,7 @@ PopoverPanel {
                 width: 38
                 height: 22
                 radius: Style.pillRadius
-                color: (index + 1) === root.todayDate ? Mocha.blue : "transparent"
+                color: (index + 1) === root.todayDate ? Mocha.accent : "transparent"
 
                 Text {
                     anchors.centerIn: parent

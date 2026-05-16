@@ -33,7 +33,7 @@ PanelWindow {
     property string icon: "󰕾"
     property string title: "Volume"
     property int value: -1
-    property color accent: Mocha.blue
+    property color accent: Mocha.accent
     property bool initializedBattery: false
     property bool lastOnBattery: UPower.onBattery
 
@@ -44,7 +44,7 @@ PanelWindow {
             return UPower.onBattery ? Mocha.teal : Mocha.green;
         if (kindName === "mute")
             return Mocha.red;
-        return Mocha.blue;
+        return Mocha.accent;
     }
 
     function show(payload) {
@@ -124,8 +124,8 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         radius: Style.pillRadius
-        color: Qt.rgba(Mocha.base.r, Mocha.base.g, Mocha.base.b, 0.92)
-        border.color: Mocha.pillBorder
+        color: Mocha.panelBg
+        border.color: Mocha.panelBorder
         border.width: 1
         opacity: root.showing ? 1 : 0
 
@@ -169,7 +169,7 @@ PanelWindow {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 7
                     radius: 4
-                    color: Qt.rgba(Mocha.surface1.r, Mocha.surface1.g, Mocha.surface1.b, 0.75)
+                    color: Mocha.rowSelected
                     visible: root.value >= 0
 
                     Rectangle {

@@ -43,7 +43,7 @@ PopoverPanel {
             width: parent.width
             height: 6
             radius: 3
-            color: Mocha.surface1
+            color: Mocha.rowSelected
             Rectangle {
                 width: parent.width * (root.battModule.capacity / 100)
                 height: parent.height

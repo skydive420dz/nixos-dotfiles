@@ -253,8 +253,8 @@ PanelWindow {
         anchors.top: parent.top
         anchors.topMargin: Style.panelTopMargin
         radius: Style.panelRadius
-        color: Qt.rgba(Mocha.mantle.r, Mocha.mantle.g, Mocha.mantle.b, 0.94)
-        border.color: Mocha.pillBorder
+        color: Mocha.panelBg
+        border.color: Mocha.panelBorder
         border.width: 1
         clip: true
         opacity: root.open ? 1 : 0
@@ -283,7 +283,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 height: Style.controlHeight
                 radius: Style.controlRadius
-                color: Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.58)
+                color: Mocha.controlBg
                 clip: true
 
                 RowLayout {
@@ -294,7 +294,7 @@ PanelWindow {
 
                     Text {
                         text: ""
-                        color: Mocha.blue
+                        color: Mocha.accent
                         font.family: Style.font
                         font.pixelSize: Style.controlFontSize
                     }
@@ -396,8 +396,8 @@ PanelWindow {
                     width: ListView.view.width
                     height: root.rowHeight
                     radius: Style.rowRadius
-                    color: index === root.selectedIndex ? Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.78) : "transparent"
-                    border.color: index === root.selectedIndex ? Qt.rgba(Mocha.blue.r, Mocha.blue.g, Mocha.blue.b, 0.18) : "transparent"
+                    color: index === root.selectedIndex ? Mocha.rowSelected : "transparent"
+                    border.color: index === root.selectedIndex ? Qt.rgba(Mocha.accent.r, Mocha.accent.g, Mocha.accent.b, 0.18) : "transparent"
                     border.width: 1
 
                     Component.onCompleted: {
@@ -422,7 +422,7 @@ PanelWindow {
                             Layout.preferredWidth: Style.overlayIconBoxSize
                             Layout.preferredHeight: Style.overlayIconBoxSize
                             radius: Style.iconBoxRadius
-                            color: Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.62)
+                            color: Mocha.iconBg
                             clip: true
 
                             Image {
@@ -439,7 +439,7 @@ PanelWindow {
                                 anchors.centerIn: parent
                                 visible: !modelData.isImage || !previewReady
                                 text: modelData.isImage ? "" : ""
-                                color: index === root.selectedIndex ? Mocha.blue : Mocha.subtext0
+                                color: index === root.selectedIndex ? Mocha.accent : Mocha.subtext0
                                 font.family: Style.font
                                 font.pixelSize: 16
                             }

@@ -8,14 +8,14 @@ Rectangle {
     property bool selected: false
     property string icon: ""
     property string label: ""
-    property color accent: Mocha.blue
+    property color accent: Mocha.accent
 
     signal activated()
 
     Layout.fillWidth: true
     height: 28
     radius: 8
-    color: selected ? Qt.rgba(accent.r, accent.g, accent.b, 0.2) : itemHover.containsMouse ? Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.5) : "transparent"
+    color: selected ? Qt.rgba(accent.r, accent.g, accent.b, 0.2) : itemHover.containsMouse ? Mocha.rowHover : "transparent"
     border.color: selected ? accent : "transparent"
     border.width: 1
 

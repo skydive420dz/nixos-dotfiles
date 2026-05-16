@@ -15,7 +15,7 @@ PopoverPanel {
             text: root.volModule.icon
             font.pixelSize: 22
             font.family: Style.font
-            color: root.volModule.muted ? Mocha.overlay0 : Mocha.blue
+            color: root.volModule.muted ? Mocha.overlay0 : Mocha.accent
         }
         Text {
             text: root.volModule.muted ? "Muted" : Math.round(root.volModule.volume * 100) + "%"
@@ -29,7 +29,7 @@ PopoverPanel {
             width: 28
             height: 20
             radius: Style.pillRadius
-            color: root.volModule.muted ? Qt.rgba(Mocha.red.r, Mocha.red.g, Mocha.red.b, 0.3) : Mocha.surface1
+            color: root.volModule.muted ? Mocha.statusMutedBg : Mocha.iconBg
             Text {
                 anchors.centerIn: parent
                 text: root.volModule.muted ? "󰖁" : "󰕾"
@@ -55,12 +55,12 @@ PopoverPanel {
             width: parent.width
             height: 6
             radius: 3
-            color: Mocha.surface1
+            color: Mocha.rowSelected
             Rectangle {
                 width: parent.width * Math.min(root.volModule.volume, 1.0)
                 height: parent.height
                 radius: parent.radius
-                color: root.volModule.muted ? Mocha.overlay0 : Mocha.blue
+                color: root.volModule.muted ? Mocha.overlay0 : Mocha.accent
                 Behavior on width {
                     NumberAnimation {
                         duration: 80
@@ -97,7 +97,7 @@ PopoverPanel {
             selected: isDefault
             icon: isDefault ? "󰓃" : ""
             label: modelData.description || modelData.name
-            accent: Mocha.blue
+            accent: Mocha.accent
             onActivated: Pipewire.preferredDefaultAudioSink = sinkDelegate.modelData
         }
     }

@@ -39,6 +39,14 @@ QtObject {
     readonly property color rosewater: "#d7b8ad"
 
     // ── Derived / utility ─────────────────────────────────────────────────────
+    readonly property color accent: blue
     readonly property color pillBg: Qt.rgba(0.090, 0.098, 0.135, 0.58)
     readonly property color pillBorder: Qt.rgba(0.616, 0.659, 0.812, 0.10)
+    readonly property color panelBg: Qt.rgba(base.r, base.g, base.b, 0.92)
+    readonly property color panelBorder: pillBorder
+    readonly property color controlBg: Qt.rgba(surface0.r, surface0.g, surface0.b, 0.58)
+    readonly property color iconBg: Qt.rgba(surface0.r, surface0.g, surface0.b, 0.55)
+    readonly property color rowHover: Qt.rgba(surface0.r, surface0.g, surface0.b, 0.50)
+    readonly property color rowSelected: Qt.rgba(surface1.r, surface1.g, surface1.b, 0.72)
+    readonly property color statusMutedBg: Qt.rgba(red.r, red.g, red.b, 0.30)
 }

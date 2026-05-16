@@ -251,8 +251,8 @@ PanelWindow {
         anchors.top: parent.top
         anchors.topMargin: Style.panelTopMargin
         radius: Style.panelRadius
-        color: Qt.rgba(Mocha.base.r, Mocha.base.g, Mocha.base.b, 0.92)
-        border.color: Mocha.pillBorder
+        color: Mocha.panelBg
+        border.color: Mocha.panelBorder
         border.width: 1
         clip: true
         opacity: root.open ? 1 : 0
@@ -281,7 +281,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 height: Style.controlHeight
                 radius: Style.controlRadius
-                color: "transparent"
+                color: Mocha.controlBg
                 clip: true
 
                 RowLayout {
@@ -292,7 +292,7 @@ PanelWindow {
 
                     Text {
                         text: ""
-                        color: Mocha.blue
+                        color: Mocha.accent
                         font.family: Style.font
                         font.pixelSize: Style.controlFontSize
                     }
@@ -361,7 +361,7 @@ PanelWindow {
                     width: ListView.view.width
                     height: root.rowHeight
                     radius: Style.rowRadius
-                    color: index === root.selectedIndex ? Qt.rgba(Mocha.surface1.r, Mocha.surface1.g, Mocha.surface1.b, 0.72) : "transparent"
+                    color: index === root.selectedIndex ? Mocha.rowSelected : "transparent"
 
                     RowLayout {
                         anchors.fill: parent
@@ -373,7 +373,7 @@ PanelWindow {
                             Layout.preferredWidth: Style.overlayIconBoxSize
                             Layout.preferredHeight: Style.overlayIconBoxSize
                             radius: Style.iconBoxRadius
-                            color: Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.55)
+                            color: Mocha.iconBg
 
                             IconImage {
                                 anchors.centerIn: parent
@@ -388,7 +388,7 @@ PanelWindow {
                                 anchors.centerIn: parent
                                 visible: modelData.type === "window" || modelData.icon.length === 0
                                 text: modelData.type === "window" ? "󰖲" : "󰣆"
-                                color: index === root.selectedIndex ? Mocha.blue : Mocha.subtext0
+                                color: index === root.selectedIndex ? Mocha.accent : Mocha.subtext0
                                 font.family: Style.font
                                 font.pixelSize: 15
                             }
@@ -422,7 +422,7 @@ PanelWindow {
                             Layout.preferredWidth: typeLabel.implicitWidth + 14
                             Layout.preferredHeight: 22
                             radius: Style.iconBoxRadius
-                            color: Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.55)
+                            color: Mocha.iconBg
 
                             Text {
                                 id: typeLabel
