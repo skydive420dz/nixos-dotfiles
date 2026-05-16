@@ -25,7 +25,28 @@ PanelWindow {
     color: "transparent"
 
     mask: Region {
-        item: panel
+        item: outsideClickCatcher
+        Region {
+            item: panel
+        }
+    }
+
+    Item {
+        id: outsideClickCatcher
+        width: root.open ? root.width : 0
+        height: root.open ? root.height : 0
+        visible: root.open
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: mouse => {
+                var point = mapToItem(panel, mouse.x, mouse.y);
+                if (point.x < 0 || point.x > panel.width || point.y < 0 || point.y > panel.height)
+                    root.close();
+                else
+                    mouse.accepted = false;
+            }
+        }
     }
 
     property bool open: false
@@ -36,7 +57,7 @@ PanelWindow {
     property var windows: []
     property bool appsLoaded: false
     readonly property var results: filteredResults()
-    readonly property int rowHeight: 50
+    readonly property int rowHeight: Style.overlayRowHeight
     readonly property int visibleRows: Math.min(results.length, 8)
 
     function toggle() {
@@ -60,6 +81,16 @@ PanelWindow {
         query = "";
         selectedIndex = 0;
         closeTimer.restart();
+    }
+
+    function selectResult(index) {
+        if (root.results.length === 0) {
+            selectedIndex = 0;
+            return;
+        }
+
+        selectedIndex = Math.max(0, Math.min(index, root.results.length - 1));
+        resultList.positionViewAtIndex(selectedIndex, ListView.Contain);
     }
 
     function normalize(text) {
@@ -200,28 +231,15 @@ PanelWindow {
         }
     }
 
-    MouseArea {
-        anchors.fill: parent
-        enabled: root.open
-        visible: root.open
-        onClicked: mouse => {
-            var point = mapToItem(panel, mouse.x, mouse.y);
-            if (point.x < 0 || point.x > panel.width || point.y < 0 || point.y > panel.height)
-                root.close();
-            else
-                mouse.accepted = false;
-        }
-    }
-
     Rectangle {
         id: panel
         visible: root.open || root.closing
-        width: Math.min(560, root.width - 48)
-        height: searchBox.height + (root.visibleRows > 0 ? resultList.height + 8 : 0)
+        width: Math.min(Style.panelWidth, root.width - 48)
+        height: searchBox.height + (root.visibleRows > 0 ? resultList.height + Style.panelSpacing : 0)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
-        anchors.topMargin: Style.barHeight + 20
-        radius: Style.pillRadius
+        anchors.topMargin: Style.panelTopMargin
+        radius: Style.panelRadius
         color: Qt.rgba(Mocha.base.r, Mocha.base.g, Mocha.base.b, 0.92)
         border.color: Mocha.pillBorder
         border.width: 1
@@ -245,13 +263,13 @@ PanelWindow {
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: 0
-            spacing: 8
+            spacing: Style.panelSpacing
 
             Rectangle {
                 id: searchBox
                 Layout.fillWidth: true
-                height: Style.pillHeight
-                radius: Style.pillRadius
+                height: Style.controlHeight
+                radius: Style.controlRadius
                 color: "transparent"
                 clip: true
 
@@ -265,7 +283,7 @@ PanelWindow {
                         text: ""
                         color: Mocha.blue
                         font.family: Style.font
-                        font.pixelSize: 24
+                        font.pixelSize: Style.controlFontSize
                     }
 
                     TextInput {
@@ -276,7 +294,7 @@ PanelWindow {
                         selectionColor: Mocha.surface2
                         selectedTextColor: Mocha.text
                         font.family: Style.font
-                        font.pixelSize: 24
+                        font.pixelSize: Style.controlFontSize
                         clip: true
                         focus: root.open
 
@@ -301,10 +319,10 @@ PanelWindow {
                                 root.close();
                                 event.accepted = true;
                             } else if (event.key === Qt.Key_Down || (event.key === Qt.Key_J && (event.modifiers & Qt.ControlModifier))) {
-                                root.selectedIndex = Math.min(root.selectedIndex + 1, root.results.length - 1);
+                                root.selectResult(root.selectedIndex + 1);
                                 event.accepted = true;
                             } else if (event.key === Qt.Key_Up || (event.key === Qt.Key_K && (event.modifiers & Qt.ControlModifier))) {
-                                root.selectedIndex = Math.max(root.selectedIndex - 1, 0);
+                                root.selectResult(root.selectedIndex - 1);
                                 event.accepted = true;
                             } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                                 root.activate(root.selectedIndex);
@@ -331,7 +349,7 @@ PanelWindow {
 
                     width: ListView.view.width
                     height: root.rowHeight
-                    radius: 12
+                    radius: Style.rowRadius
                     color: index === root.selectedIndex ? Qt.rgba(Mocha.surface1.r, Mocha.surface1.g, Mocha.surface1.b, 0.72) : "transparent"
 
                     RowLayout {
@@ -341,15 +359,15 @@ PanelWindow {
                         spacing: 12
 
                         Rectangle {
-                            Layout.preferredWidth: 30
-                            Layout.preferredHeight: 30
-                            radius: 9
+                            Layout.preferredWidth: Style.overlayIconBoxSize
+                            Layout.preferredHeight: Style.overlayIconBoxSize
+                            radius: Style.iconBoxRadius
                             color: Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.55)
 
                             IconImage {
                                 anchors.centerIn: parent
-                                width: 22
-                                height: 22
+                                width: Style.overlayIconSize
+                                height: Style.overlayIconSize
                                 source: Quickshell.iconPath(modelData.type === "window" ? "preferences-system-windows" : (modelData.icon || "application-x-executable"), "application-x-executable")
                                 asynchronous: true
                                 mipmap: true
@@ -392,7 +410,7 @@ PanelWindow {
                         Rectangle {
                             Layout.preferredWidth: typeLabel.implicitWidth + 14
                             Layout.preferredHeight: 22
-                            radius: 8
+                            radius: Style.iconBoxRadius
                             color: Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.55)
 
                             Text {

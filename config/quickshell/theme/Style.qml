@@ -6,8 +6,20 @@ QtObject {
     readonly property int barTopMargin: 5
     readonly property int popoverTop: barHeight + barTopMargin   // 43 — flush below bar
     readonly property int pillHeight: 38
-    readonly property int pillRadius: 10
-    readonly property int pillRadiusS: 8
+    readonly property int pillRadius: 8
+    readonly property int pillRadiusS: 6
+    readonly property int panelRadius: 10
+    readonly property int panelWidth: 620
+    readonly property int panelTopMargin: barHeight + 20
+    readonly property int panelSpacing: 10
+    readonly property int controlHeight: pillHeight
+    readonly property int controlRadius: pillRadius
+    readonly property int controlFontSize: 18
+    readonly property int overlayRowHeight: 58
+    readonly property int overlayIconBoxSize: 42
+    readonly property int overlayIconSize: 22
+    readonly property int rowRadius: pillRadius
+    readonly property int iconBoxRadius: pillRadiusS
     readonly property int pillPadH: 15
     readonly property int pillSpacing: 8
     readonly property int groupSpacing: 20

@@ -24,7 +24,28 @@ PanelWindow {
     color: "transparent"
 
     mask: Region {
-        item: panel
+        item: outsideClickCatcher
+        Region {
+            item: panel
+        }
+    }
+
+    Item {
+        id: outsideClickCatcher
+        width: root.open ? root.width : 0
+        height: root.open ? root.height : 0
+        visible: root.open
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: mouse => {
+                var point = mapToItem(panel, mouse.x, mouse.y);
+                if (point.x < 0 || point.x > panel.width || point.y < 0 || point.y > panel.height)
+                    root.close();
+                else
+                    mouse.accepted = false;
+            }
+        }
     }
 
     property bool open: false
@@ -33,7 +54,7 @@ PanelWindow {
     property int selectedIndex: 0
     property var entries: []
     readonly property var results: filteredResults()
-    readonly property int rowHeight: 58
+    readonly property int rowHeight: Style.overlayRowHeight
     readonly property int visibleRows: Math.min(results.length, 8)
     readonly property string previewDir: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-clipboard-previews"
 
@@ -212,28 +233,15 @@ PanelWindow {
         running: false
     }
 
-    MouseArea {
-        anchors.fill: parent
-        enabled: root.open
-        visible: root.open
-        onClicked: mouse => {
-            var point = mapToItem(panel, mouse.x, mouse.y);
-            if (point.x < 0 || point.x > panel.width || point.y < 0 || point.y > panel.height)
-                root.close();
-            else
-                mouse.accepted = false;
-        }
-    }
-
     Rectangle {
         id: panel
         visible: root.open || root.closing
-        width: Math.min(620, root.width - 48)
-        height: searchBox.height + (root.visibleRows > 0 ? resultList.height + 10 : emptyState.height + 10)
+        width: Math.min(Style.panelWidth, root.width - 48)
+        height: searchBox.height + (root.visibleRows > 0 ? resultList.height + Style.panelSpacing : emptyState.height + Style.panelSpacing)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
-        anchors.topMargin: Style.barHeight + 20
-        radius: 16
+        anchors.topMargin: Style.panelTopMargin
+        radius: Style.panelRadius
         color: Qt.rgba(Mocha.mantle.r, Mocha.mantle.g, Mocha.mantle.b, 0.94)
         border.color: Mocha.pillBorder
         border.width: 1
@@ -257,13 +265,13 @@ PanelWindow {
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: 0
-            spacing: 10
+            spacing: Style.panelSpacing
 
             Rectangle {
                 id: searchBox
                 Layout.fillWidth: true
-                height: 44
-                radius: 14
+                height: Style.controlHeight
+                radius: Style.controlRadius
                 color: Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.58)
                 clip: true
 
@@ -277,7 +285,7 @@ PanelWindow {
                         text: ""
                         color: Mocha.blue
                         font.family: Style.font
-                        font.pixelSize: 18
+                        font.pixelSize: Style.controlFontSize
                     }
 
                     TextInput {
@@ -288,7 +296,7 @@ PanelWindow {
                         selectionColor: Mocha.surface2
                         selectedTextColor: Mocha.text
                         font.family: Style.font
-                        font.pixelSize: 18
+                        font.pixelSize: Style.controlFontSize
                         clip: true
                         focus: root.open
 
@@ -376,7 +384,7 @@ PanelWindow {
 
                     width: ListView.view.width
                     height: root.rowHeight
-                    radius: 10
+                    radius: Style.rowRadius
                     color: index === root.selectedIndex ? Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.78) : "transparent"
                     border.color: index === root.selectedIndex ? Qt.rgba(Mocha.blue.r, Mocha.blue.g, Mocha.blue.b, 0.18) : "transparent"
                     border.width: 1
@@ -400,9 +408,9 @@ PanelWindow {
                         spacing: 10
 
                         Rectangle {
-                            Layout.preferredWidth: 42
-                            Layout.preferredHeight: 42
-                            radius: 10
+                            Layout.preferredWidth: Style.overlayIconBoxSize
+                            Layout.preferredHeight: Style.overlayIconBoxSize
+                            radius: Style.iconBoxRadius
                             color: Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.62)
                             clip: true
 

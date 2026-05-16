@@ -52,7 +52,7 @@ PopoverPanel {
             Rectangle {
                 width: 38
                 height: 22
-                radius: 11
+                radius: Style.pillRadius
                 color: (index + 1) === root.todayDate ? Mocha.blue : "transparent"
 
                 Text {

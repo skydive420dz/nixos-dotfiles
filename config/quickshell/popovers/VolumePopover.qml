@@ -28,7 +28,7 @@ PopoverPanel {
         Rectangle {
             width: 28
             height: 20
-            radius: 10
+            radius: Style.pillRadius
             color: root.volModule.muted ? Qt.rgba(Mocha.red.r, Mocha.red.g, Mocha.red.b, 0.3) : Mocha.surface1
             Text {
                 anchors.centerIn: parent
