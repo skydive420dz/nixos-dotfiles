@@ -130,8 +130,8 @@ hl.config({
 		kb_layout = "us",
 		follow_mouse = 1,
 		sensitivity = 0,
-		repeat_rate = 35,
-		repeat_delay = 200,
+		repeat_rate = 67,
+		repeat_delay = 210,
 
 		touchpad = {
 			natural_scroll = true,
