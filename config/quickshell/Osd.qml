@@ -33,7 +33,7 @@ PanelWindow {
     property string icon: "󰕾"
     property string title: "Volume"
     property int value: -1
-    property color accent: Mocha.lavender
+    property color accent: Mocha.blue
     property bool initializedBattery: false
     property bool lastOnBattery: UPower.onBattery
 
@@ -44,7 +44,7 @@ PanelWindow {
             return UPower.onBattery ? Mocha.teal : Mocha.green;
         if (kindName === "mute")
             return Mocha.red;
-        return Mocha.mauve;
+        return Mocha.blue;
     }
 
     function show(payload) {

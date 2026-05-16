@@ -15,7 +15,7 @@ PopoverPanel {
             text: WeatherData.icon
             font.pixelSize: 28
             font.family: Style.font
-            color: Mocha.sky
+            color: Mocha.blue
         }
 
         ColumnLayout {
@@ -101,7 +101,7 @@ PopoverPanel {
 
                 Text {
                     text: modelData.day
-                    color: Mocha.lavender
+                    color: Mocha.blue
                     font.pixelSize: Style.fontSizeS
                     font.family: Style.font
                     Layout.preferredWidth: 56

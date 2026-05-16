@@ -14,7 +14,7 @@ PopoverPanel {
             text: root.netModule.connType === "wifi" ? "󰤨" : root.netModule.connType === "ethernet" ? "󰈀" : "󰤯"
             font.pixelSize: 20
             font.family: Style.font
-            color: Mocha.teal
+            color: Mocha.blue
         }
 
         Text {

@@ -14,7 +14,7 @@ PopoverPanel {
             text: root.btModule.icon
             font.pixelSize: 20
             font.family: Style.font
-            color: root.btModule.powerState !== "on" ? Mocha.overlay0 : Mocha.teal
+            color: root.btModule.powerState !== "on" ? Mocha.overlay0 : Mocha.blue
         }
 
         Text {

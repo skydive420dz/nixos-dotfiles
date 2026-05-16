@@ -33,20 +33,6 @@ Item {
     readonly property bool isBrowserMedia: isYoutube || playerSource.indexOf("firefox") >= 0
     readonly property string contentIcon: isYoutube ? "" : isBrowserMedia ? "󰕧" : ""
     readonly property real trackWidth: 180
-    readonly property bool hasProgress: player !== null && player.length > 0
-    property real progress: 0
-
-    function refreshProgress() {
-        if (!hasProgress) {
-            progress = 0;
-            return;
-        }
-
-        progress = Math.max(0, Math.min(player.position / player.length, 1.0));
-    }
-
-    onPlayerChanged: refreshProgress()
-    onPlayingChanged: refreshProgress()
 
     implicitWidth: active ? pill.implicitWidth : 0
     Behavior on implicitWidth {
@@ -63,54 +49,6 @@ Item {
     }
     visible: opacity > 0
 
-    Timer {
-        interval: 1000
-        running: root.playing
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root.refreshProgress()
-    }
-
-    // Progress bar — sits flush under the pill, same width, peeks out like an underline
-    Rectangle {
-        anchors.bottom: pill.bottom
-        anchors.left: pill.left
-        anchors.right: pill.right
-        height: pill.height
-        radius: Style.pillRadius
-        color: "transparent"
-        opacity: root.hasProgress ? 1 : 0
-        z: 0   // behind pill
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 150
-            }
-        }
-
-        Rectangle {
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.leftMargin: Style.pillRadius
-            anchors.rightMargin: Style.pillRadius
-            height: 2
-            color: Mocha.surface1
-
-            Rectangle {
-                width: parent.width * root.progress
-                height: parent.height
-                radius: 1
-                color: Mocha.mauve
-                Behavior on width {
-                    NumberAnimation {
-                        duration: 900
-                    }
-                }
-            }
-        }
-    }
-
     Rectangle {
         id: pill
         layer.enabled: true
@@ -122,7 +60,6 @@ Item {
         border.color: Mocha.pillBorder
         border.width: 1
         clip: false
-        z: 1   // above progress bar
 
         RowLayout {
             id: mediaRow

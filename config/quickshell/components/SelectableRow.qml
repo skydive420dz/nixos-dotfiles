@@ -8,7 +8,7 @@ Rectangle {
     property bool selected: false
     property string icon: ""
     property string label: ""
-    property color accent: Mocha.mauve
+    property color accent: Mocha.blue
 
     signal activated()
 

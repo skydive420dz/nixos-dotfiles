@@ -275,7 +275,7 @@ PanelWindow {
 
                     Text {
                         text: ""
-                        color: Mocha.lavender
+                        color: Mocha.blue
                         font.family: Style.font
                         font.pixelSize: 18
                     }
@@ -378,7 +378,7 @@ PanelWindow {
                     height: root.rowHeight
                     radius: 10
                     color: index === root.selectedIndex ? Qt.rgba(Mocha.surface0.r, Mocha.surface0.g, Mocha.surface0.b, 0.78) : "transparent"
-                    border.color: index === root.selectedIndex ? Qt.rgba(Mocha.lavender.r, Mocha.lavender.g, Mocha.lavender.b, 0.18) : "transparent"
+                    border.color: index === root.selectedIndex ? Qt.rgba(Mocha.blue.r, Mocha.blue.g, Mocha.blue.b, 0.18) : "transparent"
                     border.width: 1
 
                     Component.onCompleted: {
@@ -420,7 +420,7 @@ PanelWindow {
                                 anchors.centerIn: parent
                                 visible: !modelData.isImage || !previewReady
                                 text: modelData.isImage ? "" : ""
-                                color: index === root.selectedIndex ? Mocha.lavender : Mocha.subtext0
+                                color: index === root.selectedIndex ? Mocha.blue : Mocha.subtext0
                                 font.family: Style.font
                                 font.pixelSize: 16
                             }

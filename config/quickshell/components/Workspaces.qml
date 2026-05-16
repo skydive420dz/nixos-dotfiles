@@ -89,7 +89,7 @@ Rectangle {
                 height: 20
                 radius: 50
                 implicitWidth: isActive ? 55 : 20
-                color: isActive ? Mocha.lavender : isOccupied ? Mocha.surface1 : Mocha.mantle
+                color: isActive ? Mocha.blue : isOccupied ? Mocha.surface1 : Mocha.mantle
 
                 Behavior on implicitWidth {
                     NumberAnimation {

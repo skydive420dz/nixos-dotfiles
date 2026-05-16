@@ -35,7 +35,7 @@ Rectangle {
         anchors.centerIn: parent
         width: Math.min(implicitWidth, root.width - Style.pillPadH * 2)
         text: root.displayTitle
-        color: Mocha.lavender
+        color: Mocha.blue
         font.pixelSize: Style.fontSize
         font.family: Style.font
         elide: Text.ElideRight

@@ -26,7 +26,7 @@ RowLayout {
         text: root.playing ? "󰏤" : "󰐊"
         font.pixelSize: Style.fontSize
         font.family: Style.font
-        color: Mocha.mauve
+        color: Mocha.blue
 
         MouseArea {
             anchors.fill: parent

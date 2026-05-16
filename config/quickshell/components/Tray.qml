@@ -147,7 +147,7 @@ Item {
                         color: {
                             if (menuItemRect.modelData.isSeparator)
                                 return Mocha.pillBorder;
-                            return itemHover.containsMouse ? Qt.rgba(Mocha.lavender.r, Mocha.lavender.g, Mocha.lavender.b, 0.15) : "transparent";
+                            return itemHover.containsMouse ? Qt.rgba(Mocha.blue.r, Mocha.blue.g, Mocha.blue.b, 0.15) : "transparent";
                         }
 
                         RowLayout {
@@ -181,7 +181,7 @@ Item {
                             Text {
                                 visible: menuItemRect.modelData.checkState !== undefined && menuItemRect.modelData.checkState !== Qt.Unchecked
                                 text: "󰄵"
-                                color: Mocha.lavender
+                                color: Mocha.blue
                                 font.pixelSize: Style.fontSizeS
                                 font.family: Style.font
                             }
