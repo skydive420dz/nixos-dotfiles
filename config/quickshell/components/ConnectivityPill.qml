@@ -10,13 +10,6 @@ Rectangle {
     implicitWidth: connectRow.implicitWidth + Style.pillPadH * 2
     implicitHeight: root.hoveredModule !== "" ? Style.pillHeight + 300 : Style.pillHeight
 
-    Behavior on implicitHeight {
-        NumberAnimation {
-            duration: 200
-            easing.type: Easing.OutCubic
-        }
-    }
-
     radius: Style.pillRadius
     color: Mocha.pillBg
     border.color: Mocha.pillBorder

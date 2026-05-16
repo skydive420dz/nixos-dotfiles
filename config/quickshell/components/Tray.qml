@@ -30,23 +30,11 @@ Item {
 
         // Right-anchored, so growing implicitWidth expands LEFT — gives L-shape effect
         implicitWidth: root.menuOpen ? Math.max(iconRow.implicitWidth, menuCol.implicitWidth) + Style.pillPadH * 2 : iconRow.implicitWidth + Style.pillPadH * 2
-        Behavior on implicitWidth {
-            NumberAnimation {
-                duration: 200
-                easing.type: Easing.OutCubic
-            }
-        }
 
         // The 320 cap matches the PanelWindow's expansion budget defined in
         // Bar.qml. Going higher would
         // make the pill exceed the panel and clip at the bottom.
         implicitHeight: root.menuOpen ? Style.pillHeight + Math.min(menuCol.implicitHeight + 20, 320) : Style.pillHeight
-        Behavior on implicitHeight {
-            NumberAnimation {
-                duration: 200
-                easing.type: Easing.OutCubic
-            }
-        }
 
         radius: Style.pillRadius
         color: Mocha.pillBg
