@@ -12,7 +12,7 @@ PanelWindow {
     id: root
 
     WlrLayershell.layer: WlrLayer.Top
-    WlrLayershell.exclusiveZone: Theme.barHeight + 1
+    WlrLayershell.exclusiveZone: Theme.barHeight - 1
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     WlrLayershell.namespace: "qs-bar"
 
@@ -540,7 +540,7 @@ PanelWindow {
 
         Rectangle {
             Layout.preferredHeight: Theme.pillHeight
-            Layout.preferredWidth: 390
+            Layout.preferredWidth: 360
             radius: Theme.radius
             color: Theme.panel
             border.color: Theme.border
@@ -553,11 +553,12 @@ PanelWindow {
 
                 Text {
                     text: root.networkIcon() + (root.networkLabel() ? " " + root.networkLabel() : "")
-                    width: 112
+                    Layout.preferredWidth: 118
                     color: root.network ? Theme.muted : Theme.danger
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
                     horizontalAlignment: Text.AlignLeft
+                    elide: Text.ElideRight
 
                     MouseArea {
                         anchors.fill: parent
@@ -567,9 +568,11 @@ PanelWindow {
 
                 Text {
                     text: root.bluetoothIcon()
+                    Layout.preferredWidth: 16
                     color: root.bluetoothConnected ? Theme.accent : Theme.muted
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
+                    horizontalAlignment: Text.AlignHCenter
 
                     MouseArea {
                         anchors.fill: parent
@@ -579,9 +582,11 @@ PanelWindow {
 
                 Text {
                     text: root.volumeIcon() + " " + root.volumeLabel()
+                    Layout.preferredWidth: 56
                     color: root.muted ? Theme.warning : Theme.muted
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
+                    horizontalAlignment: Text.AlignLeft
 
                     MouseArea {
                         anchors.fill: parent
@@ -592,16 +597,20 @@ PanelWindow {
                 Text {
                     visible: root.battery >= 0
                     text: root.batteryIcon() + " " + root.batteryLabel()
+                    Layout.preferredWidth: 56
                     color: root.battery < 20 && !root.charging ? Theme.danger : Theme.muted
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
+                    horizontalAlignment: Text.AlignLeft
                 }
 
                 Text {
                     text: root.clockText
+                    Layout.preferredWidth: 105
                     color: Theme.accent
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
+                    horizontalAlignment: Text.AlignLeft
                 }
             }
         }
