@@ -105,6 +105,10 @@ module is ready to move.
 - Use shared theme tokens before local `Qt.rgba(...)` recipes.
 - Keep fades, but be skeptical of height/width animation unless it explains a
   real spatial change.
+- Hyprland is Lua-first now. Do not use old hyprlang dispatcher strings such as
+  `workspace 3` or `exec kitty` from Quickshell. Use Lua dispatcher expressions
+  such as `hl.dsp.focus({ workspace = "3" })` through `Hyprland.dispatch(...)`
+  or `hyprctl dispatch 'hl.dsp....'`.
 
 ## Refactor Plan
 
