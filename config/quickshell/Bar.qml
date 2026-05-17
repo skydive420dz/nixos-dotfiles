@@ -540,7 +540,7 @@ PanelWindow {
 
         Rectangle {
             Layout.preferredHeight: Theme.pillHeight
-            Layout.preferredWidth: 424
+            Layout.preferredWidth: 392
             radius: Theme.radius
             color: Theme.panel
             border.color: Theme.border
@@ -549,14 +549,14 @@ PanelWindow {
             RowLayout {
                 id: statusRow
                 anchors.fill: parent
-                anchors.leftMargin: Theme.pad
-                anchors.rightMargin: Theme.pad
-                spacing: 9
+                anchors.leftMargin: 8
+                anchors.rightMargin: 8
+                spacing: 6
 
                 Text {
                     text: root.networkIcon() + (root.networkLabel() ? " " + root.networkLabel() : "")
                     Layout.fillWidth: true
-                    Layout.minimumWidth: 112
+                    Layout.minimumWidth: 118
                     color: root.network ? Theme.muted : Theme.danger
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -587,7 +587,7 @@ PanelWindow {
 
                 Text {
                     text: root.volumeIcon() + " " + root.volumeLabel()
-                    Layout.preferredWidth: 56
+                    Layout.preferredWidth: 52
                     color: root.muted ? Theme.warning : Theme.muted
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -603,7 +603,7 @@ PanelWindow {
                 Text {
                     visible: root.battery >= 0
                     text: root.batteryIcon() + " " + root.batteryLabel()
-                    Layout.preferredWidth: 56
+                    Layout.preferredWidth: 52
                     color: root.battery < 20 && !root.charging ? Theme.danger : Theme.muted
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -613,7 +613,7 @@ PanelWindow {
 
                 Text {
                     text: root.clockText
-                    Layout.preferredWidth: 116
+                    Layout.preferredWidth: 108
                     color: Theme.accent
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
