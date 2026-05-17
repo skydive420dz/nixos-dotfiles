@@ -49,6 +49,8 @@ PanelWindow {
     property bool bluetoothConnected: false
     property int battery: -1
     property bool charging: false
+    property string batteryStatus: ""
+    property bool batteryStatusReady: false
     property MprisPlayer mediaPlayer: {
         var players = Mpris.players.values;
         for (var i = 0; i < players.length; i++) {
@@ -95,14 +97,14 @@ PanelWindow {
                 root.battery = parseInt(value);
             else if (key === "charging")
                 root.charging = value === "1";
+            else if (key === "battery_status")
+                root.updateBatteryStatus(value);
         }
     }
 
     function formatRate(bytesPerSecond) {
-        if (!Number.isFinite(bytesPerSecond) || bytesPerSecond < 1)
+        if (!Number.isFinite(bytesPerSecond) || bytesPerSecond < 1024)
             return "0";
-        if (bytesPerSecond < 1024)
-            return Math.round(bytesPerSecond) + "B";
         if (bytesPerSecond < 1024 * 1024)
             return Math.round(bytesPerSecond / 1024) + "K";
         return (bytesPerSecond / 1024 / 1024).toFixed(1) + "M";
@@ -129,6 +131,40 @@ PanelWindow {
             networkLastTxBytes = value;
             networkLastSampleMs = now;
         }
+    }
+
+    function updateBatteryStatus(value) {
+        var nextStatus = value || "";
+        if (nextStatus === batteryStatus)
+            return;
+
+        var previousStatus = batteryStatus;
+        batteryStatus = nextStatus;
+
+        if (!batteryStatusReady) {
+            batteryStatusReady = true;
+            return;
+        }
+
+        if (!previousStatus || !nextStatus)
+            return;
+
+        if (nextStatus === "Charging")
+            showOsd("󱐋", "Charging", battery);
+        else if (nextStatus === "Discharging")
+            showOsd("󰁹", "On battery", battery);
+        else if (nextStatus === "Full")
+            showOsd("󱐥", "Charged", battery);
+    }
+
+    function showOsd(icon, title, value) {
+        var runtimeDir = Quickshell.env("XDG_RUNTIME_DIR") || "/run/user/" + Quickshell.env("UID");
+        var payload = JSON.stringify({ icon: icon, title: title, value: value });
+        Quickshell.execDetached([
+            "bash",
+            "-lc",
+            "printf '%s\\n' " + JSON.stringify(payload) + " > " + JSON.stringify(runtimeDir + "/qs-osd.json") + " && printf '%s\\n' \"$(date +%s%N)\" > " + JSON.stringify(runtimeDir + "/qs-osd-signal")
+        ]);
     }
 
     function windowLabel() {
@@ -203,8 +239,10 @@ PanelWindow {
     function batteryIcon() {
         if (battery < 0)
             return "";
-        if (charging)
-            return "󰂄";
+        if (batteryStatus === "Charging")
+            return "󱐋";
+        if (batteryStatus === "Full" || batteryStatus === "Not charging")
+            return "󱐥";
         if (battery < 20)
             return "󰂃";
         if (battery < 50)
@@ -318,7 +356,7 @@ PanelWindow {
         command: [
             "bash",
             "-lc",
-            "vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true); muted=0; case \"$vol\" in *MUTED*) muted=1;; esac; level=$(awk '{ printf \"%d\", ($2+0)*100 }' <<<\"$vol\"); netrow=$(nmcli -t -f DEVICE,TYPE,STATE device status 2>/dev/null | awk -F: '$3==\"connected\"{print $1\":\"$2; exit}'); netdev=${netrow%%:*}; net=${netrow#*:}; rx=0; tx=0; if [ -n \"$netdev\" ] && [ -r \"/sys/class/net/$netdev/statistics/rx_bytes\" ]; then rx=$(cat \"/sys/class/net/$netdev/statistics/rx_bytes\"); tx=$(cat \"/sys/class/net/$netdev/statistics/tx_bytes\"); fi; bt=0; btconn=0; if command -v bluetoothctl >/dev/null 2>&1 && bluetoothctl show >/dev/null 2>&1; then bt=1; bluetoothctl devices Connected 2>/dev/null | grep -q . && btconn=1; fi; bat=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n1); stat=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n1); charging=0; [ \"$stat\" = Charging ] && charging=1; printf 'volume=%s\\nmuted=%s\\nnetwork=%s\\nnetwork_device=%s\\nrx_bytes=%s\\ntx_bytes=%s\\nbluetooth=%s\\nbluetooth_connected=%s\\nbattery=%s\\ncharging=%s\\n' \"${level:-0}\" \"$muted\" \"${net:-}\" \"${netdev:-}\" \"$rx\" \"$tx\" \"$bt\" \"$btconn\" \"${bat:--1}\" \"$charging\""
+            "vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true); muted=0; case \"$vol\" in *MUTED*) muted=1;; esac; level=$(awk '{ printf \"%d\", ($2+0)*100 }' <<<\"$vol\"); netrow=$(nmcli -t -f DEVICE,TYPE,STATE device status 2>/dev/null | awk -F: '$3==\"connected\"{print $1\":\"$2; exit}'); netdev=${netrow%%:*}; net=${netrow#*:}; rx=0; tx=0; if [ -n \"$netdev\" ] && [ -r \"/sys/class/net/$netdev/statistics/rx_bytes\" ]; then rx=$(cat \"/sys/class/net/$netdev/statistics/rx_bytes\"); tx=$(cat \"/sys/class/net/$netdev/statistics/tx_bytes\"); fi; bt=0; btconn=0; if command -v bluetoothctl >/dev/null 2>&1 && bluetoothctl show >/dev/null 2>&1; then bt=1; bluetoothctl devices Connected 2>/dev/null | grep -q . && btconn=1; fi; bat=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n1); stat=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n1); charging=0; [ \"$stat\" = Charging ] && charging=1; printf 'volume=%s\\nmuted=%s\\nnetwork=%s\\nnetwork_device=%s\\nrx_bytes=%s\\ntx_bytes=%s\\nbluetooth=%s\\nbluetooth_connected=%s\\nbattery=%s\\ncharging=%s\\nbattery_status=%s\\n' \"${level:-0}\" \"$muted\" \"${net:-}\" \"${netdev:-}\" \"$rx\" \"$tx\" \"$bt\" \"$btconn\" \"${bat:--1}\" \"$charging\" \"${stat:-}\""
         ]
         stdout: SplitParser {
             property string buffer: ""
@@ -540,7 +578,7 @@ PanelWindow {
 
         Rectangle {
             Layout.preferredHeight: Theme.pillHeight
-            Layout.preferredWidth: 352
+            Layout.preferredWidth: 324
             radius: Theme.radius
             color: Theme.panel
             border.color: Theme.border
@@ -557,7 +595,7 @@ PanelWindow {
                 Text {
                     text: root.networkIcon() + (root.networkLabel() ? " " + root.networkLabel() : "")
                     Layout.fillWidth: true
-                    Layout.minimumWidth: 72
+                    Layout.minimumWidth: 56
                     color: root.network ? Theme.muted : Theme.danger
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -590,12 +628,12 @@ PanelWindow {
                     spacing: 3
 
                     Text {
-                        text: root.volumeIcon() + " " + root.volumeLabel()
-                        Layout.preferredWidth: 48
+                        text: root.volumeIcon()
+                        Layout.preferredWidth: 16
                         color: root.muted ? Theme.warning : Theme.muted
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSize
-                        horizontalAlignment: Text.AlignLeft
+                        horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
 
                         MouseArea {
