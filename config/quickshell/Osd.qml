@@ -68,8 +68,8 @@ PanelWindow {
 
     Rectangle {
         id: card
-        width: 230
-        height: root.value >= 0 ? 82 : 58
+        width: 260
+        height: root.value >= 0 ? 88 : 64
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: Theme.barHeight + 10
@@ -93,15 +93,15 @@ PanelWindow {
                     text: root.icon
                     color: Theme.accent
                     font.family: Theme.font
-                    font.pixelSize: 18
+                    font.pixelSize: 22
                 }
 
                 Text {
-                    Layout.preferredWidth: Math.min(implicitWidth, 160)
+                    Layout.preferredWidth: Math.min(implicitWidth, 180)
                     text: root.title
                     color: Theme.text
                     font.family: Theme.font
-                    font.pixelSize: Theme.fontSize
+                    font.pixelSize: Theme.fontSize + 2
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
                 }

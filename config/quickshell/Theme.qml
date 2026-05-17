@@ -14,10 +14,10 @@ QtObject {
     readonly property int fontSize: 12
     readonly property int iconSize: 13
 
-    readonly property color bg: "#17191d"
-    readonly property color panel: "#1d2026"
-    readonly property color panelAlt: "#232731"
-    readonly property color border: "#333946"
+    readonly property color bg: Qt.rgba(0.075, 0.082, 0.114, 0.82)
+    readonly property color panel: Qt.rgba(0.090, 0.098, 0.135, 0.78)
+    readonly property color panelAlt: Qt.rgba(0.141, 0.153, 0.204, 0.84)
+    readonly property color border: Qt.rgba(0.200, 0.224, 0.275, 0.58)
     readonly property color text: "#c9d1dd"
     readonly property color muted: "#7d8796"
     readonly property color accent: "#7aa2f7"
