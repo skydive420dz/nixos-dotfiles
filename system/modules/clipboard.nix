@@ -15,7 +15,7 @@
 #   hl.exec_cmd("uwsm app -- wl-paste --type image --watch cliphist store")
 #   hl.exec_cmd("uwsm app -- wl-clip-persist --clipboard regular")
 #
-#   Caps+Y and Caps+P are emitted by keyd as Ctrl+C and Ctrl+V.
+#   Caps+Y and Caps+P are emitted by Kanata as Ctrl+C and Ctrl+V.
 #
 # Privacy:
 #   Password managers that set "x-kde-passwordManagerHint: secret" MIME hint

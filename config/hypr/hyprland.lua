@@ -23,6 +23,15 @@ local menu = "~/.config/scripts/launcher-toggle"
 local clipboard = "~/.config/scripts/clipboard-toggle"
 local snip = "grimblast copy area"
 local reload_shell = "systemctl --user restart quickshell"
+-- MSI Bravo 15 C7V internal touchpad from `hyprctl devices`.
+-- Future host portability target: move this into a Nix option.
+local touchpad_device = "pnp0c50:0b-06cb:7e7e-touchpad"
+local touchpad_enabled = true
+
+local function toggle_touchpad()
+	touchpad_enabled = not touchpad_enabled
+	hl.device({ name = touchpad_device, enabled = touchpad_enabled })
+end
 
 hl.monitor({
 	output = "eDP-1",
@@ -202,7 +211,9 @@ hl.bind(
 	{ locked = true, repeating = true }
 )
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("~/.config/scripts/osd-volume mute"), { locked = true })
+hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("qs ipc call media playPause"), { locked = true })
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("~/.config/scripts/osd-mic"), { locked = true })
+hl.bind("code:202", toggle_touchpad, { locked = true })
 hl.bind(
 	"XF86MonBrightnessUp",
 	hl.dsp.exec_cmd("~/.config/scripts/osd-brightness up"),

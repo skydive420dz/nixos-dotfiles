@@ -3,6 +3,8 @@
 {
   environment.systemPackages = with pkgs; [
     libinput
+    evtest
+    wev
     tmux
     vim
     lshw

@@ -268,6 +268,14 @@ PanelWindow {
         return artist ? title + " - " + artist : title;
     }
 
+    IpcHandler {
+        target: "media"
+
+        function playPause(): void {
+            root.mediaPlayer?.togglePlaying();
+        }
+    }
+
     function updateClock() {
         var date = new Date();
         root.clockText = Qt.formatDateTime(date, "ddd MMM d  HH:mm");
