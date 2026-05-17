@@ -3,7 +3,7 @@ set -euo pipefail
 
 action=${1:-}
 step=${2:-5}
-runtime_dir=${XDG_RUNTIME_DIR:-/tmp}
+runtime_dir=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
 state_file="$runtime_dir/qs-osd.json"
 signal_file="$runtime_dir/qs-osd-signal"
 

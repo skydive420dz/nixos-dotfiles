@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-runtime_dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
-mkdir -p "$runtime_dir"
-printf '%s\n' "$(date +%s%N)" > "$runtime_dir/qs-launcher-toggle"
+exec fuzzel --show drun --prompt "Apps "

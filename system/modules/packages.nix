@@ -15,6 +15,7 @@
     qt6.qtlanguageserver
 
     fzf
+    fuzzel
     quickshell
 
     nil

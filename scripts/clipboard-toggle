@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-runtime_dir="${XDG_RUNTIME_DIR:-/tmp}"
-printf '%s\n' "$(date +%s%N)" > "$runtime_dir/qs-clipboard-toggle"
+selection=$(cliphist list | fuzzel --dmenu --prompt "Clipboard " || true)
+
+if [[ -n "${selection:-}" ]]; then
+    printf '%s' "$selection" | cliphist decode | wl-copy
+fi

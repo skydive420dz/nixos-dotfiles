@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-runtime_dir=${XDG_RUNTIME_DIR:-/tmp}
+runtime_dir=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
 state_file="$runtime_dir/qs-osd.json"
 signal_file="$runtime_dir/qs-osd-signal"
 
