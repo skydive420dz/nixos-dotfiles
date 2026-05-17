@@ -43,6 +43,20 @@ move into host-level Nix options later instead of becoming mystery strings.
 | Extra `\|` key | MSI Bravo 15 C7V 99-key layout | `system/modules/input.nix` | Map Kanata `IntlBackslash = bksl` | Built-in 99-key layout emitted the wrong logical key for the physical `\|` key | Keep with host keyboard options later |
 | Display-mode key | MSI Bravo 15 C7V | none | Leave `Fn+F11` unmapped | It emits `Super+p`, not a clean display XF86 key; no current workflow needs it | Design explicit monitor profile/picker later |
 
+## Future Kanata Layer Ideas
+
+Do not rush these. The current Kanata config is intentionally small and stable.
+Only add layer behavior when it removes real friction and does not fight app-native
+bindings.
+
+| Idea | Candidate behavior | Notes |
+| --- | --- | --- |
+| Vim-style navigation | Layer + `h/j/k/l` sends arrows | Useful outside terminal/editor contexts |
+| Word motion | Layer + `w/b/e` sends word-forward/back behavior | Needs app-safe modifier choices per platform |
+| Copy/paste holds | Hold `y` for copy, hold `p` for paste | Candidate replacement for explicit layer `Y/P`; test carefully to avoid typing latency |
+| Workspace/tag switching | Hold number keys to switch workspaces/tags | Mirrors the Hypr workspace mental model |
+| Move to workspace/tag | Shift + hold number keys to move window to workspace/tag | Should map to Hypr actions, not app-level number input |
+
 Useful commands after installing the diagnostic tools:
 
 ```sh
