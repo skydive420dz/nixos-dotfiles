@@ -58,7 +58,7 @@ hl.monitor({
 	sdrbrightness = 0.6,
 	sdrsaturation = 1.15,
 	supports_wide_color = 1,
-	supports_hdr = 0,
+	supports_hdr = 1,
 	sdr_min_luminance = 0.001,
 	sdr_max_luminance = 450,
 	vrr = 1,
@@ -67,10 +67,7 @@ hl.monitor({
 hl.on("hyprland.start", function()
 	hl.exec_cmd("uwsm finalize HYPRLAND_INSTANCE_SIGNATURE")
 	hl.exec_cmd(
-		"uwsm app -- awww img --outputs eDP-1 /home/skydive420dz/nixos-dotfiles/wallpapers/wallpaper-003.gif --transition-type fade"
-	)
-	hl.exec_cmd(
-		"uwsm app -- awww img --outputs HDMI-A-1 /home/skydive420dz/nixos-dotfiles/wallpapers/wallpaper-008.jpg --transition-type fade"
+		"uwsm app -- awww img /home/skydive420dz/nixos-dotfiles/wallpapers/wallpaper-003.gif --transition-type fade"
 	)
 	hl.exec_cmd("uwsm app -- vesktop -m")
 	hl.exec_cmd("uwsm app -- wl-paste --type text --watch cliphist store")
