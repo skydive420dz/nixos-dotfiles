@@ -38,10 +38,13 @@ Rectangle {
         spacing: 8
 
         Text {
+            Layout.preferredWidth: Theme.iconSize
             text: "󰒮"
-            color: root.mediaPlayer?.canGoPrevious ? Theme.muted : Theme.border
+            color: Theme.muted
+            opacity: root.mediaPlayer?.canGoPrevious ? 1 : 0.35
             font.family: Theme.font
             font.pixelSize: Theme.iconSize
+            horizontalAlignment: Text.AlignHCenter
 
             MouseArea {
                 anchors.fill: parent
@@ -53,10 +56,12 @@ Rectangle {
         }
 
         Text {
+            Layout.preferredWidth: Theme.iconSize
             text: root.mediaPlaying ? "󰏤" : "󰐊"
             color: Theme.accent
             font.family: Theme.font
             font.pixelSize: Theme.iconSize
+            horizontalAlignment: Text.AlignHCenter
 
             MouseArea {
                 anchors.fill: parent
@@ -67,10 +72,13 @@ Rectangle {
         }
 
         Text {
+            Layout.preferredWidth: Theme.iconSize
             text: "󰒭"
-            color: root.mediaPlayer?.canGoNext ? Theme.muted : Theme.border
+            color: Theme.muted
+            opacity: root.mediaPlayer?.canGoNext ? 1 : 0.35
             font.family: Theme.font
             font.pixelSize: Theme.iconSize
+            horizontalAlignment: Text.AlignHCenter
 
             MouseArea {
                 anchors.fill: parent
