@@ -24,6 +24,7 @@ Rectangle {
 
     property int activeWorkspace: Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1
     property var occupiedWorkspaces: ({})
+
     function refreshWorkspaces() {
         workspaceTimer.restart();
     }
