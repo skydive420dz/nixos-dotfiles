@@ -160,6 +160,9 @@ module is ready to move.
 - 2026-05-17: Network traffic labels use fixed four-character rates so the
   status pill does not visually twitch as traffic changes. Examples: `0000`,
   `012K`, `1.2M`, `042M`, `99M+`.
+- 2026-05-17: The status pill grew from 324px to 348px and the network field
+  minimum grew from 64px to 88px to fit the fixed-width traffic labels without
+  clipping the clock/status fields.
 
 ## Test Notes
 
