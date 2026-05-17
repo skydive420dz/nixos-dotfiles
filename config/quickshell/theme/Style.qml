@@ -23,7 +23,20 @@ QtObject {
     readonly property int pillPadH: 15
     readonly property int pillSpacing: 8
     readonly property int groupSpacing: 20
+    readonly property int connectivityPillWidth: 424
     readonly property int fontSize: 14
     readonly property int fontSizeS: 10
     readonly property string font: "FantasqueSansMono Nerd Font Propo"
+
+    // QML owns UI motion. Hyprland layer animations stay disabled so layer-shell
+    // surfaces do not slide or fade as transparent compositor rectangles.
+    readonly property int animFast: 100
+    readonly property int animNormal: 150
+    readonly property int animSlow: 240
+    readonly property int animPanel: 140
+    readonly property int animResize: 220
+    readonly property int animColor: 130
+    readonly property int animMicroSlide: 4
+    readonly property int easeOut: Easing.OutCubic
+    readonly property int easeInOut: Easing.InOutCubic
 }

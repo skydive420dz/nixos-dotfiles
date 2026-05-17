@@ -103,13 +103,14 @@ Rectangle {
 
                 Behavior on implicitWidth {
                     NumberAnimation {
-                        duration: 250
-                        easing.type: Easing.OutCubic
+                        duration: Style.animResize
+                        easing.type: Style.easeOut
                     }
                 }
                 Behavior on color {
                     ColorAnimation {
-                        duration: 150
+                        duration: Style.animColor
+                        easing.type: Style.easeOut
                     }
                 }
 
@@ -122,7 +123,8 @@ Rectangle {
                     color: parent.isActive ? Mocha.crust : "transparent"
                     Behavior on color {
                         ColorAnimation {
-                            duration: 150
+                            duration: Style.animColor
+                            easing.type: Style.easeOut
                         }
                     }
                 }

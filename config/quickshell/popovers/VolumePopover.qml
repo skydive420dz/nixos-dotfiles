@@ -63,7 +63,8 @@ PopoverPanel {
                 color: root.volModule.muted ? Mocha.overlay0 : Mocha.accent
                 Behavior on width {
                     NumberAnimation {
-                        duration: 80
+                        duration: Style.animFast
+                        easing.type: Style.easeOut
                     }
                 }
             }

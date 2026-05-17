@@ -5,10 +5,8 @@ import QtQuick.Layouts
 Rectangle {
     id: root
 
-    property string hoveredModule: ""
-
-    implicitWidth: connectRow.implicitWidth + Style.pillPadH * 2
-    implicitHeight: root.hoveredModule !== "" ? Style.pillHeight + 300 : Style.pillHeight
+    implicitWidth: Style.connectivityPillWidth
+    implicitHeight: Style.pillHeight
 
     radius: Style.pillRadius
     color: Mocha.pillBg
@@ -17,29 +15,18 @@ Rectangle {
     clip: true
 
     function show(moduleName) {
-        hideTimer.stop();
-        hoveredModule = moduleName;
+        ConnectivityHover.show(moduleName);
     }
 
     function hideSoon() {
-        hideTimer.restart();
-    }
-
-    Timer {
-        id: hideTimer
-        interval: 120
-        repeat: false
-        onTriggered: root.hoveredModule = ""
+        ConnectivityHover.hideSoon();
     }
 
     RowLayout {
         id: connectRow
         anchors {
             top: parent.top
-            left: parent.left
-            right: parent.right
-            leftMargin: Style.pillPadH
-            rightMargin: Style.pillPadH
+            horizontalCenter: parent.horizontalCenter
         }
         height: Style.pillHeight
         spacing: Style.pillSpacing
@@ -79,50 +66,6 @@ Rectangle {
             HoverHandler {
                 onHoveredChanged: hovered ? root.show("battery") : root.hideSoon()
             }
-        }
-    }
-
-    Item {
-        id: popoverArea
-        anchors {
-            top: connectRow.bottom
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
-            margins: 12
-            topMargin: 10
-        }
-
-        HoverHandler {
-            onHoveredChanged: hovered ? hideTimer.stop() : root.hideSoon()
-        }
-
-        ClockPopover {
-            hoveredModule: root.hoveredModule
-        }
-
-        WeatherPopover {
-            hoveredModule: root.hoveredModule
-        }
-
-        NetworkPopover {
-            hoveredModule: root.hoveredModule
-            netModule: netModule
-        }
-
-        BluetoothPopover {
-            hoveredModule: root.hoveredModule
-            btModule: btModule
-        }
-
-        VolumePopover {
-            hoveredModule: root.hoveredModule
-            volModule: volModule
-        }
-
-        BatteryPopover {
-            hoveredModule: root.hoveredModule
-            battModule: battModule
         }
     }
 }

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import ".."
 
 ColumnLayout {
     id: root
@@ -18,7 +19,8 @@ ColumnLayout {
 
     Behavior on opacity {
         NumberAnimation {
-            duration: 150
+            duration: Style.animNormal
+            easing.type: Style.easeOut
         }
     }
 }

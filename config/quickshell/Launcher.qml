@@ -267,8 +267,8 @@ PanelWindow {
 
         Behavior on opacity {
             NumberAnimation {
-                duration: 120
-                easing.type: Easing.OutCubic
+                duration: Style.animPanel
+                easing.type: Style.easeOut
             }
         }
 

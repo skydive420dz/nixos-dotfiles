@@ -150,8 +150,12 @@ hl.animation({ leaf = "windows", enabled = true, speed = 5, bezier = "overshot",
 hl.animation({ leaf = "windowsIn", enabled = true, speed = 5, bezier = "overshot", style = "popin 80%" })
 hl.animation({ leaf = "windowsOut", enabled = true, speed = 4, bezier = "smoothOut", style = "popin 95%" })
 hl.animation({ leaf = "windowsMove", enabled = true, speed = 4, bezier = "softSnap" })
-hl.animation({ leaf = "layersIn", enabled = true, speed = 3, bezier = "smoothIn", style = "slide right" })
-hl.animation({ leaf = "layersOut", enabled = true, speed = 2, bezier = "softSnap", style = "slide right" })
+hl.animation({ leaf = "layers", enabled = false })
+hl.animation({ leaf = "layersIn", enabled = false })
+hl.animation({ leaf = "layersOut", enabled = false })
+hl.animation({ leaf = "fadeLayers", enabled = false })
+hl.animation({ leaf = "fadeLayersIn", enabled = false })
+hl.animation({ leaf = "fadeLayersOut", enabled = false })
 hl.animation({ leaf = "fade", enabled = true, speed = 4, bezier = "smoothIn" })
 hl.animation({ leaf = "fadeIn", enabled = true, speed = 4, bezier = "smoothIn" })
 hl.animation({ leaf = "fadeOut", enabled = true, speed = 4, bezier = "smoothOut" })
@@ -284,11 +288,4 @@ centered_float({
 	match = { class = "^(wiremix)$" },
 	size = { 700, 500 },
 	opacity = opacity.solid,
-})
-
-hl.layer_rule({
-	name = "qs_bar_blur",
-	match = { namespace = "^qs-bar$" },
-	blur = true,
-	ignore_alpha = 0,
 })

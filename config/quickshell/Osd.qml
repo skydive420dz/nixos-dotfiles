@@ -139,8 +139,8 @@ PanelWindow {
 
         Behavior on opacity {
             NumberAnimation {
-                duration: 140
-                easing.type: Easing.OutCubic
+                duration: Style.animPanel
+                easing.type: Style.easeOut
             }
         }
 
@@ -190,8 +190,8 @@ PanelWindow {
 
                         Behavior on width {
                             NumberAnimation {
-                                duration: 120
-                                easing.type: Easing.OutCubic
+                                duration: Style.animFast
+                                easing.type: Style.easeOut
                             }
                         }
                     }

@@ -7,19 +7,27 @@ import Quickshell.Services.SystemTray
 Item {
     id: root
 
-    // Mirror the inner pill's size so the mask in Bar.qml correctly covers the
-    // expanded area. Without this, mouse events disappear when the cursor moves
-    // into the menu region.
+    // Mirror the inner pill's size so the tray layer mask follows the menu.
+    // Without this, mouse events disappear when the cursor moves into the menu region.
     implicitWidth: hasItems || menuOpen ? pill.implicitWidth : 0
     implicitHeight: hasItems || menuOpen ? pill.implicitHeight : 0
 
-    property SystemTrayItem activeItem: null
     readonly property bool hasItems: SystemTray.items.values.length > 0
-    readonly property bool menuOpen: activeItem !== null
+    readonly property bool menuOpen: TrayState.menuOpen
 
     QsMenuOpener {
         id: menuOpener
-        menu: root.activeItem?.hasMenu ? root.activeItem.menu : null
+        menu: TrayState.activeItem?.hasMenu ? TrayState.activeItem.menu : null
+    }
+
+    Timer {
+        id: closeTimer
+        interval: 140
+        repeat: false
+        onTriggered: {
+            if (!trayHover.hovered)
+                TrayState.close();
+        }
     }
 
     Rectangle {
@@ -31,9 +39,7 @@ Item {
         // Right-anchored, so growing implicitWidth expands LEFT — gives L-shape effect
         implicitWidth: root.menuOpen ? Math.max(iconRow.implicitWidth, menuCol.implicitWidth) + Style.pillPadH * 2 : iconRow.implicitWidth + Style.pillPadH * 2
 
-        // The 320 cap matches the PanelWindow's expansion budget defined in
-        // Bar.qml. Going higher would
-        // make the pill exceed the panel and clip at the bottom.
+        // Keep the menu compact enough to fit inside the tray layer's expansion budget.
         implicitHeight: root.menuOpen ? Style.pillHeight + Math.min(menuCol.implicitHeight + 20, 320) : Style.pillHeight
 
         radius: Style.pillRadius
@@ -41,6 +47,17 @@ Item {
         border.color: Mocha.pillBorder
         border.width: 1
         clip: true
+
+        HoverHandler {
+            id: trayHover
+            onHoveredChanged: {
+                if (hovered) {
+                    closeTimer.stop();
+                } else if (root.menuOpen) {
+                    closeTimer.restart();
+                }
+            }
+        }
 
         // ── Icon row — right-aligned so icons stay put as pill grows left ──────
         RowLayout {
@@ -76,10 +93,10 @@ Item {
 
                         onClicked: mouse => {
                             if (mouse.button === Qt.LeftButton) {
-                                root.activeItem = null;
+                                TrayState.close();
                                 trayItem.modelData.activate();
                             } else if (mouse.button === Qt.RightButton && trayItem.modelData.hasMenu) {
-                                root.activeItem = root.activeItem === trayItem.modelData ? null : trayItem.modelData;
+                                TrayState.activeItem = TrayState.activeItem === trayItem.modelData ? null : trayItem.modelData;
                             }
                         }
                     }
@@ -102,7 +119,8 @@ Item {
             visible: opacity > 0
             Behavior on opacity {
                 NumberAnimation {
-                    duration: 150
+                    duration: Style.animNormal
+                    easing.type: Style.easeOut
                 }
             }
 
@@ -182,7 +200,7 @@ Item {
                             enabled: menuItemRect.modelData.enabled && !menuItemRect.modelData.isSeparator
                             onClicked: {
                                 menuItemRect.modelData.triggered();
-                                root.activeItem = null;
+                                TrayState.close();
                             }
                         }
                     }

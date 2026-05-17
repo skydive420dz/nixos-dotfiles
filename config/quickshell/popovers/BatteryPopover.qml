@@ -51,7 +51,8 @@ PopoverPanel {
                 color: root.battModule.iconColor
                 Behavior on width {
                     NumberAnimation {
-                        duration: 500
+                        duration: Style.animSlow
+                        easing.type: Style.easeOut
                     }
                 }
             }

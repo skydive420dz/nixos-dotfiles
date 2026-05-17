@@ -37,14 +37,15 @@ Item {
     implicitWidth: active ? pill.implicitWidth : 0
     Behavior on implicitWidth {
         NumberAnimation {
-            duration: 250
-            easing.type: Easing.OutCubic
+            duration: Style.animResize
+            easing.type: Style.easeOut
         }
     }
     opacity: active ? 1 : 0
     Behavior on opacity {
         NumberAnimation {
-            duration: 250
+            duration: Style.animPanel
+            easing.type: Style.easeOut
         }
     }
     visible: opacity > 0

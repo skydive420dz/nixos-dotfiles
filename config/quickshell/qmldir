@@ -1,10 +1,17 @@
 Bar           1.0 Bar.qml
+BarLeft       1.0 BarLeft.qml
+BarCenter     1.0 BarCenter.qml
+BarRight      1.0 BarRight.qml
+BarTray       1.0 BarTray.qml
+BarConnectivityPopover 1.0 BarConnectivityPopover.qml
 Launcher      1.0 Launcher.qml
 Clipboard     1.0 Clipboard.qml
 Osd           1.0 Osd.qml
 singleton Mocha       1.0 theme/Mocha.qml
 singleton Style       1.0 theme/Style.qml
 singleton WeatherData 1.0 services/WeatherData.qml
+singleton ConnectivityHover 1.0 services/ConnectivityHover.qml
+singleton TrayState 1.0 services/TrayState.qml
 Media         1.0 components/Media.qml
 MediaControls 1.0 components/MediaControls.qml
 MediaTrack    1.0 components/MediaTrack.qml

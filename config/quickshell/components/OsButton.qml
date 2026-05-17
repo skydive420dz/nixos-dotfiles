@@ -17,7 +17,8 @@ Rectangle {
 
     Behavior on color {
         ColorAnimation {
-            duration: 150
+            duration: Style.animColor
+            easing.type: Style.easeOut
         }
     }
 
