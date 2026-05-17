@@ -149,10 +149,12 @@ PanelWindow {
         if (!previousStatus || !nextStatus)
             return;
 
-        if (nextStatus === "Charging")
-            showOsd("󱐋", "Charging", battery);
-        else if (nextStatus === "Discharging")
+        if (nextStatus === "Discharging")
             showOsd("󰁹", "On battery", battery);
+        else if (previousStatus === "Discharging" && nextStatus === "Charging")
+            showOsd("󱐋", "Charging", battery);
+        else if (previousStatus === "Discharging")
+            showOsd("󱐥", nextStatus === "Full" ? "Charged" : "Plugged in", battery);
         else if (nextStatus === "Full")
             showOsd("󱐥", "Charged", battery);
     }
