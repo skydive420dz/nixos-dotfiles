@@ -157,6 +157,9 @@ module is ready to move.
   15s, battery every 10s, and bluetooth every 30s. This keeps service-heavy
   checks like `nmcli` and `bluetoothctl` out of the hot path without changing
   bar geometry or click targets.
+- 2026-05-17: Network traffic labels use fixed four-character rates so the
+  status pill does not visually twitch as traffic changes. Examples: `0000`,
+  `012K`, `1.2M`, `042M`, `99M+`.
 
 ## Test Notes
 

@@ -72,10 +72,21 @@ Rectangle {
 
     function formatRate(bytesPerSecond) {
         if (!Number.isFinite(bytesPerSecond) || bytesPerSecond < 1024)
-            return "0";
-        if (bytesPerSecond < 1024 * 1024)
-            return Math.round(bytesPerSecond / 1024) + "K";
-        return (bytesPerSecond / 1024 / 1024).toFixed(1) + "M";
+            return "0000";
+
+        if (bytesPerSecond < 1024 * 1024) {
+            var kib = Math.min(Math.round(bytesPerSecond / 1024), 999);
+            return ("00" + kib).slice(-3) + "K";
+        }
+
+        var mib = bytesPerSecond / 1024 / 1024;
+        if (mib < 9.95)
+            return mib.toFixed(1) + "M";
+        if (mib < 100) {
+            var roundedMib = Math.min(Math.round(mib), 99);
+            return ("00" + roundedMib).slice(-3) + "M";
+        }
+        return "99M+";
     }
 
     function updateNetworkRate(kind, value) {
