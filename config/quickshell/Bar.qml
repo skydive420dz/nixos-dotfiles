@@ -540,7 +540,7 @@ PanelWindow {
 
         Rectangle {
             Layout.preferredHeight: Theme.pillHeight
-            Layout.preferredWidth: 376
+            Layout.preferredWidth: 352
             radius: Theme.radius
             color: Theme.panel
             border.color: Theme.border
@@ -556,7 +556,7 @@ PanelWindow {
                 Text {
                     text: root.networkIcon() + (root.networkLabel() ? " " + root.networkLabel() : "")
                     Layout.fillWidth: true
-                    Layout.minimumWidth: 118
+                    Layout.minimumWidth: 94
                     color: root.network ? Theme.muted : Theme.danger
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
