@@ -120,10 +120,10 @@ module is ready to move.
 - 2026-05-17: `modules/workspaces/Workspaces.qml` owns workspace state,
   `hyprctl workspaces -j` polling, Hyprland workspace events, rendering, and
   workspace click dispatch. `Bar.qml` only places `Workspaces {}`. The module
-  keeps explicit implicit/Layout bounds. Workspace switching is press-driven and
-  handled by a module-local `Process`, matching the `hyprctl` path already used
-  for workspace polling. Delegate files that read outer IDs should use
-  `pragma ComponentBehavior: Bound`.
+  keeps explicit implicit/Layout bounds. Workspace switching uses
+  `Hyprland.dispatch("hl.dsp.focus({ workspace = ... })")`, because Hyprland
+  0.55/Lua no longer accepts the old `hyprctl dispatch workspace N` shape.
+  Delegate files that read outer IDs should use `pragma ComponentBehavior: Bound`.
 
 ## Known Lesson
 

@@ -24,16 +24,13 @@ Rectangle {
 
     property int activeWorkspace: Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1
     property var occupiedWorkspaces: ({})
-    property int targetWorkspace: 1
-
     function refreshWorkspaces() {
         workspaceTimer.restart();
     }
 
     function switchWorkspace(workspaceId) {
-        targetWorkspace = workspaceId;
-        if (!switchWorkspaceProc.running)
-            switchWorkspaceProc.running = true;
+        Hyprland.dispatch("hl.dsp.focus({ workspace = \"" + workspaceId + "\" })");
+        refreshWorkspaces();
     }
 
     Component.onCompleted: refreshWorkspaces()
@@ -83,12 +80,6 @@ Rectangle {
             } catch (e) {}
             stdout.buffer = "";
         }
-    }
-
-    Process {
-        id: switchWorkspaceProc
-        command: ["hyprctl", "dispatch", "workspace", root.targetWorkspace.toString()]
-        onExited: root.refreshWorkspaces()
     }
 
     RowLayout {
