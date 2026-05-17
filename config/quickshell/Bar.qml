@@ -595,7 +595,7 @@ PanelWindow {
                 Text {
                     text: root.networkIcon() + (root.networkLabel() ? " " + root.networkLabel() : "")
                     Layout.fillWidth: true
-                    Layout.minimumWidth: 56
+                    Layout.minimumWidth: 64
                     color: root.network ? Theme.muted : Theme.danger
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -611,7 +611,7 @@ PanelWindow {
 
                 Text {
                     text: root.bluetoothIcon()
-                    Layout.preferredWidth: 16
+                    Layout.preferredWidth: 10
                     color: root.bluetoothConnected ? Theme.accent : Theme.muted
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
