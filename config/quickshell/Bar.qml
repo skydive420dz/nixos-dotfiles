@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
+import Quickshell.Services.Mpris
 import Quickshell.Services.SystemTray
 import Quickshell.Wayland
 
@@ -40,6 +41,20 @@ PanelWindow {
     property bool bluetoothConnected: false
     property int battery: -1
     property bool charging: false
+    property MprisPlayer mediaPlayer: {
+        var players = Mpris.players.values;
+        for (var i = 0; i < players.length; i++) {
+            if (players[i].playbackState === MprisPlaybackState.Playing)
+                return players[i];
+        }
+        for (var j = 0; j < players.length; j++) {
+            if (players[j].playbackState === MprisPlaybackState.Paused)
+                return players[j];
+        }
+        return null;
+    }
+    readonly property bool mediaActive: mediaPlayer !== null
+    readonly property bool mediaPlaying: mediaPlayer?.playbackState === MprisPlaybackState.Playing
 
     function refreshWorkspaces() {
         workspaceTimer.restart();
@@ -83,12 +98,31 @@ PanelWindow {
         return activeTitle;
     }
 
+    function loadActiveWindow(payload) {
+        try {
+            var win = JSON.parse(payload.trim());
+            root.activeClass = win.class ?? "";
+            root.activeTitle = win.title ?? "";
+        } catch (e) {
+            root.activeClass = "";
+            root.activeTitle = "";
+        }
+    }
+
     function networkIcon() {
         if (network === "ethernet")
             return "󰈀";
         if (network === "wifi")
             return "󰤨";
         return "󰤮";
+    }
+
+    function networkLabel() {
+        if (network === "ethernet")
+            return "Eth";
+        if (network === "wifi")
+            return "Wi-Fi";
+        return "Off";
     }
 
     function bluetoothIcon() {
@@ -99,6 +133,14 @@ PanelWindow {
         return "󰂯";
     }
 
+    function bluetoothLabel() {
+        if (!bluetoothAvailable)
+            return "Off";
+        if (bluetoothConnected)
+            return "On";
+        return "Idle";
+    }
+
     function volumeIcon() {
         if (muted)
             return "󰖁";
@@ -107,6 +149,10 @@ PanelWindow {
         if (volume < 70)
             return "󰖀";
         return "󰕾";
+    }
+
+    function volumeLabel() {
+        return muted ? "Mute" : volume + "%";
     }
 
     function batteryIcon() {
@@ -123,6 +169,20 @@ PanelWindow {
         return "󰁹";
     }
 
+    function batteryLabel() {
+        if (battery < 0)
+            return "";
+        return battery + "%";
+    }
+
+    function mediaLabel() {
+        if (!mediaPlayer)
+            return "";
+        var title = mediaPlayer.trackTitle || mediaPlayer.identity || "Media";
+        var artist = mediaPlayer.trackArtist || "";
+        return artist ? title + " - " + artist : title;
+    }
+
     function updateClock() {
         var date = new Date();
         root.clockText = Qt.formatDateTime(date, "MMM d  HH:mm");
@@ -131,6 +191,7 @@ PanelWindow {
     Component.onCompleted: {
         updateClock();
         statusProc.running = true;
+        activeWindowProc.running = true;
         refreshWorkspaces();
     }
 
@@ -224,6 +285,19 @@ PanelWindow {
         }
     }
 
+    Process {
+        id: activeWindowProc
+        command: ["hyprctl", "activewindow", "-j"]
+        stdout: SplitParser {
+            property string buffer: ""
+            onRead: data => buffer += data + "\n"
+        }
+        onExited: {
+            root.loadActiveWindow(stdout.buffer);
+            stdout.buffer = "";
+        }
+    }
+
     RowLayout {
         id: barRow
         anchors {
@@ -310,8 +384,8 @@ PanelWindow {
 
         Rectangle {
             Layout.preferredHeight: Theme.pillHeight
-            Layout.maximumWidth: 420
-            Layout.preferredWidth: Math.min(titleText.implicitWidth + Theme.pad * 2, 420)
+            Layout.maximumWidth: 360
+            Layout.preferredWidth: Math.min(titleText.implicitWidth + Theme.pad * 2, 360)
             radius: Theme.radius
             color: Theme.panel
             border.color: Theme.border
@@ -332,6 +406,68 @@ PanelWindow {
 
         Item {
             Layout.fillWidth: true
+        }
+
+        Rectangle {
+            visible: root.mediaActive
+            Layout.preferredHeight: Theme.pillHeight
+            Layout.preferredWidth: Math.min(mediaRow.implicitWidth + Theme.pad * 2, 360)
+            radius: Theme.radius
+            color: Theme.panel
+            border.color: Theme.border
+            border.width: 1
+            clip: true
+
+            RowLayout {
+                id: mediaRow
+                anchors.centerIn: parent
+                spacing: 8
+
+                Text {
+                    text: "󰒮"
+                    color: root.mediaPlayer?.canGoPrevious ? Theme.muted : Theme.border
+                    font.family: Theme.font
+                    font.pixelSize: Theme.iconSize
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: root.mediaPlayer?.previous()
+                    }
+                }
+
+                Text {
+                    text: root.mediaPlaying ? "󰏤" : "󰐊"
+                    color: Theme.accent
+                    font.family: Theme.font
+                    font.pixelSize: Theme.iconSize
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: root.mediaPlayer?.togglePlaying()
+                    }
+                }
+
+                Text {
+                    text: "󰒭"
+                    color: root.mediaPlayer?.canGoNext ? Theme.muted : Theme.border
+                    font.family: Theme.font
+                    font.pixelSize: Theme.iconSize
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: root.mediaPlayer?.next()
+                    }
+                }
+
+                Text {
+                    Layout.maximumWidth: 230
+                    text: root.mediaLabel()
+                    color: Theme.muted
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSize
+                    elide: Text.ElideRight
+                }
+            }
         }
 
         RowLayout {
@@ -371,32 +507,47 @@ PanelWindow {
                 spacing: 9
 
                 Text {
-                    text: root.networkIcon()
+                    text: root.networkIcon() + " " + root.networkLabel()
                     color: root.network ? Theme.muted : Theme.danger
                     font.family: Theme.font
-                    font.pixelSize: Theme.iconSize
+                    font.pixelSize: Theme.fontSize
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: Quickshell.execDetached(["bash", "-lc", "uwsm app -- kitty --class nmtui -e nmtui"])
+                    }
                 }
 
                 Text {
-                    text: root.bluetoothIcon()
+                    text: root.bluetoothIcon() + " " + root.bluetoothLabel()
                     color: root.bluetoothConnected ? Theme.accent : Theme.muted
                     font.family: Theme.font
-                    font.pixelSize: Theme.iconSize
+                    font.pixelSize: Theme.fontSize
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: Quickshell.execDetached(["bash", "-lc", "uwsm app -- kitty --class bluetui -e bluetui"])
+                    }
                 }
 
                 Text {
-                    text: root.volumeIcon()
+                    text: root.volumeIcon() + " " + root.volumeLabel()
                     color: root.muted ? Theme.warning : Theme.muted
                     font.family: Theme.font
-                    font.pixelSize: Theme.iconSize
+                    font.pixelSize: Theme.fontSize
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: Quickshell.execDetached(["bash", "-lc", "uwsm app -- kitty --class wiremix -e wiremix"])
+                    }
                 }
 
                 Text {
                     visible: root.battery >= 0
-                    text: root.batteryIcon()
+                    text: root.batteryIcon() + " " + root.batteryLabel()
                     color: root.battery < 20 && !root.charging ? Theme.danger : Theme.muted
                     font.family: Theme.font
-                    font.pixelSize: Theme.iconSize
+                    font.pixelSize: Theme.fontSize
                 }
 
                 Text {
