@@ -16,6 +16,7 @@ one module at a time.
 - [Theme tokens](../../config/quickshell/Theme.qml)
 - [QML module index](../../config/quickshell/qmldir)
 - [Workspaces module](../../config/quickshell/modules/workspaces/Workspaces.qml)
+- [Window title module](../../config/quickshell/modules/window/WindowTitle.qml)
 
 ## Commands
 
@@ -128,6 +129,10 @@ module is ready to move.
   `Hyprland.dispatch("hl.dsp.focus({ workspace = ... })")`, because Hyprland
   0.55/Lua no longer accepts the old `hyprctl dispatch workspace N` shape.
   Delegate files that read outer IDs should use `pragma ComponentBehavior: Bound`.
+- 2026-05-17: `modules/window/WindowTitle.qml` owns active-window polling,
+  Hyprland active-window events, title normalization, and title rendering.
+  `Bar.qml` only places `WindowTitle {}`. This module has no pointer handlers or
+  masks; its bounds are the visible pill only.
 
 ## Known Lesson
 

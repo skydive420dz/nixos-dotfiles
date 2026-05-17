@@ -2,11 +2,11 @@ import "."
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Services.Mpris
 import Quickshell.Services.SystemTray
 import Quickshell.Wayland
+import "modules/window"
 import "modules/workspaces"
 
 PanelWindow {
@@ -30,8 +30,6 @@ PanelWindow {
         item: barRow
     }
 
-    property string activeClass: ""
-    property string activeTitle: ""
     property string clockText: ""
     property int volume: 0
     property bool muted: false
@@ -164,31 +162,6 @@ PanelWindow {
         ]);
     }
 
-    function windowLabel() {
-        if (!activeTitle)
-            return "Desktop";
-
-        var klass = activeClass.toLowerCase();
-        if (klass.indexOf("firefox") >= 0)
-            return activeTitle.replace(/ [—–] Mozilla Firefox$/, "").replace(/ Mozilla Firefox$/, "");
-        if (klass === "kitty")
-            return "Terminal";
-        if (klass === "vesktop" || klass === "discord")
-            return "Discord";
-        return activeTitle;
-    }
-
-    function loadActiveWindow(payload) {
-        try {
-            var win = JSON.parse(payload.trim());
-            root.activeClass = win.class ?? "";
-            root.activeTitle = win.title ?? "";
-        } catch (e) {
-            root.activeClass = "";
-            root.activeTitle = "";
-        }
-    }
-
     function networkIcon() {
         if (network === "ethernet")
             return "󰈀";
@@ -279,22 +252,6 @@ PanelWindow {
     Component.onCompleted: {
         updateClock();
         statusProc.running = true;
-        activeWindowProc.running = true;
-    }
-
-    Connections {
-        target: Hyprland
-
-        function onRawEvent(event) {
-            if (event.name === "activewindow") {
-                var active = event.data.split(",");
-                root.activeClass = active[0] ?? "";
-                root.activeTitle = active.slice(1).join(",") ?? "";
-            } else if (event.name === "closewindow") {
-                root.activeClass = "";
-                root.activeTitle = "";
-            }
-        }
     }
 
     Timer {
@@ -329,19 +286,6 @@ PanelWindow {
         }
         onExited: {
             root.parseKeyValue(stdout.buffer);
-            stdout.buffer = "";
-        }
-    }
-
-    Process {
-        id: activeWindowProc
-        command: ["hyprctl", "activewindow", "-j"]
-        stdout: SplitParser {
-            property string buffer: ""
-            onRead: data => buffer += data + "\n"
-        }
-        onExited: {
-            root.loadActiveWindow(stdout.buffer);
             stdout.buffer = "";
         }
     }
@@ -389,27 +333,7 @@ PanelWindow {
 
         Workspaces {}
 
-        Rectangle {
-            Layout.preferredHeight: Theme.pillHeight
-            Layout.maximumWidth: 360
-            Layout.preferredWidth: Math.min(titleText.implicitWidth + Theme.pad * 2, 360)
-            radius: Theme.radius
-            color: Theme.panel
-            border.color: Theme.border
-            border.width: 1
-            clip: true
-
-            Text {
-                id: titleText
-                anchors.centerIn: parent
-                width: Math.min(implicitWidth, parent.width - Theme.pad * 2)
-                text: root.windowLabel()
-                elide: Text.ElideRight
-                color: Theme.muted
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSize
-            }
-        }
+        WindowTitle {}
 
         Item {
             Layout.fillWidth: true
