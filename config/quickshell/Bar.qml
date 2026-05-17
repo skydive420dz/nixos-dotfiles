@@ -540,7 +540,7 @@ PanelWindow {
 
         Rectangle {
             Layout.preferredHeight: Theme.pillHeight
-            Layout.preferredWidth: 392
+            Layout.preferredWidth: 376
             radius: Theme.radius
             color: Theme.panel
             border.color: Theme.border
@@ -585,40 +585,44 @@ PanelWindow {
                     }
                 }
 
-                Text {
-                    text: root.volumeIcon() + " " + root.volumeLabel()
-                    Layout.preferredWidth: 52
-                    color: root.muted ? Theme.warning : Theme.muted
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSize
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
+                RowLayout {
+                    spacing: 3
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: Quickshell.execDetached(["bash", "-lc", "uwsm app -- kitty --class wiremix -e wiremix"])
+                    Text {
+                        text: root.volumeIcon() + " " + root.volumeLabel()
+                        Layout.preferredWidth: 48
+                        color: root.muted ? Theme.warning : Theme.muted
+                        font.family: Theme.font
+                        font.pixelSize: Theme.fontSize
+                        horizontalAlignment: Text.AlignLeft
+                        verticalAlignment: Text.AlignVCenter
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: Quickshell.execDetached(["bash", "-lc", "uwsm app -- kitty --class wiremix -e wiremix"])
+                        }
                     }
-                }
 
-                Text {
-                    visible: root.battery >= 0
-                    text: root.batteryIcon() + " " + root.batteryLabel()
-                    Layout.preferredWidth: 52
-                    color: root.battery < 20 && !root.charging ? Theme.danger : Theme.muted
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSize
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
-                }
+                    Text {
+                        visible: root.battery >= 0
+                        text: root.batteryIcon() + " " + root.batteryLabel()
+                        Layout.preferredWidth: 48
+                        color: root.battery < 20 && !root.charging ? Theme.danger : Theme.muted
+                        font.family: Theme.font
+                        font.pixelSize: Theme.fontSize
+                        horizontalAlignment: Text.AlignLeft
+                        verticalAlignment: Text.AlignVCenter
+                    }
 
-                Text {
-                    text: root.clockText
-                    Layout.preferredWidth: 108
-                    color: Theme.accent
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSize
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
+                    Text {
+                        text: root.clockText
+                        Layout.preferredWidth: 104
+                        color: Theme.accent
+                        font.family: Theme.font
+                        font.pixelSize: Theme.fontSize
+                        horizontalAlignment: Text.AlignLeft
+                        verticalAlignment: Text.AlignVCenter
+                    }
                 }
             }
         }
