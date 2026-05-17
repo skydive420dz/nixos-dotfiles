@@ -145,6 +145,19 @@ module is ready to move.
   controller id must not share the same name as `Bar.mediaController`, or the
   delegate binding can shadow itself and leave media hidden.
 
+## Test Notes
+
+- 2026-05-17: Workspace split tested live. Workspaces render, update, and switch
+  using Lua Hyprland dispatch. The visible button hitboxes match the interactive
+  area.
+- 2026-05-17: Window title split tested live. Title updates across window focus
+  and workspace changes, with no visible module interference.
+- 2026-05-17: Media split tested live. Media pill appears and collapses with
+  active player state, play/pause works, prev/next controls work, and the
+  duplicate `media` IPC handler warning is gone after restart. Remaining Firefox
+  MPRIS `Position` DBus warnings appear to be player-side churn, not shell
+  structure breakage.
+
 ## Known Lesson
 
 The HDMI/HDR flicker investigation currently points at per-output `awww`
