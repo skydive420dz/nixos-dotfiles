@@ -164,6 +164,10 @@ module is ready to move.
   duplicate `media` IPC handler warning is gone after restart. Remaining Firefox
   MPRIS `Position` DBus warnings appear to be player-side churn, not shell
   structure breakage.
+- 2026-05-17: Status cluster split tested live. Configuration loads cleanly after
+  restart and status behavior appears intact: clock/status rendering, network,
+  bluetooth, volume, battery, and app-launch clicks continue to work. Polling
+  remains unchanged from the pre-split implementation.
 
 ## Known Lesson
 
