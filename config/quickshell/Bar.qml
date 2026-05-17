@@ -545,6 +545,7 @@ PanelWindow {
             color: Theme.panel
             border.color: Theme.border
             border.width: 1
+            clip: true
 
             RowLayout {
                 id: statusRow
@@ -556,7 +557,7 @@ PanelWindow {
                 Text {
                     text: root.networkIcon() + (root.networkLabel() ? " " + root.networkLabel() : "")
                     Layout.fillWidth: true
-                    Layout.minimumWidth: 94
+                    Layout.minimumWidth: 72
                     color: root.network ? Theme.muted : Theme.danger
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -616,11 +617,11 @@ PanelWindow {
 
                     Text {
                         text: root.clockText
-                        Layout.preferredWidth: 104
+                        Layout.preferredWidth: 124
                         color: Theme.accent
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSize
-                        horizontalAlignment: Text.AlignLeft
+                        horizontalAlignment: Text.AlignRight
                         verticalAlignment: Text.AlignVCenter
                     }
                 }
