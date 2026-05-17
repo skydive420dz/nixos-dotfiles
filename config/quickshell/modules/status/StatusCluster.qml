@@ -210,7 +210,11 @@ Rectangle {
 
     Component.onCompleted: {
         updateClock();
-        statusProc.running = true;
+        volumeProc.running = true;
+        networkInfoProc.running = true;
+        trafficProc.running = true;
+        bluetoothProc.running = true;
+        batteryProc.running = true;
     }
 
     Timer {
@@ -223,21 +227,134 @@ Rectangle {
     }
 
     Timer {
+        id: volumeTimer
         interval: 2000
         repeat: true
         running: true
         onTriggered: {
-            if (!statusProc.running)
-                statusProc.running = true;
+            if (!volumeProc.running)
+                volumeProc.running = true;
+        }
+    }
+
+    Timer {
+        id: trafficTimer
+        interval: 2000
+        repeat: true
+        running: true
+        onTriggered: {
+            if (!trafficProc.running)
+                trafficProc.running = true;
+        }
+    }
+
+    Timer {
+        id: networkInfoTimer
+        interval: 15000
+        repeat: true
+        running: true
+        onTriggered: {
+            if (!networkInfoProc.running)
+                networkInfoProc.running = true;
+        }
+    }
+
+    Timer {
+        id: batteryTimer
+        interval: 10000
+        repeat: true
+        running: true
+        onTriggered: {
+            if (!batteryProc.running)
+                batteryProc.running = true;
+        }
+    }
+
+    Timer {
+        id: bluetoothTimer
+        interval: 30000
+        repeat: true
+        running: true
+        onTriggered: {
+            if (!bluetoothProc.running)
+                bluetoothProc.running = true;
         }
     }
 
     Process {
-        id: statusProc
+        id: volumeProc
         command: [
             "bash",
             "-lc",
-            "vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true); muted=0; case \"$vol\" in *MUTED*) muted=1;; esac; level=$(awk '{ printf \"%d\", ($2+0)*100 }' <<<\"$vol\"); netrow=$(nmcli -t -f DEVICE,TYPE,STATE device status 2>/dev/null | awk -F: '$3==\"connected\"{print $1\":\"$2; exit}'); netdev=${netrow%%:*}; net=${netrow#*:}; rx=0; tx=0; if [ -n \"$netdev\" ] && [ -r \"/sys/class/net/$netdev/statistics/rx_bytes\" ]; then rx=$(cat \"/sys/class/net/$netdev/statistics/rx_bytes\"); tx=$(cat \"/sys/class/net/$netdev/statistics/tx_bytes\"); fi; bt=0; btconn=0; if command -v bluetoothctl >/dev/null 2>&1 && bluetoothctl show >/dev/null 2>&1; then bt=1; bluetoothctl devices Connected 2>/dev/null | grep -q . && btconn=1; fi; bat=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n1); stat=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n1); charging=0; [ \"$stat\" = Charging ] && charging=1; printf 'volume=%s\\nmuted=%s\\nnetwork=%s\\nnetwork_device=%s\\nrx_bytes=%s\\ntx_bytes=%s\\nbluetooth=%s\\nbluetooth_connected=%s\\nbattery=%s\\ncharging=%s\\nbattery_status=%s\\n' \"${level:-0}\" \"$muted\" \"${net:-}\" \"${netdev:-}\" \"$rx\" \"$tx\" \"$bt\" \"$btconn\" \"${bat:--1}\" \"$charging\" \"${stat:-}\""
+            "vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true); muted=0; case \"$vol\" in *MUTED*) muted=1;; esac; level=$(awk '{ printf \"%d\", ($2+0)*100 }' <<<\"$vol\"); printf 'volume=%s\\nmuted=%s\\n' \"${level:-0}\" \"$muted\""
+        ]
+        stdout: SplitParser {
+            property string buffer: ""
+            onRead: data => buffer += data + "\n"
+        }
+        onExited: {
+            root.parseKeyValue(stdout.buffer);
+            stdout.buffer = "";
+        }
+    }
+
+    Process {
+        id: networkInfoProc
+        command: [
+            "bash",
+            "-lc",
+            "netrow=$(nmcli -t -f DEVICE,TYPE,STATE device status 2>/dev/null | awk -F: '$3==\"connected\"{print $1\":\"$2; exit}'); netdev=${netrow%%:*}; net=${netrow#*:}; if [ \"$netdev\" = \"$net\" ]; then netdev=; net=; fi; printf 'network=%s\\nnetwork_device=%s\\n' \"${net:-}\" \"${netdev:-}\""
+        ]
+        stdout: SplitParser {
+            property string buffer: ""
+            onRead: data => buffer += data + "\n"
+        }
+        onExited: {
+            root.parseKeyValue(stdout.buffer);
+            stdout.buffer = "";
+        }
+    }
+
+    Process {
+        id: trafficProc
+        command: [
+            "bash",
+            "-lc",
+            "dev=" + JSON.stringify(root.networkDevice) + "; rx=0; tx=0; if [ -n \"$dev\" ] && [ -r \"/sys/class/net/$dev/statistics/rx_bytes\" ]; then rx=$(cat \"/sys/class/net/$dev/statistics/rx_bytes\"); tx=$(cat \"/sys/class/net/$dev/statistics/tx_bytes\"); fi; printf 'rx_bytes=%s\\ntx_bytes=%s\\n' \"$rx\" \"$tx\""
+        ]
+        stdout: SplitParser {
+            property string buffer: ""
+            onRead: data => buffer += data + "\n"
+        }
+        onExited: {
+            root.parseKeyValue(stdout.buffer);
+            stdout.buffer = "";
+        }
+    }
+
+    Process {
+        id: bluetoothProc
+        command: [
+            "bash",
+            "-lc",
+            "bt=0; btconn=0; if command -v bluetoothctl >/dev/null 2>&1 && bluetoothctl show >/dev/null 2>&1; then bt=1; bluetoothctl devices Connected 2>/dev/null | grep -q . && btconn=1; fi; printf 'bluetooth=%s\\nbluetooth_connected=%s\\n' \"$bt\" \"$btconn\""
+        ]
+        stdout: SplitParser {
+            property string buffer: ""
+            onRead: data => buffer += data + "\n"
+        }
+        onExited: {
+            root.parseKeyValue(stdout.buffer);
+            stdout.buffer = "";
+        }
+    }
+
+    Process {
+        id: batteryProc
+        command: [
+            "bash",
+            "-lc",
+            "bat=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n1); stat=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n1); charging=0; [ \"$stat\" = Charging ] && charging=1; printf 'battery=%s\\ncharging=%s\\nbattery_status=%s\\n' \"${bat:--1}\" \"$charging\" \"${stat:-}\""
         ]
         stdout: SplitParser {
             property string buffer: ""

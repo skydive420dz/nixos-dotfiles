@@ -151,6 +151,12 @@ module is ready to move.
   `nmtui`, `bluetui`, and `wiremix`. `Bar.qml` only places `StatusCluster {}`.
   Polling is intentionally unchanged in the extraction slice; optimize it only
   after the module passes live testing.
+- 2026-05-17: Status polling was split after the extraction passed live testing.
+  Keep the fast loop limited to cheap, visible-changing state: volume and
+  traffic every 2s. Slower probes now run separately: network identity every
+  15s, battery every 10s, and bluetooth every 30s. This keeps service-heavy
+  checks like `nmcli` and `bluetoothctl` out of the hot path without changing
+  bar geometry or click targets.
 
 ## Test Notes
 
