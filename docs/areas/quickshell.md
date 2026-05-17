@@ -17,6 +17,7 @@ one module at a time.
 - [QML module index](../../config/quickshell/qmldir)
 - [Media module](../../config/quickshell/modules/media/Media.qml)
 - [Media controller](../../config/quickshell/modules/media/MediaController.qml)
+- [Status cluster](../../config/quickshell/modules/status/StatusCluster.qml)
 - [Workspaces module](../../config/quickshell/modules/workspaces/Workspaces.qml)
 - [Window title module](../../config/quickshell/modules/window/WindowTitle.qml)
 
@@ -144,6 +145,12 @@ module is ready to move.
   visually present instead of collapsing or blending into the border. The root
   controller id must not share the same name as `Bar.mediaController`, or the
   delegate binding can shadow itself and leave media hidden.
+- 2026-05-17: `modules/status/StatusCluster.qml` owns the current status
+  behavior unchanged: clock, volume, network traffic, bluetooth, battery,
+  battery plug/unplug OSD triggers, status polling, and click launchers for
+  `nmtui`, `bluetui`, and `wiremix`. `Bar.qml` only places `StatusCluster {}`.
+  Polling is intentionally unchanged in the extraction slice; optimize it only
+  after the module passes live testing.
 
 ## Test Notes
 
