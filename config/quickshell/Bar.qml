@@ -48,7 +48,7 @@ PanelWindow {
     property bool charging: false
     property string batteryStatus: ""
     property bool batteryStatusReady: false
-    property var mediaController: null
+    required property var mediaController
 
     function parseKeyValue(text) {
         var rows = text.trim().split("\n");

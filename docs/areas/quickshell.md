@@ -139,7 +139,9 @@ module is ready to move.
   controls. `modules/media/MediaController.qml` lives once at `ShellRoot` and
   owns player selection plus the `media.playPause` IPC target, avoiding duplicate
   `IpcHandler` registration from per-monitor bars. Inactive media has zero layout
-  width, and prev/next only accept clicks when the player supports them.
+  width, and prev/next only accept clicks when the player supports them. The
+  root controller id must not share the same name as `Bar.mediaController`, or
+  the delegate binding can shadow itself and leave media hidden.
 
 ## Known Lesson
 

@@ -3,7 +3,7 @@ import "modules/media"
 
 ShellRoot {
     MediaController {
-        id: mediaController
+        id: rootMediaController
     }
 
     Variants {
@@ -11,7 +11,7 @@ ShellRoot {
         delegate: Bar {
             required property var modelData
             screen: modelData
-            mediaController: mediaController
+            mediaController: rootMediaController
         }
     }
 
