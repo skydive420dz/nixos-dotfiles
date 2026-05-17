@@ -69,7 +69,7 @@ PanelWindow {
     Rectangle {
         id: card
         width: 230
-        height: root.value >= 0 ? 74 : 54
+        height: root.value >= 0 ? 82 : 58
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: Theme.barHeight + 10
@@ -86,6 +86,7 @@ PanelWindow {
 
             RowLayout {
                 Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
                 spacing: 10
 
                 Text {
@@ -96,12 +97,13 @@ PanelWindow {
                 }
 
                 Text {
-                    Layout.fillWidth: true
+                    Layout.preferredWidth: Math.min(implicitWidth, 160)
                     text: root.title
                     color: Theme.text
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
                     elide: Text.ElideRight
+                    horizontalAlignment: Text.AlignHCenter
                 }
             }
 

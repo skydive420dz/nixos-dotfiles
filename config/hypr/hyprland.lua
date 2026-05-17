@@ -285,3 +285,10 @@ centered_float({
 	size = { 700, 500 },
 	opacity = opacity.solid,
 })
+
+hl.layer_rule({
+	name = "qs_bar_blur",
+	match = { namespace = "^qs-bar$" },
+	blur = true,
+	ignore_alpha = 0,
+})

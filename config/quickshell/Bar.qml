@@ -37,6 +37,14 @@ PanelWindow {
     property int volume: 0
     property bool muted: false
     property string network: ""
+    property string networkDevice: ""
+    property double networkRxBytes: 0
+    property double networkTxBytes: 0
+    property double networkLastRxBytes: 0
+    property double networkLastTxBytes: 0
+    property double networkLastSampleMs: 0
+    property string networkDownRate: ""
+    property string networkUpRate: ""
     property bool bluetoothAvailable: false
     property bool bluetoothConnected: false
     property int battery: -1
@@ -73,6 +81,12 @@ PanelWindow {
                 root.muted = value === "1";
             else if (key === "network")
                 root.network = value;
+            else if (key === "network_device")
+                root.networkDevice = value;
+            else if (key === "rx_bytes")
+                root.updateNetworkRate("rx", Number(value));
+            else if (key === "tx_bytes")
+                root.updateNetworkRate("tx", Number(value));
             else if (key === "bluetooth")
                 root.bluetoothAvailable = value === "1";
             else if (key === "bluetooth_connected")
@@ -81,6 +95,39 @@ PanelWindow {
                 root.battery = parseInt(value);
             else if (key === "charging")
                 root.charging = value === "1";
+        }
+    }
+
+    function formatRate(bytesPerSecond) {
+        if (!Number.isFinite(bytesPerSecond) || bytesPerSecond < 1)
+            return "0";
+        if (bytesPerSecond < 1024)
+            return Math.round(bytesPerSecond) + "B";
+        if (bytesPerSecond < 1024 * 1024)
+            return Math.round(bytesPerSecond / 1024) + "K";
+        return (bytesPerSecond / 1024 / 1024).toFixed(1) + "M";
+    }
+
+    function updateNetworkRate(kind, value) {
+        var now = Date.now();
+        if (!Number.isFinite(value))
+            value = 0;
+
+        if (kind === "rx") {
+            if (networkLastSampleMs > 0 && networkLastRxBytes > 0) {
+                var rxElapsed = Math.max((now - networkLastSampleMs) / 1000, 1);
+                networkDownRate = formatRate(Math.max(0, value - networkLastRxBytes) / rxElapsed);
+            }
+            networkRxBytes = value;
+            networkLastRxBytes = value;
+        } else {
+            if (networkLastSampleMs > 0 && networkLastTxBytes > 0) {
+                var txElapsed = Math.max((now - networkLastSampleMs) / 1000, 1);
+                networkUpRate = formatRate(Math.max(0, value - networkLastTxBytes) / txElapsed);
+            }
+            networkTxBytes = value;
+            networkLastTxBytes = value;
+            networkLastSampleMs = now;
         }
     }
 
@@ -118,11 +165,9 @@ PanelWindow {
     }
 
     function networkLabel() {
-        if (network === "ethernet")
-            return "Eth";
-        if (network === "wifi")
-            return "Wi-Fi";
-        return "Off";
+        if (!network)
+            return "";
+        return "↓" + (networkDownRate || "0") + " ↑" + (networkUpRate || "0");
     }
 
     function bluetoothIcon() {
@@ -185,7 +230,7 @@ PanelWindow {
 
     function updateClock() {
         var date = new Date();
-        root.clockText = Qt.formatDateTime(date, "MMM d  HH:mm");
+        root.clockText = Qt.formatDateTime(date, "ddd MMM d  HH:mm");
     }
 
     Component.onCompleted: {
@@ -228,7 +273,7 @@ PanelWindow {
     }
 
     Timer {
-        interval: 5000
+        interval: 2000
         repeat: true
         running: true
         onTriggered: {
@@ -273,7 +318,7 @@ PanelWindow {
         command: [
             "bash",
             "-lc",
-            "vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true); muted=0; case \"$vol\" in *MUTED*) muted=1;; esac; level=$(awk '{ printf \"%d\", ($2+0)*100 }' <<<\"$vol\"); net=$(nmcli -t -f TYPE,STATE device status 2>/dev/null | awk -F: '$2==\"connected\"{print $1; exit}'); bt=0; btconn=0; if command -v bluetoothctl >/dev/null 2>&1 && bluetoothctl show >/dev/null 2>&1; then bt=1; bluetoothctl devices Connected 2>/dev/null | grep -q . && btconn=1; fi; bat=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n1); stat=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n1); charging=0; [ \"$stat\" = Charging ] && charging=1; printf 'volume=%s\\nmuted=%s\\nnetwork=%s\\nbluetooth=%s\\nbluetooth_connected=%s\\nbattery=%s\\ncharging=%s\\n' \"${level:-0}\" \"$muted\" \"${net:-}\" \"$bt\" \"$btconn\" \"${bat:--1}\" \"$charging\""
+            "vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true); muted=0; case \"$vol\" in *MUTED*) muted=1;; esac; level=$(awk '{ printf \"%d\", ($2+0)*100 }' <<<\"$vol\"); netrow=$(nmcli -t -f DEVICE,TYPE,STATE device status 2>/dev/null | awk -F: '$3==\"connected\"{print $1\":\"$2; exit}'); netdev=${netrow%%:*}; net=${netrow#*:}; rx=0; tx=0; if [ -n \"$netdev\" ] && [ -r \"/sys/class/net/$netdev/statistics/rx_bytes\" ]; then rx=$(cat \"/sys/class/net/$netdev/statistics/rx_bytes\"); tx=$(cat \"/sys/class/net/$netdev/statistics/tx_bytes\"); fi; bt=0; btconn=0; if command -v bluetoothctl >/dev/null 2>&1 && bluetoothctl show >/dev/null 2>&1; then bt=1; bluetoothctl devices Connected 2>/dev/null | grep -q . && btconn=1; fi; bat=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n1); stat=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n1); charging=0; [ \"$stat\" = Charging ] && charging=1; printf 'volume=%s\\nmuted=%s\\nnetwork=%s\\nnetwork_device=%s\\nrx_bytes=%s\\ntx_bytes=%s\\nbluetooth=%s\\nbluetooth_connected=%s\\nbattery=%s\\ncharging=%s\\n' \"${level:-0}\" \"$muted\" \"${net:-}\" \"${netdev:-}\" \"$rx\" \"$tx\" \"$bt\" \"$btconn\" \"${bat:--1}\" \"$charging\""
         ]
         stdout: SplitParser {
             property string buffer: ""
@@ -507,7 +552,7 @@ PanelWindow {
                 spacing: 9
 
                 Text {
-                    text: root.networkIcon() + " " + root.networkLabel()
+                    text: root.networkIcon() + (root.networkLabel() ? " " + root.networkLabel() : "")
                     color: root.network ? Theme.muted : Theme.danger
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -519,7 +564,7 @@ PanelWindow {
                 }
 
                 Text {
-                    text: root.bluetoothIcon() + " " + root.bluetoothLabel()
+                    text: root.bluetoothIcon()
                     color: root.bluetoothConnected ? Theme.accent : Theme.muted
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
