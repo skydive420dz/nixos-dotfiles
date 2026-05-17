@@ -71,11 +71,18 @@ PanelWindow {
 
     function focusedScreen() {
         var monitorName = Hyprland.focusedMonitor?.name ?? "";
+        var screen = screenByName(monitorName);
+        return screen ?? root.screen;
+    }
+
+    function screenByName(screenName) {
+        if (!screenName || screenName.length === 0)
+            return null;
         for (var i = 0; i < Quickshell.screens.length; i++) {
-            if (Quickshell.screens[i].name === monitorName)
+            if (Quickshell.screens[i].name === screenName)
                 return Quickshell.screens[i];
         }
-        return root.screen;
+        return null;
     }
 
     function toggle(targetScreen) {
@@ -205,7 +212,21 @@ PanelWindow {
         path: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-launcher-toggle"
         watchChanges: true
         printErrors: false
-        onFileChanged: root.toggle()
+        onFileChanged: targetScreenProc.running = true
+    }
+
+    Process {
+        id: targetScreenProc
+        command: ["bash", "-lc", "cat \"${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/qs-launcher-target\" 2>/dev/null || true"]
+        stdout: SplitParser {
+            property string buffer: ""
+            onRead: data => buffer += data
+        }
+        onExited: {
+            var screenName = stdout.buffer.trim();
+            stdout.buffer = "";
+            root.toggle(screenByName(screenName));
+        }
     }
 
     Timer {

@@ -22,7 +22,7 @@ local browser = "uwsm app -- firefox"
 local menu = "~/.config/scripts/launcher-toggle"
 local clipboard = "~/.config/scripts/clipboard-toggle"
 local snip = "grimblast copy area"
-local reload_shell = "systemctl --user restart quickshell"
+local reload_shell = "systemctl --user restart quickshell quickshell-launcher quickshell-clipboard quickshell-osd"
 
 hl.monitor({
 	output = "eDP-1",

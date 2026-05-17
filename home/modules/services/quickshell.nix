@@ -1,16 +1,46 @@
 { pkgs, ... }:
 
+let
+  quickshell = "${pkgs.quickshell}/bin/quickshell";
+
+  mkQuickshellService =
+    {
+      description,
+      path,
+    }:
+    {
+      Unit = {
+        Description = description;
+        After = [ "graphical-session.target" ];
+        PartOf = [ "graphical-session.target" ];
+      };
+      Service = {
+        ExecStart = "${quickshell} -p ${path}";
+        Restart = "on-failure";
+      };
+      Install.WantedBy = [ "graphical-session.target" ];
+    };
+in
 {
-  systemd.user.services.quickshell = {
-    Unit = {
-      Description = "Quickshell bar";
-      After = [ "graphical-session.target" ];
-      PartOf = [ "graphical-session.target" ];
+  systemd.user.services = {
+    quickshell = mkQuickshellService {
+      description = "Quickshell bar";
+      path = "%h/.config/quickshell";
     };
-    Service = {
-      ExecStart = "${pkgs.quickshell}/bin/quickshell -p %h/.config/quickshell";
-      Restart = "on-failure";
+
+    quickshell-launcher = mkQuickshellService {
+      description = "Quickshell launcher";
+      path = "%h/.config/quickshell/launcher";
     };
-    Install.WantedBy = [ "graphical-session.target" ];
+
+    quickshell-clipboard = mkQuickshellService {
+      description = "Quickshell clipboard";
+      path = "%h/.config/quickshell/clipboard";
+    };
+
+    quickshell-osd = mkQuickshellService {
+      description = "Quickshell OSD";
+      path = "%h/.config/quickshell/osd";
+    };
   };
 }

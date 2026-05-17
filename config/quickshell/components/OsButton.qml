@@ -1,5 +1,6 @@
 import ".."
 import QtQuick
+import Quickshell
 
 Rectangle {
     id: root
@@ -12,7 +13,6 @@ Rectangle {
     border.width: 1
 
     property bool hovered: false
-    property var launcher: null
     property var targetScreen: null
 
     Behavior on color {
@@ -35,6 +35,12 @@ Rectangle {
         hoverEnabled: true
         onEntered: root.hovered = true
         onExited: root.hovered = false
-        onClicked: root.launcher?.toggle(root.targetScreen)
+        onClicked: Quickshell.execDetached([
+            "bash",
+            "-lc",
+            "$HOME/.config/scripts/launcher-toggle \"$1\"",
+            "launcher-toggle",
+            root.targetScreen?.name ?? ""
+        ])
     }
 }

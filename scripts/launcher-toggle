@@ -2,5 +2,7 @@
 set -euo pipefail
 
 runtime_dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+target_screen="${1:-}"
 mkdir -p "$runtime_dir"
+printf '%s\n' "$target_screen" > "$runtime_dir/qs-launcher-target"
 printf '%s\n' "$(date +%s%N)" > "$runtime_dir/qs-launcher-toggle"
