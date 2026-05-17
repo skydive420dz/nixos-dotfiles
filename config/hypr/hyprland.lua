@@ -49,7 +49,7 @@ hl.monitor({
 	sdrbrightness = 0.6,
 	sdrsaturation = 1.15,
 	supports_wide_color = 1,
-	supports_hdr = 1,
+	supports_hdr = 0,
 	sdr_min_luminance = 0.001,
 	sdr_max_luminance = 450,
 	vrr = 1,
