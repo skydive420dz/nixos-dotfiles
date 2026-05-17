@@ -24,9 +24,16 @@ Rectangle {
 
     property int activeWorkspace: Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1
     property var occupiedWorkspaces: ({})
+    property int targetWorkspace: 1
 
     function refreshWorkspaces() {
         workspaceTimer.restart();
+    }
+
+    function switchWorkspace(workspaceId) {
+        targetWorkspace = workspaceId;
+        if (!switchWorkspaceProc.running)
+            switchWorkspaceProc.running = true;
     }
 
     Component.onCompleted: refreshWorkspaces()
@@ -78,6 +85,12 @@ Rectangle {
         }
     }
 
+    Process {
+        id: switchWorkspaceProc
+        command: ["hyprctl", "dispatch", "workspace", root.targetWorkspace.toString()]
+        onExited: root.refreshWorkspaces()
+    }
+
     RowLayout {
         id: workspaceRow
         anchors.centerIn: parent
@@ -113,7 +126,10 @@ Rectangle {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: Quickshell.execDetached(["hyprctl", "dispatch", "workspace", workspaceButton.workspaceId.toString()])
+                    onPressed: mouse => {
+                        root.switchWorkspace(workspaceButton.workspaceId);
+                        mouse.accepted = true;
+                    }
                 }
             }
         }
