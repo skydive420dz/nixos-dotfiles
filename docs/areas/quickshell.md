@@ -174,6 +174,10 @@ module is ready to move.
   restart and status behavior appears intact: clock/status rendering, network,
   bluetooth, volume, battery, and app-launch clicks continue to work. Polling
   remains unchanged from the pre-split implementation.
+- 2026-05-17: Status polling split tested live after `nrs`. Quickshell reloads
+  cleanly with `Configuration Loaded`, and the latest journal output shows no new
+  status errors. Historical media/import warnings in the same journal tail were
+  from earlier iterations, not the polling split.
 
 ## Known Lesson
 
