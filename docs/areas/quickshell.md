@@ -181,6 +181,9 @@ module is ready to move.
   cleanly with `Configuration Loaded`, and the latest journal output shows no new
   status errors. Historical media/import warnings in the same journal tail were
   from earlier iterations, not the polling split.
+- 2026-05-17: Fixed-width network traffic labels tested live after reload.
+  Quickshell reports `Configuration Loaded` with no new warnings from the
+  formatter-only change.
 
 ## Known Lesson
 
