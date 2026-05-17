@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import "../.."
 import QtQuick
 import QtQuick.Layouts
@@ -25,10 +27,6 @@ Rectangle {
 
     function refreshWorkspaces() {
         workspaceTimer.restart();
-    }
-
-    function switchWorkspace(workspaceId) {
-        Quickshell.execDetached(["hyprctl", "dispatch", "workspace", workspaceId.toString()]);
     }
 
     Component.onCompleted: refreshWorkspaces()
@@ -115,7 +113,7 @@ Rectangle {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: root.switchWorkspace(workspaceButton.workspaceId)
+                    onClicked: Quickshell.execDetached(["hyprctl", "dispatch", "workspace", workspaceButton.workspaceId.toString()])
                 }
             }
         }
