@@ -17,6 +17,7 @@ one module at a time.
 - [QML module index](../../config/quickshell/qmldir)
 - [Media module](../../config/quickshell/modules/media/Media.qml)
 - [Media controller](../../config/quickshell/modules/media/MediaController.qml)
+- [OSD view](../../config/quickshell/modules/osd/OsdView.qml)
 - [Status cluster](../../config/quickshell/modules/status/StatusCluster.qml)
 - [Workspaces module](../../config/quickshell/modules/workspaces/Workspaces.qml)
 - [Window title module](../../config/quickshell/modules/window/WindowTitle.qml)
@@ -163,6 +164,11 @@ module is ready to move.
 - 2026-05-17: The status pill grew from 324px to 340px and the network field
   minimum grew from 64px to 80px to fit the fixed-width traffic labels without
   clipping the clock/status fields.
+- 2026-05-17: `Osd.qml` now owns only the top-level overlay layer, namespace,
+  focus policy, and mask. `modules/osd/OsdView.qml` owns the signal watcher,
+  JSON load process, hide timer, payload state, and card rendering. The root OSD
+  mask still points to the visible card through `osdView.maskItem`, so this split
+  should not expand the clickable/input region.
 
 ## Test Notes
 
