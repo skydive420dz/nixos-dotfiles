@@ -202,6 +202,9 @@ module is ready to move.
   build results.
 - 2026-05-17: OSD view split tested live. Volume, brightness, and battery OSD
   behavior passed, and Quickshell reloads cleanly with `Configuration Loaded`.
+- 2026-05-17: Root surface migration tested live after restart. Bar and OSD
+  behavior stayed consistent, and Quickshell starts cleanly with
+  `Configuration Loaded`.
 
 ## Known Lesson
 
