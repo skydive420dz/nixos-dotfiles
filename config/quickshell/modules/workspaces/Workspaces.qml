@@ -8,19 +8,27 @@ import Quickshell.Io
 Rectangle {
     id: root
 
-    Layout.preferredHeight: Theme.pillHeight
-    Layout.preferredWidth: workspaceRow.implicitWidth + Theme.pad * 2
+    implicitWidth: workspaceRow.implicitWidth + Theme.pad * 2
+    implicitHeight: Theme.pillHeight
+    Layout.preferredWidth: implicitWidth
+    Layout.preferredHeight: implicitHeight
+    Layout.alignment: Qt.AlignVCenter
 
     radius: Theme.radius
     color: Theme.panel
     border.color: Theme.border
     border.width: 1
+    clip: true
 
     property int activeWorkspace: Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1
     property var occupiedWorkspaces: ({})
 
     function refreshWorkspaces() {
         workspaceTimer.restart();
+    }
+
+    function switchWorkspace(workspaceId) {
+        Quickshell.execDetached(["hyprctl", "dispatch", "workspace", workspaceId.toString()]);
     }
 
     Component.onCompleted: refreshWorkspaces()
@@ -80,27 +88,34 @@ Rectangle {
         Repeater {
             model: 9
             delegate: Rectangle {
+                id: workspaceButton
+
                 required property int index
                 readonly property int workspaceId: index + 1
                 readonly property bool active: root.activeWorkspace === workspaceId
                 readonly property bool occupied: root.occupiedWorkspaces[workspaceId] ?? false
 
+                implicitWidth: active ? 25 : 16
+                implicitHeight: 16
                 Layout.preferredWidth: active ? 25 : 16
                 Layout.preferredHeight: 16
                 radius: Theme.radiusSmall
                 color: active ? Theme.accent : occupied ? Theme.border : Theme.bg
+                clip: true
 
                 Text {
                     anchors.centerIn: parent
-                    text: parent.workspaceId
-                    color: parent.active ? Theme.bg : Theme.muted
+                    text: workspaceButton.workspaceId
+                    color: workspaceButton.active ? Theme.bg : Theme.muted
                     font.family: Theme.font
                     font.pixelSize: 10
                 }
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: Quickshell.execDetached(["hyprctl", "dispatch", "workspace", parent.workspaceId.toString()])
+                    acceptedButtons: Qt.LeftButton
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.switchWorkspace(workspaceButton.workspaceId)
                 }
             }
         }
