@@ -7,7 +7,7 @@ import Quickshell.Io
 Rectangle {
     id: root
 
-    implicitWidth: 348
+    implicitWidth: 340
     implicitHeight: Theme.pillHeight
     Layout.preferredWidth: implicitWidth
     Layout.preferredHeight: implicitHeight
@@ -387,7 +387,7 @@ Rectangle {
         Text {
             text: root.networkIcon() + (root.networkLabel() ? " " + root.networkLabel() : "")
             Layout.fillWidth: true
-            Layout.minimumWidth: 88
+            Layout.minimumWidth: 80
             color: root.network ? Theme.muted : Theme.danger
             font.family: Theme.font
             font.pixelSize: Theme.fontSize
