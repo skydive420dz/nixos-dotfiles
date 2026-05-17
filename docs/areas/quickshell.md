@@ -15,6 +15,7 @@ one module at a time.
 - [OSD](../../config/quickshell/Osd.qml)
 - [Theme tokens](../../config/quickshell/Theme.qml)
 - [QML module index](../../config/quickshell/qmldir)
+- [Workspaces module](../../config/quickshell/modules/workspaces/Workspaces.qml)
 
 ## Commands
 
@@ -113,6 +114,12 @@ module is ready to move.
 4. After each slice, rebuild/restart and test clicks, hover, focus, and monitor
    behavior before continuing.
 5. Commit each stable slice separately.
+
+## Refactor Progress
+
+- 2026-05-17: `modules/workspaces/Workspaces.qml` owns workspace state,
+  `hyprctl workspaces -j` polling, Hyprland workspace events, rendering, and
+  workspace click dispatch. `Bar.qml` only places `Workspaces {}`.
 
 ## Known Lesson
 
