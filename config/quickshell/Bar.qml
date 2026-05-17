@@ -3,9 +3,9 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
-import Quickshell.Services.Mpris
 import Quickshell.Services.SystemTray
 import Quickshell.Wayland
+import "modules/media"
 import "modules/window"
 import "modules/workspaces"
 
@@ -48,20 +48,7 @@ PanelWindow {
     property bool charging: false
     property string batteryStatus: ""
     property bool batteryStatusReady: false
-    property MprisPlayer mediaPlayer: {
-        var players = Mpris.players.values;
-        for (var i = 0; i < players.length; i++) {
-            if (players[i].playbackState === MprisPlaybackState.Playing)
-                return players[i];
-        }
-        for (var j = 0; j < players.length; j++) {
-            if (players[j].playbackState === MprisPlaybackState.Paused)
-                return players[j];
-        }
-        return null;
-    }
-    readonly property bool mediaActive: mediaPlayer !== null
-    readonly property bool mediaPlaying: mediaPlayer?.playbackState === MprisPlaybackState.Playing
+    property var mediaController: null
 
     function parseKeyValue(text) {
         var rows = text.trim().split("\n");
@@ -228,22 +215,6 @@ PanelWindow {
         return battery + "%";
     }
 
-    function mediaLabel() {
-        if (!mediaPlayer)
-            return "";
-        var title = mediaPlayer.trackTitle || mediaPlayer.identity || "Media";
-        var artist = mediaPlayer.trackArtist || "";
-        return artist ? title + " - " + artist : title;
-    }
-
-    IpcHandler {
-        target: "media"
-
-        function playPause(): void {
-            root.mediaPlayer?.togglePlaying();
-        }
-    }
-
     function updateClock() {
         var date = new Date();
         root.clockText = Qt.formatDateTime(date, "ddd MMM d  HH:mm");
@@ -339,66 +310,8 @@ PanelWindow {
             Layout.fillWidth: true
         }
 
-        Rectangle {
-            visible: root.mediaActive
-            Layout.preferredHeight: Theme.pillHeight
-            Layout.preferredWidth: Math.min(mediaRow.implicitWidth + Theme.pad * 2, 360)
-            radius: Theme.radius
-            color: Theme.panel
-            border.color: Theme.border
-            border.width: 1
-            clip: true
-
-            RowLayout {
-                id: mediaRow
-                anchors.centerIn: parent
-                spacing: 8
-
-                Text {
-                    text: "󰒮"
-                    color: root.mediaPlayer?.canGoPrevious ? Theme.muted : Theme.border
-                    font.family: Theme.font
-                    font.pixelSize: Theme.iconSize
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: root.mediaPlayer?.previous()
-                    }
-                }
-
-                Text {
-                    text: root.mediaPlaying ? "󰏤" : "󰐊"
-                    color: Theme.accent
-                    font.family: Theme.font
-                    font.pixelSize: Theme.iconSize
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: root.mediaPlayer?.togglePlaying()
-                    }
-                }
-
-                Text {
-                    text: "󰒭"
-                    color: root.mediaPlayer?.canGoNext ? Theme.muted : Theme.border
-                    font.family: Theme.font
-                    font.pixelSize: Theme.iconSize
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: root.mediaPlayer?.next()
-                    }
-                }
-
-                Text {
-                    Layout.maximumWidth: 230
-                    text: root.mediaLabel()
-                    color: Theme.muted
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSize
-                    elide: Text.ElideRight
-                }
-            }
+        Media {
+            controller: root.mediaController
         }
 
         RowLayout {

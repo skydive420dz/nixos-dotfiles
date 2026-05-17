@@ -15,6 +15,8 @@ one module at a time.
 - [OSD](../../config/quickshell/Osd.qml)
 - [Theme tokens](../../config/quickshell/Theme.qml)
 - [QML module index](../../config/quickshell/qmldir)
+- [Media module](../../config/quickshell/modules/media/Media.qml)
+- [Media controller](../../config/quickshell/modules/media/MediaController.qml)
 - [Workspaces module](../../config/quickshell/modules/workspaces/Workspaces.qml)
 - [Window title module](../../config/quickshell/modules/window/WindowTitle.qml)
 
@@ -133,6 +135,11 @@ module is ready to move.
   Hyprland active-window events, title normalization, and title rendering.
   `Bar.qml` only places `WindowTitle {}`. This module has no pointer handlers or
   masks; its bounds are the visible pill only.
+- 2026-05-17: `modules/media/Media.qml` owns the visible media pill and player
+  controls. `modules/media/MediaController.qml` lives once at `ShellRoot` and
+  owns player selection plus the `media.playPause` IPC target, avoiding duplicate
+  `IpcHandler` registration from per-monitor bars. Inactive media has zero layout
+  width, and prev/next only accept clicks when the player supports them.
 
 ## Known Lesson
 
