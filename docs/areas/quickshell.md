@@ -187,6 +187,9 @@ module is ready to move.
 - 2026-05-17: Fixed-width network traffic labels tested live after reload.
   Quickshell reports `Configuration Loaded` with no new warnings from the
   formatter-only change.
+- 2026-05-17: Tuned status traffic width tested live after build/reload. The
+  340px pill and 80px network field are good for now, with clean reload and
+  build results.
 
 ## Known Lesson
 
