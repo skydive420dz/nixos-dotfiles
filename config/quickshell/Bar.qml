@@ -540,7 +540,7 @@ PanelWindow {
 
         Rectangle {
             Layout.preferredHeight: Theme.pillHeight
-            Layout.preferredWidth: 360
+            Layout.preferredWidth: 424
             radius: Theme.radius
             color: Theme.panel
             border.color: Theme.border
@@ -548,16 +548,20 @@ PanelWindow {
 
             RowLayout {
                 id: statusRow
-                anchors.centerIn: parent
+                anchors.fill: parent
+                anchors.leftMargin: Theme.pad
+                anchors.rightMargin: Theme.pad
                 spacing: 9
 
                 Text {
                     text: root.networkIcon() + (root.networkLabel() ? " " + root.networkLabel() : "")
-                    Layout.preferredWidth: 118
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 112
                     color: root.network ? Theme.muted : Theme.danger
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
                     horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignVCenter
                     elide: Text.ElideRight
 
                     MouseArea {
@@ -573,6 +577,7 @@ PanelWindow {
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
                     horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
 
                     MouseArea {
                         anchors.fill: parent
@@ -587,6 +592,7 @@ PanelWindow {
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
                     horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignVCenter
 
                     MouseArea {
                         anchors.fill: parent
@@ -602,15 +608,17 @@ PanelWindow {
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
                     horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignVCenter
                 }
 
                 Text {
                     text: root.clockText
-                    Layout.preferredWidth: 105
+                    Layout.preferredWidth: 116
                     color: Theme.accent
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
                     horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignVCenter
                 }
             }
         }
