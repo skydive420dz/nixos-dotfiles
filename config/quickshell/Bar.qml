@@ -36,6 +36,8 @@ PanelWindow {
     property int volume: 0
     property bool muted: false
     property string network: ""
+    property bool bluetoothAvailable: false
+    property bool bluetoothConnected: false
     property int battery: -1
     property bool charging: false
 
@@ -56,6 +58,10 @@ PanelWindow {
                 root.muted = value === "1";
             else if (key === "network")
                 root.network = value;
+            else if (key === "bluetooth")
+                root.bluetoothAvailable = value === "1";
+            else if (key === "bluetooth_connected")
+                root.bluetoothConnected = value === "1";
             else if (key === "battery")
                 root.battery = parseInt(value);
             else if (key === "charging")
@@ -85,6 +91,14 @@ PanelWindow {
         return "󰤮";
     }
 
+    function bluetoothIcon() {
+        if (!bluetoothAvailable)
+            return "󰂲";
+        if (bluetoothConnected)
+            return "󰂱";
+        return "󰂯";
+    }
+
     function volumeIcon() {
         if (muted)
             return "󰖁";
@@ -111,7 +125,7 @@ PanelWindow {
 
     function updateClock() {
         var date = new Date();
-        root.clockText = Qt.formatDateTime(date, "ddd HH:mm");
+        root.clockText = Qt.formatDateTime(date, "MMM d  HH:mm");
     }
 
     Component.onCompleted: {
@@ -198,7 +212,7 @@ PanelWindow {
         command: [
             "bash",
             "-lc",
-            "vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true); muted=0; case \"$vol\" in *MUTED*) muted=1;; esac; level=$(awk '{ printf \"%d\", ($2+0)*100 }' <<<\"$vol\"); net=$(nmcli -t -f TYPE,STATE device status 2>/dev/null | awk -F: '$2==\"connected\"{print $1; exit}'); bat=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n1); stat=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n1); charging=0; [ \"$stat\" = Charging ] && charging=1; printf 'volume=%s\\nmuted=%s\\nnetwork=%s\\nbattery=%s\\ncharging=%s\\n' \"${level:-0}\" \"$muted\" \"${net:-}\" \"${bat:--1}\" \"$charging\""
+            "vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true); muted=0; case \"$vol\" in *MUTED*) muted=1;; esac; level=$(awk '{ printf \"%d\", ($2+0)*100 }' <<<\"$vol\"); net=$(nmcli -t -f TYPE,STATE device status 2>/dev/null | awk -F: '$2==\"connected\"{print $1; exit}'); bt=0; btconn=0; if command -v bluetoothctl >/dev/null 2>&1 && bluetoothctl show >/dev/null 2>&1; then bt=1; bluetoothctl devices Connected 2>/dev/null | grep -q . && btconn=1; fi; bat=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n1); stat=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n1); charging=0; [ \"$stat\" = Charging ] && charging=1; printf 'volume=%s\\nmuted=%s\\nnetwork=%s\\nbluetooth=%s\\nbluetooth_connected=%s\\nbattery=%s\\ncharging=%s\\n' \"${level:-0}\" \"$muted\" \"${net:-}\" \"$bt\" \"$btconn\" \"${bat:--1}\" \"$charging\""
         ]
         stdout: SplitParser {
             property string buffer: ""
@@ -359,6 +373,13 @@ PanelWindow {
                 Text {
                     text: root.networkIcon()
                     color: root.network ? Theme.muted : Theme.danger
+                    font.family: Theme.font
+                    font.pixelSize: Theme.iconSize
+                }
+
+                Text {
+                    text: root.bluetoothIcon()
+                    color: root.bluetoothConnected ? Theme.accent : Theme.muted
                     font.family: Theme.font
                     font.pixelSize: Theme.iconSize
                 }
