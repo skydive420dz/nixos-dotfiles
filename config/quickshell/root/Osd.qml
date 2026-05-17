@@ -1,8 +1,8 @@
-import "."
+import ".."
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
-import "modules/osd"
+import "../modules/osd"
 
 PanelWindow {
     id: root

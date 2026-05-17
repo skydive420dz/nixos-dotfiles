@@ -1,5 +1,6 @@
 import Quickshell
 import "modules/media"
+import "root"
 
 ShellRoot {
     MediaController {

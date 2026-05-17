@@ -11,8 +11,8 @@ one module at a time.
 ## Current Files
 
 - [Shell root](../../config/quickshell/shell.qml)
-- [Bar](../../config/quickshell/Bar.qml)
-- [OSD](../../config/quickshell/Osd.qml)
+- [Bar root surface](../../config/quickshell/root/Bar.qml)
+- [OSD root surface](../../config/quickshell/root/Osd.qml)
 - [Theme tokens](../../config/quickshell/Theme.qml)
 - [QML module index](../../config/quickshell/qmldir)
 - [Media module](../../config/quickshell/modules/media/Media.qml)
@@ -169,6 +169,10 @@ module is ready to move.
   JSON load process, hide timer, payload state, and card rendering. The root OSD
   mask still points to the visible card through `osdView.maskItem`, so this split
   should not expand the clickable/input region.
+- 2026-05-17: Top-level surfaces moved into `root/`: `root/Bar.qml` and
+  `root/Osd.qml`. `shell.qml` imports `root/`, `qmldir` now only exports the
+  `Theme` singleton, and the root surfaces still own the only bar/OSD
+  `PanelWindow` and mask definitions.
 
 ## Test Notes
 

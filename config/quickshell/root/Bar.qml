@@ -1,14 +1,14 @@
-import "."
+import ".."
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.SystemTray
 import Quickshell.Wayland
-import "modules/media"
-import "modules/status"
-import "modules/window"
-import "modules/workspaces"
+import "../modules/media"
+import "../modules/status"
+import "../modules/window"
+import "../modules/workspaces"
 
 PanelWindow {
     id: root

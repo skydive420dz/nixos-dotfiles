@@ -39,7 +39,7 @@ move into host-level Nix options later instead of becoming mystery strings.
 | --- | --- | --- | --- | --- | --- |
 | Touchpad toggle | MSI Bravo 15 C7V | `config/hypr/hyprland.lua` | Bind `code:202` to an inline Lua toggle | MSI emits `XF86TouchpadToggle`, but Hypr did not catch the keysym bind; keycode binding worked | Move keycode/device into host options |
 | Touchpad device | MSI Bravo 15 C7V | `config/hypr/hyprland.lua` | Hardcode `pnp0c50:0b-06cb:7e7e-touchpad` | Hypr runtime toggle needs the exact device name from `hyprctl devices` | Move to `mkOption` per host |
-| Play/pause media key | NixOS shell | `config/hypr/hyprland.lua`, `config/quickshell/Bar.qml` | Bind `XF86AudioPlay` to Quickshell IPC | Quickshell already owns MPRIS state/control, so no extra media package is needed | Keep as-is unless media ownership changes |
+| Play/pause media key | NixOS shell | `config/hypr/hyprland.lua`, `config/quickshell/root/Bar.qml` | Bind `XF86AudioPlay` to Quickshell IPC | Quickshell already owns MPRIS state/control, so no extra media package is needed | Keep as-is unless media ownership changes |
 | Extra `\|` key | MSI Bravo 15 C7V 99-key layout | `system/modules/input.nix` | Map Kanata `IntlBackslash = bksl` | Built-in 99-key layout emitted the wrong logical key for the physical `\|` key | Keep with host keyboard options later |
 | Display-mode key | MSI Bravo 15 C7V | none | Leave `Fn+F11` unmapped | It emits `Super+p`, not a clean display XF86 key; no current workflow needs it | Design explicit monitor profile/picker later |
 
