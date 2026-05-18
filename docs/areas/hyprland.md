@@ -20,3 +20,4 @@
 - Old-style dispatch strings can be interpreted badly by Lua config paths; use `hyr eval` with Lua dispatch where needed.
 - Floating applets use persistent window rules for size/placement.
 - Portal config keeps GTK as a fallback, but disables `org.freedesktop.impl.portal.Inhibit` to avoid GTK ScreenSaver noise under Hyprland.
+- Hyprland exports `HYPRLAND_INSTANCE_SIGNATURE` through UWSM on startup, but long-lived tmux servers can keep a stale environment. If plain `hyprctl` fails inside tmux, refresh tmux from a fresh Hyprland shell or use `hyr` for stale/remote shells.
