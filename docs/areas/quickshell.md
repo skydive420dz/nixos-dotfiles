@@ -19,6 +19,7 @@ one module at a time.
 - [Media module](../../config/quickshell/modules/media/Media.qml)
 - [Media controller](../../config/quickshell/modules/media/MediaController.qml)
 - [OSD view](../../config/quickshell/modules/osd/OsdView.qml)
+- [Status bluetooth](../../config/quickshell/modules/status/Bluetooth.qml)
 - [Status clock](../../config/quickshell/modules/status/Clock.qml)
 - [Status cluster](../../config/quickshell/modules/status/StatusCluster.qml)
 - [Tray module](../../config/quickshell/modules/tray/Tray.qml)
@@ -188,6 +189,10 @@ module is ready to move.
 - 2026-05-17: `modules/status/Clock.qml` owns status clock formatting, timer
   refresh, and clock text rendering. `StatusCluster.qml` only places `Clock {}`
   in the existing right-side status row.
+- 2026-05-17: `modules/status/Bluetooth.qml` owns the bluetooth status icon,
+  active color, fixed icon width, and `bluetui` click launcher. `StatusCluster`
+  still owns the bluetooth polling process and passes only `available` and
+  `connected` state into the view.
 
 ## Test Notes
 
@@ -235,6 +240,7 @@ module is ready to move.
 - 2026-05-17: Status clock extraction tested live. Quickshell reports
   `Configuration Loaded`, the clock renders as expected, and no visible
   anomalies were detected.
+- 2026-05-17: Status bluetooth extraction pending live test.
 
 ## Known Lesson
 

@@ -161,22 +161,6 @@ Rectangle {
         return "↓" + (networkDownRate || "0") + " ↑" + (networkUpRate || "0");
     }
 
-    function bluetoothIcon() {
-        if (!bluetoothAvailable)
-            return "󰂲";
-        if (bluetoothConnected)
-            return "󰂱";
-        return "󰂯";
-    }
-
-    function bluetoothLabel() {
-        if (!bluetoothAvailable)
-            return "Off";
-        if (bluetoothConnected)
-            return "On";
-        return "Idle";
-    }
-
     function volumeIcon() {
         if (muted)
             return "󰖁";
@@ -385,19 +369,9 @@ Rectangle {
             }
         }
 
-        Text {
-            text: root.bluetoothIcon()
-            Layout.preferredWidth: 10
-            color: root.bluetoothConnected ? Theme.accent : Theme.muted
-            font.family: Theme.font
-            font.pixelSize: Theme.fontSize
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: Quickshell.execDetached(["bash", "-lc", "uwsm app -- kitty --class bluetui -e bluetui"])
-            }
+        Bluetooth {
+            available: root.bluetoothAvailable
+            connected: root.bluetoothConnected
         }
 
         RowLayout {
