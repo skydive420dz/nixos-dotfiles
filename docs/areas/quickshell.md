@@ -19,6 +19,7 @@ one module at a time.
 - [Media module](../../config/quickshell/modules/media/Media.qml)
 - [Media controller](../../config/quickshell/modules/media/MediaController.qml)
 - [OSD view](../../config/quickshell/modules/osd/OsdView.qml)
+- [Status battery](../../config/quickshell/modules/status/Battery.qml)
 - [Status bluetooth](../../config/quickshell/modules/status/Bluetooth.qml)
 - [Status clock](../../config/quickshell/modules/status/Clock.qml)
 - [Status cluster](../../config/quickshell/modules/status/StatusCluster.qml)
@@ -198,6 +199,10 @@ module is ready to move.
   color, fixed icon width, and `wiremix` click launcher. `StatusCluster` still
   owns the volume polling process and passes only `level` and `muted` state into
   the view.
+- 2026-05-17: `modules/status/Battery.qml` owns the battery status icon,
+  percent label, low-battery color, fixed battery width, and visibility. The
+  plug/unplug OSD behavior stays in `StatusCluster`, which still owns battery
+  polling and passes `level`, `charging`, and `status` into the view.
 
 ## Test Notes
 
@@ -256,6 +261,7 @@ module is ready to move.
 - 2026-05-17: Status volume extraction tested live. Quickshell reports
   `Configuration Loaded`, the volume icon behaves as expected, and no visible
   anomalies were detected.
+- 2026-05-17: Status battery extraction pending live test.
 
 ## Known Lesson
 

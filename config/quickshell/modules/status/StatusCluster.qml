@@ -161,28 +161,6 @@ Rectangle {
         return "↓" + (networkDownRate || "0") + " ↑" + (networkUpRate || "0");
     }
 
-    function batteryIcon() {
-        if (battery < 0)
-            return "";
-        if (batteryStatus === "Charging")
-            return "󱐋";
-        if (batteryStatus === "Full" || batteryStatus === "Not charging")
-            return "󱐥";
-        if (battery < 20)
-            return "󰂃";
-        if (battery < 50)
-            return "󰁾";
-        if (battery < 80)
-            return "󰂁";
-        return "󰁹";
-    }
-
-    function batteryLabel() {
-        if (battery < 0)
-            return "";
-        return battery + "%";
-    }
-
     Component.onCompleted: {
         volumeProc.running = true;
         networkInfoProc.running = true;
@@ -368,15 +346,10 @@ Rectangle {
                 muted: root.muted
             }
 
-            Text {
-                visible: root.battery >= 0
-                text: root.batteryIcon() + " " + root.batteryLabel()
-                Layout.preferredWidth: 48
-                color: root.battery < 20 && !root.charging ? Theme.danger : Theme.muted
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSize
-                horizontalAlignment: Text.AlignLeft
-                verticalAlignment: Text.AlignVCenter
+            Battery {
+                level: root.battery
+                charging: root.charging
+                status: root.batteryStatus
             }
 
             Clock {}
