@@ -111,6 +111,9 @@ in
       # SPLITS
       # =========================================
 
+      # Visual/editor naming:
+      #   prefix+\ -> vertical split, side-by-side panes (tmux calls this -h)
+      #   prefix+| -> horizontal split, stacked panes (tmux calls this -v)
       bind \\ split-window -h -c "#{pane_current_path}"
       bind | split-window -v -c "#{pane_current_path}"
       bind Enter new-window -c "#{pane_current_path}"
