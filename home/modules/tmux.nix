@@ -111,17 +111,8 @@ in
       # SPLITS
       # =========================================
 
-      bind v split-window -h -c "#{pane_current_path}"
-      bind h split-window -v -c "#{pane_current_path}"
-      bind Enter new-window -c "#{pane_current_path}"
-
-      # =========================================
-      # PANE NAVIGATION
-      # =========================================
-
-      bind -r j select-pane -D
-      bind -r k select-pane -U
-      bind -r l select-pane -R
+      bind v split-window -| -c "#{pane_current_path}"
+      bind h split-window -\ -c "#{pane_current_path}"
 
       # =========================================
       # VIM / TMUX NAVIGATION
@@ -146,7 +137,7 @@ in
       # COPY MODE
       # =========================================
 
-      bind [ copy-mode
+      bind v copy-mode
 
       bind-key -T copy-mode-vi v send-keys -X begin-selection
       bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'wl-copy'
