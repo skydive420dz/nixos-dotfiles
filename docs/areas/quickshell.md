@@ -8,6 +8,15 @@ on `prototype/quickshell-legacy` and the archived quickshell branches. Treat
 those branches as reference material only: port useful ideas back deliberately,
 one module at a time.
 
+## Branch Workflow
+
+- `main` is the stable checkpoint for the known-good shell.
+- `work/quickshell-cleanup` is the active refactor and polish lane.
+- Promote the cleanup branch to `main` only by fast-forwarding a clean,
+  documented, live-tested state.
+- After promoting a stable state, switch back to `work/quickshell-cleanup` and
+  continue the next small slice there.
+
 ## Current Files
 
 - [Shell root](../../config/quickshell/shell.qml)
