@@ -145,12 +145,14 @@ in
       # COPY MODE
       # =========================================
 
-      # Remove tmux default copy-mode key; prefix+v is our chosen entry point.
-      unbind -q [
+      # Remove tmux default copy/paste keys; prefix+v and y are our chosen flow.
+      unbind-key -q [
+      unbind-key -q ]
       bind v copy-mode
 
       bind-key -T copy-mode-vi Space send-keys -X begin-selection
       bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'wl-copy'
+      bind-key -T copy-mode-vi Enter send-keys -X cancel
 
       # =========================================
       # WINDOW NAMES
