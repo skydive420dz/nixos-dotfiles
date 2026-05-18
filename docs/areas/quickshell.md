@@ -225,7 +225,9 @@ module is ready to move.
   native menu opens and this slice is considered operational. Follow-up polish:
   tighten the tray menu hitbox/anchor and decide whether native menu styling is
   acceptable or should be replaced later by a themed QML menu.
-- 2026-05-17: Launcher button extraction pending live test.
+- 2026-05-17: Launcher button extraction tested live after `nrs` and full
+  Quickshell restart. The service starts cleanly with `Configuration Loaded`,
+  and the slice is considered operational.
 
 ## Known Lesson
 
