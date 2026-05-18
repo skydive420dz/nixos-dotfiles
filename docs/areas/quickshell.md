@@ -253,7 +253,9 @@ module is ready to move.
   pass so network, bluetooth, volume, battery, and clock read as one coherent
   set. Cursor shape alone is not proof of hitbox size because `MouseArea`
   defaults to the normal arrow cursor.
-- 2026-05-17: Status volume extraction pending live test.
+- 2026-05-17: Status volume extraction tested live. Quickshell reports
+  `Configuration Loaded`, the volume icon behaves as expected, and no visible
+  anomalies were detected.
 
 ## Known Lesson
 
