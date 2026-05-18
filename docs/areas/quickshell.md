@@ -19,6 +19,7 @@ one module at a time.
 - [Media module](../../config/quickshell/modules/media/Media.qml)
 - [Media controller](../../config/quickshell/modules/media/MediaController.qml)
 - [OSD view](../../config/quickshell/modules/osd/OsdView.qml)
+- [Status clock](../../config/quickshell/modules/status/Clock.qml)
 - [Status cluster](../../config/quickshell/modules/status/StatusCluster.qml)
 - [Tray module](../../config/quickshell/modules/tray/Tray.qml)
 - [Workspaces module](../../config/quickshell/modules/workspaces/Workspaces.qml)
@@ -184,6 +185,9 @@ module is ready to move.
   button rendering, hover color, and click dispatch. Left click opens
   `launcher-toggle`; right click opens `clipboard-toggle`. `Bar.qml` only places
   `LauncherButton {}`.
+- 2026-05-17: `modules/status/Clock.qml` owns status clock formatting, timer
+  refresh, and clock text rendering. `StatusCluster.qml` only places `Clock {}`
+  in the existing right-side status row.
 
 ## Test Notes
 
@@ -228,6 +232,7 @@ module is ready to move.
 - 2026-05-17: Launcher button extraction tested live after `nrs` and full
   Quickshell restart. The service starts cleanly with `Configuration Loaded`,
   and the slice is considered operational.
+- 2026-05-17: Status clock extraction pending live test.
 
 ## Known Lesson
 

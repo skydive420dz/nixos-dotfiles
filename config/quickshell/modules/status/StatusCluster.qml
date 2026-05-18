@@ -19,7 +19,6 @@ Rectangle {
     border.width: 1
     clip: true
 
-    property string clockText: ""
     property int volume: 0
     property bool muted: false
     property string network: ""
@@ -214,27 +213,12 @@ Rectangle {
         return battery + "%";
     }
 
-    function updateClock() {
-        var date = new Date();
-        root.clockText = Qt.formatDateTime(date, "ddd MMM d  HH:mm");
-    }
-
     Component.onCompleted: {
-        updateClock();
         volumeProc.running = true;
         networkInfoProc.running = true;
         trafficProc.running = true;
         bluetoothProc.running = true;
         batteryProc.running = true;
-    }
-
-    Timer {
-        id: clockTimer
-        interval: 30000
-        repeat: true
-        running: true
-        triggeredOnStart: true
-        onTriggered: root.updateClock()
     }
 
     Timer {
@@ -445,15 +429,7 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter
             }
 
-            Text {
-                text: root.clockText
-                Layout.preferredWidth: 124
-                color: Theme.accent
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSize
-                horizontalAlignment: Text.AlignRight
-                verticalAlignment: Text.AlignVCenter
-            }
+            Clock {}
         }
     }
 }
