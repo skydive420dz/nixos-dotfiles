@@ -36,31 +36,18 @@ in
     prefix = "C-Space";
     baseIndex = 1;
     escapeTime = 0;
-    historyLimit = 100000;
     keyMode = "vi";
     mouse = true;
-    sensibleOnTop = true;
-    terminal = "tmux-256color";
 
     # =========================
     # PLUGINS
     # =========================
 
     plugins = with pkgs.tmuxPlugins; [
+      sensible
       yank
-      {
-        plugin = resurrect;
-        extraConfig = ''
-          set -g @resurrect-capture-pane-contents 'on'
-        '';
-      }
-      {
-        plugin = continuum;
-        extraConfig = ''
-          set -g @continuum-restore 'on'
-          set -g @continuum-save-interval '15'
-        '';
-      }
+      resurrect
+      continuum
     ];
 
     # =========================
@@ -72,12 +59,17 @@ in
       # GENERAL
       # =========================================
 
+      setw -g pane-base-index 1
+      set -g history-limit 100000
       set -ga update-environment " WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP HYPRLAND_INSTANCE_SIGNATURE"
+      unbind C-a
+      bind C-Space send-prefix
 
       # =========================================
-      # TRUECOLOR
+      # KITTY / TRUECOLOR
       # =========================================
 
+      set -g default-terminal "tmux-256color"
       set -ga terminal-overrides ",xterm-256color:RGB"
 
       # =========================================
@@ -111,8 +103,17 @@ in
       # SPLITS
       # =========================================
 
-      bind v split-window -| -c "#{pane_current_path}"
-      bind h split-window -\ -c "#{pane_current_path}"
+      bind v split-window -h -c "#{pane_current_path}"
+      bind h split-window -v -c "#{pane_current_path}"
+      bind Enter new-window -c "#{pane_current_path}"
+
+      # =========================================
+      # PANE NAVIGATION
+      # =========================================
+
+      bind -r j select-pane -D
+      bind -r k select-pane -U
+      bind -r l select-pane -R
 
       # =========================================
       # VIM / TMUX NAVIGATION
@@ -137,7 +138,7 @@ in
       # COPY MODE
       # =========================================
 
-      bind v copy-mode
+      bind [ copy-mode
 
       bind-key -T copy-mode-vi v send-keys -X begin-selection
       bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'wl-copy'
@@ -148,6 +149,17 @@ in
 
       set -g automatic-rename on
       set -g automatic-rename-format "#{b:pane_current_path}"
+
+      # =========================================
+      # TMUX RESURRECT / CONTINUUM
+      # =========================================
+
+      set -g @resurrect-capture-pane-contents 'on'
+      set -g @continuum-restore 'on'
+      set -g @continuum-save-interval '15'
+
+      # Save:    Ctrl+a Ctrl+s
+      # Restore: Ctrl+a Ctrl+r
 
       # =========================================
       # RELOAD CONFIG
