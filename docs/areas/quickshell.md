@@ -261,7 +261,11 @@ module is ready to move.
 - 2026-05-17: Status volume extraction tested live. Quickshell reports
   `Configuration Loaded`, the volume icon behaves as expected, and no visible
   anomalies were detected.
-- 2026-05-17: Status battery extraction pending live test.
+- 2026-05-17: Status battery extraction tested live. Quickshell reports
+  `Configuration Loaded`, the battery indicator behaves as expected, and no
+  visible anomalies were detected. Follow-up improvement: consider replacing
+  timer-based status polling with event-driven or more real-time sources where
+  Quickshell/DBus/system APIs make that reliable.
 
 ## Known Lesson
 
