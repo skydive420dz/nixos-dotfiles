@@ -103,17 +103,9 @@ in
       # SPLITS
       # =========================================
 
-      bind v split-window -h -c "#{pane_current_path}"
-      bind h split-window -v -c "#{pane_current_path}"
+      bind | split-window -h -c "#{pane_current_path}"
+      bind \\ split-window -v -c "#{pane_current_path}"
       bind Enter new-window -c "#{pane_current_path}"
-
-      # =========================================
-      # PANE NAVIGATION
-      # =========================================
-
-      bind -r j select-pane -D
-      bind -r k select-pane -U
-      bind -r l select-pane -R
 
       # =========================================
       # VIM / TMUX NAVIGATION
