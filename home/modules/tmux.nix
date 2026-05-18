@@ -36,18 +36,31 @@ in
     prefix = "C-Space";
     baseIndex = 1;
     escapeTime = 0;
+    historyLimit = 100000;
     keyMode = "vi";
     mouse = true;
+    sensibleOnTop = true;
+    terminal = "tmux-256color";
 
     # =========================
     # PLUGINS
     # =========================
 
     plugins = with pkgs.tmuxPlugins; [
-      sensible
       yank
-      resurrect
-      continuum
+      {
+        plugin = resurrect;
+        extraConfig = ''
+          set -g @resurrect-capture-pane-contents 'on'
+        '';
+      }
+      {
+        plugin = continuum;
+        extraConfig = ''
+          set -g @continuum-restore 'on'
+          set -g @continuum-save-interval '15'
+        '';
+      }
     ];
 
     # =========================
@@ -59,17 +72,12 @@ in
       # GENERAL
       # =========================================
 
-      setw -g pane-base-index 1
-      set -g history-limit 100000
       set -ga update-environment " WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP HYPRLAND_INSTANCE_SIGNATURE"
-      unbind C-a
-      bind C-Space send-prefix
 
       # =========================================
-      # KITTY / TRUECOLOR
+      # TRUECOLOR
       # =========================================
 
-      set -g default-terminal "tmux-256color"
       set -ga terminal-overrides ",xterm-256color:RGB"
 
       # =========================================
@@ -103,8 +111,8 @@ in
       # SPLITS
       # =========================================
 
-      bind | split-window -h -c "#{pane_current_path}"
-      bind \\ split-window -v -c "#{pane_current_path}"
+      bind \\ split-window -h -c "#{pane_current_path}"
+      bind | split-window -v -c "#{pane_current_path}"
       bind Enter new-window -c "#{pane_current_path}"
 
       # =========================================
@@ -141,17 +149,6 @@ in
 
       set -g automatic-rename on
       set -g automatic-rename-format "#{b:pane_current_path}"
-
-      # =========================================
-      # TMUX RESURRECT / CONTINUUM
-      # =========================================
-
-      set -g @resurrect-capture-pane-contents 'on'
-      set -g @continuum-restore 'on'
-      set -g @continuum-save-interval '15'
-
-      # Save:    Ctrl+a Ctrl+s
-      # Restore: Ctrl+a Ctrl+r
 
       # =========================================
       # RELOAD CONFIG
