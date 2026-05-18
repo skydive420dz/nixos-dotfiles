@@ -240,7 +240,12 @@ module is ready to move.
 - 2026-05-17: Status clock extraction tested live. Quickshell reports
   `Configuration Loaded`, the clock renders as expected, and no visible
   anomalies were detected.
-- 2026-05-17: Status bluetooth extraction pending live test.
+- 2026-05-17: Status bluetooth extraction tested live. Quickshell reports
+  `Configuration Loaded`, the bluetooth status area behaves as expected, and no
+  visible anomalies were detected. Follow-up polish: status click targets
+  currently use the default cursor; add explicit pointer cursors and re-check
+  hitbox bounds as a separate affordance pass. Cursor shape alone is not proof
+  of hitbox size because `MouseArea` defaults to the normal arrow cursor.
 
 ## Known Lesson
 
