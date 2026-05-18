@@ -19,6 +19,7 @@ one module at a time.
 - [Media controller](../../config/quickshell/modules/media/MediaController.qml)
 - [OSD view](../../config/quickshell/modules/osd/OsdView.qml)
 - [Status cluster](../../config/quickshell/modules/status/StatusCluster.qml)
+- [Tray module](../../config/quickshell/modules/tray/Tray.qml)
 - [Workspaces module](../../config/quickshell/modules/workspaces/Workspaces.qml)
 - [Window title module](../../config/quickshell/modules/window/WindowTitle.qml)
 
@@ -173,6 +174,9 @@ module is ready to move.
   `root/Osd.qml`. `shell.qml` imports `root/`, `qmldir` now only exports the
   `Theme` singleton, and the root surfaces still own the only bar/OSD
   `PanelWindow` and mask definitions.
+- 2026-05-17: `modules/tray/Tray.qml` owns the system tray item model, icon
+  sizing, visibility, and activation clicks. `Bar.qml` only places `Tray {}`.
+  The tray still has no background, mask, hover panel, or global state.
 
 ## Test Notes
 
@@ -205,6 +209,7 @@ module is ready to move.
 - 2026-05-17: Root surface migration tested live after restart. Bar and OSD
   behavior stayed consistent, and Quickshell starts cleanly with
   `Configuration Loaded`.
+- 2026-05-17: Tray extraction pending live test.
 
 ## Known Lesson
 

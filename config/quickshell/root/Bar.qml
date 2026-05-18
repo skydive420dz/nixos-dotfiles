@@ -2,11 +2,10 @@ import ".."
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
-import Quickshell.Services.SystemTray
 import Quickshell.Wayland
 import "../modules/media"
 import "../modules/status"
+import "../modules/tray"
 import "../modules/window"
 import "../modules/workspaces"
 
@@ -86,28 +85,7 @@ PanelWindow {
             controller: root.mediaController
         }
 
-        RowLayout {
-            Layout.preferredHeight: Theme.pillHeight
-            spacing: Theme.gap
-            visible: SystemTray.items.values.length > 0
-
-            Repeater {
-                model: SystemTray.items
-                delegate: Image {
-                    required property SystemTrayItem modelData
-                    Layout.preferredWidth: 16
-                    Layout.preferredHeight: 16
-                    source: modelData.icon
-                    smooth: true
-                    mipmap: true
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: modelData.activate()
-                    }
-                }
-            }
-        }
+        Tray {}
 
         StatusCluster {}
     }
