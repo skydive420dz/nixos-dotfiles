@@ -244,8 +244,10 @@ module is ready to move.
   `Configuration Loaded`, the bluetooth status area behaves as expected, and no
   visible anomalies were detected. Follow-up polish: status click targets
   currently use the default cursor; add explicit pointer cursors and re-check
-  hitbox bounds as a separate affordance pass. Cursor shape alone is not proof
-  of hitbox size because `MouseArea` defaults to the normal arrow cursor.
+  hitbox bounds as a separate affordance pass. Refresh status icons in the same
+  pass so network, bluetooth, volume, battery, and clock read as one coherent
+  set. Cursor shape alone is not proof of hitbox size because `MouseArea`
+  defaults to the normal arrow cursor.
 
 ## Known Lesson
 
