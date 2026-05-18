@@ -216,7 +216,10 @@ module is ready to move.
   tray clients need native menu handling, so right-click/menu-only support was
   added as a follow-up. Native StatusNotifier menus require
   `//@ pragma UseQApplication` at the top of `shell.qml`; without it Quickshell
-  logs `Cannot display PlatformMenuEntry`.
+  logs `Cannot display PlatformMenuEntry`. After a full Quickshell restart, the
+  native menu opens and this slice is considered operational. Follow-up polish:
+  tighten the tray menu hitbox/anchor and decide whether native menu styling is
+  acceptable or should be replaced later by a themed QML menu.
 
 ## Known Lesson
 
