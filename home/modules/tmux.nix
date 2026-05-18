@@ -88,6 +88,17 @@ in
       set -g status-right "#[fg=${semantic.muted},bg=${semantic.background}]  #{user}   #H "
 
       # =========================================
+      # TMUX UI SURFACES
+      # =========================================
+
+      set -g message-style "fg=${semantic.foreground},bg=${semantic.surfaceStrong}"
+      set -g message-command-style "fg=${semantic.accent},bg=${semantic.surfaceStrong}"
+      set -g mode-style "fg=${semantic.selectionForeground},bg=${semantic.selectionBackground},bold"
+      set -g menu-style "fg=${semantic.foreground},bg=${semantic.surface}"
+      set -g menu-selected-style "fg=${semantic.selectionForeground},bg=${semantic.selectionBackground},bold"
+      set -g menu-border-style "fg=${semantic.borderActive},bg=${semantic.surface}"
+
+      # =========================================
       # PANE BORDERS
       # =========================================
 
