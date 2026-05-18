@@ -271,7 +271,9 @@ module is ready to move.
   visible anomalies were detected. Follow-up improvement: consider replacing
   timer-based status polling with event-driven or more real-time sources where
   Quickshell/DBus/system APIs make that reliable.
-- 2026-05-17: Status network extraction pending live test.
+- 2026-05-17: Status network extraction tested live. Quickshell reports
+  `Configuration Loaded`, network/traffic rendering behaves as expected, and no
+  visible anomalies were detected.
 
 ## Known Lesson
 
