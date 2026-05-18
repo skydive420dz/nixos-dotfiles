@@ -175,8 +175,10 @@ module is ready to move.
   `Theme` singleton, and the root surfaces still own the only bar/OSD
   `PanelWindow` and mask definitions.
 - 2026-05-17: `modules/tray/Tray.qml` owns the system tray item model, icon
-  sizing, visibility, and activation clicks. `Bar.qml` only places `Tray {}`.
-  The tray still has no background, mask, hover panel, or global state.
+  sizing, visibility, activation clicks, and native StatusNotifier menu clicks.
+  `Bar.qml` only places `Tray {}` and passes its panel window so tray menus can
+  anchor to the clicked icon. The tray still has no background, mask, hover
+  panel, or global state.
 
 ## Test Notes
 
@@ -209,7 +211,10 @@ module is ready to move.
 - 2026-05-17: Root surface migration tested live after restart. Bar and OSD
   behavior stayed consistent, and Quickshell starts cleanly with
   `Configuration Loaded`.
-- 2026-05-17: Tray extraction pending live test.
+- 2026-05-17: Tray extraction tested live. The tray hides when empty, Quickshell
+  loads cleanly, and plain activation works for Vesktop. Steam exposed that some
+  tray clients need native menu handling, so right-click/menu-only support was
+  added as a follow-up and is pending live test.
 
 ## Known Lesson
 

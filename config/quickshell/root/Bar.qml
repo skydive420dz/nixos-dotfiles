@@ -85,7 +85,9 @@ PanelWindow {
             controller: root.mediaController
         }
 
-        Tray {}
+        Tray {
+            panelWindow: root
+        }
 
         StatusCluster {}
     }
