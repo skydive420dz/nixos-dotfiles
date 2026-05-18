@@ -114,9 +114,10 @@ in
       # Visual/editor naming:
       #   prefix+\ -> vertical split, side-by-side panes (tmux calls this -h)
       #   prefix+| -> horizontal split, stacked panes (tmux calls this -v)
-      unbind -q \\
-      unbind -q |
-      unbind -q Enter
+      # Remove tmux defaults that duplicate our chosen split/window keys.
+      unbind -q %
+      unbind -q '"'
+      unbind -q c
       bind \\ split-window -h -c "#{pane_current_path}"
       bind | split-window -v -c "#{pane_current_path}"
       bind Enter new-window -c "#{pane_current_path}"
@@ -126,10 +127,6 @@ in
       # =========================================
 
       # Prefer smart-splits' pane-local marker, then fall back to process detection while Neovim starts.
-      unbind-key -q -n C-h
-      unbind-key -q -n C-j
-      unbind-key -q -n C-k
-      unbind-key -q -n C-l
       bind-key -n C-h if-shell "test '#{@pane-is-vim}' = '1' || ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +([^ ]+/)?(g?(view|l?n?vim?x?)(diff)?|mnw|nvim-wrapper)$'" "send-keys C-h" "select-pane -L"
       bind-key -n C-j if-shell "test '#{@pane-is-vim}' = '1' || ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +([^ ]+/)?(g?(view|l?n?vim?x?)(diff)?|mnw|nvim-wrapper)$'" "send-keys C-j" "select-pane -D"
       bind-key -n C-k if-shell "test '#{@pane-is-vim}' = '1' || ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +([^ ]+/)?(g?(view|l?n?vim?x?)(diff)?|mnw|nvim-wrapper)$'" "send-keys C-k" "select-pane -U"
@@ -139,10 +136,6 @@ in
       # PANE RESIZING
       # =========================================
 
-      unbind -q H
-      unbind -q J
-      unbind -q K
-      unbind -q L
       bind -r H resize-pane -L 5
       bind -r J resize-pane -D 5
       bind -r K resize-pane -U 5
@@ -152,11 +145,10 @@ in
       # COPY MODE
       # =========================================
 
-      unbind -q v
+      # Remove tmux default copy-mode key; prefix+v is our chosen entry point.
+      unbind -q [
       bind v copy-mode
 
-      unbind-key -q -T copy-mode-vi Space
-      unbind-key -q -T copy-mode-vi y
       bind-key -T copy-mode-vi Space send-keys -X begin-selection
       bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'wl-copy'
 
@@ -171,7 +163,6 @@ in
       # RELOAD CONFIG
       # =========================================
 
-      unbind -q r
       bind r source-file ${config.xdg.configHome}/tmux/tmux.conf \; display "Reloaded!"
     '';
   };
