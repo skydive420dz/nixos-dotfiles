@@ -15,6 +15,7 @@ one module at a time.
 - [OSD root surface](../../config/quickshell/root/Osd.qml)
 - [Theme tokens](../../config/quickshell/Theme.qml)
 - [QML module index](../../config/quickshell/qmldir)
+- [Launcher button](../../config/quickshell/modules/launcher/LauncherButton.qml)
 - [Media module](../../config/quickshell/modules/media/Media.qml)
 - [Media controller](../../config/quickshell/modules/media/MediaController.qml)
 - [OSD view](../../config/quickshell/modules/osd/OsdView.qml)
@@ -179,6 +180,10 @@ module is ready to move.
   `Bar.qml` only places `Tray {}` and passes its panel window so tray menus can
   anchor to the clicked icon. The tray still has no background, mask, hover
   panel, or global state.
+- 2026-05-17: `modules/launcher/LauncherButton.qml` owns the left launcher
+  button rendering, hover color, and click dispatch. Left click opens
+  `launcher-toggle`; right click opens `clipboard-toggle`. `Bar.qml` only places
+  `LauncherButton {}`.
 
 ## Test Notes
 
@@ -220,6 +225,7 @@ module is ready to move.
   native menu opens and this slice is considered operational. Follow-up polish:
   tighten the tray menu hitbox/anchor and decide whether native menu styling is
   acceptable or should be replaced later by a themed QML menu.
+- 2026-05-17: Launcher button extraction pending live test.
 
 ## Known Lesson
 
