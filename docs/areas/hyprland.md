@@ -19,3 +19,4 @@
 - Prefer native Lua rules over shell helpers.
 - Old-style dispatch strings can be interpreted badly by Lua config paths; use `hyr eval` with Lua dispatch where needed.
 - Floating applets use persistent window rules for size/placement.
+- Portal config keeps GTK as a fallback, but disables `org.freedesktop.impl.portal.Inhibit` to avoid GTK ScreenSaver noise under Hyprland.
