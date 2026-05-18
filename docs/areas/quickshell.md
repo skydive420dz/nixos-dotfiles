@@ -214,7 +214,9 @@ module is ready to move.
 - 2026-05-17: Tray extraction tested live. The tray hides when empty, Quickshell
   loads cleanly, and plain activation works for Vesktop. Steam exposed that some
   tray clients need native menu handling, so right-click/menu-only support was
-  added as a follow-up and is pending live test.
+  added as a follow-up. Native StatusNotifier menus require
+  `//@ pragma UseQApplication` at the top of `shell.qml`; without it Quickshell
+  logs `Cannot display PlatformMenuEntry`.
 
 ## Known Lesson
 
