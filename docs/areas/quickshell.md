@@ -23,6 +23,7 @@ one module at a time.
 - [Status bluetooth](../../config/quickshell/modules/status/Bluetooth.qml)
 - [Status clock](../../config/quickshell/modules/status/Clock.qml)
 - [Status cluster](../../config/quickshell/modules/status/StatusCluster.qml)
+- [Status network](../../config/quickshell/modules/status/Network.qml)
 - [Status volume](../../config/quickshell/modules/status/Volume.qml)
 - [Tray module](../../config/quickshell/modules/tray/Tray.qml)
 - [Workspaces module](../../config/quickshell/modules/workspaces/Workspaces.qml)
@@ -203,6 +204,10 @@ module is ready to move.
   percent label, low-battery color, fixed battery width, and visibility. The
   plug/unplug OSD behavior stays in `StatusCluster`, which still owns battery
   polling and passes `level`, `charging`, and `status` into the view.
+- 2026-05-17: `modules/status/Network.qml` owns the network status icon, traffic
+  label rendering, disconnected color, layout width, text elision, and `nmtui`
+  click launcher. `StatusCluster` still owns network identity polling and rate
+  calculation, and passes `kind`, `downRate`, and `upRate` into the view.
 
 ## Test Notes
 
@@ -266,6 +271,7 @@ module is ready to move.
   visible anomalies were detected. Follow-up improvement: consider replacing
   timer-based status polling with event-driven or more real-time sources where
   Quickshell/DBus/system APIs make that reliable.
+- 2026-05-17: Status network extraction pending live test.
 
 ## Known Lesson
 

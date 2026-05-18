@@ -147,20 +147,6 @@ Rectangle {
         ]);
     }
 
-    function networkIcon() {
-        if (network === "ethernet")
-            return "󰈀";
-        if (network === "wifi")
-            return "󰤨";
-        return "󰤮";
-    }
-
-    function networkLabel() {
-        if (!network)
-            return "";
-        return "↓" + (networkDownRate || "0") + " ↑" + (networkUpRate || "0");
-    }
-
     Component.onCompleted: {
         volumeProc.running = true;
         networkInfoProc.running = true;
@@ -316,21 +302,10 @@ Rectangle {
         anchors.rightMargin: 8
         spacing: 6
 
-        Text {
-            text: root.networkIcon() + (root.networkLabel() ? " " + root.networkLabel() : "")
-            Layout.fillWidth: true
-            Layout.minimumWidth: 80
-            color: root.network ? Theme.muted : Theme.danger
-            font.family: Theme.font
-            font.pixelSize: Theme.fontSize
-            horizontalAlignment: Text.AlignLeft
-            verticalAlignment: Text.AlignVCenter
-            elide: Text.ElideRight
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: Quickshell.execDetached(["bash", "-lc", "uwsm app -- kitty --class nmtui -e nmtui"])
-            }
+        Network {
+            kind: root.network
+            downRate: root.networkDownRate
+            upRate: root.networkUpRate
         }
 
         Bluetooth {
