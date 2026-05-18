@@ -232,7 +232,9 @@ module is ready to move.
 - 2026-05-17: Launcher button extraction tested live after `nrs` and full
   Quickshell restart. The service starts cleanly with `Configuration Loaded`,
   and the slice is considered operational.
-- 2026-05-17: Status clock extraction pending live test.
+- 2026-05-17: Status clock extraction tested live. Quickshell reports
+  `Configuration Loaded`, the clock renders as expected, and no visible
+  anomalies were detected.
 
 ## Known Lesson
 
