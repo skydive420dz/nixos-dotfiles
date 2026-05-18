@@ -22,6 +22,7 @@ one module at a time.
 - [Status bluetooth](../../config/quickshell/modules/status/Bluetooth.qml)
 - [Status clock](../../config/quickshell/modules/status/Clock.qml)
 - [Status cluster](../../config/quickshell/modules/status/StatusCluster.qml)
+- [Status volume](../../config/quickshell/modules/status/Volume.qml)
 - [Tray module](../../config/quickshell/modules/tray/Tray.qml)
 - [Workspaces module](../../config/quickshell/modules/workspaces/Workspaces.qml)
 - [Window title module](../../config/quickshell/modules/window/WindowTitle.qml)
@@ -193,6 +194,10 @@ module is ready to move.
   active color, fixed icon width, and `bluetui` click launcher. `StatusCluster`
   still owns the bluetooth polling process and passes only `available` and
   `connected` state into the view.
+- 2026-05-17: `modules/status/Volume.qml` owns the volume status icon, muted
+  color, fixed icon width, and `wiremix` click launcher. `StatusCluster` still
+  owns the volume polling process and passes only `level` and `muted` state into
+  the view.
 
 ## Test Notes
 
@@ -248,6 +253,7 @@ module is ready to move.
   pass so network, bluetooth, volume, battery, and clock read as one coherent
   set. Cursor shape alone is not proof of hitbox size because `MouseArea`
   defaults to the normal arrow cursor.
+- 2026-05-17: Status volume extraction pending live test.
 
 ## Known Lesson
 

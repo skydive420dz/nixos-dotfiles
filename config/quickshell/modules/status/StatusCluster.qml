@@ -161,20 +161,6 @@ Rectangle {
         return "↓" + (networkDownRate || "0") + " ↑" + (networkUpRate || "0");
     }
 
-    function volumeIcon() {
-        if (muted)
-            return "󰖁";
-        if (volume < 35)
-            return "󰕿";
-        if (volume < 70)
-            return "󰖀";
-        return "󰕾";
-    }
-
-    function volumeLabel() {
-        return muted ? "Mute" : volume + "%";
-    }
-
     function batteryIcon() {
         if (battery < 0)
             return "";
@@ -377,19 +363,9 @@ Rectangle {
         RowLayout {
             spacing: 3
 
-            Text {
-                text: root.volumeIcon()
-                Layout.preferredWidth: 16
-                color: root.muted ? Theme.warning : Theme.muted
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSize
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: Quickshell.execDetached(["bash", "-lc", "uwsm app -- kitty --class wiremix -e wiremix"])
-                }
+            Volume {
+                level: root.volume
+                muted: root.muted
             }
 
             Text {
