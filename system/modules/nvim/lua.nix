@@ -144,7 +144,7 @@
       group = markdown_navigation_group,
       pattern = "markdown",
       callback = function(event)
-        local link_pattern = [[\[[^]]\+\]([^)]\+)]]
+        local link_pattern = [=[\[[^]]\+\]([^)]\+)]=]
 
         local function jump_link(flags)
           return function()
