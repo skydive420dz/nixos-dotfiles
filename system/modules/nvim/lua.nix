@@ -156,8 +156,8 @@
         end
 
         local opts = { buffer = event.buf, silent = true }
-        vim.keymap.set("n", "]l", jump_link("W"), vim.tbl_extend("force", opts, { desc = "Next markdown link" }))
-        vim.keymap.set("n", "[l", jump_link("bW"), vim.tbl_extend("force", opts, { desc = "Previous markdown link" }))
+        vim.keymap.set("n", "]u", jump_link("W"), vim.tbl_extend("force", opts, { desc = "Next markdown link" }))
+        vim.keymap.set("n", "[u", jump_link("bW"), vim.tbl_extend("force", opts, { desc = "Previous markdown link" }))
       end,
     })
 
