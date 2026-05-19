@@ -3,7 +3,8 @@
 ## Current
 
 - Launcher and clipboard are separate Quickshell overlays.
-- Both set `PanelWindow.screen` when opened so they follow the focused/current monitor.
+- Both set `PanelWindow.screen` when opened so they follow the focused/current
+  monitor.
 - Clipboard has image previews and keyboard scrolling.
 
 ## Commands
@@ -21,10 +22,12 @@
 
 ## Decisions
 
-- Do not merge clipboard into launcher until focus restoration is understood cleanly.
+- Do not merge clipboard into launcher until focus restoration is understood
+  cleanly.
 - Avoid runtime focus helpers for overlay placement.
 - Use Quickshell screen binding for layer windows.
 
 ## Next
 
-- Revisit unified source search only after the separate tools feel boring and reliable.
+- Revisit unified source search only after the separate tools feel boring and
+  reliable.

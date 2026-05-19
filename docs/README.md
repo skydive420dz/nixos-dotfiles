@@ -18,7 +18,8 @@ Small maps for finding the shape of the system again after context has cooled.
 
 ## How to Use This
 
-- Keep project notes focused on current state, commands, important files, decisions, and next actions.
+- Keep project notes focused on current state, commands, important files,
+  decisions, and next actions.
 - Put reusable knowledge in area notes.
 - When a project changes, update the project note before or after the commit.
 - Prefer links to files over long explanations.

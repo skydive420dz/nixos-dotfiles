@@ -26,7 +26,8 @@
 - Hyprland is configured through `config/hypr/hyprland.lua`.
 - `hyprland.conf`, `mocha.conf`, and `uwsm-at-cursor` were removed.
 - Quickshell layer windows choose their screen when opened.
-- Bar applets launch plainly through `uwsm app`; Hyprland rules place them near the cursor.
+- Bar applets launch plainly through `uwsm app`; Hyprland rules place them near
+  the cursor.
 - Key repeat in Hyprland matches macOS feel.
 
 ## Next
