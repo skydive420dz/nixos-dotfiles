@@ -144,6 +144,16 @@
       group = markdown_navigation_group,
       pattern = "markdown",
       callback = function(event)
+        vim.opt_local.foldenable = true
+        vim.opt_local.foldlevel = 99
+
+        if vim.treesitter and vim.treesitter.foldexpr then
+          vim.opt_local.foldmethod = "expr"
+          vim.opt_local.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+        else
+          vim.opt_local.foldmethod = "indent"
+        end
+
         local link_target_pattern = [=[\[[^]]\+\](\zs[^)]\+)]=]
 
         local function jump_link(flags)
