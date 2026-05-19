@@ -144,14 +144,17 @@
       group = markdown_navigation_group,
       pattern = "markdown",
       callback = function(event)
-        local link_pattern = [=[\[[^]]\+\]([^)]\+)]=]
+        local link_target_pattern = [=[]([^)]\+)]=]
 
         local function jump_link(flags)
           return function()
-            local found = vim.fn.search(link_pattern, flags)
+            local found = vim.fn.search(link_target_pattern, flags)
             if found == 0 then
               vim.notify("No markdown link found", vim.log.levels.INFO, { title = "Markdown" })
+              return
             end
+
+            vim.cmd("normal! l")
           end
         end
 
