@@ -121,6 +121,12 @@ in
       bind Enter new-window -c "#{pane_current_path}"
 
       # =========================================
+      # SESSION ADMIN
+      # =========================================
+
+      bind s choose-tree -s -F '#[fg=${semantic.accent},bg=${semantic.background}]#{?session_attached,●,○} #[fg=${semantic.foreground},bg=${semantic.background}]#{session_name} #[fg=${semantic.muted},bg=${semantic.background}](#{session_windows} windows)'
+
+      # =========================================
       # VIM / TMUX NAVIGATION
       # =========================================
 
