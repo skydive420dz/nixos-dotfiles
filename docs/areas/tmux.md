@@ -12,8 +12,8 @@ baseline instead of being the source of truth.
 - `sensibleOnTop` provides a small baseline of sane tmux defaults.
 - `prefix-highlight` shows when tmux is waiting after `prefix`.
 - `resurrect` saves/restores live tmux state when needed.
-- `continuum` autosaves/restores live state, now acceptable because the
-  sessionizer gives us clean recipes when we want to start fresh.
+- `continuum` autosaves live state, but auto-restore stays off. The sessionizer
+  owns startup so resurrect does not race `main` and create duplicate sessions.
 
 We still do not use a tmux vim-navigation plugin or fzf plugin. Navigation is
 handled by our explicit tmux/smart-splits bindings, and the sessionizer calls
