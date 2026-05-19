@@ -24,66 +24,6 @@
       libnotify
       mako
       powertop
-      (pkgs.writeShellScriptBin "tmux-session" ''
-        set -euo pipefail
-
-        tmux_bin="${pkgs.tmux}/bin/tmux"
-        fzf_bin="${pkgs.fzf}/bin/fzf"
-        home_dir="${config.home.homeDirectory}"
-        repo_dir="$home_dir/nixos-dotfiles"
-        notes_dir="$home_dir/Documents"
-
-        session_table() {
-          printf 'main\t%s\n' "$home_dir"
-          printf 'dots\t%s\n' "$repo_dir"
-          printf 'quickshell\t%s\n' "$repo_dir"
-          printf 'notes\t%s\n' "$notes_dir"
-        }
-
-        session_dir() {
-          case "$1" in
-            main) printf '%s\n' "$home_dir" ;;
-            dots|quickshell) printf '%s\n' "$repo_dir" ;;
-            notes) printf '%s\n' "$notes_dir" ;;
-            *) printf '%s\n' "$PWD" ;;
-          esac
-        }
-
-        choose_session() {
-          if [ -n "''${1:-}" ]; then
-            printf '%s\n' "$1"
-            return
-          fi
-
-          session_table \
-            | "$fzf_bin" \
-              --delimiter=$'\t' \
-              --with-nth=1 \
-              --prompt='tmux session > ' \
-              --height=40% \
-            | cut -f1
-        }
-
-        target="$(choose_session "''${1:-}")"
-        if [ -z "$target" ]; then
-          exit 0
-        fi
-
-        dir="$(session_dir "$target")"
-        if [ ! -d "$dir" ]; then
-          dir="$home_dir"
-        fi
-
-        if ! "$tmux_bin" has-session -t "=$target" 2>/dev/null; then
-          "$tmux_bin" new-session -d -s "$target" -c "$dir" -n "$target"
-        fi
-
-        if [ -n "''${TMUX:-}" ]; then
-          exec "$tmux_bin" switch-client -t "=$target"
-        fi
-
-        exec "$tmux_bin" attach-session -t "=$target"
-      '')
       (pkgs.writeShellScriptBin "hyr" ''
         set -euo pipefail
 

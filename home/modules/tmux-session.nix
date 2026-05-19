@@ -1,0 +1,100 @@
+{ config, pkgs, ... }:
+
+{
+  home.packages = [
+    (pkgs.writeShellScriptBin "tmux-session" ''
+      set -euo pipefail
+
+      tmux_bin="${pkgs.tmux}/bin/tmux"
+      fzf_bin="${pkgs.fzf}/bin/fzf"
+      home_dir="${config.home.homeDirectory}"
+      repo_dir="$home_dir/nixos-dotfiles"
+      docs_dir="$repo_dir/docs"
+
+      session_table() {
+        printf 'main\t%s\n' "$home_dir"
+        printf 'dots\t%s\n' "$repo_dir"
+        printf 'qs\t%s\n' "$repo_dir"
+        printf 'notes\t%s\n' "$docs_dir/README.md"
+      }
+
+      normalize_session() {
+        case "$1" in
+          quickshell) printf 'qs\n' ;;
+          *) printf '%s\n' "$1" ;;
+        esac
+      }
+
+      session_dir() {
+        case "$1" in
+          main) printf '%s\n' "$home_dir" ;;
+          dots|qs) printf '%s\n' "$repo_dir" ;;
+          notes) printf '%s\n' "$docs_dir" ;;
+          *) printf '%s\n' "$PWD" ;;
+        esac
+      }
+
+      choose_session() {
+        if [ -n "''${1:-}" ]; then
+          normalize_session "$1"
+          return
+        fi
+
+        session_table \
+          | "$fzf_bin" \
+            --delimiter=$'\t' \
+            --with-nth=1 \
+            --prompt='tmux session > ' \
+            --height=40% \
+          | cut -f1
+      }
+
+      create_session() {
+        target="$1"
+        dir="$(session_dir "$target")"
+
+        if [ ! -d "$dir" ]; then
+          dir="$home_dir"
+        fi
+
+        case "$target" in
+          main)
+            "$tmux_bin" new-session -d -s "$target" -c "$dir" -n main
+            ;;
+          dots)
+            "$tmux_bin" new-session -d -s "$target" -c "$dir" -n files yazi
+            "$tmux_bin" split-window -h -t "$target:files" -c "$dir"
+            "$tmux_bin" new-window -t "$target:" -c "$dir" -n term
+            "$tmux_bin" select-window -t "$target:files"
+            ;;
+          qs)
+            "$tmux_bin" new-session -d -s "$target" -c "$dir" -n vim 'nvim config/quickshell/shell.qml'
+            "$tmux_bin" new-window -t "$target:" -c "$dir" -n term
+            "$tmux_bin" select-window -t "$target:vim"
+            ;;
+          notes)
+            "$tmux_bin" new-session -d -s "$target" -c "$dir" -n notes 'nvim README.md'
+            ;;
+          *)
+            "$tmux_bin" new-session -d -s "$target" -c "$dir" -n "$target"
+            ;;
+        esac
+      }
+
+      target="$(choose_session "''${1:-}")"
+      if [ -z "$target" ]; then
+        exit 0
+      fi
+
+      if ! "$tmux_bin" has-session -t "=$target" 2>/dev/null; then
+        create_session "$target"
+      fi
+
+      if [ -n "''${TMUX:-}" ]; then
+        exec "$tmux_bin" switch-client -t "=$target"
+      fi
+
+      exec "$tmux_bin" attach-session -t "=$target"
+    '')
+  ];
+}

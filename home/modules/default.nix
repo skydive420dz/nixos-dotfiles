@@ -11,6 +11,7 @@
     ./notifications.nix
     ./qutebrowser.nix
     ./tmux.nix
+    ./tmux-session.nix
     ./yazi.nix
     ./vesktop.nix
   ];
