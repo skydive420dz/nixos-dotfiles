@@ -57,19 +57,6 @@ in
           set -g @prefix_highlight_copy_mode_attr 'fg=${semantic.background},bg=${semantic.accentAlt},bold'
         '';
       }
-      {
-        plugin = resurrect;
-        extraConfig = ''
-          set -g @resurrect-capture-pane-contents 'on'
-        '';
-      }
-      {
-        plugin = continuum;
-        extraConfig = ''
-          set -g @continuum-restore 'off'
-          set -g @continuum-save-interval '15'
-        '';
-      }
     ];
 
     # =========================
