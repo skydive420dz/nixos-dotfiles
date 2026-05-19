@@ -93,10 +93,12 @@ in
 
       set -g message-style "fg=${semantic.foreground},bg=${semantic.surfaceStrong}"
       set -g message-command-style "fg=${semantic.accent},bg=${semantic.surfaceStrong}"
-      set -g mode-style "fg=${semantic.selectionForeground},bg=${semantic.selectionBackground},bold"
+      set -g mode-style "fg=${semantic.background},bg=${semantic.accent},bold"
       set -g menu-style "fg=${semantic.foreground},bg=${semantic.surface}"
-      set -g menu-selected-style "fg=${semantic.selectionForeground},bg=${semantic.selectionBackground},bold"
+      set -g menu-selected-style "fg=${semantic.background},bg=${semantic.accent},bold"
       set -g menu-border-style "fg=${semantic.borderActive},bg=${semantic.surface}"
+      set -g popup-style "fg=${semantic.foreground},bg=${semantic.surface}"
+      set -g popup-border-style "fg=${semantic.borderActive},bg=${semantic.surface}"
 
       # =========================================
       # PANE BORDERS
