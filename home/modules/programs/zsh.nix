@@ -25,8 +25,8 @@
       cat = "bat";
       btop = "kitty --title btop_float -e btop";
       nvtop = "kitty --title nvtop_float -e nvtop";
-      tm = "tmux new -A -s main";
-      tmd = "tmux new -A -s dots";
+      tm = "tmux-session main";
+      tmd = "tmux-session dots";
       discord = "vesktop --use-gl=desktop --enable-features=UseOzonePlatform --ozone-platform=wayland";
     };
 
@@ -43,7 +43,7 @@
         && [ -z "$TMUX" ] \
         && [ -z "$NO_TMUX_AUTO" ] \
         && { [ "$TERM" = "xterm-kitty" ] || [ -n "$KITTY_WINDOW_ID" ]; }; then
-        tmux new -A -s main
+        tmux-session main
       fi
 
     '';

@@ -126,6 +126,7 @@ in
       # SESSION ADMIN
       # =========================================
 
+      bind g display-popup -E -w 70% -h 50% "${config.home.profileDirectory}/bin/tmux-session"
       bind s choose-tree -s -F '#[fg=${semantic.accent},bg=${semantic.background}]#{?session_attached,●,○} #[fg=${semantic.foreground},bg=${semantic.background}]#{session_name} #[fg=${semantic.muted},bg=${semantic.background}](#{session_windows} windows)'
 
       # =========================================
