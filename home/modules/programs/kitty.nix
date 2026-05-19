@@ -1,7 +1,7 @@
 { ... }:
 
 let
-  theme = import ../../theme/tokens.nix;
+  theme = import ../../../theme/tokens.nix;
   colors = theme.palette;
   semantic = theme.semantic;
   terminal = theme.terminal;

@@ -6,9 +6,9 @@
 }:
 let
   inherit (lib.generators) mkLuaInline;
-  theme = import ../../theme/tokens.nix;
+  theme = import ../../../../theme/tokens.nix;
   semantic = theme.semantic;
-  customLua = import ./nvim/lua.nix {
+  customLua = import ./lua.nix {
     inherit theme semantic;
   };
 

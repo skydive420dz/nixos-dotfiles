@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 let
-  tokens = import ../../theme/tokens.nix;
+  tokens = import ../../../theme/tokens.nix;
 in
 {
   programs.yazi = {
@@ -62,7 +62,7 @@ in
       }
     ];
 
-    theme = import ../../theme/yazi.nix {
+    theme = import ../../../theme/yazi.nix {
       inherit (tokens) palette;
     };
 

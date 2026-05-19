@@ -20,6 +20,7 @@
 - [Home entry](../../home/home.nix)
 - [Live links](../../home/modules/links.nix)
 - [System modules](../../system/modules/)
+- [Module structure](../areas/modules.md)
 
 ## Decisions
 
@@ -29,6 +30,8 @@
 - Bar applets launch plainly through `uwsm app`; Hyprland rules place them near
   the cursor.
 - Key repeat in Hyprland matches macOS feel.
+- Units that grow past one small file move into category-aware module
+  directories with a local `default.nix`; current examples are tmux and Neovim.
 
 ## Next
 

@@ -8,9 +8,9 @@
     ./gaming.nix
     ./packages.nix
     ./programs/bat.nix
+    ./programs/nvim
     ./services/ollama.nix
     ./desktop/hyprland.nix
-    ./nvim.nix
     ./audio-config.nix
     ./nvidia.nix
     ./boot.nix

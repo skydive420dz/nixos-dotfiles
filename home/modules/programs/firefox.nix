@@ -9,7 +9,7 @@
 # (Mozilla doesn't allow it on AMO, so it's not in NUR either).
 # Manual extensions coexist fine with the declarative ones.
 #
-# Lives in home/modules/firefox.nix.
+# Lives in home/modules/programs/firefox.nix.
 
 { pkgs, inputs, ... }:
 
