@@ -48,15 +48,6 @@ in
 
     plugins = with pkgs.tmuxPlugins; [
       yank
-      {
-        plugin = prefix-highlight;
-        extraConfig = ''
-          set -g @prefix_highlight_fg '${semantic.background}'
-          set -g @prefix_highlight_bg '${semantic.accent}'
-          set -g @prefix_highlight_show_copy_mode 'on'
-          set -g @prefix_highlight_copy_mode_attr 'fg=${semantic.background},bg=${semantic.accentAlt},bold'
-        '';
-      }
     ];
 
     # =========================
@@ -100,6 +91,11 @@ in
       # TMUX UI SURFACES
       # =========================================
 
+      set -g @prefix_highlight_fg '${semantic.background}'
+      set -g @prefix_highlight_bg '${semantic.accent}'
+      set -g @prefix_highlight_show_copy_mode 'on'
+      set -g @prefix_highlight_copy_mode_attr 'fg=${semantic.background},bg=${semantic.accentAlt},bold'
+
       set -g message-style "fg=${semantic.foreground},bg=${semantic.surfaceStrong}"
       set -g message-command-style "fg=${semantic.accent},bg=${semantic.surfaceStrong}"
       set -g mode-style "fg=${semantic.background},bg=${semantic.accent},bold"
@@ -108,6 +104,7 @@ in
       set -g menu-border-style "fg=${semantic.borderActive},bg=${semantic.surface}"
       set -g popup-style "fg=${semantic.foreground},bg=${semantic.surface}"
       set -g popup-border-style "fg=${semantic.borderActive},bg=${semantic.surface}"
+      run-shell ${pkgs.tmuxPlugins.prefix-highlight.rtp}
 
       # =========================================
       # PANE BORDERS

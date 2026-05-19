@@ -10,7 +10,9 @@ state can fight the clean `main` startup/sessionizer flow.
 
 - `yank` keeps copy-mode integration with the system clipboard.
 - `sensibleOnTop` provides a small baseline of sane tmux defaults.
-- `prefix-highlight` shows when tmux is waiting after `prefix`.
+- `prefix-highlight` shows when tmux is waiting after `prefix`. It is loaded
+  manually after the status bar is defined because the plugin replaces a
+  literal status placeholder at load time.
 
 We still do not use a tmux vim-navigation plugin or fzf plugin. Navigation is
 handled by our explicit tmux/smart-splits bindings, and the sessionizer calls
