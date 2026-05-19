@@ -137,6 +137,30 @@
     vim.keymap.set("n", "<leader>zw", "zw", { desc = "Mark word wrong" })
     vim.keymap.set("n", "<leader>z=", "z=", { desc = "Spelling suggestions" })
 
+    -- Markdown link navigation
+    local markdown_navigation_group = vim.api.nvim_create_augroup("UserMarkdownNavigation", { clear = true })
+
+    vim.api.nvim_create_autocmd("FileType", {
+      group = markdown_navigation_group,
+      pattern = "markdown",
+      callback = function(event)
+        local link_pattern = [[\[[^]]\+\]([^)]\+)]]
+
+        local function jump_link(flags)
+          return function()
+            local found = vim.fn.search(link_pattern, flags)
+            if found == 0 then
+              vim.notify("No markdown link found", vim.log.levels.INFO, { title = "Markdown" })
+            end
+          end
+        end
+
+        local opts = { buffer = event.buf, silent = true }
+        vim.keymap.set("n", "]l", jump_link("W"), vim.tbl_extend("force", opts, { desc = "Next markdown link" }))
+        vim.keymap.set("n", "[l", jump_link("bW"), vim.tbl_extend("force", opts, { desc = "Previous markdown link" }))
+      end,
+    })
+
     -- Autosave changed normal file buffers after 3 seconds idle in normal mode
     vim.opt.updatetime = 3000
     local autosave_group = vim.api.nvim_create_augroup("NormalModeAutosave", { clear = true })
