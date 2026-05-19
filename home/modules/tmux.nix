@@ -48,6 +48,28 @@ in
 
     plugins = with pkgs.tmuxPlugins; [
       yank
+      {
+        plugin = prefix-highlight;
+        extraConfig = ''
+          set -g @prefix_highlight_fg '${semantic.background}'
+          set -g @prefix_highlight_bg '${semantic.accent}'
+          set -g @prefix_highlight_show_copy_mode 'on'
+          set -g @prefix_highlight_copy_mode_attr 'fg=${semantic.background},bg=${semantic.accentAlt},bold'
+        '';
+      }
+      {
+        plugin = resurrect;
+        extraConfig = ''
+          set -g @resurrect-capture-pane-contents 'on'
+        '';
+      }
+      {
+        plugin = continuum;
+        extraConfig = ''
+          set -g @continuum-restore 'on'
+          set -g @continuum-save-interval '15'
+        '';
+      }
     ];
 
     # =========================
@@ -85,7 +107,7 @@ in
 
       set -g status-left "#[fg=${semantic.muted},bg=${semantic.surface}]  #S #[fg=${semantic.muted},bg=${semantic.background}] #[fg=${semantic.foreground},bg=${semantic.surface}] #(${tmuxDirName} '#{pane_current_path}') #[fg=${semantic.muted},bg=${semantic.background}] "
 
-      set -g status-right "#[fg=${semantic.muted},bg=${semantic.background}]  #{user}   #H "
+      set -g status-right "#{prefix_highlight}#[fg=${semantic.muted},bg=${semantic.background}]  #{user}   #H "
 
       # =========================================
       # TMUX UI SURFACES

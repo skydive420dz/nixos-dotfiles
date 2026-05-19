@@ -2,9 +2,22 @@
 
 ## Direction
 
-Tmux should stay lean and intentional. We removed automatic resurrect/continuum
-state restore in favor of named session recipes that can be recreated from a
-known shape.
+Tmux should stay lean and intentional. Named session recipes are the clean
+baseline, and resurrect/continuum are allowed as a convenience layer over that
+baseline instead of being the source of truth.
+
+## Plugins
+
+- `yank` keeps copy-mode integration with the system clipboard.
+- `sensibleOnTop` provides a small baseline of sane tmux defaults.
+- `prefix-highlight` shows when tmux is waiting after `prefix`.
+- `resurrect` saves/restores live tmux state when needed.
+- `continuum` autosaves/restores live state, now acceptable because the
+  sessionizer gives us clean recipes when we want to start fresh.
+
+We still do not use a tmux vim-navigation plugin or fzf plugin. Navigation is
+handled by our explicit tmux/smart-splits bindings, and the sessionizer calls
+plain `fzf` directly.
 
 ## Sessionizer
 
