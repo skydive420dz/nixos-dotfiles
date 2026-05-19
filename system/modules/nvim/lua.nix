@@ -146,7 +146,7 @@
       callback = function(event)
         local link_target_pattern = [=[]([^)]\+)]=]
 
-        local function jump_link(flags)
+        local function jump_link(flags, offset)
           return function()
             local found = vim.fn.search(link_target_pattern, flags)
             if found == 0 then
@@ -154,13 +154,15 @@
               return
             end
 
-            vim.cmd("normal! l")
+            if offset ~= 0 then
+              vim.cmd("normal! " .. offset .. "l")
+            end
           end
         end
 
         local opts = { buffer = event.buf, silent = true }
-        vim.keymap.set("n", "]u", jump_link("W"), vim.tbl_extend("force", opts, { desc = "Next markdown link" }))
-        vim.keymap.set("n", "[u", jump_link("bW"), vim.tbl_extend("force", opts, { desc = "Previous markdown link" }))
+        vim.keymap.set("n", "]u", jump_link("eW", 1), vim.tbl_extend("force", opts, { desc = "Next markdown link" }))
+        vim.keymap.set("n", "[u", jump_link("bW", 2), vim.tbl_extend("force", opts, { desc = "Previous markdown link" }))
       end,
     })
 
