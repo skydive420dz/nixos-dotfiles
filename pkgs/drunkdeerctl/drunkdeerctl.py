@@ -152,12 +152,14 @@ def decode_identity(payload):
         raise DrunkDeerError(f"identity response too short: {len(payload)} bytes")
     type_bytes = tuple(payload[4:7])
     model_name, type_code = MODEL_BY_TYPE_BYTES.get(type_bytes, ("unknown", None))
-    firmware_triplet = tuple(payload[34:37])
+    firmware_value = (payload[8] << 8) | payload[7]
     return {
         "raw": payload,
         "type_bytes": type_bytes,
         "model_name": model_name,
         "type_code": type_code,
+        "firmware": f"{payload[8]}.{payload[7]:02d}",
+        "firmware_value": firmware_value,
         "turbo": payload[15],
         "rapid_trigger": payload[16],
         "rtp": payload[18],
@@ -169,7 +171,6 @@ def decode_identity(payload):
         "rt_match": payload[30],
         "auto_match_mode": payload[31],
         "last_win_replace": payload[32],
-        "firmware": ".".join(str(v) for v in firmware_triplet),
     }
 
 
@@ -212,21 +213,25 @@ def candidate_devices(node=None):
     )
 
 
-def cmd_info(args):
+def read_identity(device_arg=None):
     errors = []
-    for device in candidate_devices(args.device):
+    for device in candidate_devices(device_arg):
         try:
             payload = write_identity(device["node"])
-            break
+            return device, decode_identity(payload)
         except DrunkDeerError as exc:
             errors.append(f"{device['node']}: {exc}")
-    else:
-        raise DrunkDeerError(
-            "no identity response from any DrunkDeer hidraw device:\n  "
-            + "\n  ".join(errors)
-        )
+    raise DrunkDeerError(
+        "no identity response from any DrunkDeer hidraw device:\n  "
+        + "\n  ".join(errors)
+    )
 
-    info = decode_identity(payload)
+
+def yes_no(value):
+    return "yes" if value else "no"
+
+
+def print_identity(device, info, raw=False):
     if "vid" in device:
         print(f"device: {device['node']} ({device['vid']:04x}:{device['pid']:04x})")
         print(f"name: {device['name']}")
@@ -235,7 +240,7 @@ def cmd_info(args):
         print(f"device: {device['node']}")
     print(f"model: {info['model_name']} ({info['type_code'] or 'unknown'})")
     print(f"type-bytes: {info['type_bytes']}")
-    print(f"firmware: {info['firmware']}")
+    print(f"firmware: {info['firmware']} (0x{info['firmware_value']:04x})")
     print(f"turbo: {info['turbo']}")
     print(f"rapid-trigger: {info['rapid_trigger']}")
     print(f"rtp: {info['rtp']}")
@@ -244,8 +249,32 @@ def cmd_info(args):
     print(f"rt-match: {info['rt_match']}")
     print(f"auto-match-mode: {info['auto_match_mode']}")
     print(f"last-win-replace: {info['last_win_replace']}")
-    if args.raw:
+    if raw:
         print("raw:", " ".join(f"{byte:02x}" for byte in info["raw"]))
+
+
+def print_status(device, info):
+    print(f"device: {device['node']}")
+    print(f"model: {info['model_name']} ({info['type_code'] or 'unknown'})")
+    print(f"firmware: {info['firmware']} (0x{info['firmware_value']:04x})")
+    print(f"profile: {info['profile_index']}")
+    print(f"rapid-trigger: {yes_no(info['rapid_trigger'])}")
+    print(f"last-win: {yes_no(info['last_win'])}")
+    print(f"turbo: {yes_no(info['turbo'])}")
+    print(f"rtp-mode: {info['rtp']}")
+    print(f"rt-match: {yes_no(info['rt_match'])}")
+    print(f"auto-match-mode: {info['auto_match_mode']}")
+    print(f"last-win-replace: {yes_no(info['last_win_replace'])}")
+
+
+def cmd_info(args):
+    device, info = read_identity(args.device)
+    print_identity(device, info, raw=args.raw)
+
+
+def cmd_status(args):
+    device, info = read_identity(args.device)
+    print_status(device, info)
 
 
 def build_parser():
@@ -263,6 +292,10 @@ def build_parser():
     info_parser.add_argument("-d", "--device", help="hidraw node, e.g. /dev/hidraw1")
     info_parser.add_argument("--raw", action="store_true", help="print raw identity payload")
     info_parser.set_defaults(func=cmd_info)
+
+    status_parser = subparsers.add_parser("status", help="print concise keyboard status")
+    status_parser.add_argument("-d", "--device", help="hidraw node, e.g. /dev/hidraw2")
+    status_parser.set_defaults(func=cmd_status)
 
     return parser
 
