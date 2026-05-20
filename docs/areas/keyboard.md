@@ -67,7 +67,6 @@ sudo libinput debug-events --show-keycodes
 wev
 drunkdeerctl list
 drunkdeerctl --list
-drunkdeerctl status
 drunkdeerctl info --raw
 ```
 
@@ -80,8 +79,6 @@ first local tool is `drunkdeerctl`, a read-only probe that:
 - sends the identity packet over hidraw with report ID `0x04`
 - tries all matching hidraw interfaces and prefers the richer config descriptor
 - decodes model/type bytes and current global mode bytes
-- reports firmware using the app-observed bytes `[8], [7]`; A75 Pro currently
-  reports `0.09` / `0x0009`
 - does not write profile, actuation, remap, Last Win, or Rapid Trigger settings
 
 Current A75 Pro observations:
@@ -94,14 +91,12 @@ Current A75 Pro observations:
 | VID/PID | `352d:2383` |
 | HID name | `Drunkdeer Drunkdeer A75 Pro ANSI` |
 | A75 Pro identity bytes | `(11, 4, 3)` |
-| Firmware bytes | raw `[7]=0x09`, `[8]=0x00`; display `0.09` |
 
 Before adding writes, verify:
 
 1. `drunkdeerctl list` finds the keyboard as the regular user.
-2. `drunkdeerctl status` returns model `A75 Pro`.
-3. `drunkdeerctl info --raw` returns raw bytes for protocol notes.
-4. udev assigns DrunkDeer hidraw nodes to group `input` after `nrs` and
+2. `drunkdeerctl info --raw` returns model `A75 Pro`.
+3. udev assigns DrunkDeer hidraw nodes to group `input` after `nrs` and
    reconnect/reload.
 
 Known input devices from `/proc/bus/input/devices`:
