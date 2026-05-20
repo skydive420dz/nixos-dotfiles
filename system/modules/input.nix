@@ -25,5 +25,28 @@
           _ @copy @paste _)
       '';
     };
+
+    # TEMP: DrunkDeer A75 Pro stays in Kanata only while drunkdeerctl grows into
+    # the real firmware/config tool. Remove this keyboard block once the
+    # standalone DrunkDeer flake owns the workflow we need.
+    keyboards.drunkdeer = {
+      devices = [ "/dev/input/by-id/usb-Drunkdeer_Drunkdeer_A75_Pro_ANSI_RYMicro-event-kbd" ];
+      extraDefCfg = "process-unmapped-keys yes";
+      config = ''
+        (defsrc
+          caps y p)
+
+        (defalias
+          capsmod (tap-hold 200 200 esc (multi lctl lalt (layer-while-held controlalt)))
+          copy (multi (release-key lalt) C-c)
+          paste (multi (release-key lalt) C-v))
+
+        (deflayer base
+          @capsmod _ _)
+
+        (deflayer controlalt
+          _ @copy @paste)
+      '';
+    };
   };
 }

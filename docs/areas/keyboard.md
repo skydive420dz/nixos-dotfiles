@@ -18,7 +18,7 @@
 ## Notes
 
 - Caps is handled through Kanata on NixOS.
-- keyd is disabled. Keep it disabled while Kanata owns the internal keyboard.
+- keyd is disabled. Keep it disabled while Kanata owns keyboards.
 - Keep app-native navigation simple until a real layer system is worth the setup cost.
 
 ## NixOS Kanata Investigation
@@ -41,6 +41,7 @@ move into host-level Nix options later instead of becoming mystery strings.
 | Touchpad device | MSI Bravo 15 C7V | `config/hypr/hyprland.lua` | Hardcode `pnp0c50:0b-06cb:7e7e-touchpad` | Hypr runtime toggle needs the exact device name from `hyprctl devices` | Move to `mkOption` per host |
 | Play/pause media key | NixOS shell | `config/hypr/hyprland.lua`, `config/quickshell/root/Bar.qml` | Bind `XF86AudioPlay` to Quickshell IPC | Quickshell already owns MPRIS state/control, so no extra media package is needed | Keep as-is unless media ownership changes |
 | Extra `\|` key | MSI Bravo 15 C7V 99-key layout | `system/modules/input.nix` | Map Kanata `IntlBackslash = bksl` | Built-in 99-key layout emitted the wrong logical key for the physical `\|` key | Keep with host keyboard options later |
+| DrunkDeer A75 Pro ANSI temporary Kanata | External USB keyboard | `system/modules/input.nix` | Add separate `kanata-drunkdeer.service` with the same Caps tap/hold and Caps+Y/P clipboard layer | Makes the keyboard usable while the standalone `drunkdeerctl` flake grows into the real configuration tool | Remove this block once DrunkDeer firmware/app workflow is ready |
 | Display-mode key | MSI Bravo 15 C7V | none | Leave `Fn+F11` unmapped | It emits `Super+p`, not a clean display XF86 key; no current workflow needs it | Design explicit monitor profile/picker later |
 
 ## Future Kanata Layer Ideas
@@ -73,6 +74,7 @@ Known input devices from `/proc/bus/input/devices`:
 | Video Bus | event1, event2 | Brightness/display-style hotkeys may appear here |
 | MSI WMI hotkeys | event3 | Vendor hotkeys |
 | Kanata virtual keyboard | service output | Current Kanata output device |
+| DrunkDeer A75 Pro ANSI | event varies | TEMP Kanata-owned external keyboard; stable path is `/dev/input/by-id/usb-Drunkdeer_Drunkdeer_A75_Pro_ANSI_RYMicro-event-kbd` |
 
 Inventory table:
 
