@@ -18,7 +18,7 @@
 ## Notes
 
 - Caps is handled through Kanata on NixOS.
-- keyd is disabled. Keep it disabled while Kanata owns keyboards.
+- keyd is disabled. Keep it disabled while Kanata owns the internal keyboard.
 - Keep app-native navigation simple until a real layer system is worth the setup cost.
 
 ## NixOS Kanata Investigation
@@ -41,8 +41,6 @@ move into host-level Nix options later instead of becoming mystery strings.
 | Touchpad device | MSI Bravo 15 C7V | `config/hypr/hyprland.lua` | Hardcode `pnp0c50:0b-06cb:7e7e-touchpad` | Hypr runtime toggle needs the exact device name from `hyprctl devices` | Move to `mkOption` per host |
 | Play/pause media key | NixOS shell | `config/hypr/hyprland.lua`, `config/quickshell/root/Bar.qml` | Bind `XF86AudioPlay` to Quickshell IPC | Quickshell already owns MPRIS state/control, so no extra media package is needed | Keep as-is unless media ownership changes |
 | Extra `\|` key | MSI Bravo 15 C7V 99-key layout | `system/modules/input.nix` | Map Kanata `IntlBackslash = bksl` | Built-in 99-key layout emitted the wrong logical key for the physical `\|` key | Keep with host keyboard options later |
-| DrunkDeer A75 Pro ANSI | External USB keyboard | `system/modules/input.nix` | Separate `kanata-drunkdeer.service` on `/dev/input/by-id/usb-Drunkdeer_Drunkdeer_A75_Pro_ANSI_RYMicro-event-kbd` | External keyboard should get the same Caps tap/hold and Caps+Y/P clipboard layer without coupling to the laptop keyboard service | Move keyboard device paths into host options later |
-| DrunkDeer control | External keyboard configuration | `pkgs/drunkdeerctl`, `system/modules/input.nix` | Start with a read-only Linux-native HID probe | Chromium-family portal access was fragile; `DrunkDeer-Control` documents the HID protocol well enough to build our own path | Add profile writes only after list/info are boring |
 | Display-mode key | MSI Bravo 15 C7V | none | Leave `Fn+F11` unmapped | It emits `Super+p`, not a clean display XF86 key; no current workflow needs it | Design explicit monitor profile/picker later |
 
 ## Future Kanata Layer Ideas
@@ -65,39 +63,7 @@ Useful commands after installing the diagnostic tools:
 sudo evtest
 sudo libinput debug-events --show-keycodes
 wev
-drunkdeerctl list
-drunkdeerctl --list
-drunkdeerctl info --raw
 ```
-
-## DrunkDeer Control Plan
-
-Use `DrunkDeer-Control` as a protocol reference, not as an app to package. The
-first local tool is `drunkdeerctl`, a read-only probe that:
-
-- scans `/sys/class/hidraw` for DrunkDeer VID `0x352d`
-- sends the identity packet over hidraw with report ID `0x04`
-- tries all matching hidraw interfaces and prefers the richer config descriptor
-- decodes model/type bytes and current global mode bytes
-- does not write profile, actuation, remap, Last Win, or Rapid Trigger settings
-
-Current A75 Pro observations:
-
-| Path | Value |
-| --- | --- |
-| Main event path | `/dev/input/by-id/usb-Drunkdeer_Drunkdeer_A75_Pro_ANSI_RYMicro-event-kbd` |
-| Config hidraw paths | `/dev/hidraw1`, `/dev/hidraw2` |
-| Config interface note | The keyboard can expose multiple hidraw nodes; probe all, because the keyboard interface may time out while the vendor/config interface responds |
-| VID/PID | `352d:2383` |
-| HID name | `Drunkdeer Drunkdeer A75 Pro ANSI` |
-| A75 Pro identity bytes | `(11, 4, 3)` |
-
-Before adding writes, verify:
-
-1. `drunkdeerctl list` finds the keyboard as the regular user.
-2. `drunkdeerctl info --raw` returns model `A75 Pro`.
-3. udev assigns DrunkDeer hidraw nodes to group `input` after `nrs` and
-   reconnect/reload.
 
 Known input devices from `/proc/bus/input/devices`:
 
@@ -107,7 +73,6 @@ Known input devices from `/proc/bus/input/devices`:
 | Video Bus | event1, event2 | Brightness/display-style hotkeys may appear here |
 | MSI WMI hotkeys | event3 | Vendor hotkeys |
 | Kanata virtual keyboard | service output | Current Kanata output device |
-| DrunkDeer A75 Pro ANSI | event22 | External keyboard main event device; stable path is `/dev/input/by-id/usb-Drunkdeer_Drunkdeer_A75_Pro_ANSI_RYMicro-event-kbd` |
 
 Inventory table:
 

@@ -1,15 +1,9 @@
 { pkgs, ... }:
 
-let
-  drunkdeerctl = pkgs.callPackage ../../pkgs/drunkdeerctl { };
-in
-
 {
   environment.systemPackages = with pkgs; [
     libinput
     evtest
-    drunkdeerctl
-    kanata
     wev
     tmux
     vim
