@@ -42,7 +42,7 @@
 
   set -g status-left "\
   #[fg=${semantic.muted},bg=${semantic.surface}] \
-   #S #[fg=${semantic.muted},bg=${semantic.background}] \
+   #S #[fg=${semantic.muted},bg=${semantic.background}] \
   #[fg=${semantic.foreground},bg=${semantic.surface}] \
   #(${tmuxDirName} '#{pane_current_path}') \
   #[fg=${semantic.muted},bg=${semantic.background}] "
