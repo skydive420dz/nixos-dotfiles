@@ -9,6 +9,16 @@ STATIC_DIR = os.environ.get("HOME_DECK_STATIC_DIR", os.path.dirname(os.path.absp
 STATE_DIR = os.environ.get("HOME_DECK_STATE_DIR", STATIC_DIR)
 OLLAMA_URL = os.environ.get("HOME_DECK_OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
 MODEL = os.environ.get("HOME_DECK_MODEL", "llama3.2:latest")
+ALLOWED_MODELS = {
+    "llama3.2:latest",
+    "deepseek-r1:1.5b",
+    "deepseek-r1:7b",
+}
+SYSTEM_PROMPT = (
+    "You are answering from a small private Home Deck dashboard. "
+    "Be concise, literal, and practical. Do not invent deployments, URLs, "
+    "external facts, or status you were not given."
+)
 
 
 class DeckHandler(SimpleHTTPRequestHandler):
@@ -28,6 +38,7 @@ class DeckHandler(SimpleHTTPRequestHandler):
             body = self.rfile.read(length).decode("utf-8")
             payload = json.loads(body or "{}")
             prompt = (payload.get("prompt") or "").strip()
+            model = (payload.get("model") or MODEL).strip()
         except Exception:
             self.send_json({"response": "Bad request."}, status=400)
             return
@@ -36,14 +47,17 @@ class DeckHandler(SimpleHTTPRequestHandler):
             self.send_json({"response": "Type something first."}, status=400)
             return
 
+        if model not in ALLOWED_MODELS:
+            model = MODEL
+
         prompt = prompt[:1200]
-        answer = self.ask(prompt)
+        answer = self.ask(prompt, model)
         self.send_json({"response": answer})
 
-    def ask(self, prompt):
+    def ask(self, prompt, model):
         payload = {
-            "model": MODEL,
-            "prompt": prompt,
+            "model": model,
+            "prompt": SYSTEM_PROMPT + "\n\nUser request:\n" + prompt,
             "stream": False,
             "options": {
                 "num_predict": 220,

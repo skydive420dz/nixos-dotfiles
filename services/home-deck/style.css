@@ -11,6 +11,11 @@ body {
   border-top: 8px solid #79b8ff;
 }
 
+body.night {
+  background: #030609;
+  border-top-color: #26313b;
+}
+
 .wrap {
   max-width: 920px;
   margin: 0 auto;
@@ -53,6 +58,17 @@ p {
   color: #ffd479;
 }
 
+.mode {
+  float: right;
+  margin-top: 8px;
+  padding: 8px 12px;
+  color: #101418;
+  background: #d7b8ff;
+  border: 0;
+  border-radius: 5px;
+  font-weight: 700;
+}
+
 .grid,
 .details {
   overflow: hidden;
@@ -78,6 +94,14 @@ article.offline {
   border-color: #d36c6c;
 }
 
+article.warn {
+  border-color: #ffd479;
+}
+
+article.critical {
+  border-color: #ff7b72;
+}
+
 .details article {
   min-height: 132px;
   background: #151c22;
@@ -85,6 +109,30 @@ article.offline {
 
 .details p {
   font-size: 16px;
+}
+
+.bar {
+  height: 10px;
+  margin: 0 0 10px;
+  overflow: hidden;
+  background: #0d1115;
+  border: 1px solid #25313a;
+  border-radius: 5px;
+}
+
+.bar span {
+  display: block;
+  width: 0;
+  height: 10px;
+  background: #79b8ff;
+}
+
+.bar span.warn {
+  background: #ffd479;
+}
+
+.bar span.critical {
+  background: #ff7b72;
 }
 
 .big {
@@ -122,6 +170,10 @@ article.offline {
   background: #d7b8ff;
 }
 
+.links a:nth-child(5) {
+  background: #c7d0d6;
+}
+
 .ask {
   clear: both;
   margin-bottom: 18px;
@@ -129,6 +181,34 @@ article.offline {
   background: #151c22;
   border: 1px solid #31414b;
   border-radius: 6px;
+}
+
+.notes {
+  clear: both;
+  margin-bottom: 18px;
+  padding: 18px;
+  background: #151c22;
+  border: 1px solid #31414b;
+  border-radius: 6px;
+}
+
+.notes p {
+  font-size: 16px;
+}
+
+.ask select {
+  display: inline-block;
+  margin: 0 10px 10px 0;
+  padding: 10px;
+  color: #eef3f6;
+  background: #0d1115;
+  border: 1px solid #31414b;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.presets button {
+  background: #79b8ff;
 }
 
 .ask textarea {
@@ -186,6 +266,33 @@ footer {
 footer span {
   display: inline-block;
   margin-right: 18px;
+}
+
+body.night article,
+body.night .ask,
+body.night .notes {
+  background: #080d12;
+}
+
+body.night p,
+body.night #answer {
+  color: #9aa7b0;
+}
+
+body.night .clock {
+  color: #7f8c96;
+}
+
+body.night h1,
+body.night h2 {
+  color: #8fa8b8;
+}
+
+body.night .links,
+body.night .ask,
+body.night .notes,
+body.night article {
+  opacity: 0.72;
 }
 
 @media (max-width: 700px) {

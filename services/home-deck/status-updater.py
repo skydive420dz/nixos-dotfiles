@@ -35,12 +35,29 @@ REMOTE_SCRIPT = r'''
 u="$(uptime | sed 's/.* up *//; s/, *[0-9][0-9]* user.*//; s/, *load average.*//')"
 l="$(uptime | sed 's/.*load average[s]*: *//')"
 disk="$(df -h / | awk 'NR==2 {print $5 " used, " $4 " free"}')"
+disk_pct="$(df -P / | awk 'NR==2 {gsub("%", "", $5); print $5}')"
+read _ u1 n1 s1 i1 w1 q1 r1 t1 _ < /proc/stat
+total1=$((u1+n1+s1+i1+w1+q1+r1+t1))
+idle1=$((i1+w1))
+sleep 1
+read _ u2 n2 s2 i2 w2 q2 r2 t2 _ < /proc/stat
+total2=$((u2+n2+s2+i2+w2+q2+r2+t2))
+idle2=$((i2+w2))
+totald=$((total2-total1))
+idled=$((idle2-idle1))
+cpu_pct=0
+if [ "$totald" -gt 0 ]; then
+  cpu_pct=$((100*(totald-idled)/totald))
+fi
+ram_pct="$(awk '/MemTotal/ {t=$2} /MemAvailable/ {a=$2} END {if (t > 0) printf "%d", 100*(t-a)/t; else print 0}' /proc/meminfo)"
 b=""
+bpct=""
 for f in /sys/class/power_supply/BAT*/capacity; do
   if [ -r "$f" ]; then
     s="$(cat "${f%/capacity}/status" 2>/dev/null || true)"
     c="$(cat "$f" 2>/dev/null || true)"
     b="$s $c%"
+    bpct="$c"
     break
   fi
 done
@@ -51,10 +68,14 @@ for name in "$@"; do
   svc="$svc$name:${state:-missing}"
 done
 gpu=""
+gpu_temp=""
+gpu_util=""
 if command -v nvidia-smi >/dev/null 2>&1; then
   gpu="$(nvidia-smi --query-gpu=temperature.gpu,power.draw,utilization.gpu,memory.used,memory.total --format=csv,noheader,nounits 2>/dev/null | awk -F', ' 'NR==1 {print $1 "C, " $2 "W, " $3 "%, " $4 "/" $5 "MiB"}')"
+  gpu_temp="$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | awk 'NR==1 {print $1}')"
+  gpu_util="$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | awk 'NR==1 {print $1}')"
 fi
-printf '%s\n%s\n%s\n%s\n%s\n%s\n' "$u" "$l" "$b" "$disk" "$svc" "$gpu"
+printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' "$u" "$l" "$b" "$disk" "$svc" "$gpu" "$cpu_pct" "$ram_pct" "$disk_pct" "$bpct" "$gpu_temp" "$gpu_util"
 '''
 
 
@@ -112,6 +133,12 @@ def remote(host):
                 "disk": "--",
                 "services": "ssh unavailable",
                 "gpu": "--",
+                "cpu_pct": "0",
+                "ram_pct": "0",
+                "disk_pct": "0",
+                "battery_pct": "",
+                "gpu_temp": "",
+                "gpu_util": "",
                 "ollama": "--",
             }
         return {
@@ -123,6 +150,12 @@ def remote(host):
             "disk": "--",
             "services": "--",
             "gpu": "--",
+            "cpu_pct": "0",
+            "ram_pct": "0",
+            "disk_pct": "0",
+            "battery_pct": "",
+            "gpu_temp": "",
+            "gpu_util": "",
             "ollama": "--",
         }
 
@@ -131,6 +164,12 @@ def remote(host):
     disk = lines[3] if len(lines) > 3 else ""
     services = lines[4] if len(lines) > 4 else ""
     gpu = lines[5] if len(lines) > 5 else ""
+    cpu_pct = lines[6] if len(lines) > 6 else ""
+    ram_pct = lines[7] if len(lines) > 7 else ""
+    disk_pct = lines[8] if len(lines) > 8 else ""
+    battery_pct = lines[9] if len(lines) > 9 else ""
+    gpu_temp = lines[10] if len(lines) > 10 else ""
+    gpu_util = lines[11] if len(lines) > 11 else ""
     extra = host["extra"]
     if extra == "battery":
         extra = "battery: " + (battery or "--")
@@ -144,6 +183,12 @@ def remote(host):
         "disk": disk or "--",
         "services": services or "--",
         "gpu": gpu or "--",
+        "cpu_pct": cpu_pct or "0",
+        "ram_pct": ram_pct or "0",
+        "disk_pct": disk_pct or "0",
+        "battery_pct": battery_pct or "",
+        "gpu_temp": gpu_temp or "",
+        "gpu_util": gpu_util or "",
         "ollama": "--",
     }
 
@@ -187,6 +232,17 @@ def ollama():
         return "ready"
 
 
+def router():
+    reachable = bool(run(["ping", "-c", "1", "-W", "1", "192.168.1.1"], timeout=2))
+    http = run(["nc", "-vz", "-w", "2", "192.168.1.1", "80"], timeout=3, keep_stderr=True)
+    return {
+        "online": reachable,
+        "http": bool(http),
+        "ip": "192.168.1.1",
+        "label": "DD-WRT",
+    }
+
+
 def snapshot():
     os.makedirs(STATE_DIR, exist_ok=True)
     msi = remote(HOSTS["msi"])
@@ -197,6 +253,7 @@ def snapshot():
         "t430": remote(HOSTS["t430"]),
         "x230t": remote(HOSTS["x230t"]),
         "ipad": ipad(),
+        "router": router(),
     }
     tmp = STATUS_PATH + ".tmp"
     with open(tmp, "w") as f:

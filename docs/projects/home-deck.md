@@ -104,12 +104,18 @@ The current deck displays:
 - Clock/date
 - MSI, T430, X230T, and iPad online state
 - Uptime/load
+- CPU and RAM meters
 - Laptop batteries
 - Root filesystem usage
+- Alert colors for low battery, high disk, hot GPU, offline hosts, and service issues
 - Important service status
 - MSI GPU temperature, watts, utilization, and VRAM
 - Ollama model availability
-- A small `Ask MSI` prompt box proxied to Ollama
+- Router reachability and HTTP status
+- A small event timeline
+- A night mode toggle for dim display use
+- Lab notes for the current network and jailbreak state
+- An `Ask MSI` prompt box proxied to Ollama, with model selection and prompt presets
 
 ## Operating Notes
 
@@ -139,8 +145,6 @@ recreate it.
 
 ## Next Ideas
 
-- Animated CPU/GPU/RAM meters
-- Alert colors for low battery, full disk, down services, and hot GPU
 - Router/DD-WRT panel
 - Local lab notes panel
 - Safer command buttons, like refresh status or ping all hosts

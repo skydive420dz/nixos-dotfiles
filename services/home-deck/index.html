@@ -16,7 +16,10 @@
         <h1>Home Deck</h1>
         <p id="date">Loading...</p>
       </div>
-      <div class="clock" id="clock">--:--</div>
+      <div>
+        <div class="clock" id="clock">--:--</div>
+        <button id="modeButton" class="mode" type="button">Night</button>
+      </div>
     </header>
 
     <section class="grid">
@@ -79,6 +82,34 @@
         <p data-detail="gpu">GPU: --</p>
         <p data-detail="ollama">Ollama: --</p>
       </article>
+
+      <article id="panel-compute">
+        <h2>Compute</h2>
+        <p>MSI CPU <span data-detail="msiCpu">--</span></p>
+        <div class="bar"><span data-bar="msiCpu"></span></div>
+        <p>MSI RAM <span data-detail="msiRam">--</span></p>
+        <div class="bar"><span data-bar="msiRam"></span></div>
+      </article>
+
+      <article id="panel-router">
+        <h2>Router</h2>
+        <p data-detail="router">Router: --</p>
+        <p data-detail="routerHttp">HTTP: --</p>
+        <p>LAN: 192.168.1.0/24</p>
+      </article>
+
+      <article id="panel-alerts">
+        <h2>Alerts</h2>
+        <p data-detail="alerts">No alerts yet.</p>
+      </article>
+
+      <article id="panel-events">
+        <h2>Events</h2>
+        <p data-event="0">Waiting for status...</p>
+        <p data-event="1"></p>
+        <p data-event="2"></p>
+        <p data-event="3"></p>
+      </article>
     </section>
 
     <section class="links">
@@ -86,16 +117,34 @@
       <a href="http://192.168.1.1/">Router HTTP</a>
       <a href="http://192.168.1.175:11434/api/tags">Ollama Tags</a>
       <a href="/">Deck</a>
+      <a href="#panel-alerts">Alerts</a>
     </section>
 
     <section class="ask">
       <h2>Ask MSI</h2>
+      <select id="model">
+        <option value="llama3.2:latest">llama3.2</option>
+        <option value="deepseek-r1:1.5b">deepseek 1.5b</option>
+        <option value="deepseek-r1:7b">deepseek 7b</option>
+      </select>
+      <div class="presets">
+        <button type="button" data-preset="Summarize the current dashboard status in 3 short bullets.">Summarize</button>
+        <button type="button" data-preset="What needs attention on this dashboard? Be brief.">Attention</button>
+        <button type="button" data-preset="Explain the current Home Deck setup in one short paragraph.">Explain</button>
+      </div>
       <textarea id="prompt" rows="3" placeholder="Ask Ollama..."></textarea>
       <div>
-        <button id="askButton" type="button">Ask llama3.2</button>
+        <button id="askButton" type="button">Ask MSI</button>
         <span id="askState">ready</span>
       </div>
       <pre id="answer">Local answer will appear here.</pre>
+    </section>
+
+    <section class="notes">
+      <h2>Lab Notes</h2>
+      <p>Secure Boot: enabled with local keys and TPM eventlog OptionROM handling.</p>
+      <p>iPad: Phoenix is semi-untethered; rerun jailbreak after reboot.</p>
+      <p>DD-WRT leases: managed through DNSMasq options.</p>
     </section>
 
     <footer>
