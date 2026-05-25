@@ -115,6 +115,8 @@ The current deck displays:
 - A small event timeline
 - A night mode toggle for dim display use
 - Lab notes for the current network and jailbreak state
+- MSI-only system details: top process, failed systemd units, kernel, and Secure Boot state
+- Intentional powered-down placeholders for offline ThinkPads
 - An `Ask MSI` prompt box proxied to Ollama, with model selection and prompt presets
 
 ## Operating Notes

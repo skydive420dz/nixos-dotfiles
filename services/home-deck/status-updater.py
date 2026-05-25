@@ -75,7 +75,11 @@ if command -v nvidia-smi >/dev/null 2>&1; then
   gpu_temp="$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | awk 'NR==1 {print $1}')"
   gpu_util="$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | awk 'NR==1 {print $1}')"
 fi
-printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' "$u" "$l" "$b" "$disk" "$svc" "$gpu" "$cpu_pct" "$ram_pct" "$disk_pct" "$bpct" "$gpu_temp" "$gpu_util"
+top_proc="$(ps -eo comm,pcpu,pmem --sort=-pcpu 2>/dev/null | awk 'NR==2 {print $1 " " $2 "% cpu, " $3 "% ram"}')"
+failed_units="$(systemctl --failed --no-legend 2>/dev/null | wc -l | awk '{print $1}')"
+kernel="$(uname -r 2>/dev/null || true)"
+secureboot="$(bootctl status 2>/dev/null | awk -F': ' '/Secure Boot/ {print $2; exit}')"
+printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' "$u" "$l" "$b" "$disk" "$svc" "$gpu" "$cpu_pct" "$ram_pct" "$disk_pct" "$bpct" "$gpu_temp" "$gpu_util" "$top_proc" "$failed_units" "$kernel" "$secureboot"
 '''
 
 
@@ -139,6 +143,10 @@ def remote(host):
                 "battery_pct": "",
                 "gpu_temp": "",
                 "gpu_util": "",
+                "top_proc": "--",
+                "failed_units": "--",
+                "kernel": "--",
+                "secureboot": "--",
                 "ollama": "--",
             }
         return {
@@ -156,6 +164,10 @@ def remote(host):
             "battery_pct": "",
             "gpu_temp": "",
             "gpu_util": "",
+            "top_proc": "--",
+            "failed_units": "--",
+            "kernel": "--",
+            "secureboot": "--",
             "ollama": "--",
         }
 
@@ -170,6 +182,10 @@ def remote(host):
     battery_pct = lines[9] if len(lines) > 9 else ""
     gpu_temp = lines[10] if len(lines) > 10 else ""
     gpu_util = lines[11] if len(lines) > 11 else ""
+    top_proc = lines[12] if len(lines) > 12 else ""
+    failed_units = lines[13] if len(lines) > 13 else ""
+    kernel = lines[14] if len(lines) > 14 else ""
+    secureboot = lines[15] if len(lines) > 15 else ""
     extra = host["extra"]
     if extra == "battery":
         extra = "battery: " + (battery or "--")
@@ -189,6 +205,10 @@ def remote(host):
         "battery_pct": battery_pct or "",
         "gpu_temp": gpu_temp or "",
         "gpu_util": gpu_util or "",
+        "top_proc": top_proc or "--",
+        "failed_units": failed_units or "0",
+        "kernel": kernel or "--",
+        "secureboot": secureboot or "--",
         "ollama": "--",
     }
 

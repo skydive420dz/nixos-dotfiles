@@ -68,16 +68,16 @@ function setDetails(data) {
   var t430 = data.t430 || {};
   var x230t = data.x230t || {};
 
-  detail("t430Battery", "T430: " + (t430.battery || "--"));
-  detail("x230tBattery", "X230T: " + (x230t.battery || "--"));
+  detail("t430Battery", "T430: " + hostValue(t430, "battery"));
+  detail("x230tBattery", "X230T: " + hostValue(x230t, "battery"));
 
   detail("msiDisk", "MSI: " + (msi.disk || "--"));
-  detail("t430Disk", "T430: " + (t430.disk || "--"));
-  detail("x230tDisk", "X230T: " + (x230t.disk || "--"));
+  detail("t430Disk", "T430: " + hostValue(t430, "disk"));
+  detail("x230tDisk", "X230T: " + hostValue(x230t, "disk"));
 
   detail("msiServices", "MSI: " + (msi.services || "--"));
-  detail("t430Services", "T430: " + (t430.services || "--"));
-  detail("x230tServices", "X230T: " + (x230t.services || "--"));
+  detail("t430Services", "T430: " + hostValue(t430, "services"));
+  detail("x230tServices", "X230T: " + hostValue(x230t, "services"));
 
   detail("gpu", "GPU: " + (msi.gpu || "--"));
   detail("ollama", "Ollama: " + (msi.ollama || "--"));
@@ -89,15 +89,24 @@ function setDetails(data) {
 
   detail("router", "Router: " + ((data.router && data.router.online) ? "online" : "offline"));
   detail("routerHttp", "HTTP: " + ((data.router && data.router.http) ? "ready" : "unavailable"));
+  detail("msiTop", "Top: " + (msi.top_proc || "--"));
+  detail("msiFailed", "Failed units: " + (msi.failed_units || "0"));
+  detail("msiKernel", "Kernel: " + (msi.kernel || "--"));
+  detail("msiSecureBoot", "Secure Boot: " + (msi.secureboot || "--"));
   detail("alerts", alerts(data).join("<br>") || "All quiet.");
   setEvents(data);
 }
 
+function hostValue(host, field) {
+  if (!host || !host.online) return "powered down";
+  return host[field] || "--";
+}
+
 function alerts(data) {
   var out = [];
-  addHostAlerts(out, "MSI", data.msi || {});
-  addHostAlerts(out, "T430", data.t430 || {});
-  addHostAlerts(out, "X230T", data.x230t || {});
+  addHostAlerts(out, "MSI", data.msi || {}, true);
+  addHostAlerts(out, "T430", data.t430 || {}, false);
+  addHostAlerts(out, "X230T", data.x230t || {}, false);
   if (data.ipad && !data.ipad.online) out.push("iPad is offline");
   if (data.ipad && data.ipad.uptime && data.ipad.uptime.indexOf("unknown") >= 0) {
     out.push("iPad SSH not ready");
@@ -106,9 +115,9 @@ function alerts(data) {
   return out;
 }
 
-function addHostAlerts(out, label, host) {
+function addHostAlerts(out, label, host, required) {
   if (!host.online) {
-    out.push(label + " offline");
+    if (required) out.push(label + " offline");
     return;
   }
   if (host.battery_pct !== "" && number(host.battery_pct) < 30) {
@@ -125,8 +134,8 @@ function setEvents(data) {
   events.push("Ollama " + ((data.msi && data.msi.ollama && data.msi.ollama !== "not reachable") ? "ready" : "unavailable"));
   events.push("Router " + ((data.router && data.router.online) ? "online" : "offline"));
   events.push("iPad " + ((data.ipad && data.ipad.online) ? "awake" : "offline"));
-  events.push("T430 " + ((data.t430 && data.t430.online) ? "online" : "offline"));
-  events.push("X230T " + ((data.x230t && data.x230t.online) ? "online" : "offline"));
+  events.push("T430 " + ((data.t430 && data.t430.online) ? "online" : "powered down"));
+  events.push("X230T " + ((data.x230t && data.x230t.online) ? "online" : "powered down"));
   for (var i = 0; i < 4; i++) {
     var node = document.querySelector('[data-event="' + i + '"]');
     if (node) node.innerHTML = events[i] || "";
