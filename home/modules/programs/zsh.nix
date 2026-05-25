@@ -35,8 +35,15 @@
         . "$HOME/.openai_key"
       fi
 
-      if uwsm check may-start; then
-        exec uwsm start hyprland-uwsm.desktop > /dev/null 2>&1
+      current_tty="$(tty 2>/dev/null || true)"
+
+      if [[ -o login ]] \
+        && [[ -o interactive ]] \
+        && [ -z "$SSH_CONNECTION" ] \
+        && [ -z "$WAYLAND_DISPLAY" ] \
+        && [ "$current_tty" = "/dev/tty1" ] \
+        && uwsm check may-start; then
+        exec uwsm start hyprland-uwsm.desktop >/dev/null 2>&1
       fi
 
       if [[ -o interactive ]] \

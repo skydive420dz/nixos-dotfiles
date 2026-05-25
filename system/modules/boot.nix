@@ -7,11 +7,16 @@
 
 {
   config,
+  lib,
   pkgs,
   ...
 }:
 
 {
+  environment.systemPackages = with pkgs; [
+    sbctl
+  ];
+
   boot = {
     consoleLogLevel = 0;
 
@@ -33,12 +38,19 @@
     loader = {
       timeout = 0;
       systemd-boot = {
-        enable = true;
+        # Lanzaboote replaces NixOS' systemd-boot module while still using a
+        # systemd-boot based flow under Secure Boot.
+        enable = lib.mkForce false;
         graceful = true;
         consoleMode = "max"; # match Plymouth resolution to avoid flicker
         editor = false; # disable boot entry editing (security)
       };
       efi.canTouchEfiVariables = true;
+    };
+
+    lanzaboote = {
+      enable = true;
+      pkiBundle = "/var/lib/sbctl";
     };
 
     # ── Kernel parameters ───────────────────────────────────────────────────

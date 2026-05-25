@@ -14,6 +14,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v1.0.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     quickshell = {
       url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -34,6 +39,7 @@
       home-manager,
       nvf,
       catppuccin,
+      lanzaboote,
       ...
     }@inputs:
     let
@@ -60,6 +66,7 @@
         modules = [
           nvf.nixosModules.default
           catppuccin.nixosModules.catppuccin
+          lanzaboote.nixosModules.lanzaboote
           home-manager.nixosModules.home-manager
           {
             home-manager = {

@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Deck">
+  <title>Home Deck</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Home Deck</h1>
+        <p id="date">Loading...</p>
+      </div>
+      <div class="clock" id="clock">--:--</div>
+    </header>
+
+    <section class="grid">
+      <article id="card-msi">
+        <h2>MSI</h2>
+        <p class="big" data-field="state">checking</p>
+        <p data-field="uptime">uptime: --</p>
+        <p data-field="load">load: --</p>
+        <p data-field="extra">secure boot: enabled</p>
+      </article>
+
+      <article id="card-t430">
+        <h2>T430</h2>
+        <p class="big" data-field="state">checking</p>
+        <p data-field="uptime">uptime: --</p>
+        <p data-field="load">load: --</p>
+        <p data-field="extra">battery: --</p>
+      </article>
+
+      <article id="card-x230t">
+        <h2>X230T</h2>
+        <p class="big" data-field="state">checking</p>
+        <p data-field="uptime">uptime: --</p>
+        <p data-field="load">load: --</p>
+        <p data-field="extra">battery: --</p>
+      </article>
+
+      <article id="card-ipad">
+        <h2>iPad mini</h2>
+        <p class="big" data-field="state">checking</p>
+        <p data-field="uptime">jailbreak: active if SSH works</p>
+        <p data-field="load">ip: 192.168.1.185</p>
+        <p data-field="extra">ios 9.3.5</p>
+      </article>
+    </section>
+
+    <section class="details">
+      <article id="panel-batteries">
+        <h2>Batteries</h2>
+        <p data-detail="t430Battery">T430: --</p>
+        <p data-detail="x230tBattery">X230T: --</p>
+      </article>
+
+      <article id="panel-storage">
+        <h2>Storage</h2>
+        <p data-detail="msiDisk">MSI: --</p>
+        <p data-detail="t430Disk">T430: --</p>
+        <p data-detail="x230tDisk">X230T: --</p>
+      </article>
+
+      <article id="panel-services">
+        <h2>Services</h2>
+        <p data-detail="msiServices">MSI: --</p>
+        <p data-detail="t430Services">T430: --</p>
+        <p data-detail="x230tServices">X230T: --</p>
+      </article>
+
+      <article id="panel-gpu">
+        <h2>MSI GPU / Ollama</h2>
+        <p data-detail="gpu">GPU: --</p>
+        <p data-detail="ollama">Ollama: --</p>
+      </article>
+    </section>
+
+    <section class="links">
+      <a href="/status.json">Raw Status</a>
+      <a href="http://192.168.1.1/">Router HTTP</a>
+      <a href="http://192.168.1.175:11434/api/tags">Ollama Tags</a>
+      <a href="/">Deck</a>
+    </section>
+
+    <section class="ask">
+      <h2>Ask MSI</h2>
+      <textarea id="prompt" rows="3" placeholder="Ask Ollama..."></textarea>
+      <div>
+        <button id="askButton" type="button">Ask llama3.2</button>
+        <span id="askState">ready</span>
+      </div>
+      <pre id="answer">Local answer will appear here.</pre>
+    </section>
+
+    <footer>
+      <span id="updated">Updated: --</span>
+      <span>Keep iPad plugged in</span>
+    </footer>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

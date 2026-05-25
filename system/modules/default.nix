@@ -9,6 +9,7 @@
     ./packages.nix
     ./programs/bat.nix
     ./programs/nvim
+    ./services/home-deck.nix
     ./services/ollama.nix
     ./desktop/hyprland.nix
     ./audio-config.nix
