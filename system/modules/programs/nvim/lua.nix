@@ -36,9 +36,6 @@
         "FloatBorder",
         "SignColumn",
         "EndOfBuffer",
-        "NeoTreeNormal",
-        "NeoTreeNormalNC",
-        "NeoTreeEndOfBuffer",
       }
 
       for _, group in ipairs(transparent_groups) do
@@ -108,35 +105,6 @@
       vim.g.smart_splits_multiplexer_integration = "tmux"
     end
 
-    local function smart_move(method, fallback)
-      return function()
-        local ok, splits = pcall(require, "smart-splits")
-        if ok and type(splits[method]) == "function" then
-          splits[method]()
-          return
-        end
-
-        vim.cmd("wincmd " .. fallback)
-      end
-    end
-
-    local neo_tree_navigation_group = vim.api.nvim_create_augroup("UserNeoTreeNavigation", { clear = true })
-
-    vim.api.nvim_create_autocmd("FileType", {
-      group = neo_tree_navigation_group,
-      pattern = "neo-tree",
-      callback = function(event)
-        local function opts(desc)
-          return { buffer = event.buf, silent = true, desc = desc }
-        end
-
-        vim.keymap.set("n", "<C-h>", smart_move("move_cursor_left", "h"), opts("Move left"))
-        vim.keymap.set("n", "<C-j>", smart_move("move_cursor_down", "j"), opts("Move down"))
-        vim.keymap.set("n", "<C-k>", smart_move("move_cursor_up", "k"), opts("Move up"))
-        vim.keymap.set("n", "<C-l>", smart_move("move_cursor_right", "l"), opts("Move right"))
-      end,
-    })
-
     -- Spelling
     vim.opt.spell = true
     vim.opt.spelllang = { "en_us" }
@@ -180,54 +148,182 @@
       end,
     })
 
-    -- Autosave changed normal file buffers after 3 seconds idle in normal mode
-    vim.opt.updatetime = 3000
-    local autosave_group = vim.api.nvim_create_augroup("NormalModeAutosave", { clear = true })
-    local autosave_pending = false
+    local function mini_files_open(path)
+      return function()
+        local ok, files = pcall(require, "mini.files")
+        if not ok then
+          vim.notify("mini.files is not available", vim.log.levels.WARN, { title = "Files" })
+          return
+        end
 
-    local function can_autosave()
-      return vim.bo.modified
-        and vim.bo.modifiable
-        and not vim.bo.readonly
-        and vim.bo.buftype == ""
-        and vim.fn.expand("%") ~= ""
-        and vim.fn.mode() == "n"
+        files.open(path(), true)
+      end
     end
 
-    vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
-      group = autosave_group,
-      callback = function()
-        autosave_pending = true
-      end,
-    })
-
-    vim.api.nvim_create_autocmd("CursorHold", {
-      group = autosave_group,
-      callback = function()
-        if autosave_pending and can_autosave() then
-          local filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":t")
-          autosave_pending = false
-          vim.cmd("silent! update")
-          vim.notify("Saved " .. filename, vim.log.levels.INFO, { title = "Autosave" })
-        end
-      end,
-    })
-
-    -- Pane and Neo-tree navigation
-    vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle reveal_force_cwd<cr>", { desc = "Toggle Neo-tree" })
-    vim.keymap.set("n", "<leader>E", "<cmd>Neotree reveal_force_cwd<cr>", { desc = "Focus Neo-tree" })
+    -- Pane and file navigation
+    vim.keymap.set("n", "<leader>e", mini_files_open(function()
+      local current = vim.api.nvim_buf_get_name(0)
+      return current ~= "" and current or vim.uv.cwd()
+    end), { desc = "Open MiniFiles" })
+    vim.keymap.set("n", "<leader>E", mini_files_open(function()
+      return vim.uv.cwd()
+    end), { desc = "Open MiniFiles cwd" })
     vim.keymap.set("n", "<leader>u", "<cmd>UndotreeToggle<cr>", { desc = "Toggle Undotree" })
 
     -- Navigation Hints Toggle
     vim.keymap.set("n", "<leader>pt", "<cmd>Precognition toggle<cr>", { desc = "Toggle Hints" })
-    vim.keymap.set("n", "<leader>pc", function()
-      local ok, context = pcall(require, "treesitter-context")
-      if ok then
-        context.toggle()
-      end
-    end, { desc = "Toggle Context" })
 
-    -- Trouble Diagnostics Toggle
-    vim.keymap.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics" })
+    local function format_buffer()
+      local ok, conform = pcall(require, "conform")
+      if ok then
+        conform.format({ async = true, lsp_format = "fallback" })
+      else
+        vim.lsp.buf.format({ async = true })
+      end
+    end
+
+    local function open_navbuddy()
+      local ok, navbuddy = pcall(require, "nvim-navbuddy")
+      if ok then
+        navbuddy.open()
+      else
+        vim.notify("nvim-navbuddy is not available", vim.log.levels.WARN, { title = "LSP" })
+      end
+    end
+
+    local function code_action()
+      local ok, fastaction = pcall(require, "fastaction")
+      if ok then
+        fastaction.code_action()
+      else
+        vim.lsp.buf.code_action()
+      end
+    end
+
+    vim.keymap.set("n", "<leader>gd", "<cmd>DiffviewOpen<cr>", { desc = "Open Diffview" })
+    vim.keymap.set("n", "<leader>gD", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" })
+    vim.keymap.set("n", "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", { desc = "File history" })
+
+    vim.keymap.set("n", "<leader>rr", "<cmd>GrugFar<cr>", { desc = "Replace in project" })
+    vim.keymap.set("n", "<leader>rw", "<cmd>GrugFarWithin<cr>", { desc = "Replace in scope" })
+    vim.keymap.set("x", "<leader>rw", ":GrugFarWithin<cr>", { desc = "Replace selection" })
+
+    vim.keymap.set("n", "<leader>in", "<cmd>IconPickerNormal<cr>", { desc = "Pick icon" })
+    vim.keymap.set("n", "<leader>ii", "<cmd>IconPickerInsert<cr>", { desc = "Insert icon" })
+    vim.keymap.set("n", "<leader>iy", "<cmd>IconPickerYank<cr>", { desc = "Yank icon" })
+    vim.keymap.set("n", "<leader>ip", "<cmd>PasteImage<cr>", { desc = "Paste image" })
+
+    vim.keymap.set("n", "<leader>ln", open_navbuddy, { desc = "Navbuddy" })
+    vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, { desc = "Rename symbol" })
+    vim.keymap.set({ "n", "x" }, "<leader>la", code_action, { desc = "Code action" })
+    vim.keymap.set("n", "<leader>lf", format_buffer, { desc = "Format buffer" })
+    vim.keymap.set("n", "<leader>lF", "<cmd>ConformInfo<cr>", { desc = "Conform info" })
+
+    vim.keymap.set("n", "<leader>pl", "<cmd>Lazy<cr>", { desc = "Lazy" })
+    vim.keymap.set("n", "<leader>tt", "<cmd>ToggleTerm<cr>", { desc = "Toggle terminal" })
+    vim.keymap.set("n", "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>", { desc = "Horizontal terminal" })
+    vim.keymap.set("n", "<leader>tv", "<cmd>ToggleTerm direction=vertical<cr>", { desc = "Vertical terminal" })
+    vim.keymap.set("t", "<C-\\>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+
+    vim.api.nvim_create_autocmd("LspAttach", {
+      group = vim.api.nvim_create_augroup("UserLspKeymaps", { clear = true }),
+      callback = function(event)
+        local opts = { buffer = event.buf, silent = true }
+        vim.keymap.set("n", "<leader>lf", format_buffer, vim.tbl_extend("force", opts, { desc = "Format buffer" }))
+        vim.keymap.set("n", "<leader>ln", open_navbuddy, vim.tbl_extend("force", opts, { desc = "Navbuddy" }))
+        vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename symbol" }))
+        vim.keymap.set({ "n", "x" }, "<leader>la", code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
+      end,
+    })
+
+    local ok_which_key, which_key = pcall(require, "which-key")
+    if ok_which_key then
+      which_key.add({
+        { "<leader>b", group = "󰓩 Buffers" },
+        { "<leader>bm", group = "󰁌 Move Buffer" },
+        { "<leader>bs", group = "󰒺 Sort Buffers" },
+        { "<leader>d", group = " Debug" },
+        { "<leader>dg", group = "󰆹 Debug Step" },
+        { "<leader>dv", group = "󰕮 Debug Stack" },
+        { "<leader>f", group = "󰱼 Find" },
+        { "<leader>fl", group = " LSP Search" },
+        { "<leader>fv", group = " Git Search" },
+        { "<leader>fvc", group = "󰜘 Commits" },
+        { "<leader>g", group = " Git / Diff" },
+        { "<leader>i", group = "󰀻 Insert / Media" },
+        { "<leader>l", group = " LSP / Code" },
+        { "<leader>lg", group = "󰁔 LSP Go" },
+        { "<leader>lt", group = "󰔡 LSP Toggles" },
+        { "<leader>lw", group = "󰖲 Workspace" },
+        { "<leader>m", group = "󰯈 Multicursor" },
+        { "<leader>mc", group = "󰯈 Multicursor" },
+        { "<leader>p", group = "󰐃 Plugins / Toggles" },
+        { "<leader>r", group = "󰑕 Replace" },
+        { "<localleader>r", group = " Rust" },
+        { "<leader>S", group = "󰆓 Sessions" },
+        { "<leader>s", group = "󰿅 Seek / Leap" },
+        { "<leader>t", group = " Terminal / Tools" },
+        { "<leader>td", group = " Todos" },
+        { "<leader>z", group = "󰓆 Spelling" },
+      })
+    end
+
+    -- MiniSnippets maps <C-j> to manual snippet expansion by default. Completion
+    -- navigation owns <C-j>/<C-k>/<C-l>; snippets use Tab/S-Tab after expansion.
+    pcall(vim.keymap.del, "i", "<C-j>")
+    pcall(vim.keymap.del, "s", "<C-j>")
+
+    local function completion_or_snippet_next()
+      local ok_cmp, cmp = pcall(require, "blink.cmp")
+      if ok_cmp and cmp.is_menu_visible() then
+        cmp.select_next()
+        return ""
+      end
+
+      local ok_snippets = pcall(require, "mini.snippets")
+      if ok_snippets and MiniSnippets.session.get() ~= nil then
+        MiniSnippets.session.jump("next")
+        return ""
+      end
+
+      if vim.snippet and vim.snippet.active({ direction = 1 }) then
+        vim.snippet.jump(1)
+        return ""
+      end
+
+      return "\t"
+    end
+
+    local function completion_or_snippet_prev()
+      local ok_cmp, cmp = pcall(require, "blink.cmp")
+      if ok_cmp and cmp.is_menu_visible() then
+        cmp.select_prev()
+        return ""
+      end
+
+      local ok_snippets = pcall(require, "mini.snippets")
+      if ok_snippets and MiniSnippets.session.get() ~= nil then
+        MiniSnippets.session.jump("prev")
+        return ""
+      end
+
+      if vim.snippet and vim.snippet.active({ direction = -1 }) then
+        vim.snippet.jump(-1)
+        return ""
+      end
+
+      return vim.keycode("<S-Tab>")
+    end
+
+    vim.keymap.set({ "i", "s" }, "<Tab>", completion_or_snippet_next, { expr = true, desc = "Next completion or snippet jump" })
+    vim.keymap.set({ "i", "s" }, "<S-Tab>", completion_or_snippet_prev, { expr = true, desc = "Previous completion or snippet jump" })
+
+    vim.diagnostic.config({
+      virtual_text = true,
+      signs = true,
+      underline = true,
+      update_in_insert = true,
+      severity_sort = true,
+    })
   '';
 }
