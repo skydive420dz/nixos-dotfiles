@@ -34,7 +34,7 @@
       extraDefCfg = "process-unmapped-keys yes";
       config = ''
         (defsrc
-          caps y p)
+          caps y p pgup pgdn)
 
         (defalias
           capsmod (tap-hold 200 200 esc (multi lctl lalt (layer-while-held controlalt)))
@@ -42,10 +42,10 @@
           paste (multi (release-key lalt) C-v))
 
         (deflayer base
-          @capsmod _ _)
+          @capsmod _ _ brup brdn)
 
         (deflayer controlalt
-          _ @copy @paste)
+          _ @copy @paste _ _)
       '';
     };
   };

@@ -42,6 +42,7 @@ move into host-level Nix options later instead of becoming mystery strings.
 | Play/pause media key | NixOS shell | `config/hypr/hyprland.lua`, `config/quickshell/root/Bar.qml` | Bind `XF86AudioPlay` to Quickshell IPC | Quickshell already owns MPRIS state/control, so no extra media package is needed | Keep as-is unless media ownership changes |
 | Extra `\|` key | MSI Bravo 15 C7V 99-key layout | `system/modules/input.nix` | Map Kanata `IntlBackslash = bksl` | Built-in 99-key layout emitted the wrong logical key for the physical `\|` key | Keep with host keyboard options later |
 | DrunkDeer A75 Pro ANSI temporary Kanata | External USB keyboard | `system/modules/input.nix` | Add separate `kanata-drunkdeer.service` with the same Caps tap/hold and Caps+Y/P clipboard layer | Makes the keyboard usable while the standalone `drunkdeerctl` flake grows into the real configuration tool | Remove this block once DrunkDeer firmware/app workflow is ready |
+| DrunkDeer brightness layer | External USB keyboard | `system/modules/input.nix` | Map DrunkDeer `pgup`/`pgdn` output to Kanata `brup`/`brdn` | DrunkDeer Antler does not expose brightness keys for firmware remapping; the board's Fn layer can emit Page Up/Page Down instead | Revisit if we later need plain Page Up/Page Down on the board |
 | Display-mode key | MSI Bravo 15 C7V | none | Leave `Fn+F11` unmapped | It emits `Super+p`, not a clean display XF86 key; no current workflow needs it | Design explicit monitor profile/picker later |
 
 ## Future Kanata Layer Ideas

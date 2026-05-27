@@ -6,7 +6,7 @@ Text {
     id: root
 
     Layout.preferredWidth: 124
-    color: Theme.accent
+    color: Theme.muted
     font.family: Theme.font
     font.pixelSize: Theme.fontSize
     horizontalAlignment: Text.AlignRight
