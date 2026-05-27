@@ -217,6 +217,11 @@ module is ready to move.
   label rendering, disconnected color, layout width, text elision, and `nmtui`
   click launcher. `StatusCluster` still owns network identity polling and rate
   calculation, and passes `kind`, `downRate`, and `upRate` into the view.
+- 2026-05-27: Bar visual checkpoint: the bar grew to a 34px rhythm with taller
+  pills, the clock now uses a compact two-line time/date treatment, the media
+  pill gained richer controls plus a dotted placeholder analyzer, and network
+  traffic moved from numeric rates to a compact dotted graph. The media analyzer
+  is still a fake animated placeholder; wire it to real audio levels later.
 
 ## Test Notes
 

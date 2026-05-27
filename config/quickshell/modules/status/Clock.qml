@@ -2,31 +2,54 @@ import "../.."
 import QtQuick
 import QtQuick.Layouts
 
-Text {
+Item {
     id: root
 
-    Layout.preferredWidth: 124
-    color: Theme.muted
-    font.family: Theme.font
-    font.pixelSize: Theme.fontSize
-    horizontalAlignment: Text.AlignRight
-    verticalAlignment: Text.AlignVCenter
-    text: clockText
+    Layout.preferredWidth: 76
+    Layout.preferredHeight: Theme.pillHeight
+    Layout.leftMargin: 4
 
-    property string clockText: ""
+    property string timeText: ""
+    property string dateText: ""
 
     function updateClock() {
         var date = new Date();
-        root.clockText = Qt.formatDateTime(date, "ddd MMM d  HH:mm");
+        root.timeText = "󱑂 " + Qt.formatTime(date, "HH:mm");
+        root.dateText = Qt.formatDate(date, "ddd, MMM d");
     }
 
     Component.onCompleted: updateClock()
 
     Timer {
-        interval: 30000
+        interval: 1000
         repeat: true
         running: true
         triggeredOnStart: true
         onTriggered: root.updateClock()
+    }
+
+    Column {
+        width: parent.width
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 0
+
+        Text {
+            width: parent.width
+            color: Theme.text
+            font.family: Theme.font
+            font.pixelSize: Theme.fontSize
+            font.bold: true
+            horizontalAlignment: Text.AlignHCenter
+            text: root.timeText
+        }
+
+        Text {
+            width: parent.width
+            color: Theme.muted
+            font.family: Theme.font
+            font.pixelSize: Theme.fontSizeSmall
+            horizontalAlignment: Text.AlignHCenter
+            text: root.dateText
+        }
     }
 }

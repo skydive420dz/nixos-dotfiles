@@ -3,22 +3,17 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 
-Text {
+Item {
     id: root
 
-    Layout.fillWidth: true
-    Layout.minimumWidth: 80
-    color: kind ? Theme.muted : Theme.danger
-    font.family: Theme.font
-    font.pixelSize: Theme.fontSize
-    horizontalAlignment: Text.AlignLeft
-    verticalAlignment: Text.AlignVCenter
-    elide: Text.ElideRight
-    text: icon() + (label() ? " " + label() : "")
+    Layout.preferredWidth: 61
+    Layout.preferredHeight: Theme.pillHeight
 
     property string kind: ""
     property string downRate: ""
     property string upRate: ""
+    property var downSamples: []
+    property var upSamples: []
 
     function icon() {
         if (kind === "ethernet")
@@ -28,14 +23,31 @@ Text {
         return "󰤮";
     }
 
-    function label() {
-        if (!kind)
-            return "";
-        return "↓" + (downRate || "0") + " ↑" + (upRate || "0");
+    RowLayout {
+        anchors.fill: parent
+        spacing: 9
+
+        Text {
+            Layout.preferredWidth: Theme.iconSize
+            Layout.alignment: Qt.AlignVCenter
+            color: root.kind ? Theme.muted : Theme.danger
+            font.family: Theme.font
+            font.pixelSize: Theme.iconSize
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: root.icon()
+        }
+
+        NetworkGraph {
+            downSamples: root.downSamples
+            upSamples: root.upSamples
+            opacity: root.kind ? 1 : 0.24
+        }
     }
 
     MouseArea {
         anchors.fill: parent
+        cursorShape: Qt.PointingHandCursor
         onClicked: Quickshell.execDetached(["bash", "-lc", "uwsm app -- kitty --class nmtui -e nmtui"])
     }
 }

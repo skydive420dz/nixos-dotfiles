@@ -7,7 +7,7 @@ import Quickshell.Io
 Rectangle {
     id: root
 
-    implicitWidth: 340
+    implicitWidth: 324
     implicitHeight: Theme.pillHeight
     Layout.preferredWidth: implicitWidth
     Layout.preferredHeight: implicitHeight
@@ -30,6 +30,8 @@ Rectangle {
     property double networkLastSampleMs: 0
     property string networkDownRate: ""
     property string networkUpRate: ""
+    property var networkDownSamples: []
+    property var networkUpSamples: []
     property bool bluetoothAvailable: false
     property bool bluetoothConnected: false
     property int battery: -1
@@ -96,19 +98,33 @@ Rectangle {
         if (kind === "rx") {
             if (networkLastSampleMs > 0 && networkLastRxBytes > 0) {
                 var rxElapsed = Math.max((now - networkLastSampleMs) / 1000, 1);
-                networkDownRate = formatRate(Math.max(0, value - networkLastRxBytes) / rxElapsed);
+                var rxRate = Math.max(0, value - networkLastRxBytes) / rxElapsed;
+                networkDownRate = formatRate(rxRate);
+                networkDownSamples = appendNetworkSample(networkDownSamples, rxRate);
             }
             networkRxBytes = value;
             networkLastRxBytes = value;
         } else {
             if (networkLastSampleMs > 0 && networkLastTxBytes > 0) {
                 var txElapsed = Math.max((now - networkLastSampleMs) / 1000, 1);
-                networkUpRate = formatRate(Math.max(0, value - networkLastTxBytes) / txElapsed);
+                var txRate = Math.max(0, value - networkLastTxBytes) / txElapsed;
+                networkUpRate = formatRate(txRate);
+                networkUpSamples = appendNetworkSample(networkUpSamples, txRate);
             }
             networkTxBytes = value;
             networkLastTxBytes = value;
             networkLastSampleMs = now;
         }
+    }
+
+    function appendNetworkSample(samples, value) {
+        var nextSamples = samples.slice();
+        nextSamples.push(Math.max(0, Number(value) || 0));
+
+        while (nextSamples.length > 32)
+            nextSamples.shift();
+
+        return nextSamples;
     }
 
     function updateBatteryStatus(value) {
@@ -298,14 +314,16 @@ Rectangle {
     RowLayout {
         id: statusRow
         anchors.fill: parent
-        anchors.leftMargin: 8
-        anchors.rightMargin: 8
+        anchors.leftMargin: 10
+        anchors.rightMargin: 10
         spacing: 6
 
         Network {
             kind: root.network
             downRate: root.networkDownRate
             upRate: root.networkUpRate
+            downSamples: root.networkDownSamples
+            upSamples: root.networkUpSamples
         }
 
         Bluetooth {
@@ -314,7 +332,7 @@ Rectangle {
         }
 
         RowLayout {
-            spacing: 3
+            spacing: 6
 
             Volume {
                 level: root.volume

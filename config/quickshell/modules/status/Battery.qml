@@ -6,7 +6,7 @@ Text {
     id: root
 
     visible: level >= 0
-    Layout.preferredWidth: 48
+    Layout.preferredWidth: 40
     color: level < 20 && !charging ? Theme.danger : Theme.muted
     font.family: Theme.font
     font.pixelSize: Theme.fontSize
