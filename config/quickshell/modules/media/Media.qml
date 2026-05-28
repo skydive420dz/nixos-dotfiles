@@ -30,8 +30,12 @@ Rectangle {
     readonly property string mediaUrl: metadata["xesam:url"] ?? ""
     readonly property string playerSource: ((mediaPlayer?.desktopEntry || "") + " " + (mediaPlayer?.identity || "")).toLowerCase()
     readonly property bool isYoutube: mediaUrl.indexOf("youtube.com") >= 0 || mediaUrl.indexOf("youtu.be") >= 0
+    readonly property bool isSpotify: playerSource.indexOf("spotify") >= 0
+    readonly property bool isMpv: playerSource.indexOf("mpv") >= 0
+    readonly property bool isVlc: playerSource.indexOf("vlc") >= 0
     readonly property bool isBrowserMedia: isYoutube || playerSource.indexOf("firefox") >= 0 || playerSource.indexOf("chrom") >= 0
-    readonly property string contentIcon: isYoutube ? "" : isBrowserMedia ? "󰕧" : "󰝚"
+    readonly property string contentIcon: isYoutube ? "" : isSpotify ? "󰓇" : isMpv ? "󰐹" : isVlc ? "󰕼" : isBrowserMedia ? "󰖟" : "󰝚"
+    readonly property color contentColor: isYoutube ? Theme.danger : isSpotify ? Theme.good : isBrowserMedia ? Theme.accent : Theme.muted
 
     Behavior on Layout.preferredWidth {
         NumberAnimation {
@@ -59,8 +63,8 @@ Rectangle {
                 text: "󰒮"
                 color: Theme.muted
                 opacity: root.mediaPlayer?.canGoPrevious ? 1 : 0.30
-                font.family: Theme.font
-                font.pixelSize: Theme.iconSize
+                font.family: Theme.iconFont
+                font.pixelSize: Theme.mediaIconSize
                 horizontalAlignment: Text.AlignHCenter
 
                 MouseArea {
@@ -76,8 +80,8 @@ Rectangle {
                 Layout.preferredWidth: Theme.iconSize
                 text: root.mediaPlaying ? "󰏤" : "󰐊"
                 color: Theme.accent
-                font.family: Theme.font
-                font.pixelSize: Theme.iconSize
+                font.family: Theme.iconFont
+                font.pixelSize: Theme.mediaIconSize
                 horizontalAlignment: Text.AlignHCenter
 
                 MouseArea {
@@ -93,8 +97,8 @@ Rectangle {
                 text: "󰒭"
                 color: Theme.muted
                 opacity: root.mediaPlayer?.canGoNext ? 1 : 0.30
-                font.family: Theme.font
-                font.pixelSize: Theme.iconSize
+                font.family: Theme.iconFont
+                font.pixelSize: Theme.mediaIconSize
                 horizontalAlignment: Text.AlignHCenter
 
                 MouseArea {
@@ -129,9 +133,9 @@ Rectangle {
                 Text {
                     visible: root.contentIcon !== ""
                     text: root.contentIcon
-                    color: root.isYoutube ? Theme.danger : Theme.accent
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSize
+                    color: root.contentColor
+                    font.family: Theme.iconFont
+                    font.pixelSize: Theme.statusIconSize
                 }
 
                 Text {

@@ -1,1 +1,2 @@
 singleton Theme 1.0 Theme.qml
+singleton StatusMetrics 1.0 modules/status/StatusMetrics.qml

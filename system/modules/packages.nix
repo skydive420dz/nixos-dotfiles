@@ -1,43 +1,49 @@
 { pkgs, ... }:
 
 {
-  environment.systemPackages = with pkgs; [
-    libinput
-    evtest
-    wev
-    tmux
-    vim
-    lshw
-    wget
-    git
-    ripgrep
-    fd
-    qt6.qtdeclarative
-    qt6.qtbase
-    qt6.qtlanguageserver
+  environment.systemPackages =
+    let
+      wlctl = pkgs.callPackage ../../pkgs/wlctl-bin.nix { };
+    in
+    with pkgs; [
+      libinput
+      evtest
+      wev
+      tmux
+      vim
+      lshw
+      wget
+      git
+      ripgrep
+      fd
+      qt6.qtdeclarative
+      qt6.qtbase
+      qt6.qtlanguageserver
 
-    fzf
-    fuzzel
-    quickshell
+      fzf
+      fuzzel
+      quickshell
 
-    nil
-    nixpkgs-fmt
-    nodejs
-    gcc
-    c3-lsp
+      nil
+      nixpkgs-fmt
+      nodejs
+      gcc
+      c3-lsp
 
-    fastfetch
-    nitch
+      fastfetch
+      nitch
 
-    ffmpeg-full
-    mpv
+      ffmpeg-full
+      mpv
+      cava
 
-    bluez
-    bluez-tools
-    brightnessctl
-    bluetui
+      bluez
+      bluez-tools
+      brightnessctl
+      bluetui
+      wlctl
 
-    protonup-ng
-    snip
-  ];
+      protonup-ng
+      snip
+    ];
 }

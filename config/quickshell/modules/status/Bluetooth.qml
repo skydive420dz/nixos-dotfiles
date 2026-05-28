@@ -8,8 +8,8 @@ Text {
 
     Layout.preferredWidth: 10
     color: connected ? Theme.accent : Theme.muted
-    font.family: Theme.font
-    font.pixelSize: Theme.fontSize
+    font.family: Theme.iconFont
+    font.pixelSize: Theme.statusIconSize
     horizontalAlignment: Text.AlignHCenter
     verticalAlignment: Text.AlignVCenter
     text: icon()

@@ -222,6 +222,18 @@ module is ready to move.
   pill gained richer controls plus a dotted placeholder analyzer, and network
   traffic moved from numeric rates to a compact dotted graph. The media analyzer
   is still a fake animated placeholder; wire it to real audio levels later.
+- 2026-05-27: Media analyzer is now wired to live CAVA output when media is
+  active. `modules/media/MediaAnalyzer.qml` starts `cava` through
+  `Quickshell.Io.Process` with a temporary raw ASCII config, parses the
+  semicolon-delimited levels, and keeps the previous fake animation as a
+  fallback when `cava` is missing or no live samples have arrived yet.
+- 2026-05-27: The network pill click launcher now prefers `wlctl` and falls back
+  to `nmtui`. `wlctl` is packaged locally as `pkgs/wlctl-bin.nix` from the
+  upstream `v0.1.6` musl release binary because the upstream Nix/source build
+  failed while fetching Rust crates from crates.io. Keep the local binary package
+  until the source package is reliable enough to replace it.
+- 2026-05-27: `wlctl` launches as `kitty --class wlctl -e wlctl`; Hyprland should
+  match that class with the same centered Wi-Fi applet float rule as `nmtui`.
 
 ## Test Notes
 
@@ -288,6 +300,12 @@ module is ready to move.
 - 2026-05-17: Status network extraction tested live. Quickshell reports
   `Configuration Loaded`, network/traffic rendering behaves as expected, and no
   visible anomalies were detected.
+- 2026-05-27: Live CAVA media analyzer tested after `nrs`; `cava 0.10.7` is on
+  the NixOS system path, Quickshell starts cleanly, and the user confirmed the
+  live media graph is up and running.
+- 2026-05-27: `wlctl 0.1.6` binary package built and ran on the NixOS host.
+  `nix eval --impure .#nixosConfigurations.nixos.config.environment.systemPackages --apply builtins.length`
+  returned `206` after adding the package and launcher fallback.
 
 ## Known Lesson
 

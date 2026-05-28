@@ -7,7 +7,7 @@ import Quickshell.Io
 Rectangle {
     id: root
 
-    implicitWidth: 324
+    implicitWidth: StatusMetrics.statusClusterWidth
     implicitHeight: Theme.pillHeight
     Layout.preferredWidth: implicitWidth
     Layout.preferredHeight: implicitHeight
@@ -23,6 +23,7 @@ Rectangle {
     property bool muted: false
     property string network: ""
     property string networkDevice: ""
+    property int networkSignal: -1
     property double networkRxBytes: 0
     property double networkTxBytes: 0
     property double networkLastRxBytes: 0
@@ -54,6 +55,10 @@ Rectangle {
                 root.network = value;
             else if (key === "network_device")
                 root.networkDevice = value;
+            else if (key === "network_signal") {
+                var signalValue = parseInt(value);
+                root.networkSignal = Number.isFinite(signalValue) ? signalValue : -1;
+            }
             else if (key === "rx_bytes")
                 root.updateNetworkRate("rx", Number(value));
             else if (key === "tx_bytes")
@@ -248,7 +253,7 @@ Rectangle {
         command: [
             "bash",
             "-lc",
-            "netrow=$(nmcli -t -f DEVICE,TYPE,STATE device status 2>/dev/null | awk -F: '$3==\"connected\"{print $1\":\"$2; exit}'); netdev=${netrow%%:*}; net=${netrow#*:}; if [ \"$netdev\" = \"$net\" ]; then netdev=; net=; fi; printf 'network=%s\\nnetwork_device=%s\\n' \"${net:-}\" \"${netdev:-}\""
+            "netrow=$(nmcli -t -f DEVICE,TYPE,STATE device status 2>/dev/null | awk -F: '$3==\"connected\"{print $1\":\"$2; exit}'); netdev=${netrow%%:*}; net=${netrow#*:}; signal=-1; if [ \"$netdev\" = \"$net\" ]; then netdev=; net=; fi; if [ \"$net\" = wifi ]; then signal=$(nmcli -t -f IN-USE,SIGNAL dev wifi 2>/dev/null | awk -F: '$1==\"*\" || $1==\"yes\"{print $2; exit}'); fi; printf 'network=%s\\nnetwork_device=%s\\nnetwork_signal=%s\\n' \"${net:-}\" \"${netdev:-}\" \"${signal:--1}\""
         ]
         stdout: SplitParser {
             property string buffer: ""
@@ -314,12 +319,13 @@ Rectangle {
     RowLayout {
         id: statusRow
         anchors.fill: parent
-        anchors.leftMargin: 10
-        anchors.rightMargin: 10
-        spacing: 6
+        anchors.leftMargin: StatusMetrics.statusClusterLeftMargin
+        anchors.rightMargin: StatusMetrics.statusClusterRightMargin
+        spacing: StatusMetrics.statusClusterSpacing
 
         Network {
             kind: root.network
+            signal: root.networkSignal
             downRate: root.networkDownRate
             upRate: root.networkUpRate
             downSamples: root.networkDownSamples
@@ -332,7 +338,7 @@ Rectangle {
         }
 
         RowLayout {
-            spacing: 6
+            spacing: StatusMetrics.statusRightGroupSpacing
 
             Volume {
                 level: root.volume

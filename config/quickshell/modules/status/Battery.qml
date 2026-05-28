@@ -25,12 +25,24 @@ Text {
             return "󱐋";
         if (status === "Full" || status === "Not charging")
             return "󱐥";
-        if (level < 20)
+        if (level <= 10)
+            return "󰁺";
+        if (level <= 20)
             return "󰂃";
-        if (level < 50)
+        if (level <= 30)
+            return "󰁼";
+        if (level <= 40)
+            return "󰁽";
+        if (level <= 50)
             return "󰁾";
-        if (level < 80)
+        if (level <= 60)
+            return "󰁿";
+        if (level <= 70)
+            return "󰂀";
+        if (level <= 80)
             return "󰂁";
+        if (level <= 90)
+            return "󰂂";
         return "󰁹";
     }
 

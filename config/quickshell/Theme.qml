@@ -4,6 +4,7 @@ import QtQuick
 
 QtObject {
     readonly property string font: "JetBrainsMono Nerd Font"
+    readonly property string iconFont: "Symbols Nerd Font"
 
     readonly property int barHeight: 34
     readonly property int pillHeight: 32
@@ -14,6 +15,8 @@ QtObject {
     readonly property int fontSize: 12
     readonly property int fontSizeSmall: 10
     readonly property int iconSize: 14
+    readonly property int statusIconSize: 12
+    readonly property int mediaIconSize: 14
 
     readonly property color bg: Qt.rgba(0.075, 0.082, 0.114, 0.82)
     readonly property color panel: Qt.rgba(0.090, 0.098, 0.135, 0.78)

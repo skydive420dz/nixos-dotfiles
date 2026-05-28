@@ -282,7 +282,7 @@ centered_float({
 
 centered_float({
 	name = "wifi_applet",
-	match = { class = "^(nmtui)$" },
+	match = { class = "^(nmtui|wlctl)$" },
 	size = { 600, 600 },
 	opacity = opacity.solid,
 })

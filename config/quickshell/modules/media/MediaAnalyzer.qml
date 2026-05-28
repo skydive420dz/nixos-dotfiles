@@ -1,6 +1,7 @@
 import "../.."
 import QtQuick
 import QtQuick.Layouts
+import Quickshell.Io
 
 Item {
     id: root
@@ -10,18 +11,53 @@ Item {
 
     property bool active: false
     property int tick: 0
+    property var levels: []
+    readonly property bool hasLiveLevels: levels.length > 0
 
     Timer {
         interval: 90
         repeat: true
-        running: root.active
+        running: root.active && !root.hasLiveLevels
         onTriggered: {
             root.tick = (root.tick + 1) % 360;
             spectrum.requestPaint();
         }
     }
 
-    onActiveChanged: spectrum.requestPaint()
+    onActiveChanged: {
+        if (!root.active)
+            root.levels = [];
+        spectrum.requestPaint();
+    }
+
+    onLevelsChanged: spectrum.requestPaint()
+
+    Process {
+        id: cavaProc
+
+        running: root.active
+        command: [
+            "bash",
+            "-lc",
+            "command -v cava >/dev/null 2>&1 || { sleep 3600; exit 0; }; cfg=$(mktemp); trap 'rm -f \"$cfg\"' EXIT; cat >\"$cfg\" <<'EOF'\n[general]\nbars = 12\nframerate = 24\nautosens = 1\n[input]\nmethod = pulse\nsource = auto\n[output]\nmethod = raw\nraw_target = /dev/stdout\ndata_format = ascii\nascii_max_range = 100\nchannels = mono\nEOF\nexec cava -p \"$cfg\""
+        ]
+
+        stdout: SplitParser {
+            onRead: data => {
+                var parts = data.trim().split(";");
+                var nextLevels = [];
+
+                for (var i = 0; i < parts.length; i++) {
+                    var value = Number(parts[i]);
+                    if (Number.isFinite(value))
+                        nextLevels.push(Math.max(0, Math.min(value / 100, 1)));
+                }
+
+                if (nextLevels.length > 0)
+                    root.levels = nextLevels;
+            }
+        }
+    }
 
     Canvas {
         id: spectrum
@@ -39,8 +75,9 @@ Item {
             var maxHeight = height - 4;
 
             for (var i = 0; i < columns; i++) {
-                var wave = root.active ? Math.abs(Math.sin((root.tick + i * 31) / 18)) : 0;
-                var pulse = root.active ? Math.abs(Math.sin((root.tick + i * 17) / 23)) : 0;
+                var live = root.hasLiveLevels ? (Number(root.levels[i]) || 0) : -1;
+                var wave = live >= 0 ? live : root.active ? Math.abs(Math.sin((root.tick + i * 31) / 18)) : 0;
+                var pulse = live >= 0 ? live : root.active ? Math.abs(Math.sin((root.tick + i * 17) / 23)) : 0;
                 var peak = 3 + wave * maxHeight;
                 var dots = Math.max(1, Math.round(peak / 3));
                 var x = i * step;

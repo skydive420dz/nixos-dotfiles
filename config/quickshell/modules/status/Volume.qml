@@ -8,8 +8,8 @@ Text {
 
     Layout.preferredWidth: 16
     color: muted ? Theme.warning : Theme.muted
-    font.family: Theme.font
-    font.pixelSize: Theme.fontSize
+    font.family: Theme.iconFont
+    font.pixelSize: Theme.statusIconSize
     horizontalAlignment: Text.AlignHCenter
     verticalAlignment: Text.AlignVCenter
     text: icon()
@@ -20,9 +20,11 @@ Text {
     function icon() {
         if (muted)
             return "󰖁";
-        if (level < 35)
+        if (level <= 0)
+            return "󰖁";
+        if (level < 20)
             return "󰕿";
-        if (level < 70)
+        if (level < 50)
             return "󰖀";
         return "󰕾";
     }
