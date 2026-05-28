@@ -9,9 +9,9 @@ Rectangle {
     Layout.preferredHeight: Theme.pillHeight
     Layout.preferredWidth: launcherText.implicitWidth + Theme.pad * 2
     radius: Theme.radius
-    color: launcherMouse.containsMouse ? Theme.panelAlt : Theme.panel
-    border.color: Theme.border
-    border.width: 1
+    color: launcherMouse.containsMouse ? Theme.panelAlt : "transparent"
+    border.color: "transparent"
+    border.width: 0
 
     Text {
         id: launcherText

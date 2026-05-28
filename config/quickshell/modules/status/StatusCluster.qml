@@ -14,9 +14,9 @@ Rectangle {
     Layout.alignment: Qt.AlignVCenter
 
     radius: Theme.radius
-    color: Theme.panel
-    border.color: Theme.border
-    border.width: 1
+    color: "transparent"
+    border.color: "transparent"
+    border.width: 0
     clip: true
 
     property int volume: 0

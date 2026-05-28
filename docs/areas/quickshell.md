@@ -21,6 +21,7 @@ one module at a time.
 
 - [Shell root](../../config/quickshell/shell.qml)
 - [Bar root surface](../../config/quickshell/root/Bar.qml)
+- [Bar frame primitive](../../config/quickshell/common/BarFrame.qml)
 - [OSD root surface](../../config/quickshell/root/Osd.qml)
 - [Theme tokens](../../config/quickshell/Theme.qml)
 - [QML module index](../../config/quickshell/qmldir)
@@ -234,6 +235,12 @@ module is ready to move.
   until the source package is reliable enough to replace it.
 - 2026-05-27: `wlctl` launches as `kitty --class wlctl -e wlctl`; Hyprland should
   match that class with the same centered Wi-Fi applet float rule as `nmtui`.
+- 2026-05-27: The full bar/window-frame visual is drawn as one bar-owned surface
+  to avoid translucent layer mismatches. `root/Bar.qml` owns the layer-shell
+  surface, mask, placement, and module row; `common/BarFrame.qml` owns only the
+  canvas path for the square outer bar/frame with Hyprland-radius inner cutout.
+  Keep the bar mask pointed at `barRow` so the full-height decorative frame does
+  not become a phantom click area.
 
 ## Test Notes
 
@@ -278,6 +285,10 @@ module is ready to move.
 - 2026-05-17: Launcher button extraction tested live after `nrs` and full
   Quickshell restart. The service starts cleanly with `Configuration Loaded`,
   and the slice is considered operational.
+- 2026-05-27: Bar frame extraction tested live. Quickshell starts with
+  `Configuration Loaded`; `ScreenFrame.qml` was removed, and the frame is now
+  contained in `common/BarFrame.qml` while the input mask remains limited to
+  `barRow`.
 - 2026-05-17: Status clock extraction tested live. Quickshell reports
   `Configuration Loaded`, the clock renders as expected, and no visible
   anomalies were detected.
