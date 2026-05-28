@@ -16,7 +16,7 @@
 let
   # Pick the addon set for the current system. NUR's firefox-addons flake
   # exposes a packages set per system.
-  addons = inputs.firefox-addons.packages.${pkgs.system};
+  addons = inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system};
 in
 {
   programs.firefox = {
