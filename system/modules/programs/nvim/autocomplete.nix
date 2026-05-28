@@ -34,8 +34,53 @@ in
           };
         };
         cmdline = {
-          keymap.preset = "inherit";
-          completion.menu.auto_show = true;
+          keymap = {
+            preset = "none";
+            "<C-Space>" = [
+              "show"
+              "fallback"
+            ];
+            "<C-e>" = [
+              "cancel"
+              "fallback"
+            ];
+            "<C-j>" = [
+              "select_next"
+              "fallback"
+            ];
+            "<C-k>" = [
+              "select_prev"
+              "fallback"
+            ];
+            "<C-l>" = [
+              "accept"
+              "fallback"
+            ];
+            "<Tab>" = [
+              "select_next"
+              "fallback"
+            ];
+            "<S-Tab>" = [
+              "select_prev"
+              "fallback"
+            ];
+            "<Up>" = [
+              "select_prev"
+              "fallback"
+            ];
+            "<Down>" = [
+              "select_next"
+              "fallback"
+            ];
+            "<CR>" = [ "fallback" ];
+          };
+          completion = {
+            list.selection = {
+              preselect = false;
+              auto_insert = false;
+            };
+            menu.auto_show = true;
+          };
         };
         signature.enabled = true;
         fuzzy.implementation = "prefer_rust_with_warning";

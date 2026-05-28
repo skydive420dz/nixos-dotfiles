@@ -20,6 +20,9 @@ binding.
 | `<leader>tt` | Toggle terminal | Open/close the default ToggleTerm terminal. |
 | `<C-\>` in terminal mode | Exit terminal mode | Return from terminal input to normal mode. |
 | `<C-j/k/l>` in completion | Next / previous / accept | Navigate and accept Blink completion items. |
+| `<Tab>` / `<S-Tab>` | Next / previous buffer | Cycle BufferLine buffers in normal mode. |
+| `<leader>w…` | Window actions | Split, resize, close, isolate, or equalize windows. |
+| `<leader>q…` | Quit actions | Quit one, all, save-and-quit, or force quit. |
 | `<C-h/j/k/l>` | Focus pane/window | Move between Neovim splits or tmux panes. |
 | `<M-h/j/k/l>` | Resize pane/window | Resize Neovim splits or tmux panes. |
 | `gra` | Code action | Show available LSP actions at cursor. |
@@ -73,6 +76,10 @@ binding.
 | --- | --- | --- | --- |
 | `<leader>bn` | Normal | Next buffer | Move to next bufferline buffer. |
 | `<leader>bp` | Normal | Previous buffer | Move to previous bufferline buffer. |
+| `<Tab>` | Normal | Next buffer | Move to next bufferline buffer. |
+| `<S-Tab>` | Normal | Previous buffer | Move to previous bufferline buffer. |
+| `<leader>bN` | Normal | New buffer | Open an empty buffer. |
+| `<leader>bx` | Normal | Close buffer | Delete the current buffer. |
 | `<leader>bc` | Normal | Pick buffer | Jump to a visible buffer by label. |
 | `<leader>bmn` | Normal | Move buffer next | Reorder current buffer right. |
 | `<leader>bmp` | Normal | Move buffer previous | Reorder current buffer left. |
@@ -88,13 +95,16 @@ binding.
 | `<leader>Sr` | Normal | Load last session | Resume the last session. |
 | `<leader>Sd` | Normal | Delete session | Remove a saved session. |
 
-## Terminal And Panes
+## Terminal, Tabs And Panes
 
 | Key | Mode | Action | Use |
 | --- | --- | --- | --- |
 | `<leader>tt` | Normal | Toggle terminal | Open/close default ToggleTerm. |
 | `<leader>th` | Normal | Horizontal terminal | Open terminal in a horizontal split. |
 | `<leader>tv` | Normal | Vertical terminal | Open terminal in a vertical split. |
+| `<leader>tn` | Normal | New tab | Open a new tabpage. |
+| `<leader>tx` | Normal | Close tab | Close the current tabpage. |
+| `<leader>to` | Normal | Only tab | Close all other tabpages. |
 | `<C-t>` | Normal | Toggle terminal | NVF/ToggleTerm default terminal toggle. |
 | `<C-\>` | Terminal | Exit terminal mode | Leave terminal insert/input mode. |
 | `<C-h>` | Normal | Focus left pane | Move to left split or tmux pane. |
@@ -106,6 +116,25 @@ binding.
 | `<M-j>` | Normal | Resize down | Resize split or pane down. |
 | `<M-k>` | Normal | Resize up | Resize split or pane up. |
 | `<M-l>` | Normal | Resize right | Resize split or pane right. |
+
+## Windows And Quit
+
+| Key | Mode | Action | Use |
+| --- | --- | --- | --- |
+| `<leader>w<Left>` | Normal | Resize left | Resize the current split left through smart-splits. |
+| `<leader>w<Down>` | Normal | Resize down | Resize the current split down through smart-splits. |
+| `<leader>w<Up>` | Normal | Resize up | Resize the current split up through smart-splits. |
+| `<leader>w<Right>` | Normal | Resize right | Resize the current split right through smart-splits. |
+| `<leader>wv` | Normal | Vertical split | Open a vertical split. |
+| `<leader>ws` | Normal | Horizontal split | Open a horizontal split. |
+| `<leader>wx` | Normal | Close window | Close the current split/window. |
+| `<leader>wo` | Normal | Only window | Close every other split/window. |
+| `<leader>w=` | Normal | Equalize windows | Balance all split sizes. |
+| `<leader><leader>w` | Normal | Write file | Save the current file. |
+| `<leader>qq` | Normal | Quit | Quit the current window/session. |
+| `<leader>qa` | Normal | Quit all | Quit all windows. |
+| `<leader>qw` | Normal | Write and quit | Save the current file and quit. |
+| `<leader>qf` | Normal | Force quit | Quit without saving. |
 
 ## LSP And Code
 
@@ -263,6 +292,10 @@ These are rustaceanvim's buffer-local Rust helpers, available in Rust buffers.
 | `<C-j>` | Insert | Next completion item | Move down in Blink completion menu. |
 | `<C-k>` | Insert | Previous completion item | Move up in Blink completion menu. |
 | `<C-l>` | Insert | Accept completion item | Accept selected Blink completion item. |
+| `<C-j>` | Command-line | Next command completion | Move down in Blink's `:` completion menu. |
+| `<C-k>` | Command-line | Previous command completion | Move up in Blink's `:` completion menu. |
+| `<C-l>` | Command-line | Accept command completion | Accept the selected command-line completion item. |
+| `<Enter>` | Command-line | Execute typed command | Runs the text you typed instead of accepting the first suggestion. |
 | `<Tab>` | Insert/Select | Jump snippet forward | Move to next snippet placeholder when active; otherwise insert tab/fallback. |
 | `<S-Tab>` | Insert/Select | Jump snippet backward | Move to previous snippet placeholder when active; otherwise shift-tab/fallback. |
 

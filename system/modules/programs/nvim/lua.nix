@@ -105,6 +105,18 @@
       vim.g.smart_splits_multiplexer_integration = "tmux"
     end
 
+    local function smart_resize(method, fallback)
+      return function()
+        local ok, splits = pcall(require, "smart-splits")
+        if ok and type(splits[method]) == "function" then
+          splits[method]()
+          return
+        end
+
+        vim.cmd(fallback)
+      end
+    end
+
     -- Spelling
     vim.opt.spell = true
     vim.opt.spelllang = { "en_us" }
@@ -169,6 +181,30 @@
       return vim.uv.cwd()
     end), { desc = "Open MiniFiles cwd" })
     vim.keymap.set("n", "<leader>u", "<cmd>UndotreeToggle<cr>", { desc = "Toggle Undotree" })
+    vim.keymap.set("n", "<Tab>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
+    vim.keymap.set("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Previous buffer" })
+    vim.keymap.set("n", "<leader>bN", "<cmd>enew<cr>", { desc = "󰈔 New buffer" })
+    vim.keymap.set("n", "<leader>bx", "<cmd>bdelete<cr>", { desc = "󰅖 Close buffer" })
+
+    vim.keymap.set("n", "<leader>tn", "<cmd>tabnew<cr>", { desc = "󰓩 New tab" })
+    vim.keymap.set("n", "<leader>tx", "<cmd>tabclose<cr>", { desc = "󰅖 Close tab" })
+    vim.keymap.set("n", "<leader>to", "<cmd>tabonly<cr>", { desc = "󰝤 Only tab" })
+
+    vim.keymap.set("n", "<leader>w<Left>", smart_resize("resize_left", "vertical resize -2"), { desc = "󰁍 Resize left" })
+    vim.keymap.set("n", "<leader>w<Down>", smart_resize("resize_down", "resize +2"), { desc = "󰁅 Resize down" })
+    vim.keymap.set("n", "<leader>w<Up>", smart_resize("resize_up", "resize -2"), { desc = "󰁝 Resize up" })
+    vim.keymap.set("n", "<leader>w<Right>", smart_resize("resize_right", "vertical resize +2"), { desc = "󰁔 Resize right" })
+    vim.keymap.set("n", "<leader>wv", "<cmd>vsplit<cr>", { desc = "󰤻 Vertical split" })
+    vim.keymap.set("n", "<leader>ws", "<cmd>split<cr>", { desc = "󰤼 Horizontal split" })
+    vim.keymap.set("n", "<leader>wx", "<cmd>close<cr>", { desc = "󰅖 Close window" })
+    vim.keymap.set("n", "<leader>wo", "<cmd>only<cr>", { desc = "󰝤 Only window" })
+    vim.keymap.set("n", "<leader>w=", "<C-w>=", { desc = "󰇽 Equalize windows" })
+
+    vim.keymap.set("n", "<leader><leader>w", "<cmd>write<cr>", { desc = "󰆓 Write file" })
+    vim.keymap.set("n", "<leader>qq", "<cmd>quit<cr>", { desc = "󰗼 Quit" })
+    vim.keymap.set("n", "<leader>qa", "<cmd>quitall<cr>", { desc = "󰩈 Quit all" })
+    vim.keymap.set("n", "<leader>qw", "<cmd>wquit<cr>", { desc = "󰆓 Write and quit" })
+    vim.keymap.set("n", "<leader>qf", "<cmd>quit!<cr>", { desc = "󰜺 Force quit" })
 
     -- Navigation Hints Toggle
     vim.keymap.set("n", "<leader>pt", "<cmd>Precognition toggle<cr>", { desc = "Toggle Hints" })
@@ -258,12 +294,15 @@
         { "<leader>m", group = "󰯈 Multicursor" },
         { "<leader>mc", group = "󰯈 Multicursor" },
         { "<leader>p", group = "󰐃 Plugins / Toggles" },
+        { "<leader>q", group = "󰗼 Quit / Write" },
         { "<leader>r", group = "󰑕 Replace" },
         { "<localleader>r", group = " Rust" },
         { "<leader>S", group = "󰆓 Sessions" },
         { "<leader>s", group = "󰿅 Seek / Leap" },
-        { "<leader>t", group = " Terminal / Tools" },
+        { "<leader>t", group = " Terminal / Tabs / Tools" },
         { "<leader>td", group = " Todos" },
+        { "<leader>w", group = "󰖲 Windows" },
+        { "<leader><leader>", group = "󰘳 Quick Actions" },
         { "<leader>z", group = "󰓆 Spelling" },
       })
     end
