@@ -292,7 +292,7 @@
       end
     end
 
-    local function smart_definition()
+    local function qml_aware_definition()
       local params = vim.lsp.util.make_position_params(0, "utf-16")
       local results = vim.lsp.buf_request_sync(0, "textDocument/definition", params, 1000)
       local locations = {}
@@ -348,7 +348,7 @@
     vim.keymap.set({ "n", "x" }, "<leader>la", code_action, { desc = "Code action" })
     vim.keymap.set("n", "<leader>lf", format_buffer, { desc = "Format buffer" })
     vim.keymap.set("n", "<leader>lF", "<cmd>ConformInfo<cr>", { desc = "Conform info" })
-    vim.keymap.set("n", "gd", smart_definition, { desc = "Go to definition" })
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
     vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { desc = "Go to declaration" })
     vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
     vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "References" })
@@ -368,7 +368,8 @@
         vim.keymap.set("n", "<leader>ln", open_navbuddy, vim.tbl_extend("force", opts, { desc = "Navbuddy" }))
         vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename symbol" }))
         vim.keymap.set({ "n", "x" }, "<leader>la", code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
-        vim.keymap.set("n", "gd", smart_definition, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
+        local definition_action = vim.bo[event.buf].filetype == "qml" and qml_aware_definition or vim.lsp.buf.definition
+        vim.keymap.set("n", "gd", definition_action, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
         vim.keymap.set("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
         vim.keymap.set("n", "gi", vim.lsp.buf.implementation, vim.tbl_extend("force", opts, { desc = "Go to implementation" }))
         vim.keymap.set("n", "gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "References" }))
