@@ -236,100 +236,6 @@
       end
     end
 
-    local qml_singletons = {
-      Theme = "common/Theme.qml",
-      StatusMetrics = "modules/status/StatusMetrics.qml",
-    }
-
-    local function jump_to_qml_singleton_property()
-      if vim.bo.filetype ~= "qml" then
-        return false
-      end
-
-      local cursor = vim.api.nvim_win_get_cursor(0)
-      local line = vim.api.nvim_get_current_line()
-      local cursor_col = cursor[2] + 1
-      local search_start = 1
-
-      while true do
-        local match_start, match_end, singleton, property =
-          line:find("([%a_][%w_]*)%.([%a_][%w_]*)", search_start)
-
-        if not match_start then
-          return false
-        end
-
-        if cursor_col >= match_start and cursor_col <= match_end and qml_singletons[singleton] then
-          local current_file = vim.api.nvim_buf_get_name(0)
-          local current_dir = current_file ~= "" and vim.fs.dirname(current_file) or vim.uv.cwd()
-          local qmldir = vim.fs.find("qmldir", { path = current_dir, upward = true })[1]
-
-          if not qmldir then
-            return false
-          end
-
-          local target = vim.fs.joinpath(vim.fs.dirname(qmldir), qml_singletons[singleton])
-          if vim.fn.filereadable(target) ~= 1 then
-            return false
-          end
-
-          vim.cmd.edit(vim.fn.fnameescape(target))
-
-          for line_nr = 1, vim.api.nvim_buf_line_count(0) do
-            local target_line = vim.api.nvim_buf_get_lines(0, line_nr - 1, line_nr, false)[1]
-            if target_line and target_line:match("property%s+[%w_]+%s+" .. vim.pesc(property) .. "%f[%W]") then
-              local property_col = target_line:find(property, 1, true) or 1
-              vim.api.nvim_win_set_cursor(0, { line_nr, property_col - 1 })
-              vim.cmd("normal! zv")
-              return true
-            end
-          end
-
-          return true
-        end
-
-        search_start = match_end + 1
-      end
-    end
-
-    local function qml_aware_definition()
-      local params = vim.lsp.util.make_position_params(0, "utf-16")
-      local results = vim.lsp.buf_request_sync(0, "textDocument/definition", params, 1000)
-      local locations = {}
-      local offset_encoding = "utf-16"
-
-      for client_id, response in pairs(results or {}) do
-        local result = response.result
-        local client = vim.lsp.get_client_by_id(client_id)
-        if client and client.offset_encoding then
-          offset_encoding = client.offset_encoding
-        end
-
-        if result then
-          if result.uri or result.targetUri then
-            table.insert(locations, result)
-          else
-            vim.list_extend(locations, result)
-          end
-        end
-      end
-
-      if #locations > 0 then
-        vim.lsp.util.jump_to_location(locations[1], offset_encoding, true)
-        if #locations > 1 then
-          vim.fn.setqflist(vim.lsp.util.locations_to_items(locations, offset_encoding))
-          vim.cmd("copen")
-        end
-        return
-      end
-
-      if jump_to_qml_singleton_property() then
-        return
-      end
-
-      vim.notify("No definition found", vim.log.levels.INFO, { title = "LSP" })
-    end
-
     vim.keymap.set("n", "<leader>gd", "<cmd>DiffviewOpen<cr>", { desc = "Open Diffview" })
     vim.keymap.set("n", "<leader>gD", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" })
     vim.keymap.set("n", "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", { desc = "File history" })
@@ -368,8 +274,7 @@
         vim.keymap.set("n", "<leader>ln", open_navbuddy, vim.tbl_extend("force", opts, { desc = "Navbuddy" }))
         vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename symbol" }))
         vim.keymap.set({ "n", "x" }, "<leader>la", code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
-        local definition_action = vim.bo[event.buf].filetype == "qml" and qml_aware_definition or vim.lsp.buf.definition
-        vim.keymap.set("n", "gd", definition_action, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
+        vim.keymap.set("n", "gd", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
         vim.keymap.set("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
         vim.keymap.set("n", "gi", vim.lsp.buf.implementation, vim.tbl_extend("force", opts, { desc = "Go to implementation" }))
         vim.keymap.set("n", "gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "References" }))
