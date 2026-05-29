@@ -1,12 +1,20 @@
-{ pkgs, lib, ... }:
+{
+  pkgs,
+  lib,
+  repoPath,
+  ...
+}:
 let
+  quickshellConfigSource = ../../../../config/quickshell;
   qmlImportPaths = [
     "${pkgs.qt6.qtdeclarative}/lib/qt-6/qml"
+    "${quickshellConfigSource}"
+    "${repoPath}/config/quickshell"
   ]
   ++ lib.optionals pkgs.stdenv.isLinux [
     "${pkgs.quickshell}/lib/qt-6/qml"
   ];
-  qmlImportArgs = lib.concatMapStringsSep " " (path: "-I ${path}") qmlImportPaths;
+  qmlImportArgs = lib.concatMapStringsSep " " (path: "-I ${lib.escapeShellArg path}") qmlImportPaths;
 in
 {
   programs.nvf.settings.vim.lsp = {
@@ -21,11 +29,7 @@ in
     servers.qmlls = {
       cmd = lib.mkForce [
         "${pkgs.writeShellScriptBin "qmlls-wrapped" ''
-          extra_imports=()
-          [ -d "$HOME/.config/quickshell" ] && extra_imports+=(-I "$HOME/.config/quickshell")
-          [ -d "$PWD/config/quickshell" ] && extra_imports+=(-I "$PWD/config/quickshell")
-
-          exec ${pkgs.qt6.qtdeclarative}/bin/qmlls ${qmlImportArgs} "''${extra_imports[@]}" "$@"
+          exec ${pkgs.qt6.qtdeclarative}/bin/qmlls ${qmlImportArgs} "$@"
         ''}/bin/qmlls-wrapped"
       ];
     };
