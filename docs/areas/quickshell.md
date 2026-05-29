@@ -27,6 +27,7 @@ one module at a time.
 - [QML module index](../../config/quickshell/qmldir)
 - [Launcher button](../../config/quickshell/modules/launcher/LauncherButton.qml)
 - [Media module](../../config/quickshell/modules/media/Media.qml)
+- [Media analyzer](../../config/quickshell/modules/media/MediaAnalyzer.qml)
 - [Media controller](../../config/quickshell/modules/media/MediaController.qml)
 - [OSD view](../../config/quickshell/modules/osd/OsdView.qml)
 - [Status battery](../../config/quickshell/modules/status/Battery.qml)
@@ -34,6 +35,8 @@ one module at a time.
 - [Status clock](../../config/quickshell/modules/status/Clock.qml)
 - [Status cluster](../../config/quickshell/modules/status/StatusCluster.qml)
 - [Status network](../../config/quickshell/modules/status/Network.qml)
+- [Status network graph](../../config/quickshell/modules/status/NetworkGraph.qml)
+- [Status metrics](../../config/quickshell/modules/status/StatusMetrics.qml)
 - [Status volume](../../config/quickshell/modules/status/Volume.qml)
 - [Tray module](../../config/quickshell/modules/tray/Tray.qml)
 - [Workspaces module](../../config/quickshell/modules/workspaces/Workspaces.qml)
@@ -77,10 +80,13 @@ config/quickshell/
     media/
       Media.qml
       MediaButton.qml
+      MediaAnalyzer.qml
     status/
       StatusCluster.qml
       Battery.qml
       Network.qml
+      NetworkGraph.qml
+      StatusMetrics.qml
       Bluetooth.qml
       Volume.qml
       Clock.qml
@@ -113,6 +119,9 @@ module is ready to move.
   internal animation, and private click-out handling.
 - The bar owns placement, global height, spacing between modules, and the visible
   bar input region.
+- `modules/status/StatusMetrics.qml` owns the right-side status cluster sizing
+  and graph geometry. Tune those metrics there first; do not spread one-off
+  spacing constants across each status module.
 - Global state is allowed only when multiple modules genuinely need it.
 
 ## Guardrails
@@ -241,6 +250,24 @@ module is ready to move.
   canvas path for the square outer bar/frame with Hyprland-radius inner cutout.
   Keep the bar mask pointed at `barRow` so the full-height decorative frame does
   not become a phantom click area.
+- 2026-05-29: Status geometry was centralized in
+  `modules/status/StatusMetrics.qml`. The current known-good right cluster uses
+  a 240px total width, 6px module spacing, a 61px network slot, a 38px network
+  graph, and a 9px network icon-to-graph gap. If the right pill drifts, adjust
+  these shared metrics before touching individual module anchors.
+- 2026-05-29: `modules/status/NetworkGraph.qml` owns the compact btop-inspired
+  network graph. It draws dotted columns around a dotted middle baseline:
+  download grows upward in `Theme.accent`, upload grows downward in
+  `Theme.danger`, and each side scales from recent samples so low upload traffic
+  stays visible instead of flattening into the baseline.
+- 2026-05-29: `modules/status/Network.qml` owns dynamic network icon selection.
+  Ethernet uses the wired icon, Wi-Fi uses signal-strength icons, and the
+  disconnected state uses the no-network icon. Keep icon wells fixed-width so
+  dynamic glyphs do not disturb the cluster spacing.
+- 2026-05-29: `modules/media/MediaAnalyzer.qml` now shares the dotted-column
+  visual language with the network graph while keeping a single upward spectrum.
+  Live CAVA samples drive the graph when available, and the fake animation
+  remains only as a no-sample fallback.
 
 ## Test Notes
 
