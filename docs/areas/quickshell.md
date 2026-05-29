@@ -23,7 +23,7 @@ one module at a time.
 - [Bar root surface](../../config/quickshell/root/Bar.qml)
 - [Bar frame primitive](../../config/quickshell/common/BarFrame.qml)
 - [OSD root surface](../../config/quickshell/root/Osd.qml)
-- [Theme tokens](../../config/quickshell/Theme.qml)
+- [Theme tokens](../../config/quickshell/common/Theme.qml)
 - [QML module index](../../config/quickshell/qmldir)
 - [Launcher button](../../config/quickshell/modules/launcher/LauncherButton.qml)
 - [Media module](../../config/quickshell/modules/media/Media.qml)
@@ -112,6 +112,8 @@ module is ready to move.
   windows together, not host module behavior.
 - `common/` is for shared tokens and primitives only. It must not become a junk
   drawer for one-off component code.
+- `common/Theme.qml` owns global design tokens: colors, fonts, bar rhythm,
+  shared radii, shared padding, and shared icon/text sizes.
 - `modules/<name>/` owns the implementation details for that block: private
   helpers, local state, row components, timers, process calls, and popover
   behavior.
