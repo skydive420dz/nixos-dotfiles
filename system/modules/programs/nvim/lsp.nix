@@ -21,7 +21,11 @@ in
     servers.qmlls = {
       cmd = lib.mkForce [
         "${pkgs.writeShellScriptBin "qmlls-wrapped" ''
-          exec ${pkgs.qt6.qtdeclarative}/bin/qmlls ${qmlImportArgs} "$@"
+          extra_imports=()
+          [ -d "$HOME/.config/quickshell" ] && extra_imports+=(-I "$HOME/.config/quickshell")
+          [ -d "$PWD/config/quickshell" ] && extra_imports+=(-I "$PWD/config/quickshell")
+
+          exec ${pkgs.qt6.qtdeclarative}/bin/qmlls ${qmlImportArgs} "''${extra_imports[@]}" "$@"
         ''}/bin/qmlls-wrapped"
       ];
     };
