@@ -37,7 +37,8 @@ config/aerc/.cache/
 config/aerc/sent/
 config/aerc/postpone/
 config/aerc/state
-.qmlls.ini
+# Generated Qt/QML language-server config can contain machine-local build paths.
+**/.qmlls.ini
 
 # Neovim logs
 nvim.log

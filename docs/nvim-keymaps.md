@@ -21,10 +21,10 @@ binding.
 | `<C-\>` in terminal mode | Exit terminal mode | Return from terminal input to normal mode. |
 | `<C-j/k/l>` in completion | Next / previous / accept | Navigate and accept Blink completion items. |
 | `<Tab>` / `<S-Tab>` | Next / previous buffer | Cycle BufferLine buffers in normal mode. |
-| `<leader>w…` | Window actions | Split, resize, close, isolate, or equalize windows. |
+| `<leader>w…` | Window actions | Split, close, isolate, or equalize windows. |
 | `<leader>q…` | Quit actions | Quit one, all, save-and-quit, or force quit. |
 | `<C-h/j/k/l>` | Focus pane/window | Move between Neovim splits or tmux panes. |
-| `<M-h/j/k/l>` | Resize pane/window | Resize Neovim splits or tmux panes. |
+| `<Arrow keys>` | Resize pane/window | Resize Neovim splits or tmux panes. |
 | `gra` | Code action | Show available LSP actions at cursor. |
 | `grn` | Rename symbol | Rename the symbol under cursor via LSP. |
 
@@ -112,19 +112,15 @@ binding.
 | `<C-k>` | Normal | Focus pane above | Move to upper split or tmux pane. |
 | `<C-l>` | Normal | Focus right pane | Move to right split or tmux pane. |
 | `<C-\>` | Normal | Focus previous pane | Jump to previous split/tmux pane. |
-| `<M-h>` | Normal | Resize left | Shrink/grow split or pane left. |
-| `<M-j>` | Normal | Resize down | Resize split or pane down. |
-| `<M-k>` | Normal | Resize up | Resize split or pane up. |
-| `<M-l>` | Normal | Resize right | Resize split or pane right. |
+| `<Left>` | Normal | Resize left | Shrink/grow split or pane left. |
+| `<Down>` | Normal | Resize down | Resize split or pane down. |
+| `<Up>` | Normal | Resize up | Resize split or pane up. |
+| `<Right>` | Normal | Resize right | Resize split or pane right. |
 
 ## Windows And Quit
 
 | Key | Mode | Action | Use |
 | --- | --- | --- | --- |
-| `<leader>w<Left>` | Normal | Resize left | Resize the current split left through smart-splits. |
-| `<leader>w<Down>` | Normal | Resize down | Resize the current split down through smart-splits. |
-| `<leader>w<Up>` | Normal | Resize up | Resize the current split up through smart-splits. |
-| `<leader>w<Right>` | Normal | Resize right | Resize the current split right through smart-splits. |
 | `<leader>wv` | Normal | Vertical split | Open a vertical split. |
 | `<leader>ws` | Normal | Horizontal split | Open a horizontal split. |
 | `<leader>wx` | Normal | Close window | Close the current split/window. |

@@ -110,6 +110,15 @@ module is ready to move.
 
 - `root/` owns top-level windows and surfaces only. `shell.qml` should wire root
   windows together, not host module behavior.
+- `qmldir` is the portable QML project metadata. It exposes shared singletons
+  and lets generic QML tooling identify `config/quickshell` as the project root.
+- `.qmlls.ini` files are generated/runtime editor metadata and must stay
+  ignored. Quickshell can populate them with machine-local build directories,
+  so they are useful locally but are not repo truth.
+- Keep this as a Quickshell config tree, not a packaged Qt library. Do not
+  introduce a named QML module, CMake, or generated `.qmltypes` only to improve
+  editor navigation. Use that machinery only if runtime packaging or reusable
+  QML/C++ components need it.
 - `common/` is for shared tokens and primitives only. It must not become a junk
   drawer for one-off component code.
 - `common/Theme.qml` owns global design tokens: colors, fonts, bar rhythm,
@@ -138,6 +147,9 @@ module is ready to move.
 - Use shared theme tokens before local `Qt.rgba(...)` recipes.
 - Keep fades, but be skeptical of height/width animation unless it explains a
   real spatial change.
+- QML LSP support is best-effort editor tooling. Project structure should stay
+  portable and runtime-first even if `qmlls` cannot jump every singleton
+  property definition.
 - Hyprland is Lua-first now. Do not use old hyprlang dispatcher strings such as
   `workspace 3` or `exec kitty` from Quickshell. Use Lua dispatcher expressions
   such as `hl.dsp.focus({ workspace = "3" })` through `Hyprland.dispatch(...)`
@@ -270,6 +282,10 @@ module is ready to move.
   visual language with the network graph while keeping a single upward spectrum.
   Live CAVA samples drive the graph when available, and the fake animation
   remains only as a no-sample fallback.
+- 2026-05-29: QML project metadata stays portable through
+  `config/quickshell/qmldir`. NVF stays generic and only supplies Qt/QML tooling
+  plus generic QML project-root markers. Generated `.qmlls.ini` files remain
+  ignored because they can contain machine-local Quickshell build paths.
 
 ## Test Notes
 

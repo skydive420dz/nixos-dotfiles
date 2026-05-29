@@ -58,6 +58,59 @@
     -- Clipboard fix
     vim.opt.clipboard = 'unnamedplus'
 
+    local function lsp_clients_for_buffer()
+      return vim.lsp.get_clients({ bufnr = 0 })
+    end
+
+    vim.api.nvim_create_user_command("LspInfo", function()
+      local lines = { "LSP clients for current buffer:", "" }
+      local clients = lsp_clients_for_buffer()
+
+      if #clients == 0 then
+        table.insert(lines, "  none")
+      else
+        for _, client in ipairs(clients) do
+          local root = client.config and client.config.root_dir or "--"
+          local cmd = client.config and client.config.cmd or {}
+          table.insert(lines, ("  %s (id: %s)"):format(client.name, client.id))
+          table.insert(lines, ("    root: %s"):format(root or "--"))
+          table.insert(lines, ("    cmd: %s"):format(table.concat(cmd, " ")))
+          table.insert(lines, ("    definition: %s"):format(tostring(client.server_capabilities.definitionProvider)))
+          table.insert(lines, ("    document symbols: %s"):format(tostring(client.server_capabilities.documentSymbolProvider)))
+          table.insert(lines, "")
+        end
+      end
+
+      vim.cmd("botright new")
+      vim.bo.buftype = "nofile"
+      vim.bo.bufhidden = "wipe"
+      vim.bo.swapfile = false
+      vim.bo.filetype = "markdown"
+      vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+    end, { desc = "Show LSP clients for the current buffer" })
+
+    vim.api.nvim_create_user_command("LspRestart", function()
+      local clients = lsp_clients_for_buffer()
+      if #clients == 0 then
+        vim.notify("No LSP clients attached to this buffer", vim.log.levels.INFO, { title = "LSP" })
+        return
+      end
+
+      for _, client in ipairs(clients) do
+        vim.lsp.stop_client(client.id, true)
+      end
+
+      vim.defer_fn(function()
+        if vim.api.nvim_buf_is_valid(0) then
+          vim.cmd("edit")
+        end
+      end, 300)
+    end, { desc = "Restart LSP clients for the current buffer" })
+
+    vim.api.nvim_create_user_command("LspLog", function()
+      vim.cmd("edit " .. vim.fn.fnameescape(vim.lsp.get_log_path()))
+    end, { desc = "Open the Neovim LSP log" })
+
     local yank_highlight_group = vim.api.nvim_create_augroup("UserYankHighlight", { clear = true })
     vim.api.nvim_create_autocmd("TextYankPost", {
       group = yank_highlight_group,
@@ -190,10 +243,11 @@
     vim.keymap.set("n", "<leader>tx", "<cmd>tabclose<cr>", { desc = "󰅖 Close tab" })
     vim.keymap.set("n", "<leader>to", "<cmd>tabonly<cr>", { desc = "󰝤 Only tab" })
 
-    vim.keymap.set("n", "<leader>w<Left>", smart_resize("resize_left", "vertical resize -2"), { desc = "󰁍 Resize left" })
-    vim.keymap.set("n", "<leader>w<Down>", smart_resize("resize_down", "resize +2"), { desc = "󰁅 Resize down" })
-    vim.keymap.set("n", "<leader>w<Up>", smart_resize("resize_up", "resize -2"), { desc = "󰁝 Resize up" })
-    vim.keymap.set("n", "<leader>w<Right>", smart_resize("resize_right", "vertical resize +2"), { desc = "󰁔 Resize right" })
+    vim.keymap.set("n", "<Left>", smart_resize("resize_left", "vertical resize -2"), { desc = "󰁍 Resize left" })
+    vim.keymap.set("n", "<Down>", smart_resize("resize_down", "resize +2"), { desc = "󰁅 Resize down" })
+    vim.keymap.set("n", "<Up>", smart_resize("resize_up", "resize -2"), { desc = "󰁝 Resize up" })
+    vim.keymap.set("n", "<Right>", smart_resize("resize_right", "vertical resize +2"), { desc = "󰁔 Resize right" })
+
     vim.keymap.set("n", "<leader>wv", "<cmd>vsplit<cr>", { desc = "󰤻 Vertical split" })
     vim.keymap.set("n", "<leader>ws", "<cmd>split<cr>", { desc = "󰤼 Horizontal split" })
     vim.keymap.set("n", "<leader>wx", "<cmd>close<cr>", { desc = "󰅖 Close window" })

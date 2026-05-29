@@ -1,15 +1,11 @@
 {
   pkgs,
   lib,
-  repoPath,
   ...
 }:
 let
-  quickshellConfigSource = ../../../../config/quickshell;
   qmlImportPaths = [
     "${pkgs.qt6.qtdeclarative}/lib/qt-6/qml"
-    "${quickshellConfigSource}"
-    "${repoPath}/config/quickshell"
   ]
   ++ lib.optionals pkgs.stdenv.isLinux [
     "${pkgs.quickshell}/lib/qt-6/qml"
@@ -31,6 +27,11 @@ in
         "${pkgs.writeShellScriptBin "qmlls-wrapped" ''
           exec ${pkgs.qt6.qtdeclarative}/bin/qmlls ${qmlImportArgs} "$@"
         ''}/bin/qmlls-wrapped"
+      ];
+      root_markers = lib.mkForce [
+        ".qmlls.ini"
+        "qmldir"
+        ".git"
       ];
     };
   };
