@@ -164,6 +164,18 @@ module is ready to move.
    behavior before continuing.
 5. Commit each stable slice separately.
 
+## Next Audit
+
+- Scan `config/quickshell` for modules reaching across ownership boundaries.
+- Check whether sizing and spacing constants escaped `common/Theme.qml` or
+  `modules/status/StatusMetrics.qml`.
+- Confirm `root/Bar.qml` owns only surface placement, global bar layout, masks,
+  and module placement, not module behavior.
+- Check whether shared primitives in `common/` are genuinely reusable and not
+  one-off module helpers.
+- Document cleanup candidates before editing, then take one small slice at a
+  time.
+
 ## Refactor Progress
 
 - 2026-05-17: `modules/workspaces/Workspaces.qml` owns workspace state,
