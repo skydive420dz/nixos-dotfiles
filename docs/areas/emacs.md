@@ -46,6 +46,9 @@ This is a serious Doom Emacs experiment, not a Neovim replacement plan.
 - Line numbers are relative in code buffers and disabled in terminal buffers.
 - Spellcheck uses repo-local `config/doom/spell/en_US.pws` for personal words.
 - QML snippets live in `config/doom/snippets/qml-mode`.
+- Sky themes are native Doom themes in `config/doom/themes/`, backed by the
+  global selector output in `~/.config/theme/current/emacs-theme.el`.
+- `SPC h r t` reloads the active Sky theme after `theme-select` changes.
 
 ## Commands
 
@@ -72,3 +75,6 @@ after restarting or reloading Emacs.
   config, Evil mode, Org/Magit/Dired/vterm, QML/Lua/Nix/Rust/C tooling,
   inline diagnostics, readable modeline, dashboard logo, relative line numbers,
   repo-local spell dictionary, and Doom-owned `SPC w ...` window behavior.
+- 2026-05-30: Sky theme checkpoint: native `sky-dark` and `sky-light` Doom
+  themes, shared face definitions, and `SPC h r t` reload for runtime theme
+  changes.
