@@ -84,12 +84,24 @@
       'sky-light
     'sky-dark))
 
+(defun sk/reset-sky-theme-faces ()
+  "Clear stale user face specs for faces owned by Sky themes."
+  (require 'sky-theme-common)
+  (let ((faces (delq nil
+                     (mapcar (lambda (face)
+                               (when (facep face)
+                                 (list face nil)))
+                             sky-theme-managed-faces))))
+    (when faces
+      (apply #'custom-theme-reset-faces 'user faces))))
+
 (defun sk/load-sky-theme ()
   "Reload the active native Sky theme."
   (interactive)
   (sk/register-theme-paths)
   (sk/reload-theme-tokens)
   (mapc #'disable-theme custom-enabled-themes)
+  (sk/reset-sky-theme-faces)
   (load-theme (sk/current-doom-theme) t)
   (when (called-interactively-p 'interactive)
     (message "Loaded %s" (sk/current-style))))

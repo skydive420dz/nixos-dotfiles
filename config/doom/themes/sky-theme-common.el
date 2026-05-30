@@ -3,6 +3,60 @@
 (defun sky--color (name colors)
   (alist-get name colors))
 
+(defconst sky-theme-managed-faces
+  '(default cursor fringe highlight hl-line region secondary-selection
+    lazy-highlight isearch match minibuffer-prompt escape-glyph homoglyph
+    link link-visited error warning success shadow tooltip vertical-border
+    window-divider window-divider-first-pixel window-divider-last-pixel
+    line-number line-number-current-line font-lock-builtin-face
+    font-lock-comment-face font-lock-comment-delimiter-face
+    font-lock-constant-face font-lock-doc-face font-lock-function-name-face
+    font-lock-keyword-face font-lock-negation-char-face font-lock-number-face
+    font-lock-preprocessor-face font-lock-regexp-grouping-backslash
+    font-lock-regexp-grouping-construct font-lock-string-face
+    font-lock-type-face font-lock-variable-name-face font-lock-warning-face
+    mode-line mode-line-inactive mode-line-buffer-id header-line tab-line
+    tab-line-tab tab-line-tab-current tab-line-tab-inactive show-paren-match
+    show-paren-mismatch trailing-whitespace whitespace-space whitespace-tab
+    whitespace-newline whitespace-trailing solaire-default-face
+    solaire-fringe-face solaire-line-number-face solaire-hl-line-face
+    doom-modeline-bar doom-modeline-bar-inactive doom-modeline-buffer-file
+    doom-modeline-buffer-major-mode doom-modeline-buffer-minor-mode
+    doom-modeline-buffer-modified doom-modeline-info doom-modeline-warning
+    doom-modeline-urgent doom-modeline-debug doom-dashboard-banner
+    doom-dashboard-footer doom-dashboard-footer-icon doom-dashboard-menu-desc
+    doom-dashboard-menu-title which-key-key-face
+    which-key-group-description-face which-key-command-description-face
+    which-key-local-map-description-face which-key-separator-face
+    completions-common-part completions-first-difference vertico-current
+    marginalia-documentation marginalia-key marginalia-symbol
+    orderless-match-face-0 orderless-match-face-1 orderless-match-face-2
+    orderless-match-face-3 company-tooltip company-tooltip-selection
+    company-tooltip-common company-tooltip-annotation company-scrollbar-bg
+    company-scrollbar-fg flycheck-error flycheck-warning flycheck-info
+    flycheck-inline-error flycheck-inline-warning flycheck-inline-info
+    flyspell-incorrect flyspell-duplicate lsp-face-highlight-read
+    lsp-face-highlight-textual lsp-face-highlight-write
+    lsp-ui-doc-background lsp-ui-doc-header org-block org-block-begin-line
+    org-block-end-line org-code org-date org-document-info org-document-title
+    org-done org-headline-done org-hide org-level-1 org-level-2 org-level-3
+    org-level-4 org-level-5 org-level-6 org-link org-meta-line
+    org-special-keyword org-table org-todo org-verbatim markdown-code-face
+    markdown-header-face markdown-header-face-1 markdown-header-face-2
+    magit-section-heading magit-branch-current magit-branch-local
+    magit-branch-remote magit-diff-added magit-diff-added-highlight
+    magit-diff-removed magit-diff-removed-highlight magit-diff-context
+    magit-diff-context-highlight magit-diff-file-heading
+    magit-diff-hunk-heading magit-diff-hunk-heading-highlight diff-added
+    diff-removed diff-changed diff-header diff-file-header dired-directory
+    dired-flagged dired-header dired-ignored dired-marked dired-perm-write
+    dired-symlink dired-warning evil-goggles-default-face
+    evil-goggles-yank-face evil-goggles-paste-face evil-goggles-delete-face
+    evil-goggles-change-face evil-goggles-indent-face evil-goggles-join-face
+    avy-background-face avy-lead-face avy-lead-face-0 avy-lead-face-1
+    avy-lead-face-2)
+  "Faces owned by the native Sky themes.")
+
 (defun sky-define-theme (theme colors)
   "Define THEME from Sky COLORS."
   (let* ((bg (sky--color 'bg colors))
