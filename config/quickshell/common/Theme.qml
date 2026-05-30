@@ -67,14 +67,14 @@ QtObject {
 
     Component.onCompleted: loadThemeProc.running = true
 
-    FileView {
+    property FileView themeSignalFile: FileView {
         path: root.themeDir + "/quickshell-signal"
         watchChanges: true
         printErrors: false
         onFileChanged: loadThemeProc.running = true
     }
 
-    Process {
+    property Process loadThemeProc: Process {
         id: loadThemeProc
         command: ["bash", "-lc", "cat " + JSON.stringify(root.themeDir + "/quickshell.json") + " 2>/dev/null || true"]
         stdout: SplitParser {
