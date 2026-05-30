@@ -1,7 +1,7 @@
 # ============================================
 # BOOT CONFIGURATION — NixOS
 # ============================================
-# Silent boot with Plymouth splash (Catppuccin Mocha theme).
+# Silent boot with Plymouth splash (Sky theme).
 # TTY1 auto-logs in as skydive420dz with no visible prompt or getty text.
 # Plymouth is held until Hyprland is ready via fbcon reservation.
 
@@ -12,6 +12,9 @@
   ...
 }:
 
+let
+  skyPlymouth = import ../../theme/plymouth.nix { inherit pkgs; };
+in
 {
   environment.systemPackages = with pkgs; [
     sbctl
@@ -28,9 +31,9 @@
     # ── Plymouth splash screen ──────────────────────────────────────────────
     plymouth = {
       enable = true;
-      theme = "catppuccin-mocha";
-      themePackages = with pkgs; [
-        (catppuccin-plymouth.override { variant = "mocha"; })
+      theme = "sky";
+      themePackages = [
+        skyPlymouth
       ];
     };
 

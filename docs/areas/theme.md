@@ -28,6 +28,7 @@ but Quickshell does not own the palette.
 - `scripts/theme-select.d/consumers.sh`: session environment and live reloads.
 - `scripts/theme-select.d/generators/`: per-output-family runtime generators.
 - `theme/tokens.nix`: Nix-side fallback/default tokens.
+- `theme/plymouth.nix`: rebuild-time Sky Plymouth theme package.
 - `config/quickshell/common/Theme.qml`: runtime reader for Quickshell tokens.
 - `config/doom/theme.el`: loads the active Sky theme in Doom Emacs.
 - `config/doom/themes/sky-theme-common.el`: shared Doom face definitions.
@@ -103,7 +104,8 @@ definition changes.
 
 - Package installation for theme tools, fonts, icons, GTK/Qt helpers, and apps.
 - Home Manager service definitions and fallback session variables.
-- Plymouth and boot-time assets.
+- Plymouth uses `theme/plymouth.nix`; changes require `nrs` and a reboot to
+  observe.
 - Any module still consuming `theme/tokens.nix` directly as a static fallback.
 - NVF/Neovim is not currently part of the runtime Sky selector.
 
@@ -121,14 +123,14 @@ Fixed in this pass:
   `scripts/launcher-toggle`.
 - `config/fuzzel/fuzzel.ini` now uses SkyDark fallback colors instead of an old
   blue palette.
+- Plymouth now uses the local Sky theme package from `theme/plymouth.nix`
+  instead of Catppuccin Mocha.
 
 Known open items:
 
 - NVF still declares `catppuccin`/`mocha` in
   `system/modules/programs/nvim/nvim.nix`. Replace it with a Sky-owned theme or
   decide that NVF is being retired.
-- Plymouth still uses `catppuccin-mocha` in `system/modules/boot.nix`. This is a
-  rebuild-time boot asset and needs a Sky boot theme if we want full coverage.
 - aerc uses a static `config/aerc/stylesets/sky` file. It matches SkyDark, but
   it does not currently follow `SkyLight` at runtime.
 - Doom Emacs works with native Sky themes, but the theme files duplicate color
