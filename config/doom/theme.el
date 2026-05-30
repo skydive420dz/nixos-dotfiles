@@ -56,6 +56,10 @@
   (add-to-list 'load-path (sk/theme-dir))
   (add-to-list 'custom-theme-load-path (sk/theme-dir)))
 
+(defun sk/load-theme-common ()
+  "Load the shared Sky theme definitions from disk."
+  (load (expand-file-name "sky-theme-common.el" (sk/theme-dir)) nil 'nomessage))
+
 (defun sk/reload-theme-tokens ()
   "Reload generated Sky theme tokens, falling back to the built-in dark palette."
   (setq sk/theme (copy-tree sk/theme-default))
@@ -86,7 +90,7 @@
 
 (defun sk/reset-sky-theme-faces ()
   "Clear stale user face specs for faces owned by Sky themes."
-  (require 'sky-theme-common)
+  (sk/load-theme-common)
   (let ((faces (delq nil
                      (mapcar (lambda (face)
                                (when (facep face)
