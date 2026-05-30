@@ -1,6 +1,6 @@
 ;;; theme.el -*- lexical-binding: t; -*-
 
-(defvar sk/theme
+(defconst sk/theme-default
   '((foreground . "#f0efeb")
     (background . "#1a1d21")
     (surface . "#22262b")
@@ -25,13 +25,26 @@
     (comment . "#676d77"))
   "Theme tokens mirrored from the global Sky theme selector.")
 
-(let* ((config-home (or (getenv "XDG_CONFIG_HOME")
-                        (expand-file-name "~/.config")))
-       (runtime-theme (expand-file-name "theme/current/emacs-theme.el" config-home)))
-  (when (file-readable-p runtime-theme)
-    (load-file runtime-theme)))
+(defvar sk/theme (copy-tree sk/theme-default)
+  "Active Sky theme tokens.")
+
+(defun sk/theme-runtime-file ()
+  "Return the generated Sky theme file for this user session."
+  (let ((config-home (or (getenv "XDG_CONFIG_HOME")
+                         (expand-file-name "~/.config"))))
+    (expand-file-name "theme/current/emacs-theme.el" config-home)))
+
+(defun sk/reload-theme-tokens ()
+  "Reload generated Sky theme tokens, falling back to the built-in dark palette."
+  (setq sk/theme (copy-tree sk/theme-default))
+  (let ((runtime-theme (sk/theme-runtime-file)))
+    (when (file-readable-p runtime-theme)
+      (load-file runtime-theme)))
+  sk/theme)
 
 (defun sk/theme-color (name)
   (alist-get name sk/theme))
+
+(sk/reload-theme-tokens)
 
 (provide 'theme)
