@@ -15,7 +15,7 @@
         ''
           {
             "filetype",
-            colored = true,
+            colored = false,
             icon_only = true,
             icon = { align = "left" },
           }
