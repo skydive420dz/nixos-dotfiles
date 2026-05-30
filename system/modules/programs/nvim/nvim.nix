@@ -150,6 +150,7 @@ in
           illuminate.enable = true;
           breadcrumbs = {
             enable = true;
+            lualine.winbar.alwaysRender = false;
             navbuddy.enable = true;
           };
 
