@@ -120,6 +120,7 @@ hl.config({
 	},
 
 	master = {
+		mfact = 0.65,
 		new_status = "master",
 	},
 
@@ -180,6 +181,7 @@ hl.bind(main_mod .. " + R", hl.dsp.exec_cmd(reload_shell))
 hl.bind(main_mod .. " + Q", hl.dsp.window.close())
 hl.bind(main_mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(main_mod .. " + M", hl.dsp.exec_cmd("uwsm stop"))
+hl.bind(main_mod .. " + SHIFT + Return", hl.dsp.layout("swapwithmaster master ignoremaster"))
 hl.bind(main_mod .. " + SHIFT + D", hl.dsp.exec_cmd("kitty --title tmux_main tmux new -A -s dots"))
 
 hl.bind(main_mod .. " + h", hl.dsp.focus({ direction = "l" }))
