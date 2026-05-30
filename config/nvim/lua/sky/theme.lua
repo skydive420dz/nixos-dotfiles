@@ -96,6 +96,21 @@ local function terminal_colors(c)
   end
 end
 
+local function transparent_lualine_body(c)
+  set("StatusLine", { fg = c.foreground, bg = "NONE" })
+  set("StatusLineNC", { fg = c.muted, bg = "NONE" })
+  set("WinBar", { fg = c.foreground, bg = "NONE" })
+  set("WinBarNC", { fg = c.muted, bg = "NONE" })
+
+  for name, spec in pairs(vim.api.nvim_get_hl(0, {})) do
+    if name:match("^lualine_") and not name:match("^lualine_a_") then
+      local next_spec = vim.deepcopy(spec)
+      next_spec.bg = "NONE"
+      set(name, next_spec)
+    end
+  end
+end
+
 function M.apply()
   local c = M.load_tokens()
 
@@ -142,8 +157,10 @@ function M.apply()
   set("MatchParen", { fg = c.selection_foreground, bg = c.accent_alt, bold = true })
   set("Substitute", { fg = c.selection_foreground, bg = c.accent_alt })
 
-  set("StatusLine", { fg = c.foreground, bg = c.surface })
-  set("StatusLineNC", { fg = c.muted, bg = c.surface })
+  set("StatusLine", { fg = c.foreground, bg = "NONE" })
+  set("StatusLineNC", { fg = c.muted, bg = "NONE" })
+  set("WinBar", { fg = c.foreground, bg = "NONE" })
+  set("WinBarNC", { fg = c.muted, bg = "NONE" })
   set("TabLine", { fg = c.muted, bg = c.surface })
   set("TabLineSel", { fg = c.foreground, bg = c.surface_strong, bold = true })
   set("TabLineFill", { bg = "NONE" })
@@ -351,6 +368,11 @@ function M.apply()
     package.loaded["sky.theme"] = nil
     require("sky.theme").apply()
   end, { desc = "Reload the active Sky Neovim theme" })
+
+  transparent_lualine_body(c)
+  vim.defer_fn(function()
+    transparent_lualine_body(c)
+  end, 50)
 end
 
 return M
