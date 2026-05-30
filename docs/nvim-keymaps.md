@@ -20,7 +20,7 @@ binding.
 | `<leader>tt` | Toggle terminal | Open/close the default ToggleTerm terminal. |
 | `<C-\>` in terminal mode | Exit terminal mode | Return from terminal input to normal mode. |
 | `<C-j/k/l>` in completion | Next / previous / accept | Navigate and accept Blink completion items. |
-| `<Tab>` / `<S-Tab>` | Next / previous buffer | Cycle native Neovim buffers in normal mode. |
+| `<Tab>` / `<S-Tab>` | Next / previous buffer | Cycle BufferLine buffers in normal mode. |
 | `<leader>w…` | Window actions | Split, close, isolate, or equalize windows. |
 | `<leader>q…` | Quit actions | Quit one, all, save-and-quit, or force quit. |
 | `<C-h/j/k/l>` | Focus pane/window | Move between Neovim splits or tmux panes. |
@@ -74,10 +74,18 @@ binding.
 
 | Key | Mode | Action | Use |
 | --- | --- | --- | --- |
-| `<Tab>` | Normal | Next buffer | Move to next native Neovim buffer. |
-| `<S-Tab>` | Normal | Previous buffer | Move to previous native Neovim buffer. |
+| `<leader>bn` | Normal | Next buffer | Move to next bufferline buffer. |
+| `<leader>bp` | Normal | Previous buffer | Move to previous bufferline buffer. |
+| `<Tab>` | Normal | Next buffer | Move to next bufferline buffer. |
+| `<S-Tab>` | Normal | Previous buffer | Move to previous bufferline buffer. |
 | `<leader>bN` | Normal | New buffer | Open an empty buffer. |
 | `<leader>bx` | Normal | Close buffer | Delete the current buffer. |
+| `<leader>bc` | Normal | Pick buffer | Jump to a visible buffer by label. |
+| `<leader>bmn` | Normal | Move buffer next | Reorder current buffer right. |
+| `<leader>bmp` | Normal | Move buffer previous | Reorder current buffer left. |
+| `<leader>bsd` | Normal | Sort buffers by directory | Group/sort buffers by directory. |
+| `<leader>bse` | Normal | Sort buffers by extension | Group/sort buffers by file extension. |
+| `<leader>bsi` | Normal | Sort buffers by ID | Restore creation-order-ish buffer sorting. |
 | `<leader><leader>h` | Normal | Swap buffer left | Move current buffer/window content left. |
 | `<leader><leader>j` | Normal | Swap buffer down | Move current buffer/window content down. |
 | `<leader><leader>k` | Normal | Swap buffer up | Move current buffer/window content up. |
