@@ -11,7 +11,7 @@
     XCURSOR_THEME = "Bibata-Modern-Ice";
     XCURSOR_SIZE = "24";
     HYPRCURSOR_SIZE = "24";
-    GTK_THEME = "Adwaita";
+    GTK_THEME = "Adwaita:dark";
     GTK2_RC_FILES = "${homeDirectory}/.config/gtk-2.0/gtkrc";
     QT_STYLE_OVERRIDE = "fusion";
     QT_QPA_PLATFORMTHEME = "qt5ct";
