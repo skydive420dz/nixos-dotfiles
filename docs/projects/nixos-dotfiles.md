@@ -38,6 +38,12 @@
 
 ## Next
 
-- Audit remaining accent exceptions only when they visibly bother us.
-- Extract shared QML pieces only when duplication starts slowing changes down.
-- Convert Markdown notes to Org later as a standalone documentation migration.
+- [x] Document the global Sky theme ownership model.
+- [x] List generated files vs source files.
+- [x] Map which apps are runtime-themed vs rebuild-themed.
+- [ ] Clean up `scripts/theme-select` so it stops feeling like one giant
+  generator carpet.
+- [ ] Continue global theme coverage audit.
+- [ ] Convert docs from Markdown to Org.
+- [ ] Quickshell project structure/QML metadata follow-up.
+- [ ] NVF reassessment or replacement path.
