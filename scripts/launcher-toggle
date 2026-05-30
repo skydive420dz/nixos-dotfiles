@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-exec fuzzel --show drun --prompt "Apps "
+config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
+theme_config="$config_home/theme/current/fuzzel.ini"
+
+if [ ! -r "$theme_config" ]; then
+  "$HOME/.config/scripts/theme-select" apply >/dev/null 2>&1 || true
+fi
+
+exec fuzzel --config="$theme_config" --show drun --prompt "Apps "

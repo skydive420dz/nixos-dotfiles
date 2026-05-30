@@ -12,6 +12,7 @@ Small maps for finding the shape of the system again after context has cooled.
 
 - [Hyprland](areas/hyprland.md)
 - [Quickshell](areas/quickshell.md)
+- [Global theme](areas/theme.md)
 - [Tmux](areas/tmux.md)
 - [Neovim](areas/nvim.md)
 - [Emacs](areas/emacs.md)

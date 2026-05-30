@@ -24,7 +24,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    catppuccin.url = "github:catppuccin/nix";
     nvf.url = "github:notashelf/nvf";
 
     firefox-addons = {
@@ -38,7 +37,6 @@
       nixpkgs,
       home-manager,
       nvf,
-      catppuccin,
       lanzaboote,
       ...
     }@inputs:
@@ -65,7 +63,6 @@
 
         modules = [
           nvf.nixosModules.default
-          catppuccin.nixosModules.catppuccin
           lanzaboote.nixosModules.lanzaboote
           home-manager.nixosModules.home-manager
           {
@@ -77,7 +74,6 @@
 
               users.${username}.imports = [
                 ./home
-                catppuccin.homeModules.catppuccin
               ];
             };
           }

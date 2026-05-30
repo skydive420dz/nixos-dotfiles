@@ -148,5 +148,6 @@
   # RELOAD CONFIG
   # =========================================
 
+  source-file -q ${config.xdg.configHome}/theme/current/tmux.conf
   bind r source-file ${config.xdg.configHome}/tmux/tmux.conf \; display "Reloaded!"
 ''

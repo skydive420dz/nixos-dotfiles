@@ -35,6 +35,12 @@
         . "$HOME/.openai_key"
       fi
 
+      if [ -f "$XDG_CONFIG_HOME/theme/current/env" ]; then
+        . "$XDG_CONFIG_HOME/theme/current/env"
+      elif [ -f "$HOME/.config/theme/current/env" ]; then
+        . "$HOME/.config/theme/current/env"
+      fi
+
       current_tty="$(tty 2>/dev/null || true)"
 
       if [[ -o login ]] \

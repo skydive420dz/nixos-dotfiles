@@ -7,6 +7,7 @@ import "../common"
 import "../modules/launcher"
 import "../modules/media"
 import "../modules/status"
+import "../modules/theme"
 import "../modules/tray"
 import "../modules/window"
 import "../modules/workspaces"
@@ -77,6 +78,8 @@ PanelWindow {
         Media {
             controller: root.mediaController
         }
+
+        ThemeToggle {}
 
         Tray {
             panelWindow: root

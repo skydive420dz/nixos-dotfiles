@@ -2,22 +2,36 @@
 # QUTEBROWSER CONFIGURATION
 # ============================================
 # Style: keyboard-first with mouse fallback.
-# Theme: Catppuccin Mocha (matches the rest of the system).
+# Theme: loaded from the global Sky theme selector.
 # Reload in-app with :config-source — no restart required.
 
-import catppuccin
+import os
+import runpy
+from pathlib import Path
 
 config.load_autoconfig()
 
 # ── Theme ──────────────────────────────────────────────────────────────────
-catppuccin.setup(c, "mocha", True)
+config_home = Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config")))
+theme_data = {}
+
+for theme_file in [
+    config_home / "theme/current/qutebrowser.py",
+    config_home / "qutebrowser/sky_theme_fallback.py",
+]:
+    if theme_file.exists():
+        theme_data = runpy.run_path(str(theme_file))
+        theme_data["setup"](c)
+        break
+
+theme_flavor = theme_data.get("FLAVOR", "dark")
 
 # Force dark mode on websites that don't have their own dark theme.
 # Images are kept at original colors so photos and icons don't get inverted.
-c.colors.webpage.darkmode.enabled = True
+c.colors.webpage.darkmode.enabled = theme_flavor != "light"
 c.colors.webpage.darkmode.policy.images = "never"
 c.colors.webpage.darkmode.policy.page = "smart"
-c.colors.webpage.preferred_color_scheme = "dark"
+c.colors.webpage.preferred_color_scheme = theme_flavor
 
 # ── Fonts ──────────────────────────────────────────────────────────────────
 # Tweak default_family if you have a preferred sans (e.g. "JetBrainsMono Nerd Font").

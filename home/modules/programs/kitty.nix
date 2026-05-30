@@ -1,4 +1,4 @@
-{ ... }:
+{ config, ... }:
 
 let
   theme = import ../../../theme/tokens.nix;
@@ -96,6 +96,10 @@ in
       "ctrl+c" = "copy_or_interrupt";
       "ctrl+v" = "paste_from_clipboard";
     };
+
+    extraConfig = ''
+      include ${config.xdg.configHome}/theme/current/kitty.conf
+    '';
   };
 
 }

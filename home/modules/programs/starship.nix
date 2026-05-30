@@ -1,7 +1,7 @@
 # ============================================
 # STARSHIP PROMPT
 # ============================================
-# Calm prompt in Catppuccin Mocha:
+# Calm prompt using the global Sky theme fallback:
 #
 #   [ ~/dir ]  branch status
 #   ❯
@@ -12,6 +12,10 @@
 
 { lib, ... }:
 
+let
+  theme = import ../../../theme/tokens.nix;
+  s = theme.semantic;
+in
 {
   programs.starship = {
     enable = true;
@@ -32,7 +36,7 @@
 
       os = {
         disabled = false;
-        style = "fg:#a6e3a1";
+        style = "fg:${s.success}";
         symbols = {
           NixOS = " ";
           Macos = " ";
@@ -47,7 +51,7 @@
 
       shell = {
         disabled = false;
-        style = "fg:#6c7086";
+        style = "fg:${s.muted}";
         bash_indicator = " bash";
         zsh_indicator = " zsh";
         fish_indicator = "󰈺 fish";
@@ -57,20 +61,20 @@
 
       username = {
         show_always = true;
-        style_user = "fg:#6c7086";
-        style_root = "fg:#f38ba8 bold";
+        style_user = "fg:${s.muted}";
+        style_root = "fg:${s.danger} bold";
         format = "[ $user ]($style)";
       };
 
       hostname = {
         ssh_only = true;
-        style = "fg:#6c7086";
+        style = "fg:${s.muted}";
         format = "[@$hostname ]($style)";
       };
 
       directory = {
-        style = "fg:#cdd6f4 bg:#313244";
-        format = "[ $path ]($style)[ ](fg:#6c7086)";
+        style = "fg:${s.foreground} bg:${s.surfaceStrong}";
+        format = "[ $path ]($style)[ ](fg:${s.muted})";
         truncation_length = 3;
         truncation_symbol = "…/";
         home_symbol = " ~";
@@ -86,12 +90,12 @@
 
       git_branch = {
         symbol = "";
-        style = "fg:#b4befe";
+        style = "fg:${s.accent}";
         format = "[󰊢 $branch ]($style)";
       };
 
       git_status = {
-        style = "fg:#6c7086";
+        style = "fg:${s.muted}";
         format = "[$all_status$ahead_behind]($style)";
         conflicted = "󰞇 ";
         ahead = "󱓊 \${count}";
@@ -107,9 +111,9 @@
       };
 
       character = {
-        success_symbol = "[❯](bold fg:#a6e3a1)";
-        error_symbol = "[❯](bold fg:#f38ba8)";
-        vimcmd_symbol = "[❮](bold fg:#cba6f7)";
+        success_symbol = "[❯](bold fg:${s.success})";
+        error_symbol = "[❯](bold fg:${s.danger})";
+        vimcmd_symbol = "[❮](bold fg:${s.accentAlt})";
       };
     };
   };

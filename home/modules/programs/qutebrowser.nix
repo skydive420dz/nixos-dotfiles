@@ -2,7 +2,7 @@
 
 let
   tokens = import ../../../theme/tokens.nix;
-  p = tokens.palette;
+  s = tokens.semantic;
 in
 {
   home.packages = with pkgs; [
@@ -10,51 +10,37 @@ in
   ];
 
   xdg.configFile = {
-    "qutebrowser/catppuccin.py".text = ''
-      def setup(c, flavor="mocha", statusbar_bold=False):
-          palette = {
-              "rosewater": "${p.rosewater}",
-              "flamingo": "${p.flamingo}",
-              "pink": "${p.pink}",
-              "mauve": "${p.mauve}",
-              "red": "${p.red}",
-              "maroon": "${p.maroon}",
-              "peach": "${p.peach}",
-              "yellow": "${p.yellow}",
-              "green": "${p.green}",
-              "teal": "${p.teal}",
-              "sky": "${p.sky}",
-              "sapphire": "${p.sapphire}",
-              "blue": "${p.blue}",
-              "lavender": "${p.lavender}",
-              "text": "${p.text}",
-              "subtext1": "${p.subtext1}",
-              "subtext0": "${p.subtext0}",
-              "overlay2": "${p.overlay2}",
-              "overlay1": "${p.overlay1}",
-              "overlay0": "${p.overlay0}",
-              "surface2": "${p.surface2}",
-              "surface1": "${p.surface1}",
-              "surface0": "${p.surface0}",
-              "base": "${p.base}",
-              "mantle": "${p.mantle}",
-              "crust": "${p.crust}",
-          }
+    "qutebrowser/sky_theme_fallback.py".text = ''
+      FLAVOR = "${tokens.flavor}"
 
-          c.colors.completion.category.bg = palette["base"]
-          c.colors.completion.category.border.bottom = palette["mantle"]
-          c.colors.completion.category.border.top = palette["mantle"]
-          c.colors.completion.category.fg = palette["lavender"]
+      def setup(c):
+          c.colors.completion.category.bg = "${s.background}"
+          c.colors.completion.category.border.bottom = "${s.surface}"
+          c.colors.completion.category.border.top = "${s.surface}"
+          c.colors.completion.category.fg = "${s.accent}"
 
-          c.colors.tabs.even.bg = palette["surface0"]
-          c.colors.tabs.odd.bg = palette["surface0"]
-          c.colors.tabs.selected.even.bg = palette["base"]
-          c.colors.tabs.selected.odd.bg = palette["base"]
-          c.colors.tabs.selected.even.fg = palette["mauve"]
-          c.colors.tabs.selected.odd.fg = palette["mauve"]
+          c.colors.completion.even.bg = "${s.background}"
+          c.colors.completion.odd.bg = "${s.surface}"
+          c.colors.completion.fg = "${s.foreground}"
+          c.colors.completion.item.selected.bg = "${s.surfaceStrong}"
+          c.colors.completion.item.selected.fg = "${s.foreground}"
+          c.colors.completion.match.fg = "${s.warning}"
 
-          c.colors.statusbar.normal.bg = palette["base"]
-          c.colors.statusbar.insert.bg = palette["green"]
+          c.colors.tabs.even.bg = "${s.surface}"
+          c.colors.tabs.odd.bg = "${s.surface}"
+          c.colors.tabs.even.fg = "${s.foreground}"
+          c.colors.tabs.odd.fg = "${s.foreground}"
+          c.colors.tabs.selected.even.bg = "${s.background}"
+          c.colors.tabs.selected.odd.bg = "${s.background}"
+          c.colors.tabs.selected.even.fg = "${s.accent}"
+          c.colors.tabs.selected.odd.fg = "${s.accent}"
+
+          c.colors.statusbar.normal.bg = "${s.background}"
+          c.colors.statusbar.normal.fg = "${s.foreground}"
+          c.colors.statusbar.insert.bg = "${s.success}"
+          c.colors.statusbar.insert.fg = "${s.selectionForeground}"
+          c.colors.statusbar.command.bg = "${s.background}"
+          c.colors.statusbar.command.fg = "${s.foreground}"
     '';
   };
 

@@ -13,7 +13,8 @@ in
     };
 
     Service = {
-      ExecStart = "${pkgs.mako}/bin/mako";
+      ExecStartPre = "${pkgs.bash}/bin/bash %h/.config/scripts/theme-select apply";
+      ExecStart = "${pkgs.mako}/bin/mako -c %h/.config/theme/current/mako.conf";
       Restart = "on-failure";
     };
 
@@ -21,6 +22,8 @@ in
   };
 
   xdg.configFile."mako/config".text = ''
+    # Generated runtime theme lives in ~/.config/theme/current/mako.conf.
+    # This fallback keeps mako usable before the first theme-select apply.
     font=JetBrainsMono Nerd Font 11
     background-color=${palette.mantle}ee
     text-color=${palette.text}ff

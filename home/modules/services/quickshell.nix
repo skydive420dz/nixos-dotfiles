@@ -8,6 +8,7 @@
       PartOf = [ "graphical-session.target" ];
     };
     Service = {
+      ExecStartPre = "${pkgs.bash}/bin/bash %h/.config/scripts/theme-select apply";
       ExecStart = "${pkgs.quickshell}/bin/quickshell -p %h/.config/quickshell";
       Restart = "on-failure";
     };

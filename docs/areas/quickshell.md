@@ -38,6 +38,7 @@ one module at a time.
 - [Status network graph](../../config/quickshell/modules/status/NetworkGraph.qml)
 - [Status metrics](../../config/quickshell/modules/status/StatusMetrics.qml)
 - [Status volume](../../config/quickshell/modules/status/Volume.qml)
+- [Theme toggle](../../config/quickshell/modules/theme/ThemeToggle.qml)
 - [Tray module](../../config/quickshell/modules/tray/Tray.qml)
 - [Workspaces module](../../config/quickshell/modules/workspaces/Workspaces.qml)
 - [Window title module](../../config/quickshell/modules/window/WindowTitle.qml)
@@ -121,8 +122,14 @@ module is ready to move.
   QML/C++ components need it.
 - `common/` is for shared tokens and primitives only. It must not become a junk
   drawer for one-off component code.
-- `common/Theme.qml` owns global design tokens: colors, fonts, bar rhythm,
-  shared radii, shared padding, and shared icon/text sizes.
+- `common/Theme.qml` owns Quickshell design tokens: fonts, bar rhythm, shared
+  radii, shared padding, shared icon/text sizes, and the current colors loaded
+  from the global theme state.
+- Quickshell is not the global theme authority. It may expose a selector UI, but
+  the selected style belongs to `theme/styles.json` and `scripts/theme-select`.
+  The selector must update the shared runtime bundle under
+  `~/.config/theme/current/` so terminals, notifications, shell tools, and
+  Quickshell converge on the same style.
 - `modules/<name>/` owns the implementation details for that block: private
   helpers, local state, row components, timers, process calls, and popover
   behavior.

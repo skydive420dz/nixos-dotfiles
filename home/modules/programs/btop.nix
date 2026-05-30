@@ -2,7 +2,7 @@
   programs.btop = {
     enable = true;
     settings = {
-      color_theme = "catppuccin_mocha";
+      color_theme = "sky";
       theme_background = false;
     };
   };

@@ -1,11 +1,20 @@
-{ lib, pkgs, ... }:
+{
+  homeDirectory,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   home.sessionVariables = {
-    GTK_THEME = "catppuccin-mocha-lavender-standard";
-    XCURSOR_THEME = "catppuccin-mocha-dark-cursors";
+    SKY_THEME = "SkyDark";
+    XCURSOR_THEME = "Bibata-Modern-Ice";
     XCURSOR_SIZE = "24";
     HYPRCURSOR_SIZE = "24";
+    GTK_THEME = "Adwaita";
+    GTK2_RC_FILES = "${homeDirectory}/.config/gtk-2.0/gtkrc";
+    QT_STYLE_OVERRIDE = "Fusion";
+    QT_QPA_PLATFORMTHEME = "qt5ct";
     QML2_IMPORT_PATH = lib.makeSearchPath "lib/qt-6/qml" [
       pkgs.qt6.qtdeclarative
       pkgs.quickshell

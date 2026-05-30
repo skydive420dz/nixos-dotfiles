@@ -1,0 +1,73 @@
+# ============================================
+# SKY — aerc styleset
+# ============================================
+
+*.default                            = true
+*.normal                             = true
+*.fg                                 = #f0efeb
+*.bg                                 = default
+
+# Global selection
+*.selected.fg                        = #1a1d21
+*.selected.bg                        = #b4c0c8
+*.selected.bold                      = true
+
+# Title bars / tabs
+title.fg                             = #1a1d21
+title.bg                             = #b4c0c8
+title.bold                           = true
+header.fg                            = #b4c0c8
+header.bold                          = true
+
+# Status line
+statusline_default.fg                = #f0efeb
+statusline_default.bg                = #282c34
+statusline_error.fg                  = #cdacac
+statusline_error.bg                  = #282c34
+statusline_error.bold                = true
+statusline_warning.fg                = #d4ccb4
+statusline_warning.bg                = #282c34
+statusline_success.fg                = #b8c4b8
+statusline_success.bg                = #282c34
+
+# Message list
+msglist_default.fg                   = #f0efeb
+msglist_unread.fg                    = #b4c0c8
+msglist_unread.bold                  = true
+msglist_read.fg                      = #676d77
+msglist_flagged.fg                   = #d4ccb4
+msglist_flagged.bold                 = true
+msglist_deleted.fg                   = #676d77
+msglist_marked.fg                    = #1a1d21
+msglist_marked.bg                    = #d4ccb4
+msglist_result.fg                    = #b8c4b8
+msglist_answered.fg                  = #b8c4b8
+msglist_forwarded.fg                 = #98a4ac
+
+# Directory list
+dirlist_default.fg                   = #ccc4b4
+dirlist_unread.fg                    = #b4c0c8
+dirlist_unread.bold                  = true
+dirlist_recent.fg                    = #d4ccb4
+
+# Borders and separators
+border.fg                            = #3d424a
+
+# Completion
+completion_default.fg                = #f0efeb
+completion_default.bg                = #282c34
+completion_pill.fg                   = #1a1d21
+completion_pill.bg                   = #b4c0c8
+
+# Tab bar
+tab.fg                               = #676d77
+tab.bg                               = #1a1d21
+tab.selected.fg                      = #1a1d21
+tab.selected.bg                      = #b4c0c8
+tab.selected.bold                    = true
+
+[viewer]
+*.normal                             = true
+header.fg                            = #b4c0c8
+header.bold                          = true
+header.value.fg                      = #f0efeb
