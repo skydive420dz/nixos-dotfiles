@@ -45,6 +45,8 @@
 - [x] Clean up `scripts/theme-select` so it stops feeling like one giant
   generator carpet.
 - [ ] Continue global theme coverage audit.
+  - Open: NVF Catppuccin/Mocha, Plymouth Catppuccin/Mocha, static aerc
+    styleset, duplicated Emacs theme tokens, and inherited palette field names.
 - [ ] Convert docs from Markdown to Org.
 - [ ] Quickshell project structure/QML metadata follow-up.
 - [ ] NVF reassessment or replacement path.

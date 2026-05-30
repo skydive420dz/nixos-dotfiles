@@ -85,6 +85,8 @@ These can change without `nrs`, usually after `theme-select toggle` or
 - zsh and fzf use `~/.config/theme/current/env`; existing shells may need to
   source it again or start fresh.
 - fuzzel uses `fuzzel.ini` on the next launch.
+- The launcher and clipboard picker explicitly pass the generated fuzzel config.
+  Plain manual `fuzzel` uses `config/fuzzel/fuzzel.ini` as a SkyDark fallback.
 - qutebrowser loads `qutebrowser.py`; existing windows may need a reload or
   restart depending on what qutebrowser has already cached.
 - btop and bat use their generated themes on the next launch or refresh.
@@ -104,6 +106,39 @@ definition changes.
 - Plymouth and boot-time assets.
 - Any module still consuming `theme/tokens.nix` directly as a static fallback.
 - NVF/Neovim is not currently part of the runtime Sky selector.
+
+## Coverage Audit 2026-05-30
+
+Covered by runtime generation:
+
+- Quickshell, Mako, Kitty, tmux, Starship, fuzzel launcher/clipboard,
+  qutebrowser, btop, bat, GTK, Qt, KDE-style globals, zsh/fzf env, and Doom
+  Emacs runtime style state.
+
+Fixed in this pass:
+
+- `scripts/clipboard-toggle` now passes the generated fuzzel config, matching
+  `scripts/launcher-toggle`.
+- `config/fuzzel/fuzzel.ini` now uses SkyDark fallback colors instead of an old
+  blue palette.
+
+Known open items:
+
+- NVF still declares `catppuccin`/`mocha` in
+  `system/modules/programs/nvim/nvim.nix`. Replace it with a Sky-owned theme or
+  decide that NVF is being retired.
+- Plymouth still uses `catppuccin-mocha` in `system/modules/boot.nix`. This is a
+  rebuild-time boot asset and needs a Sky boot theme if we want full coverage.
+- aerc uses a static `config/aerc/stylesets/sky` file. It matches SkyDark, but
+  it does not currently follow `SkyLight` at runtime.
+- Doom Emacs works with native Sky themes, but the theme files duplicate color
+  values from `theme/styles.json`. A later cleanup can generate those files or
+  load tokens from a single source.
+- `theme/yazi.nix` and a few fallback modules still use old palette field names
+  like `rosewater` and `mauve`. The values are Sky values, but the names are
+  inherited vocabulary and may be worth renaming once the palette settles.
+- `config/quickshell/common/Theme.qml` intentionally keeps hard-coded SkyDark
+  fallback colors for startup before generated runtime state exists.
 
 ## Commands
 
