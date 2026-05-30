@@ -1,0 +1,31 @@
+;;; theme.el -*- lexical-binding: t; -*-
+
+(defconst sk/theme
+  '((foreground . "#cdd6f4")
+    (background . "#1e1e2e")
+    (surface . "#313244")
+    (surface-strong . "#45475a")
+    (border . "#45475a")
+    (border-active . "#89b4fa")
+    (accent . "#b4befe")
+    (accent-alt . "#cba6f7")
+    (muted . "#6c7086")
+    (success . "#a6e3a1")
+    (warning . "#f9e2af")
+    (danger . "#f38ba8")
+    (selection-foreground . "#eceff4")
+    (selection-background . "#3b4252")
+    (string . "#a6e3a1")
+    (function . "#89dceb")
+    (keyword . "#89b4fa")
+    (number . "#cba6f7")
+    (type . "#f9e2af")
+    (builtin . "#94e2d5")
+    (preprocessor . "#fab387")
+    (comment . "#6c7086"))
+  "Theme tokens mirrored from theme/tokens.nix for live Doom config.")
+
+(defun sk/theme-color (name)
+  (alist-get name sk/theme))
+
+(provide 'theme)

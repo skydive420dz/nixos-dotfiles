@@ -4,6 +4,7 @@
     ./theme.nix
     ./email.nix
     ./notifications.nix
+    ./programs/emacs.nix
     ./programs/firefox.nix
     ./programs/fzf.nix
     ./programs/gnupg.nix

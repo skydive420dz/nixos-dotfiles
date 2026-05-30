@@ -22,6 +22,7 @@ let
 
   liveDirs = {
     ".config/aerc" = "config/aerc";
+    ".config/doom" = "config/doom";
     ".config/fuzzel" = "config/fuzzel";
     ".config/quickshell" = "config/quickshell";
     ".config/scripts" = "scripts";

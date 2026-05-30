@@ -43,3 +43,6 @@ config/aerc/state
 # Neovim logs
 nvim.log
 *.log
+
+# Doom runtime/cache state belongs outside git.
+config/doom/.local/
