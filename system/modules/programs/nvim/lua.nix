@@ -197,8 +197,8 @@
       return vim.uv.cwd()
     end), { desc = "Open MiniFiles cwd" })
     vim.keymap.set("n", "<leader>u", "<cmd>UndotreeToggle<cr>", { desc = "Toggle Undotree" })
-    vim.keymap.set("n", "<Tab>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
-    vim.keymap.set("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Previous buffer" })
+    vim.keymap.set("n", "<Tab>", "<cmd>bnext<cr>", { desc = "Next buffer" })
+    vim.keymap.set("n", "<S-Tab>", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
     vim.keymap.set("n", "<leader>bN", "<cmd>enew<cr>", { desc = "󰈔 New buffer" })
     vim.keymap.set("n", "<leader>bx", "<cmd>bdelete<cr>", { desc = "󰅖 Close buffer" })
 

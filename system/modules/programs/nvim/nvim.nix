@@ -80,7 +80,7 @@ in
         };
 
         filetree.neo-tree.enable = false;
-        tabline.nvimBufferline.enable = true;
+        tabline.nvimBufferline.enable = false;
 
         # Added explicit treesitter block to help NixOS healthcheck
         treesitter = {
