@@ -1,53 +1,16 @@
-{
-  theme,
-  semantic,
-}:
+{ }:
 
 {
   themeTokens = ''
-    local theme_tokens = {
-      name = "${theme.name}",
-      foreground = "${semantic.foreground}",
-      background = "${semantic.background}",
-      surface = "${semantic.surface}",
-      border = "${semantic.border}",
-      border_active = "${semantic.borderActive}",
-      accent = "${semantic.accent}",
-      accent_alt = "${semantic.accentAlt}",
-      muted = "${semantic.muted}",
-      warning = "${semantic.warning}",
-    }
-
-    vim.g.theme_tokens = theme_tokens
-
-    local function apply_theme_token_highlights()
-      vim.api.nvim_set_hl(0, "AlphaHeader", { fg = theme_tokens.accent })
-      vim.api.nvim_set_hl(0, "WhichKeyFloat", { bg = theme_tokens.background })
-      vim.api.nvim_set_hl(0, "WhichKeyBorder", { fg = theme_tokens.border_active, bg = theme_tokens.background })
-      vim.api.nvim_set_hl(0, "WhichKey", { fg = theme_tokens.accent })
-      vim.api.nvim_set_hl(0, "WhichKeyGroup", { fg = theme_tokens.accent_alt })
-      vim.api.nvim_set_hl(0, "WhichKeyDesc", { fg = theme_tokens.foreground })
-      vim.api.nvim_set_hl(0, "WhichKeySeparator", { fg = theme_tokens.muted })
-
-      local transparent_groups = {
-        "Normal",
-        "NormalNC",
-        "NormalFloat",
-        "FloatBorder",
-        "SignColumn",
-        "EndOfBuffer",
-      }
-
-      for _, group in ipairs(transparent_groups) do
-        vim.api.nvim_set_hl(0, group, { bg = "NONE" })
-      end
+    local sky_nvim = vim.fn.expand("~/.config/sky-nvim")
+    if vim.fn.isdirectory(sky_nvim) == 1 then
+      vim.opt.runtimepath:prepend(sky_nvim)
     end
 
-    vim.api.nvim_create_autocmd("ColorScheme", {
-      pattern = "*",
-      callback = apply_theme_token_highlights,
-    })
-    apply_theme_token_highlights()
+    local ok, err = pcall(vim.cmd.colorscheme, "sky")
+    if not ok then
+      vim.notify("Sky colorscheme unavailable: " .. tostring(err), vim.log.levels.WARN, { title = "Theme" })
+    end
   '';
 
   navigation = ''

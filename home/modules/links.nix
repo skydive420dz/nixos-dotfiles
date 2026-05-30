@@ -26,6 +26,7 @@ let
     ".config/fuzzel" = "config/fuzzel";
     ".config/quickshell" = "config/quickshell";
     ".config/scripts" = "scripts";
+    ".config/sky-nvim" = "config/nvim";
   };
 
   liveFiles = {

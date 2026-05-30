@@ -1,11 +1,7 @@
 { pkgs, lib, ... }:
 let
   inherit (lib.generators) mkLuaInline;
-  theme = import ../../../../theme/tokens.nix;
-  semantic = theme.semantic;
-  customLua = import ./lua.nix {
-    inherit theme semantic;
-  };
+  customLua = import ./lua.nix { };
 in
 {
   programs.nvf = {
@@ -65,11 +61,7 @@ in
           ui.enable = true;
         };
 
-        theme = {
-          enable = true;
-          name = "catppuccin";
-          style = "mocha";
-        };
+        theme.enable = false;
 
         visuals = {
           nvim-scrollbar.enable = true;

@@ -8,6 +8,18 @@ Neovim follows the module-directory convention:
 - `system/modules/programs/nvim/nvim.nix` owns the main `programs.nvf` module.
 - `system/modules/programs/nvim/lua.nix` owns custom Lua injected through
   `luaConfigRC`.
+- `config/nvim/colors/sky.lua` and `config/nvim/lua/sky/theme.lua` own the
+  live Sky colorscheme. Home Manager links that tree to `~/.config/sky-nvim`;
+  NVF prepends it to Neovim's runtimepath.
 
 Keep future Neovim helpers inside `system/modules/programs/nvim/` unless they
 are shared by another unit.
+
+## Theme
+
+NVF owns editor plumbing: packages, LSP, mappings, completion, and plugin
+enablement. Sky owns colors.
+
+After a rebuild creates the live link, changes under `config/nvim/` are hot
+editable. Use `:colorscheme sky`, `:SkyThemeReload`, or restart Neovim to pick
+up theme edits or a new `theme-select` style.

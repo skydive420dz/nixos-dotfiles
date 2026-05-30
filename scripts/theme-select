@@ -31,6 +31,7 @@ write_all_outputs() {
   write_fuzzel_config
   write_starship_config
   write_tmux_config
+  write_nvim_theme
   write_emacs_theme
   write_gtk_config
   write_qt_config

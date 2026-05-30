@@ -34,6 +34,8 @@ but Quickshell does not own the palette.
 - `config/doom/themes/sky-theme-common.el`: shared Doom face definitions.
 - `config/doom/themes/sky-dark-theme.el`: native Doom `SkyDark` theme.
 - `config/doom/themes/sky-light-theme.el`: native Doom `SkyLight` theme.
+- `config/nvim/colors/sky.lua`: live Neovim colorscheme entrypoint.
+- `config/nvim/lua/sky/theme.lua`: live Neovim Sky highlight definitions.
 - Home Manager modules install packages, link scripts, and set fallback session
   variables. They should not become per-project or per-machine theme patches.
 
@@ -53,6 +55,7 @@ Generated under `~/.config/theme/current/`:
 - `fuzzel.ini`
 - `starship.toml`
 - `tmux.conf`
+- `nvim.lua`
 - `emacs-theme.el`
 - `aerc/stylesets/sky`
 - `env`
@@ -94,6 +97,9 @@ These can change without `nrs`, usually after `theme-select toggle` or
 - btop and bat use their generated themes on the next launch or refresh.
 - aerc loads the generated styleset first through `stylesets-dirs`. Existing
   sessions need `:reload-config`; new sessions pick it up on launch.
+- Neovim prepends `~/.config/sky-nvim` to runtimepath and loads the live
+  `sky` colorscheme. After changing the global style, restart Neovim or run
+  `:colorscheme sky`/`:SkyThemeReload`.
 - GTK and Qt apps get generated settings/palettes. Existing GUI apps usually
   need restart; new processes should pick up the active style.
 - Doom Emacs has native `sky-dark` and `sky-light` themes. After changing the
@@ -110,7 +116,8 @@ definition changes.
 - Plymouth uses `theme/plymouth.nix`; changes require `nrs` and a reboot to
   observe.
 - Any module still consuming `theme/tokens.nix` directly as a static fallback.
-- NVF/Neovim is not currently part of the runtime Sky selector.
+- NVF plugin, package, LSP, and mapping changes still require `nrs`. The live
+  Sky colorscheme under `config/nvim/` does not.
 
 ## Coverage Audit 2026-05-30
 
@@ -129,12 +136,11 @@ Fixed in this pass:
 - Plymouth now uses the local Sky theme package from `theme/plymouth.nix`
   instead of Catppuccin Mocha.
 - aerc now reads the generated Sky styleset before the static SkyDark fallback.
+- NVF no longer declares Catppuccin/Mocha. Neovim loads the live Sky
+  colorscheme from `config/nvim/` through `~/.config/sky-nvim`.
 
 Known open items:
 
-- NVF still declares `catppuccin`/`mocha` in
-  `system/modules/programs/nvim/nvim.nix`. Replace it with a Sky-owned theme or
-  decide that NVF is being retired.
 - Doom Emacs works with native Sky themes, but the theme files duplicate color
   values from `theme/styles.json`. A later cleanup can generate those files or
   load tokens from a single source.
