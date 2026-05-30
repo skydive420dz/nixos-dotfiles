@@ -9,7 +9,9 @@ but Quickshell does not own the palette.
 - Current styles:
   - `SkyDark`: dark Compline-derived palette.
   - `SkyLight`: light companion palette.
-- `scripts/theme-select` is the runtime selector and generator.
+- `scripts/theme-select` is the runtime selector entrypoint.
+- `scripts/theme-select.d/` owns helper functions, generated output writers,
+  session environment updates, and live app reloads.
 - `~/.config/theme/current-style` stores the active runtime style.
 - `~/.config/theme/current/` stores generated runtime files.
 - `theme/tokens.nix` exports the rebuild-time default for Nix consumers.
@@ -19,7 +21,12 @@ but Quickshell does not own the palette.
 ## Source Files
 
 - `theme/styles.json`: semantic colors, terminal colors, and palette values.
-- `scripts/theme-select`: generates runtime config files from `styles.json`.
+- `scripts/theme-select`: public command and control flow.
+- `scripts/theme-select.d/core.sh`: shared helpers for colors, jq, and file
+  targets.
+- `scripts/theme-select.d/state.sh`: current-style selection helpers.
+- `scripts/theme-select.d/consumers.sh`: session environment and live reloads.
+- `scripts/theme-select.d/generators/`: per-output-family runtime generators.
 - `theme/tokens.nix`: Nix-side fallback/default tokens.
 - `config/quickshell/common/Theme.qml`: runtime reader for Quickshell tokens.
 - `config/doom/theme.el`: loads the active Sky theme in Doom Emacs.
@@ -132,9 +139,9 @@ journalctl --user -u quickshell.service -u mako.service -b --no-pager
 
 ## Cleanup Notes
 
-- `scripts/theme-select` is the current owner and is getting large. If it starts
-  slowing changes down, split generator helpers by app while preserving the same
-  public command.
+- `scripts/theme-select` stays the stable public command. Generator code is now
+  split under `scripts/theme-select.d/` so app-specific changes can happen in a
+  smaller file without changing selector behavior.
 - After the Sky themes settle, a separate Sky theme package/repo could reduce
   surface area inside these dotfiles.
 - Markdown notes can move to Org later. Do that as a separate documentation

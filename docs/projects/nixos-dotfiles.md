@@ -4,7 +4,8 @@
 
 - Hyprland config is Lua-only.
 - Quickshell owns bar, launcher, clipboard, OSD, and popovers.
-- Sky theme selection is global runtime state owned by `scripts/theme-select`.
+- Sky theme selection is global runtime state owned by `scripts/theme-select`
+  and helpers under `scripts/theme-select.d/`.
 - Keep git clean between jobs.
 
 ## Commands
@@ -41,7 +42,7 @@
 - [x] Document the global Sky theme ownership model.
 - [x] List generated files vs source files.
 - [x] Map which apps are runtime-themed vs rebuild-themed.
-- [ ] Clean up `scripts/theme-select` so it stops feeling like one giant
+- [x] Clean up `scripts/theme-select` so it stops feeling like one giant
   generator carpet.
 - [ ] Continue global theme coverage audit.
 - [ ] Convert docs from Markdown to Org.
