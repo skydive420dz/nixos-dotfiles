@@ -54,6 +54,7 @@ Generated under `~/.config/theme/current/`:
 - `starship.toml`
 - `tmux.conf`
 - `emacs-theme.el`
+- `aerc/stylesets/sky`
 - `env`
 
 Generated outside the current bundle:
@@ -91,6 +92,8 @@ These can change without `nrs`, usually after `theme-select toggle` or
 - qutebrowser loads `qutebrowser.py`; existing windows may need a reload or
   restart depending on what qutebrowser has already cached.
 - btop and bat use their generated themes on the next launch or refresh.
+- aerc loads the generated styleset first through `stylesets-dirs`. Existing
+  sessions need `:reload-config`; new sessions pick it up on launch.
 - GTK and Qt apps get generated settings/palettes. Existing GUI apps usually
   need restart; new processes should pick up the active style.
 - Doom Emacs has native `sky-dark` and `sky-light` themes. After changing the
@@ -125,14 +128,13 @@ Fixed in this pass:
   blue palette.
 - Plymouth now uses the local Sky theme package from `theme/plymouth.nix`
   instead of Catppuccin Mocha.
+- aerc now reads the generated Sky styleset before the static SkyDark fallback.
 
 Known open items:
 
 - NVF still declares `catppuccin`/`mocha` in
   `system/modules/programs/nvim/nvim.nix`. Replace it with a Sky-owned theme or
   decide that NVF is being retired.
-- aerc uses a static `config/aerc/stylesets/sky` file. It matches SkyDark, but
-  it does not currently follow `SkyLight` at runtime.
 - Doom Emacs works with native Sky themes, but the theme files duplicate color
   values from `theme/styles.json`. A later cleanup can generate those files or
   load tokens from a single source.

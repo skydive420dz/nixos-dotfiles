@@ -25,6 +25,7 @@ write_all_outputs() {
   write_kitty_theme
   write_btop_theme
   write_bat_theme
+  write_aerc_styleset
   write_mako_config
   write_qutebrowser_theme
   write_fuzzel_config
