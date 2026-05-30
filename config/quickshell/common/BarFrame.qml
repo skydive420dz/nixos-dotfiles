@@ -9,7 +9,7 @@ Canvas {
     property int frameWidth: 3
     property int frameRadius: 10
     property int borderWidth: 2
-    property color panelColor: Qt.rgba(0.090, 0.098, 0.135, 0.54)
+    property color panelColor: Theme.panel
     property color borderColor: Theme.border
 
     onPaint: {
