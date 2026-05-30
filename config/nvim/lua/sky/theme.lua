@@ -274,7 +274,8 @@ function M.apply()
 
   pcall(vim.api.nvim_del_user_command, "SkyThemeReload")
   vim.api.nvim_create_user_command("SkyThemeReload", function()
-    M.apply()
+    package.loaded["sky.theme"] = nil
+    require("sky.theme").apply()
   end, { desc = "Reload the active Sky Neovim theme" })
 end
 
