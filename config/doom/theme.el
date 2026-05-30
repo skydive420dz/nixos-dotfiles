@@ -1,5 +1,11 @@
 ;;; theme.el -*- lexical-binding: t; -*-
 
+(require 'subr-x)
+
+(defconst sk/doom-dir
+  (file-name-directory (or load-file-name buffer-file-name))
+  "Directory containing the Doom user config.")
+
 (defconst sk/theme-default
   '((foreground . "#f0efeb")
     (background . "#1a1d21")
@@ -28,11 +34,27 @@
 (defvar sk/theme (copy-tree sk/theme-default)
   "Active Sky theme tokens.")
 
+(defun sk/theme-config-home ()
+  "Return the XDG config directory."
+  (or (getenv "XDG_CONFIG_HOME")
+      (expand-file-name "~/.config")))
+
+(defun sk/theme-style-file ()
+  "Return the global Sky style state file."
+  (expand-file-name "theme/current-style" (sk/theme-config-home)))
+
 (defun sk/theme-runtime-file ()
   "Return the generated Sky theme file for this user session."
-  (let ((config-home (or (getenv "XDG_CONFIG_HOME")
-                         (expand-file-name "~/.config"))))
-    (expand-file-name "theme/current/emacs-theme.el" config-home)))
+  (expand-file-name "theme/current/emacs-theme.el" (sk/theme-config-home)))
+
+(defun sk/theme-dir ()
+  "Return the local Doom theme directory."
+  (expand-file-name "themes" sk/doom-dir))
+
+(defun sk/register-theme-paths ()
+  "Make local Sky themes visible to Emacs."
+  (add-to-list 'load-path (sk/theme-dir))
+  (add-to-list 'custom-theme-load-path (sk/theme-dir)))
 
 (defun sk/reload-theme-tokens ()
   "Reload generated Sky theme tokens, falling back to the built-in dark palette."
@@ -45,6 +67,34 @@
 (defun sk/theme-color (name)
   (alist-get name sk/theme))
 
+(defun sk/current-style ()
+  "Return the global Sky style name."
+  (let ((style-file (sk/theme-style-file)))
+    (cond
+     ((file-readable-p style-file)
+      (with-temp-buffer
+        (insert-file-contents style-file)
+        (string-trim (buffer-string))))
+     ((getenv "SKY_THEME"))
+     (t "SkyDark"))))
+
+(defun sk/current-doom-theme ()
+  "Return the Doom theme symbol matching the global Sky style."
+  (if (string= (sk/current-style) "SkyLight")
+      'sky-light
+    'sky-dark))
+
+(defun sk/load-sky-theme ()
+  "Reload the active native Sky theme."
+  (interactive)
+  (sk/register-theme-paths)
+  (sk/reload-theme-tokens)
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme (sk/current-doom-theme) t)
+  (when (called-interactively-p 'interactive)
+    (message "Loaded %s" (sk/current-style))))
+
+(sk/register-theme-paths)
 (sk/reload-theme-tokens)
 
 (provide 'theme)
