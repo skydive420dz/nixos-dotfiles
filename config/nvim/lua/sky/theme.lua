@@ -249,20 +249,73 @@ function M.apply()
   set("TelescopePromptBorder", { fg = c.border_active, bg = c.surface_strong })
   set("TelescopeSelection", { fg = c.foreground, bg = c.surface_strong })
   set("TelescopeMatching", { fg = c.accent, bold = true })
-  set("BufferLineFill", { bg = c.surface })
-  set("BufferLineBackground", { fg = c.muted, bg = c.surface })
-  set("BufferLineBufferVisible", { fg = c.foreground, bg = c.surface })
-  set("BufferLineBufferSelected", { fg = c.foreground, bg = c.surface_strong, bold = true })
-  set("BufferLineIndicatorSelected", { fg = c.accent, bg = c.surface_strong })
-  set("BufferLineSeparator", { fg = c.surface, bg = c.surface })
-  set("BufferLineSeparatorVisible", { fg = c.surface, bg = c.surface })
-  set("BufferLineSeparatorSelected", { fg = c.surface, bg = c.surface_strong })
-  set("BufferLineCloseButton", { fg = c.muted, bg = c.surface })
-  set("BufferLineCloseButtonVisible", { fg = c.foreground, bg = c.surface })
-  set("BufferLineCloseButtonSelected", { fg = c.foreground, bg = c.surface_strong })
-  set("BufferLineModified", { fg = c.warning, bg = c.surface })
-  set("BufferLineModifiedVisible", { fg = c.warning, bg = c.surface })
-  set("BufferLineModifiedSelected", { fg = c.warning, bg = c.surface_strong })
+  local bufferline_groups = {
+    Fill = { bg = c.surface },
+    Background = { fg = c.muted, bg = c.surface },
+    Buffer = { fg = c.muted, bg = c.surface },
+    BufferVisible = { fg = c.foreground, bg = c.surface },
+    BufferSelected = { fg = c.foreground, bg = c.surface_strong, bold = true },
+    IndicatorVisible = { fg = c.surface, bg = c.surface },
+    IndicatorSelected = { fg = c.accent, bg = c.surface_strong },
+    Separator = { fg = c.surface, bg = c.surface },
+    SeparatorVisible = { fg = c.surface, bg = c.surface },
+    SeparatorSelected = { fg = c.surface, bg = c.surface_strong },
+    CloseButton = { fg = c.muted, bg = c.surface },
+    CloseButtonVisible = { fg = c.foreground, bg = c.surface },
+    CloseButtonSelected = { fg = c.foreground, bg = c.surface_strong },
+    Modified = { fg = c.warning, bg = c.surface },
+    ModifiedVisible = { fg = c.warning, bg = c.surface },
+    ModifiedSelected = { fg = c.warning, bg = c.surface_strong },
+    Numbers = { fg = c.muted, bg = c.surface },
+    NumbersVisible = { fg = c.foreground, bg = c.surface },
+    NumbersSelected = { fg = c.foreground, bg = c.surface_strong, bold = true },
+    Duplicate = { fg = c.muted, bg = c.surface },
+    DuplicateVisible = { fg = c.foreground, bg = c.surface },
+    DuplicateSelected = { fg = c.foreground, bg = c.surface_strong },
+    Diagnostic = { fg = c.muted, bg = c.surface },
+    DiagnosticVisible = { fg = c.muted, bg = c.surface },
+    DiagnosticSelected = { fg = c.foreground, bg = c.surface_strong, bold = true },
+    Hint = { fg = c.accent_alt, bg = c.surface },
+    HintVisible = { fg = c.accent_alt, bg = c.surface },
+    HintSelected = { fg = c.accent_alt, bg = c.surface_strong, bold = true },
+    HintDiagnostic = { fg = c.accent_alt, bg = c.surface },
+    HintDiagnosticVisible = { fg = c.accent_alt, bg = c.surface },
+    HintDiagnosticSelected = { fg = c.accent_alt, bg = c.surface_strong, bold = true },
+    Info = { fg = c.accent, bg = c.surface },
+    InfoVisible = { fg = c.accent, bg = c.surface },
+    InfoSelected = { fg = c.accent, bg = c.surface_strong, bold = true },
+    InfoDiagnostic = { fg = c.accent, bg = c.surface },
+    InfoDiagnosticVisible = { fg = c.accent, bg = c.surface },
+    InfoDiagnosticSelected = { fg = c.accent, bg = c.surface_strong, bold = true },
+    Warning = { fg = c.warning, bg = c.surface },
+    WarningVisible = { fg = c.warning, bg = c.surface },
+    WarningSelected = { fg = c.warning, bg = c.surface_strong, bold = true },
+    WarningDiagnostic = { fg = c.warning, bg = c.surface },
+    WarningDiagnosticVisible = { fg = c.warning, bg = c.surface },
+    WarningDiagnosticSelected = { fg = c.warning, bg = c.surface_strong, bold = true },
+    Error = { fg = c.danger, bg = c.surface },
+    ErrorVisible = { fg = c.danger, bg = c.surface },
+    ErrorSelected = { fg = c.danger, bg = c.surface_strong, bold = true },
+    ErrorDiagnostic = { fg = c.danger, bg = c.surface },
+    ErrorDiagnosticVisible = { fg = c.danger, bg = c.surface },
+    ErrorDiagnosticSelected = { fg = c.danger, bg = c.surface_strong, bold = true },
+    Pick = { fg = c.danger, bg = c.surface, bold = true },
+    PickVisible = { fg = c.danger, bg = c.surface, bold = true },
+    PickSelected = { fg = c.danger, bg = c.surface_strong, bold = true },
+    Tab = { fg = c.muted, bg = c.surface },
+    TabSelected = { fg = c.foreground, bg = c.surface_strong, bold = true },
+    TabClose = { fg = c.muted, bg = c.surface },
+    TabSeparator = { fg = c.surface, bg = c.surface },
+    TabSeparatorSelected = { fg = c.surface, bg = c.surface_strong },
+    TruncMarker = { fg = c.muted, bg = c.surface },
+    OffsetSeparator = { fg = c.surface, bg = c.surface },
+    GroupLabel = { fg = c.foreground, bg = c.surface_strong },
+    GroupSeparator = { fg = c.surface_strong, bg = c.surface },
+  }
+
+  for suffix, spec in pairs(bufferline_groups) do
+    set("BufferLine" .. suffix, spec)
+  end
   set("MiniFilesNormal", { fg = c.foreground, bg = c.surface })
   set("MiniFilesBorder", { fg = c.border_active, bg = c.surface })
   set("MiniFilesCursorLine", { bg = c.surface_strong })
