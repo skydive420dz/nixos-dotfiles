@@ -60,7 +60,7 @@ QtObject {
     function saveState() {
         var payload = JSON.stringify({
             currentPath: currentPath
-        }) + "\n";
+        });
         var command = "mkdir -p " + JSON.stringify(stateDir)
             + " && printf %s " + JSON.stringify(payload)
             + " > " + JSON.stringify(stateFile)
