@@ -6,9 +6,10 @@
 :PROPERTIES:
 :CUSTOM_ID: current
 :END:
-- Launcher and clipboard are separate Quickshell overlays.
-- Both set =PanelWindow.screen= when opened so they follow the focused/current monitor.
-- Clipboard has image previews and keyboard scrolling.
+- Current live behavior is script-backed: the Quickshell launcher button opens =scripts/launcher-toggle= on left click and =scripts/clipboard-toggle= on right click.
+- =scripts/launcher-toggle= uses =fuzzel --show drun= with the generated Sky theme config.
+- =scripts/clipboard-toggle= uses =cliphist list | fuzzel --dmenu= and decodes the selected item back to =wl-copy=.
+- The old dedicated Quickshell overlay app is not in the active tree right now. Resurrection should start from history/reference branches and port only the pieces that still fit the current structure.
 
 ** Commands
 :PROPERTIES:
@@ -22,21 +23,29 @@
 :PROPERTIES:
 :CUSTOM_ID: important-files
 :END:
-- [[../../config/quickshell/Launcher.qml][Launcher]]
-- [[../../config/quickshell/Clipboard.qml][Clipboard]]
+- [[../../config/quickshell/modules/launcher/LauncherButton.qml][Launcher button]]
 - [[../../scripts/launcher-toggle][Launcher toggle]]
 - [[../../scripts/clipboard-toggle][Clipboard toggle]]
+- Future Quickshell launcher surface should live under =config/quickshell/root/Launcher.qml=.
+- Future Quickshell clipboard surface should live under =config/quickshell/root/Clipboard.qml=.
+- Future implementation modules should live under =config/quickshell/modules/launcher/= and =config/quickshell/modules/clipboard/=.
 
 ** Decisions
 :PROPERTIES:
 :CUSTOM_ID: decisions
 :END:
-- Do not merge clipboard into launcher until focus restoration is understood cleanly.
-- Avoid runtime focus helpers for overlay placement.
+- Keep launcher and clipboard as separate tools until focus restoration, keyboard navigation, and close behavior are boring and reliable.
+- Keep =fuzzel= scripts as the working fallback until the native Quickshell app can fully replace them.
 - Use Quickshell screen binding for layer windows.
+- Follow the Quickshell ownership rules: =root/= owns surfaces, =modules/<name>/= owns behavior, =common/= owns reusable primitives only.
+- Avoid full-screen invisible masks unless the overlay is intentionally click-out-to-close and the mask is verified not to steal unrelated input.
 
 ** Next
 :PROPERTIES:
 :CUSTOM_ID: next
 :END:
+- Search git history/reference branches for the old launcher and clipboard implementation.
+- Inventory reusable behavior before editing: activation flow, clipboard model, preview rendering, keyboard navigation, focus/close handling, and theme usage.
+- Rebuild the launcher first as a native Quickshell surface while preserving the script fallback.
+- Rebuild clipboard second, with text history first and image preview only after text selection is reliable.
 - Revisit unified source search only after the separate tools feel boring and reliable.
