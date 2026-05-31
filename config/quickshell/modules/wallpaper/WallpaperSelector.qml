@@ -10,6 +10,31 @@ Item {
     anchors.fill: parent
 
     property alias maskItem: card
+    property string query: ""
+    readonly property var filteredWallpapers: filterWallpapers()
+
+    function normalize(text) {
+        return (text ?? "").toString().toLowerCase();
+    }
+
+    function filterWallpapers() {
+        var needle = normalize(query).trim();
+        if (needle.length === 0)
+            return WallpaperStore.wallpapers;
+
+        return WallpaperStore.wallpapers.filter(path => normalize(WallpaperStore.basename(path)).indexOf(needle) >= 0);
+    }
+
+    Connections {
+        target: WallpaperStore
+
+        function onSelectorOpenChanged() {
+            if (WallpaperStore.selectorOpen) {
+                root.query = "";
+                search.forceActiveFocus();
+            }
+        }
+    }
 
     Rectangle {
         id: card
@@ -81,6 +106,69 @@ Item {
                 color: Theme.border
             }
 
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Theme.pillHeight
+                radius: Theme.radius
+                color: Theme.panelAlt
+                clip: true
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.leftMargin: Theme.pad + 7
+                    anchors.rightMargin: Theme.pad + 7
+                    spacing: 8
+
+                    Text {
+                        text: ""
+                        color: Theme.accent
+                        font.family: Theme.iconFont
+                        font.pixelSize: Theme.fontSize + 3
+                    }
+
+                    TextInput {
+                        id: search
+
+                        Layout.fillWidth: true
+                        text: root.query
+                        color: Theme.text
+                        selectionColor: Theme.border
+                        selectedTextColor: Theme.text
+                        font.family: Theme.font
+                        font.pixelSize: Theme.fontSize + 4
+                        clip: true
+                        focus: WallpaperStore.selectorOpen
+
+                        Text {
+                            anchors.fill: parent
+                            text: "Search wallpapers"
+                            color: Theme.muted
+                            font.family: search.font.family
+                            font.pixelSize: search.font.pixelSize
+                            verticalAlignment: Text.AlignVCenter
+                            elide: Text.ElideRight
+                            visible: search.text.length === 0
+                        }
+
+                        onTextChanged: root.query = text
+
+                        Keys.onPressed: event => {
+                            if (event.key === Qt.Key_Escape) {
+                                WallpaperStore.closeSelector();
+                                event.accepted = true;
+                            }
+                        }
+                    }
+
+                    Text {
+                        text: root.filteredWallpapers.length + "/" + WallpaperStore.wallpapers.length
+                        color: Theme.muted
+                        font.family: Theme.font
+                        font.pixelSize: Theme.fontSizeSmall + 1
+                    }
+                }
+            }
+
             Flickable {
                 id: wallpaperList
 
@@ -98,7 +186,7 @@ Item {
                     spacing: 10
 
                     Repeater {
-                        model: WallpaperStore.selectorOpen ? WallpaperStore.wallpapers : []
+                        model: WallpaperStore.selectorOpen ? root.filteredWallpapers : []
 
                         delegate: Rectangle {
                             id: wallpaperCard
@@ -134,6 +222,39 @@ Item {
                                         fillMode: Image.PreserveAspectCrop
                                         asynchronous: true
                                         cache: false
+                                    }
+
+                                    Rectangle {
+                                        visible: wallpaperCard.selected
+                                        anchors.top: parent.top
+                                        anchors.right: parent.right
+                                        anchors.margins: 6
+                                        height: 24
+                                        width: currentBadge.implicitWidth + 18
+                                        radius: Theme.radiusSmall
+                                        color: Theme.accent
+
+                                        RowLayout {
+                                            id: currentBadge
+
+                                            anchors.centerIn: parent
+                                            spacing: 4
+
+                                            Text {
+                                                text: ""
+                                                color: Theme.bg
+                                                font.family: Theme.iconFont
+                                                font.pixelSize: Theme.fontSizeSmall
+                                            }
+
+                                            Text {
+                                                text: "Current"
+                                                color: Theme.bg
+                                                font.family: Theme.font
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                font.bold: true
+                                            }
+                                        }
                                     }
                                 }
 
