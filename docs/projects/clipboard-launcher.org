@@ -9,10 +9,9 @@
 - Launcher is native Quickshell again. =scripts/launcher-toggle= signals the =qs-launcher= overlay through =$XDG_RUNTIME_DIR=.
 - The launcher searches desktop apps from =scripts/launcher-apps=.
 - Extra terminal-first tools that do not ship desktop entries live in =config/quickshell/modules/launcher/apps.json=.
-- =scripts/launcher-fuzzel= preserves the old fuzzel app launcher as an explicit fallback.
 - Clipboard is native Quickshell again for text history. =scripts/clipboard-toggle= signals the =qs-clipboard= overlay through =$XDG_RUNTIME_DIR=.
 - Image clipboard entries are detected from =cliphist list= binary markers and get a selected-item thumbnail preview generated under =$XDG_RUNTIME_DIR=.
-- =scripts/clipboard-fuzzel= preserves the old fuzzel clipboard picker as an explicit fallback.
+- The old fuzzel launcher/clipboard fallback scripts were removed after the native tools were approved.
 
 ** Commands
 :PROPERTIES:
@@ -20,9 +19,7 @@
 :END:
 - =systemctl --user restart quickshell=
 - =~/.config/scripts/launcher-toggle=
-- =~/.config/scripts/launcher-fuzzel=
 - =~/.config/scripts/clipboard-toggle=
-- =~/.config/scripts/clipboard-fuzzel=
 
 ** Important Files
 :PROPERTIES:
@@ -33,9 +30,7 @@
 - [[../../config/quickshell/modules/launcher/LauncherView.qml][Launcher view]]
 - [[../../config/quickshell/modules/launcher/apps.json][Launcher custom apps]]
 - [[../../scripts/launcher-toggle][Launcher toggle]]
-- [[../../scripts/launcher-fuzzel][Launcher fuzzel fallback]]
 - [[../../scripts/clipboard-toggle][Clipboard toggle]]
-- [[../../scripts/clipboard-fuzzel][Clipboard fuzzel fallback]]
 - [[../../config/quickshell/root/Clipboard.qml][Clipboard root surface]]
 - [[../../config/quickshell/modules/clipboard/ClipboardView.qml][Clipboard view]]
 
@@ -44,7 +39,7 @@
 :CUSTOM_ID: decisions
 :END:
 - Keep launcher and clipboard as separate tools until focus restoration, keyboard navigation, and close behavior are boring and reliable.
-- Keep explicit fuzzel fallback scripts until the native Quickshell tools are proven boring and reliable.
+- Remove fallback scripts once the native Quickshell tools are proven boring and reliable.
 - Use Quickshell screen binding for layer windows.
 - Keep native launcher results apps-only by default. Window search is noise for the current workflow and can return later as an explicit mode if it earns its place.
 - Follow the Quickshell ownership rules: =root/= owns surfaces, =modules/<name>/= owns behavior, =common/= owns reusable primitives only.
@@ -65,7 +60,6 @@
 - [X] Press =Enter= on an app result and confirm it launches.
 - [X] Press =Esc= and confirm the launcher closes.
 - [X] Click outside the launcher and confirm it closes without stealing later input.
-- [ ] Run =~/.config/scripts/launcher-fuzzel= and confirm the fallback launcher still works.
 - [X] Rebuild clipboard second, with text history first and image preview deferred.
 - [X] Open native clipboard with the normal clipboard bind or right-click launcher button.
 - [X] Type a query and confirm matching clipboard entries appear.
@@ -76,6 +70,6 @@
 - [X] Press =Esc= and confirm the clipboard picker closes.
 - [X] Click outside the clipboard picker and confirm it closes without stealing later input.
 - [X] Select an image clipboard entry and confirm the thumbnail preview appears.
-- [ ] Run =~/.config/scripts/clipboard-fuzzel= and confirm the fallback clipboard picker still works.
+- [X] Remove the old fuzzel launcher and clipboard fallback scripts.
 - Keep image preview thumbnail-only until the text/image picker stays boring in daily use.
 - Revisit unified source search only after the separate tools feel boring and reliable.

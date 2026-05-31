@@ -28,7 +28,6 @@ write_all_outputs() {
   write_aerc_styleset
   write_mako_config
   write_qutebrowser_theme
-  write_fuzzel_config
   write_starship_config
   write_tmux_config
   write_nvim_theme
