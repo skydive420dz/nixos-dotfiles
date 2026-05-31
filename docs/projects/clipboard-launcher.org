@@ -1,0 +1,42 @@
+* Clipboard and Launcher
+:PROPERTIES:
+:CUSTOM_ID: clipboard-and-launcher
+:END:
+** Current
+:PROPERTIES:
+:CUSTOM_ID: current
+:END:
+- Launcher and clipboard are separate Quickshell overlays.
+- Both set =PanelWindow.screen= when opened so they follow the focused/current monitor.
+- Clipboard has image previews and keyboard scrolling.
+
+** Commands
+:PROPERTIES:
+:CUSTOM_ID: commands
+:END:
+- =systemctl --user restart quickshell=
+- =~/.config/scripts/launcher-toggle=
+- =~/.config/scripts/clipboard-toggle=
+
+** Important Files
+:PROPERTIES:
+:CUSTOM_ID: important-files
+:END:
+- [[../../config/quickshell/Launcher.qml][Launcher]]
+- [[../../config/quickshell/Clipboard.qml][Clipboard]]
+- [[../../scripts/launcher-toggle][Launcher toggle]]
+- [[../../scripts/clipboard-toggle][Clipboard toggle]]
+
+** Decisions
+:PROPERTIES:
+:CUSTOM_ID: decisions
+:END:
+- Do not merge clipboard into launcher until focus restoration is understood cleanly.
+- Avoid runtime focus helpers for overlay placement.
+- Use Quickshell screen binding for layer windows.
+
+** Next
+:PROPERTIES:
+:CUSTOM_ID: next
+:END:
+- Revisit unified source search only after the separate tools feel boring and reliable.

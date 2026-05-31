@@ -1,0 +1,184 @@
+* Global Theme
+:PROPERTIES:
+:CUSTOM_ID: global-theme
+:END:
+The Sky theme selector is system-wide state. Quickshell exposes a button for it, but Quickshell does not own the palette.
+
+** Ownership Model
+:PROPERTIES:
+:CUSTOM_ID: ownership-model
+:END:
+- =theme/styles.json= is the source registry for shared style data.
+- Current styles:
+  - =SkyDark=: dark Compline-derived palette.
+  - =SkyLight=: light companion palette.
+- =scripts/theme-select= is the runtime selector entrypoint.
+- =scripts/theme-select.d/= owns helper functions, generated output writers, session environment updates, and live app reloads.
+- =~/.config/theme/current-style= stores the active runtime style.
+- =~/.config/theme/current/= stores generated runtime files.
+- =theme/tokens.nix= exports the rebuild-time default for Nix consumers.
+- App configs consume generated files or shared tokens. They should not invent private palettes when the color belongs to the global style.
+
+** Source Files
+:PROPERTIES:
+:CUSTOM_ID: source-files
+:END:
+- =theme/styles.json=: semantic colors, terminal colors, and palette values.
+- =scripts/theme-select=: public command and control flow.
+- =scripts/theme-select.d/core.sh=: shared helpers for colors, jq, and file targets.
+- =scripts/theme-select.d/state.sh=: current-style selection helpers.
+- =scripts/theme-select.d/consumers.sh=: session environment and live reloads.
+- =scripts/theme-select.d/generators/=: per-output-family runtime generators.
+- =theme/tokens.nix=: Nix-side fallback/default tokens plus semantic aliases for rebuild-time consumers.
+- =theme/lib.nix=: shared Nix helper for deriving Sky semantic palette aliases from any style in =theme/styles.json=.
+- =theme/plymouth.nix=: rebuild-time Sky Plymouth theme package.
+- =config/quickshell/common/Theme.qml=: runtime reader for Quickshell tokens.
+- =config/doom/theme.el=: loads the active Sky theme in Doom Emacs.
+- =config/doom/themes/sky-theme-common.el=: shared Doom face definitions.
+- =config/doom/themes/sky-dark-theme.el=: native Doom =SkyDark= theme wrapper.
+- =config/doom/themes/sky-light-theme.el=: native Doom =SkyLight= theme wrapper.
+- =config/nvim/colors/sky.lua=: live Neovim colorscheme entrypoint.
+- =config/nvim/lua/sky/theme.lua=: live Neovim Sky highlight definitions.
+- Home Manager modules install packages, link scripts, and set fallback session variables. They should not become per-project or per-machine theme patches.
+
+** Generated Files
+:PROPERTIES:
+:CUSTOM_ID: generated-files
+:END:
+Runtime state:
+
+- =~/.config/theme/current-style=
+
+Generated under =~/.config/theme/current/=:
+
+- =quickshell.json=
+- =quickshell-signal=
+- =kitty.conf=
+- =mako.conf=
+- =qutebrowser.py=
+- =fuzzel.ini=
+- =starship.toml=
+- =tmux.conf=
+- =nvim.lua=
+- =emacs-theme.el=
+- =yazi.toml=
+- =aerc/stylesets/sky=
+- =env=
+
+Generated outside the current bundle:
+
+- =~/.config/btop/themes/sky.theme=
+- =~/.config/bat/config=
+- =~/.config/bat/themes/Sky.tmTheme=
+- =~/.config/theme/yazi/SkyDark.toml=
+- =~/.config/theme/yazi/SkyLight.toml=
+- =~/.config/gtk-2.0/gtkrc=
+- =~/.config/gtk-3.0/settings.ini=
+- =~/.config/gtk-3.0/gtk.css=
+- =~/.config/gtk-4.0/settings.ini=
+- =~/.config/gtk-4.0/gtk.css=
+- =~/.config/qt5ct/colors/Sky.conf=
+- =~/.config/qt5ct/qt5ct.conf=
+- =~/.config/qt6ct/colors/Sky.conf=
+- =~/.config/qt6ct/qt6ct.conf=
+- =~/.config/kdeglobals=
+
+** Runtime-Themed Apps
+:PROPERTIES:
+:CUSTOM_ID: runtime-themed-apps
+:END:
+These can change without =nrs=, usually after =theme-select toggle= or =theme-select SkyDark=/=theme-select SkyLight=.
+
+- Quickshell reads =quickshell.json= and watches =quickshell-signal=. The selector also restarts =quickshell.service=.
+- Mako is restarted and reads =mako.conf=.
+- Kitty reloads through =kitty @ load-config=.
+- tmux reloads through =tmux source-file ~/.config/theme/current/tmux.conf=.
+- Starship uses =STARSHIP_CONFIG=; new prompts pick up the generated config.
+- zsh and fzf use =~/.config/theme/current/env=; existing shells may need to source it again or start fresh.
+- fuzzel uses =fuzzel.ini= on the next launch.
+- The launcher and clipboard picker explicitly pass the generated fuzzel config. Plain manual =fuzzel= uses =config/fuzzel/fuzzel.ini= as a SkyDark fallback.
+- qutebrowser loads =qutebrowser.py=; existing windows may need a reload or restart depending on what qutebrowser has already cached.
+- btop and bat use their generated themes on the next launch or refresh.
+- Yazi reads =~/.config/yazi/theme.toml=, which points at the active generated =yazi.toml=; existing Yazi sessions need restart.
+- aerc loads the generated styleset first through =stylesets-dirs=. Existing sessions need =:reload-config=; new sessions pick it up on launch.
+- Neovim prepends =~/.config/sky-nvim= to runtimepath and loads the live =sky= colorscheme. After changing the global style, restart Neovim or run =:colorscheme sky=/=:SkyThemeReload=.
+- GTK and Qt apps get generated settings/palettes. Existing GUI apps usually need restart; new processes should pick up the active style.
+- Doom Emacs has native =sky-dark= and =sky-light= themes. After changing the global style, use =SPC h r t= to reload the active Sky theme in a running Emacs session.
+
+** Rebuild-Themed Apps
+:PROPERTIES:
+:CUSTOM_ID: rebuild-themed-apps
+:END:
+These are still owned by Nix/Home Manager and need =nrs= or a rebuild when the definition changes.
+
+- Package installation for theme tools, fonts, icons, GTK/Qt helpers, and apps.
+- Home Manager service definitions and fallback session variables.
+- Plymouth uses =theme/plymouth.nix=; changes require =nrs= and a reboot to observe.
+- Any module still consuming =theme/tokens.nix= directly as a static fallback.
+- NVF plugin, package, LSP, and mapping changes still require =nrs=. The live Sky colorscheme under =config/nvim/= does not.
+
+** Coverage Audit 2026-05-30
+:PROPERTIES:
+:CUSTOM_ID: coverage-audit-2026-05-30
+:END:
+Covered by runtime generation:
+
+- Quickshell, Mako, Kitty, tmux, Starship, fuzzel launcher/clipboard, qutebrowser, btop, bat, Yazi, GTK, Qt, KDE-style globals, zsh/fzf env, and Doom Emacs runtime style state.
+
+Fixed in this pass:
+
+- =scripts/clipboard-toggle= now passes the generated fuzzel config, matching =scripts/launcher-toggle=.
+- =config/fuzzel/fuzzel.ini= now uses SkyDark fallback colors instead of an old blue palette.
+- Plymouth now uses the local Sky theme package from =theme/plymouth.nix= instead of Catppuccin Mocha.
+- aerc now reads the generated Sky styleset before the static SkyDark fallback.
+- NVF no longer declares Catppuccin/Mocha. Neovim loads the live Sky colorscheme from =config/nvim/= through =~/.config/sky-nvim=.
+- Nix fallbacks for Kitty and Mako now read semantic Sky tokens instead of inherited palette names.
+- =theme/yazi.nix= now uses semantic Sky aliases from =theme/tokens.nix=.
+- Old Catppuccin-style palette aliases were removed from =theme/styles.json=.
+- Doom native theme wrappers now read generated runtime tokens instead of duplicating the dark and light color tables.
+- The stale Catppuccin shadow color in =config/hypr/hyprland.lua= was renamed and replaced with a Sky value.
+- Yazi now reads the generated runtime =yazi.toml= instead of a static Home Manager theme symlink.
+
+Known open items:
+
+- =config/quickshell/common/Theme.qml= intentionally keeps hard-coded SkyDark fallback colors for startup before generated runtime state exists.
+
+** Commands
+:PROPERTIES:
+:CUSTOM_ID: commands
+:END:
+#+begin_src sh
+theme-select list
+theme-select current
+theme-select apply
+theme-select toggle
+theme-select SkyDark
+theme-select SkyLight
+#+end_src
+
+Health checks after a rebuild or reboot:
+
+#+begin_src sh
+theme-select current
+systemctl --user show-environment | grep -E '^(SKY_THEME|GTK_THEME|QT_)'
+systemctl --user is-active quickshell.service mako.service
+journalctl --user -u quickshell.service -u mako.service -b --no-pager
+#+end_src
+
+** Rules
+:PROPERTIES:
+:CUSTOM_ID: rules
+:END:
+- Quickshell may trigger the selector, but it must not own global palette data.
+- Nix installs packages and fallback defaults; live color state belongs under =~/.config/theme/current/=.
+- New themed apps should consume =theme/styles.json= through Nix or the generated runtime bundle.
+- Avoid local app palettes. If a color should be shared, add it to the style registry and regenerate from there.
+- Avoid machine-specific editor fixes for project theme data. Project metadata belongs to the project; global editor config stays general-purpose.
+
+** Cleanup Notes
+:PROPERTIES:
+:CUSTOM_ID: cleanup-notes
+:END:
+- =scripts/theme-select= stays the stable public command. Generator code is now split under =scripts/theme-select.d/= so app-specific changes can happen in a smaller file without changing selector behavior.
+- After the Sky themes settle, a separate Sky theme package/repo could reduce surface area inside these dotfiles.
+- Markdown notes can move to Org later. Do that as a separate documentation migration so theme behavior does not get mixed with format churn.

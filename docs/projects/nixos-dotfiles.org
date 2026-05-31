@@ -1,0 +1,57 @@
+* NixOS Dotfiles
+:PROPERTIES:
+:CUSTOM_ID: nixos-dotfiles
+:END:
+** Current
+:PROPERTIES:
+:CUSTOM_ID: current
+:END:
+- Hyprland config is Lua-only.
+- Quickshell owns bar, launcher, clipboard, OSD, and popovers.
+- Sky theme selection is global runtime state owned by =scripts/theme-select= and helpers under =scripts/theme-select.d/=.
+- Keep git clean between jobs.
+
+** Commands
+:PROPERTIES:
+:CUSTOM_ID: commands
+:END:
+- =nrs=
+- =hyr reload=
+- =systemctl --user restart quickshell=
+- =git status --short --branch=
+
+** Important Files
+:PROPERTIES:
+:CUSTOM_ID: important-files
+:END:
+- [[../../config/hypr/hyprland.lua][Hyprland Lua]]
+- [[../../config/quickshell/][Quickshell]]
+- [[../../home/home.nix][Home entry]]
+- [[../../home/modules/links.nix][Live links]]
+- [[../../system/modules/][System modules]]
+- [[../areas/modules.org][Module structure]]
+
+** Decisions
+:PROPERTIES:
+:CUSTOM_ID: decisions
+:END:
+- Hyprland is configured through =config/hypr/hyprland.lua=.
+- =hyprland.conf=, =mocha.conf=, and =uwsm-at-cursor= were removed.
+- Quickshell layer windows choose their screen when opened.
+- Bar applets launch plainly through =uwsm app=; Hyprland rules place them near the cursor.
+- Key repeat in Hyprland matches macOS feel.
+- Sky theme source data lives in =theme/styles.json=; generated runtime files live under =~/.config/theme/current/=.
+- Units that grow past one small file move into category-aware module directories with a local =default.nix=; current examples are tmux and Neovim.
+
+** Next
+:PROPERTIES:
+:CUSTOM_ID: next
+:END:
+- [X] Document the global Sky theme ownership model.
+- [X] List generated files vs source files.
+- [X] Map which apps are runtime-themed vs rebuild-themed.
+- [X] Clean up =scripts/theme-select= so it stops feeling like one giant generator carpet.
+- [X] Continue global theme coverage audit.
+- [X] Convert docs from Markdown to Org.
+- [ ] Quickshell project structure/QML metadata follow-up.
+- [ ] NVF reassessment or replacement path.

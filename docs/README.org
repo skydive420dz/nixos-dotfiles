@@ -1,0 +1,36 @@
+* Notes
+:PROPERTIES:
+:CUSTOM_ID: notes
+:END:
+Small maps for finding the shape of the system again after context has cooled.
+
+** Projects
+:PROPERTIES:
+:CUSTOM_ID: projects
+:END:
+- [[file:projects/nixos-dotfiles.org][NixOS dotfiles]]
+- [[file:projects/nixos-macos.org][macOS dotfiles]]
+- [[file:projects/clipboard-launcher.org][Clipboard and launcher]]
+
+** Areas
+:PROPERTIES:
+:CUSTOM_ID: areas
+:END:
+- [[file:areas/hyprland.org][Hyprland]]
+- [[file:areas/quickshell.org][Quickshell]]
+- [[file:areas/theme.org][Global theme]]
+- [[file:areas/tmux.org][Tmux]]
+- [[file:areas/nvim.org][Neovim]]
+- [[file:areas/emacs.org][Emacs]]
+- [[file:areas/keyboard.org][Keyboard]]
+- [[file:areas/modules.org][Module structure]]
+- [[file:areas/git.org][Git workflow]]
+
+** How to Use This
+:PROPERTIES:
+:CUSTOM_ID: how-to-use-this
+:END:
+- Keep project notes focused on current state, commands, important files, decisions, and next actions.
+- Put reusable knowledge in area notes.
+- When a project changes, update the project note before or after the commit.
+- Prefer links to files over long explanations.

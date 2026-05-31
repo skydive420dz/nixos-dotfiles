@@ -1,0 +1,30 @@
+* Git Workflow
+:PROPERTIES:
+:CUSTOM_ID: git-workflow
+:END:
+** Rhythm
+:PROPERTIES:
+:CUSTOM_ID: rhythm
+:END:
+- Work in small checkpoints.
+- Keep clean git state between jobs.
+- Sync live machine before testing when needed.
+- Commit only after the live behavior is accepted.
+
+** Commands
+:PROPERTIES:
+:CUSTOM_ID: commands
+:END:
+- =git status --short --branch=
+- =git diff --stat=
+- =git log --oneline -5=
+- =git push=
+
+** Remote NixOS Checkout
+:PROPERTIES:
+:CUSTOM_ID: remote-nixos-checkout
+:END:
+- Host: =192.168.1.175=
+- Repo: =~/nixos-dotfiles=
+
+When live-syncing files directly to NixOS, remember the remote checkout can look dirty even after local commits are pushed. Clean it by fetching/resetting only after preserving any real local diff.

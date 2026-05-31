@@ -15,7 +15,7 @@
         printf 'main\t%s\n' "$home_dir"
         printf 'dots\t%s\n' "$repo_dir"
         printf 'qs\t%s\n' "$repo_dir"
-        printf 'notes\t%s\n' "$docs_dir/README.md"
+        printf 'notes\t%s\n' "$docs_dir/README.org"
       }
 
       normalize_session() {
@@ -73,7 +73,7 @@
             "$tmux_bin" select-window -t "$target:vim"
             ;;
           notes)
-            "$tmux_bin" new-session -d -s "$target" -c "$dir" -n notes 'nvim README.md'
+            "$tmux_bin" new-session -d -s "$target" -c "$dir" -n notes 'nvim README.org'
             ;;
           *)
             "$tmux_bin" new-session -d -s "$target" -c "$dir" -n "$target"
