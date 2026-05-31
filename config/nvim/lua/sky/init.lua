@@ -3,6 +3,7 @@ local M = {}
 local modules = {
   "options",
   "autocmds",
+  "environment",
 }
 
 function M.setup()

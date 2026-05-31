@@ -74,36 +74,6 @@
       vim.cmd("edit " .. vim.fn.fnameescape(vim.lsp.get_log_path()))
     end, { desc = "Open the Neovim LSP log" })
 
-    -- Neovim terminals inherit from the Neovim process, so recover the
-    -- Hyprland instance when Neovim starts from a stale environment.
-    if (vim.env.HYPRLAND_INSTANCE_SIGNATURE == nil or vim.env.HYPRLAND_INSTANCE_SIGNATURE == "") and vim.env.XDG_RUNTIME_DIR then
-      local hypr_runtime = vim.env.XDG_RUNTIME_DIR .. "/hypr"
-      local newest_signature = nil
-      local newest_mtime = 0
-
-      local ok, iter = pcall(vim.fs.dir, hypr_runtime)
-      if ok and iter then
-        for name, kind in iter do
-          if kind == "directory" then
-            local stat = vim.uv.fs_stat(hypr_runtime .. "/" .. name)
-            if stat and stat.mtime and stat.mtime.sec > newest_mtime then
-              newest_signature = name
-              newest_mtime = stat.mtime.sec
-            end
-          end
-        end
-      end
-
-      if newest_signature then
-        vim.env.HYPRLAND_INSTANCE_SIGNATURE = newest_signature
-      end
-    end
-
-    -- Smart-splits should talk to tmux when Neovim is running inside tmux.
-    if vim.env.TMUX then
-      vim.g.smart_splits_multiplexer_integration = "tmux"
-    end
-
     local function smart_resize(method, fallback)
       return function()
         local ok, splits = pcall(require, "smart-splits")
