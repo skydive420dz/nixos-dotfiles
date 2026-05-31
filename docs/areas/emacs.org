@@ -12,12 +12,15 @@ This is a serious Doom Emacs experiment, not a Neovim replacement plan.
 - Doom's live config lives in [[../../config/doom][config/doom]].
 - Home Manager links =~/.config/doom= and =~/.doom.d= to the repo config so editing =init.el=, =config.el=, or Org notes does not require a rebuild.
 - Doom itself is cloned from upstream with =doom-bootstrap=, into =~/.config/emacs=.
+- NixOS runs Emacs as a user daemon; graphical launches use =emacsclient= through the =doom-emacs= wrapper.
 
 ** Installed By Nix
 :PROPERTIES:
 :CUSTOM_ID: installed-by-nix
 :END:
 - =emacs-pgtk= from the flake's Nixpkgs pin.
+- =doom-emacs= opens a graphical client frame against the daemon.
+- =doom-emacs-terminal= opens a terminal client frame against the daemon.
 - Core project tools: Git, ripgrep, fd, EditorConfig, tree-sitter.
 - Rich document support: sqlite, gnutls, ImageMagick, zstd, unzip, pandoc, TeX Live Small, aspell English, and Harper.
 - vterm native support: libvterm, cmake, gnumake, gcc, pkg-config.
@@ -48,6 +51,7 @@ This is a serious Doom Emacs experiment, not a Neovim replacement plan.
 - QML snippets live in =config/doom/snippets/qml-mode=.
 - Sky themes are native Doom themes in =config/doom/themes/=, backed by the global selector output in =~/.config/theme/current/emacs-theme.el=.
 - =SPC h r t= reloads the active Sky theme after =theme-select= changes.
+- The desktop launcher entry named =Emacs= opens =doom-emacs=, so closing the window only closes that frame. The daemon keeps buffers, projects, LSP state, and Org files alive until the user service is restarted or stopped.
 
 ** Commands
 :PROPERTIES:
@@ -63,10 +67,22 @@ Then use:
 
 #+begin_src sh
 doom sync
-emacs
+doom-emacs
 #+end_src
 
 Run =doom sync= after changing =config/doom/init.el= or =config/doom/packages.el=. Most edits to =config.el= and Org files are live after restarting or reloading Emacs.
+
+Daemon/service commands:
+
+#+begin_src sh
+systemctl --user status emacs.service
+systemctl --user restart emacs.service
+systemctl --user stop emacs.service
+doom-emacs
+doom-emacs-terminal
+#+end_src
+
+=SPC h r r= reloads Doom config into the current running daemon. It is useful for small Elisp edits, but it is not a clean process restart. Use =doom sync= plus =systemctl --user restart emacs.service= after changing packages/modules or when the daemon has loaded bad state.
 
 ** Checkpoints
 :PROPERTIES:
@@ -74,3 +90,4 @@ Run =doom sync= after changing =config/doom/init.el= or =config/doom/packages.el
 :END:
 - 2026-05-30: Doom Emacs experiment checkpoint: upstream Doom, repo-local live config, Evil mode, Org/Magit/Dired/vterm, QML/Lua/Nix/Rust/C tooling, inline diagnostics, readable modeline, dashboard logo, relative line numbers, repo-local spell dictionary, and Doom-owned =SPC w ...= window behavior.
 - 2026-05-30: Sky theme checkpoint: native =sky-dark= and =sky-light= Doom themes, shared face definitions, and =SPC h r t= reload for runtime theme changes.
+- 2026-05-31: Emacs daemon checkpoint: NixOS owns an =emacs.service= user daemon, launcher entry opens =doom-emacs= via =emacsclient=, and terminal clients are available through =doom-emacs-terminal=.

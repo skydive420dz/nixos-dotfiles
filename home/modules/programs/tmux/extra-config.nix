@@ -17,7 +17,7 @@
   # TRUECOLOR
   # =========================================
 
-  set -ga terminal-overrides ",xterm-256color:RGB"
+  set -as terminal-features ",xterm-kitty:RGB,xterm-256color:RGB"
 
   # =========================================
   # STATUS BAR

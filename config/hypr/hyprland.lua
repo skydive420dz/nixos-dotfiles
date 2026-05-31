@@ -181,6 +181,9 @@ hl.bind(main_mod .. " + M", hl.dsp.exec_cmd("uwsm stop"))
 hl.bind(main_mod .. " + SHIFT + Return", hl.dsp.layout("swapwithmaster master ignoremaster"))
 hl.bind(main_mod .. " + SHIFT + D", hl.dsp.exec_cmd("kitty --title tmux_main tmux new -A -s dots"))
 
+hl.bind(main_mod .. " + SHIFT + l ", hl.dsp.layout("rollnext master ignoremaster"))
+hl.bind(main_mod .. " + SHIFT + h ", hl.dsp.layout("rollprev master ignoremaster"))
+
 hl.bind(main_mod .. " + h", hl.dsp.focus({ direction = "l" }))
 hl.bind(main_mod .. " + l", hl.dsp.focus({ direction = "r" }))
 hl.bind(main_mod .. " + k", hl.dsp.focus({ direction = "u" }))

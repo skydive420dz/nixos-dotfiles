@@ -20,7 +20,7 @@ in
       bold_italic_font = "auto";
 
       confirm_os_window_close = 0;
-      background_opacity = "0.85";
+      background_opacity = "0.88";
       window_padding_width = 10;
       scrollback_lines = 10000;
       enable_audio_bell = "no";

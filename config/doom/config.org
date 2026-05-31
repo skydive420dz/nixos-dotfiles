@@ -8,7 +8,7 @@ Basic user metadata for Doom/Emacs features that need a name or email.
 ;;; config.el -*- lexical-binding: t; -*-
 
 (setq user-full-name "skydive420dz"
-      user-mail-address "")
+      user-mail-address "r0liveira@icloud.com")
 #+end_src
 
 * Theme And Fonts
@@ -24,13 +24,56 @@ Load our local color tokens, set the Doom theme, fonts, line numbers, transparen
 
 (sk/load-sky-theme)
 
-(add-to-list 'default-frame-alist '(alpha-background . 92))
-(add-to-list 'default-frame-alist '(alpha . 92))
-(set-frame-parameter nil 'alpha-background 92)
-(set-frame-parameter nil 'alpha 92)
+(add-to-list 'default-frame-alist '(alpha-background . 98))
+(add-to-list 'default-frame-alist '(alpha . 98))
+(set-frame-parameter nil 'alpha-background 98)
+(set-frame-parameter nil 'alpha 98)
 (setq frame-resize-pixelwise t)
 
 (setq fancy-splash-image (expand-file-name "assets/emacs-logo.png" doom-user-dir))
+#+end_src
+
+* Terminal Frames
+Terminal clients share the daemon config, but they render through the terminal. Keep their faces aligned with the active Sky theme so they do not fall back to terminal-default blue/black palettes.
+
+#+begin_src emacs-lisp
+(defconst sk/terminal-frame-colors
+  '((background . "color-234")
+    (foreground . "color-255")
+    (mode-line . "color-235")
+    (mode-line-inactive . "color-233")
+    (muted . "color-245")
+    (border . "color-237"))
+  "256-color-safe fallback colors for terminal Emacs frames.")
+
+(defun sk/terminal-frame-color (name)
+  (alist-get name sk/terminal-frame-colors))
+
+(defun sk/terminal-frame-direct-color-p (frame)
+  (> (display-color-cells frame) 256))
+
+(defun sk/frame-color (frame sky-color fallback-color)
+  (if (sk/terminal-frame-direct-color-p frame)
+      (sk/theme-color sky-color)
+    (sk/terminal-frame-color fallback-color)))
+
+(defun sk/apply-terminal-frame-theme (&optional frame)
+  (let ((target-frame (or frame (selected-frame))))
+    (with-selected-frame target-frame
+      (unless (display-graphic-p)
+        (set-frame-parameter target-frame 'background-color (sk/frame-color target-frame 'background 'background))
+        (set-frame-parameter target-frame 'foreground-color (sk/frame-color target-frame 'foreground 'foreground))
+        (set-face-background 'default (sk/frame-color target-frame 'background 'background) target-frame)
+        (set-face-foreground 'default (sk/frame-color target-frame 'foreground 'foreground) target-frame)
+        (set-face-background 'mode-line (sk/frame-color target-frame 'surface 'mode-line) target-frame)
+        (set-face-foreground 'mode-line (sk/frame-color target-frame 'foreground 'foreground) target-frame)
+        (set-face-background 'mode-line-inactive (sk/frame-color target-frame 'background-alt 'mode-line-inactive) target-frame)
+        (set-face-foreground 'mode-line-inactive (sk/frame-color target-frame 'muted 'muted) target-frame)
+        (set-face-background 'vertical-border (sk/frame-color target-frame 'border 'border) target-frame)
+        (set-face-foreground 'vertical-border (sk/frame-color target-frame 'border 'border) target-frame)))))
+
+(add-hook 'after-make-frame-functions #'sk/apply-terminal-frame-theme)
+(sk/apply-terminal-frame-theme)
 #+end_src
 
 * Editing Defaults
@@ -182,6 +225,7 @@ Configure notes, captures, and executable Org Babel blocks.
          "* %?\n  %U\n")))
 
 (after! org
+  (setq org-ellipsis "")
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((C . t)
@@ -190,6 +234,8 @@ Configure notes, captures, and executable Org Babel blocks.
      (rust . t)
      (shell . t))))
 #+end_src
+
+#+RESULTS:
 
 * Terminal And Dired
 Use zsh in vterm, keep terminal buffers clean, and make Dired list directories first.
@@ -200,7 +246,14 @@ Use zsh in vterm, keep terminal buffers clean, and make Dired list directories f
       vterm-shell "zsh"
       dired-listing-switches "-alh --group-directories-first")
 
+(after! dired
+  (map! :map dired-mode-map
+        :n "h" #'dired-up-directory
+        :n "l" #'dired-find-file
+        :n "RET" #'dired-find-file))
+
 (after! vterm
+  (sk/load-sky-theme)
   (add-hook 'vterm-mode-hook #'evil-insert-state)
   (add-hook 'vterm-mode-hook #'sk/disable-line-numbers))
 

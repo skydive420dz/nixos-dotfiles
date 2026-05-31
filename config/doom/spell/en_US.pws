@@ -1,10 +1,26 @@
-personal_ws-1.1 en_US 9
+personal_ws-1.1 en_US 25
 avy
+btop
+catppuccin
 config
 dired
+dotfiles
 flycheck
+fuzzel
+fzf
+hardcoded
+ish
 magit
+mako
 modeline
 neovim
 neovim's
+nixos
+nrs
+quickshell
+qutebrowser
+repo
+starship
+tmux
 vterm
+zsh

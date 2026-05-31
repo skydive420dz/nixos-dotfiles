@@ -60,6 +60,16 @@
     tab-line-tab tab-line-tab-current tab-line-tab-inactive show-paren-match
     show-paren-mismatch trailing-whitespace whitespace-space whitespace-tab
     whitespace-newline whitespace-trailing solaire-default-face
+    ansi-color-black ansi-color-red ansi-color-green ansi-color-yellow
+    ansi-color-blue ansi-color-magenta ansi-color-cyan ansi-color-white
+    ansi-color-bright-black ansi-color-bright-red ansi-color-bright-green
+    ansi-color-bright-yellow ansi-color-bright-blue ansi-color-bright-magenta
+    ansi-color-bright-cyan ansi-color-bright-white
+    term-color-black term-color-red term-color-green term-color-yellow
+    term-color-blue term-color-magenta term-color-cyan term-color-white
+    vterm-color-default vterm-color-black vterm-color-red vterm-color-green
+    vterm-color-yellow vterm-color-blue vterm-color-magenta vterm-color-cyan
+    vterm-color-white vterm-color-inverse-video
     solaire-fringe-face solaire-line-number-face solaire-hl-line-face
     doom-modeline-bar doom-modeline-bar-inactive doom-modeline-buffer-file
     doom-modeline-buffer-major-mode doom-modeline-buffer-minor-mode
@@ -191,6 +201,40 @@
      `(whitespace-tab ((t (:foreground ,border))))
      `(whitespace-newline ((t (:foreground ,border))))
      `(whitespace-trailing ((t (:background ,danger :foreground ,selection-fg))))
+     `(ansi-color-black ((t (:foreground ,black :background ,black))))
+     `(ansi-color-red ((t (:foreground ,red :background ,red))))
+     `(ansi-color-green ((t (:foreground ,green :background ,green))))
+     `(ansi-color-yellow ((t (:foreground ,yellow :background ,yellow))))
+     `(ansi-color-blue ((t (:foreground ,blue :background ,blue))))
+     `(ansi-color-magenta ((t (:foreground ,magenta :background ,magenta))))
+     `(ansi-color-cyan ((t (:foreground ,cyan :background ,cyan))))
+     `(ansi-color-white ((t (:foreground ,white :background ,white))))
+     `(ansi-color-bright-black ((t (:foreground ,muted :background ,muted))))
+     `(ansi-color-bright-red ((t (:foreground ,red :background ,red :weight bold))))
+     `(ansi-color-bright-green ((t (:foreground ,green :background ,green :weight bold))))
+     `(ansi-color-bright-yellow ((t (:foreground ,yellow :background ,yellow :weight bold))))
+     `(ansi-color-bright-blue ((t (:foreground ,blue :background ,blue :weight bold))))
+     `(ansi-color-bright-magenta ((t (:foreground ,magenta :background ,magenta :weight bold))))
+     `(ansi-color-bright-cyan ((t (:foreground ,cyan :background ,cyan :weight bold))))
+     `(ansi-color-bright-white ((t (:foreground ,fg :background ,fg :weight bold))))
+     `(term-color-black ((t (:foreground ,black :background ,black))))
+     `(term-color-red ((t (:foreground ,red :background ,red))))
+     `(term-color-green ((t (:foreground ,green :background ,green))))
+     `(term-color-yellow ((t (:foreground ,yellow :background ,yellow))))
+     `(term-color-blue ((t (:foreground ,blue :background ,blue))))
+     `(term-color-magenta ((t (:foreground ,magenta :background ,magenta))))
+     `(term-color-cyan ((t (:foreground ,cyan :background ,cyan))))
+     `(term-color-white ((t (:foreground ,white :background ,white))))
+     `(vterm-color-default ((t (:foreground ,fg :background ,bg))))
+     `(vterm-color-black ((t (:foreground ,black :background ,black))))
+     `(vterm-color-red ((t (:foreground ,red :background ,red))))
+     `(vterm-color-green ((t (:foreground ,green :background ,green))))
+     `(vterm-color-yellow ((t (:foreground ,yellow :background ,yellow))))
+     `(vterm-color-blue ((t (:foreground ,blue :background ,blue))))
+     `(vterm-color-magenta ((t (:foreground ,magenta :background ,magenta))))
+     `(vterm-color-cyan ((t (:foreground ,cyan :background ,cyan))))
+     `(vterm-color-white ((t (:foreground ,white :background ,white))))
+     `(vterm-color-inverse-video ((t (:inverse-video t))))
      `(solaire-default-face ((t (:background ,bg-alt :foreground ,fg))))
      `(solaire-fringe-face ((t (:background ,bg-alt :foreground ,muted))))
      `(solaire-line-number-face ((t (:background ,bg-alt :foreground ,muted))))

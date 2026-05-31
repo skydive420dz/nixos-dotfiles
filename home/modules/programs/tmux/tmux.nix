@@ -66,7 +66,7 @@ in
     keyMode = "vi";
     mouse = true;
     sensibleOnTop = true;
-    terminal = "tmux-256color";
+    terminal = "tmux-direct";
 
     # =========================
     # PLUGINS
