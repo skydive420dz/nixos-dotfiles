@@ -64,7 +64,7 @@ The current =main= branch is the sober working shell. The old modular shell live
 :END:
 Keep the shell small, calm, and portable. The bar is just a bar plus a few small apps; it should not become a 300-file desktop framework unless the complexity clearly earns its keep.
 
-Prefer this target shape as we split things back out:
+Current tree shape:
 
 #+begin_src text
 config/quickshell/
@@ -72,49 +72,50 @@ config/quickshell/
   qmldir
   root/
     Bar.qml
-    Osd.qml
     Launcher.qml
     Clipboard.qml
+    Osd.qml
+    Wallpaper.qml
+    WallpaperPicker.qml
   common/
+    BarFrame.qml
     Theme.qml
-    Metrics.qml
-    Pill.qml
-    IconButton.qml
-    TextRow.qml
-    PopoverPanel.qml
   modules/
     workspaces/
       Workspaces.qml
-      WorkspaceButton.qml
     window/
       WindowTitle.qml
     media/
       Media.qml
-      MediaButton.qml
       MediaAnalyzer.qml
+      MediaController.qml
     status/
       StatusCluster.qml
       Battery.qml
+      Bluetooth.qml
+      Clock.qml
       Network.qml
       NetworkGraph.qml
       StatusMetrics.qml
-      Bluetooth.qml
       Volume.qml
-      Clock.qml
     tray/
       Tray.qml
-      TrayItem.qml
     osd/
       OsdView.qml
     launcher/
+      LauncherButton.qml
       LauncherView.qml
-      LauncherRow.qml
     clipboard/
       ClipboardView.qml
-      ClipboardRow.qml
+    theme/
+      ThemeToggle.qml
+    wallpaper/
+      WallpaperButton.qml
+      WallpaperSelector.qml
+      WallpaperStore.qml
 #+end_src
 
-This is a direction, not a mandate to create empty folders. Split only when a module is ready to move.
+This is descriptive, not a mandate to create empty folders. Split only when a module is ready to move.
 
 ** Ownership Rules
 :PROPERTIES:
@@ -242,6 +243,7 @@ This is a direction, not a mandate to create empty folders. Split only when a mo
 - 2026-05-30: =awww= cutover branch build check passed on NixOS. The system toplevel builds, evaluated Home Manager packages no longer include =awww=, and evaluated user services no longer include =awww-daemon=. Final validation still requires applying with =nrs= and rebooting.
 - 2026-05-30: =awww= cutover validated after reboot. Wallpaper persisted through reboot, Quickshell starts cleanly, =awww-daemon.service= is gone, and no =awww= process is running.
 - 2026-05-30: Fuzzel launcher/clipboard fallback cutover removed the fallback scripts, =fuzzel= package, =config/fuzzel= live link, generated =fuzzel.ini= output, and Hyprland =fuzzel= layer rule. Native Quickshell launcher and clipboard are now the only configured picker surfaces.
+- 2026-05-30: Quickshell structure/QML metadata follow-up kept the runtime tree intact, updated the documented tree to match reality, and added =pragma ComponentBehavior: Bound= to delegate-heavy launcher, clipboard, and tray modules. =qmldir= remains the only tracked QML metadata file.
 
 ** Known Lesson
 :PROPERTIES:
