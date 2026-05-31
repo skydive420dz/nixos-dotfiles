@@ -230,6 +230,7 @@ This is a direction, not a mandate to create empty folders. Split only when a mo
 - 2026-05-30: Native wallpaper manager live test passed on NixOS. Quickshell restarted cleanly, the wallpaper selector opens from the bar icon, static wallpapers render, animated GIF wallpapers render, static/animated switching works in both directions, and state persists in =~/.local/state/quickshell/wallpaper.json=. =awww= remains installed and wired as fallback until a separate cutover cleanup removes it.
 - 2026-05-30: Native wallpaper full-screen layer test passed. =hyprctl layers -j= reports =qs-wallpaper= at =y=0= and full monitor height on both HDMI-A-1 and eDP-1 after Quickshell restart.
 - 2026-05-30: Native launcher first slice live-tested on NixOS. Quickshell restarts with =Configuration Loaded=, =scripts/launcher-toggle= opens the =qs-launcher= overlay, the layer appears on the focused monitor, a second toggle closes it, and no new journal errors were produced by the launcher slice. User-facing typing/app activation still needs hands-on testing before replacing the clipboard path.
+- 2026-05-30: Native launcher hand test passed. The apps-only launcher opens from the normal bind, searches app/custom entries, navigates with arrows and =Ctrl-j/k=, launches apps with =Enter=, closes cleanly, and the borderless blurred panel is visually approved. =scripts/launcher-fuzzel= remains available but was not tested because it is temporary fallback.
 
 ** Known Lesson
 :PROPERTIES:

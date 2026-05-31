@@ -53,14 +53,14 @@
 - [X] Search git history/reference branches for the old launcher and clipboard implementation.
 - [X] Inventory reusable launcher behavior: activation flow, app model, fuzzy scoring, keyboard navigation, focus/close handling, and theme usage.
 - [X] Rebuild the launcher first as a native Quickshell surface while preserving the script fallback.
-- [ ] Open native launcher with the normal launcher bind.
-- [ ] Type a query and confirm matching apps appear.
-- [ ] Confirm =BlueTUI=, =WireMix=, and =Neovim= appear from the custom launcher app list.
-- [ ] Navigate rows with arrow keys.
-- [ ] Navigate rows with =Ctrl-j= and =Ctrl-k=.
-- [ ] Press =Enter= on an app result and confirm it launches.
-- [ ] Press =Esc= and confirm the launcher closes.
-- [ ] Click outside the launcher and confirm it closes without stealing later input.
+- [X] Open native launcher with the normal launcher bind.
+- [X] Type a query and confirm matching apps appear.
+- [X] Confirm =BlueTUI=, =WireMix=, and =Neovim= appear from the custom launcher app list.
+- [X] Navigate rows with arrow keys.
+- [X] Navigate rows with =Ctrl-j= and =Ctrl-k=.
+- [X] Press =Enter= on an app result and confirm it launches.
+- [X] Press =Esc= and confirm the launcher closes.
+- [X] Click outside the launcher and confirm it closes without stealing later input.
 - [ ] Run =~/.config/scripts/launcher-fuzzel= and confirm the fallback launcher still works.
 - Rebuild clipboard second, with text history first and image preview only after text selection is reliable.
 - Revisit unified source search only after the separate tools feel boring and reliable.
