@@ -296,12 +296,5 @@
     vim.keymap.set({ "i", "s" }, "<Tab>", completion_or_snippet_next, { expr = true, desc = "Next completion or snippet jump" })
     vim.keymap.set({ "i", "s" }, "<S-Tab>", completion_or_snippet_prev, { expr = true, desc = "Previous completion or snippet jump" })
 
-    vim.diagnostic.config({
-      virtual_text = true,
-      signs = true,
-      underline = true,
-      update_in_insert = true,
-      severity_sort = true,
-    })
   '';
 }
