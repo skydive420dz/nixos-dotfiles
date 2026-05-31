@@ -57,6 +57,7 @@
 - [X] Remove =awww= package/startup/service wiring.
 - [X] Validate native wallpaper after =nrs= and reboot with =awww= removed.
 - [X] Cut over from fuzzel launcher/clipboard fallbacks after the native tools stay boring.
+- [ ] Polish wallpaper manager with a clearer current marker plus optional history/favorites.
 - [ ] Add per-monitor wallpaper state if the workflow needs it.
 - [X] Quickshell project structure/QML metadata follow-up.
 - [X] NVF reassessment or replacement path.
