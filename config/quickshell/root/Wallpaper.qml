@@ -11,6 +11,7 @@ PanelWindow {
     id: root
 
     WlrLayershell.layer: WlrLayer.Background
+    WlrLayershell.exclusionMode: ExclusionMode.Ignore
     WlrLayershell.exclusiveZone: 0
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     WlrLayershell.namespace: "qs-wallpaper"
