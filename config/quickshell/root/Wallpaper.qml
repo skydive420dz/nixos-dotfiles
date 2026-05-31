@@ -24,24 +24,36 @@ PanelWindow {
 
     color: Theme.bg
 
-    Image {
-        anchors.fill: parent
-        visible: !WallpaperStore.isAnimated(WallpaperStore.currentPath)
-        source: WallpaperStore.fileUrl(WallpaperStore.currentPath)
-        fillMode: Image.PreserveAspectCrop
-        asynchronous: true
-        cache: false
-        smooth: true
-        mipmap: true
+    Repeater {
+        model: WallpaperStore.isAnimated(WallpaperStore.currentPath) ? [] : [WallpaperStore.currentPath]
+
+        delegate: Image {
+            required property string modelData
+
+            anchors.fill: parent
+            source: WallpaperStore.fileUrl(modelData)
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            cache: false
+            smooth: true
+            mipmap: true
+        }
     }
 
-    AnimatedImage {
-        anchors.fill: parent
-        visible: WallpaperStore.isAnimated(WallpaperStore.currentPath)
-        source: WallpaperStore.fileUrl(WallpaperStore.currentPath)
-        fillMode: Image.PreserveAspectCrop
-        cache: false
-        playing: visible
-        smooth: true
+    Repeater {
+        model: WallpaperStore.isAnimated(WallpaperStore.currentPath) ? [WallpaperStore.currentPath] : []
+
+        delegate: AnimatedImage {
+            required property string modelData
+
+            anchors.fill: parent
+            source: WallpaperStore.fileUrl(modelData)
+            fillMode: Image.PreserveAspectCrop
+            cache: false
+            playing: true
+            paused: false
+            speed: 1.0
+            smooth: true
+        }
     }
 }
