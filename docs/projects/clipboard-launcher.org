@@ -66,14 +66,14 @@
 - [X] Click outside the launcher and confirm it closes without stealing later input.
 - [ ] Run =~/.config/scripts/launcher-fuzzel= and confirm the fallback launcher still works.
 - [X] Rebuild clipboard second, with text history first and image preview deferred.
-- [ ] Open native clipboard with the normal clipboard bind or right-click launcher button.
+- [X] Open native clipboard with the normal clipboard bind or right-click launcher button.
 - [ ] Type a query and confirm matching clipboard entries appear.
 - [ ] Navigate rows with arrow keys.
 - [ ] Navigate rows with =Ctrl-j= and =Ctrl-k=.
-- [ ] Press =Enter= on a result and confirm it becomes the regular clipboard.
+- [X] Select a clipboard entry and confirm focus returns to the previous window.
 - [ ] Press =Delete=, or =Backspace= with an empty query, and confirm the selected item is removed from history.
-- [ ] Press =Esc= and confirm the clipboard picker closes.
-- [ ] Click outside the clipboard picker and confirm it closes without stealing later input.
+- [X] Press =Esc= and confirm the clipboard picker closes.
+- [X] Click outside the clipboard picker and confirm it closes without stealing later input.
 - [ ] Run =~/.config/scripts/clipboard-fuzzel= and confirm the fallback clipboard picker still works.
 - Add image preview only after text selection is boring and reliable.
 - Revisit unified source search only after the separate tools feel boring and reliable.
