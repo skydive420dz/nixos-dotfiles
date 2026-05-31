@@ -317,6 +317,13 @@ hl.layer_rule({
 })
 
 hl.layer_rule({
+	name = "qs_wallpaper_picker_blur",
+	match = { namespace = "^qs-wallpaper-picker$" },
+	blur = true,
+	ignore_alpha = 0,
+})
+
+hl.layer_rule({
 	name = "fuzzel_fade",
 	match = { namespace = "^fuzzel$" },
 	animation = "fade",
