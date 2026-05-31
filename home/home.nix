@@ -20,7 +20,6 @@
       btop
       nvtopPackages.full
       psmisc
-      awww
       libnotify
       mako
       powertop

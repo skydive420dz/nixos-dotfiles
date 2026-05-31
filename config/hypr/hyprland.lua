@@ -66,9 +66,6 @@ hl.monitor({
 
 hl.on("hyprland.start", function()
 	hl.exec_cmd("uwsm finalize HYPRLAND_INSTANCE_SIGNATURE")
-	hl.exec_cmd(
-		"uwsm app -- awww img /home/skydive420dz/nixos-dotfiles/wallpapers/wallpaper-003.gif --transition-type fade"
-	)
 	hl.exec_cmd("uwsm app -- vesktop -m")
 	hl.exec_cmd("uwsm app -- wl-paste --type text --watch cliphist store")
 	hl.exec_cmd("uwsm app -- wl-paste --type image --watch cliphist store")
