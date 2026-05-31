@@ -234,6 +234,7 @@ This is a direction, not a mandate to create empty folders. Split only when a mo
 - 2026-05-30: Native launcher hand test passed. The apps-only launcher opens from the normal bind, searches app/custom entries, navigates with arrows and =Ctrl-j/k=, launches apps with =Enter=, closes cleanly, and the borderless blurred panel is visually approved. =scripts/launcher-fuzzel= remains available but was not tested because it is temporary fallback.
 - 2026-05-30: Native clipboard first slice live-tested on NixOS. Quickshell restarts with =Configuration Loaded=, =scripts/clipboard-toggle= opens the =qs-clipboard= overlay, the layer appears in =hyprctl layers -j=, a second toggle closes it, and no new journal errors were produced by the clipboard slice. User-facing history selection, deletion, and fallback testing still need hands-on confirmation.
 - 2026-05-30: Native clipboard hand test passed for the core close/restore path. Click-out close and =Esc= close are clean, the picker feels responsive, and selecting a history entry returns focus to the previous window as intended. Search navigation, history deletion, and =clipboard-fuzzel= fallback remain unclaimed until explicitly tested.
+- 2026-05-30: Native clipboard mechanics approved. Search/filtering, row navigation, selection/copy focus restore, deletion, =Esc= close, and click-out close all behave as intended. =scripts/clipboard-fuzzel= remains available but was not tested because it is temporary fallback.
 
 ** Known Lesson
 :PROPERTIES:
