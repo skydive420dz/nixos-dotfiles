@@ -264,8 +264,6 @@ hl.window_rule({
 hl.window_rule({
 	name = "brave-browser",
 	match = { class = "^(brave-browser)$" },
-	opaque = true,
-	force_rgbx = true,
 	opacity = opacity.solid_fullscreen,
 })
 
