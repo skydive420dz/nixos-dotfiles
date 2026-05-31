@@ -28,6 +28,9 @@ Item {
     readonly property int visibleRows: Math.min(results.length, 8)
     readonly property int iconBoxSize: 42
     readonly property int iconSize: 22
+    readonly property color panelColor: Qt.rgba(Theme.panel.r, Theme.panel.g, Theme.panel.b, 0.94)
+    readonly property color controlColor: Qt.rgba(Theme.panelAlt.r, Theme.panelAlt.g, Theme.panelAlt.b, 0.96)
+    readonly property color chipColor: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.90)
 
     function show() {
         closing = false;
@@ -205,7 +208,7 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: root.panelTopMargin
         radius: Theme.radius
-        color: Theme.panel
+        color: root.panelColor
         border.color: Theme.border
         border.width: 1
         clip: true
@@ -229,7 +232,7 @@ Item {
                 Layout.fillWidth: true
                 height: root.controlHeight
                 radius: Theme.radius
-                color: Theme.panelAlt
+                color: root.controlColor
                 clip: true
 
                 RowLayout {
@@ -311,7 +314,7 @@ Item {
                     width: ListView.view.width
                     height: root.rowHeight
                     radius: Theme.radius
-                    color: index === root.selectedIndex ? Theme.panelAlt : "transparent"
+                    color: index === root.selectedIndex ? root.controlColor : "transparent"
 
                     RowLayout {
                         anchors.fill: parent
@@ -323,7 +326,7 @@ Item {
                             Layout.preferredWidth: root.iconBoxSize
                             Layout.preferredHeight: root.iconBoxSize
                             radius: Theme.radiusSmall
-                            color: Theme.bg
+                            color: root.chipColor
 
                             IconImage {
                                 anchors.centerIn: parent
@@ -372,7 +375,7 @@ Item {
                             Layout.preferredWidth: typeLabel.implicitWidth + 14
                             Layout.preferredHeight: 22
                             radius: Theme.radiusSmall
-                            color: Theme.bg
+                            color: root.chipColor
 
                             Text {
                                 id: typeLabel
