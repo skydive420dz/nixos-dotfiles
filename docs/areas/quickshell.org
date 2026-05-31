@@ -22,12 +22,14 @@ The current =main= branch is the sober working shell. The old modular shell live
 - [[../../config/quickshell/shell.qml][Shell root]]
 - [[../../config/quickshell/root/Bar.qml][Bar root surface]]
 - [[../../config/quickshell/common/BarFrame.qml][Bar frame primitive]]
+- [[../../config/quickshell/root/Launcher.qml][Launcher root surface]]
 - [[../../config/quickshell/root/Osd.qml][OSD root surface]]
 - [[../../config/quickshell/root/Wallpaper.qml][Wallpaper root surface]]
 - [[../../config/quickshell/root/WallpaperPicker.qml][Wallpaper picker surface]]
 - [[../../config/quickshell/common/Theme.qml][Theme tokens]]
 - [[../../config/quickshell/qmldir][QML module index]]
 - [[../../config/quickshell/modules/launcher/LauncherButton.qml][Launcher button]]
+- [[../../config/quickshell/modules/launcher/LauncherView.qml][Launcher view]]
 - [[../../config/quickshell/modules/media/Media.qml][Media module]]
 - [[../../config/quickshell/modules/media/MediaAnalyzer.qml][Media analyzer]]
 - [[../../config/quickshell/modules/media/MediaController.qml][Media controller]]
@@ -197,6 +199,7 @@ This is a direction, not a mandate to create empty folders. Split only when a mo
 - 2026-05-30: Native wallpaper management started inside Quickshell without removing the existing =awww= fallback. =root/Wallpaper.qml= owns the per-screen background layer, =root/WallpaperPicker.qml= owns the selector overlay surface, and =modules/wallpaper/= owns the bar icon, selector UI, file list, current wallpaper state, and state persistence. The current wallpaper is stored at =~/.local/state/quickshell/wallpaper.json= unless =XDG_STATE_HOME= points elsewhere. The default wallpaper directory is =$HOME/nixos-dotfiles/wallpapers= and can be overridden with =SKY_WALLPAPER_DIR=. Do not remove =awww= package/service/startup wiring until the native path passes live testing.
 - 2026-05-30: Wallpaper geometry checkpoint passed after setting =WlrLayershell.exclusionMode: ExclusionMode.Ignore= on =root/Wallpaper.qml=. Hyprland reports =qs-wallpaper= at =y=0= with full monitor height on both displays, so the native wallpaper now renders underneath the acrylic bar instead of starting below the bar's reserved 36px area.
 - 2026-05-30: Theme/wallpaper bar action spacing was tightened by narrowing only =modules/theme/ThemeToggle.qml=. The wallpaper button, tray spacing, and status cluster geometry were intentionally left alone. Further pixel polish can happen later, but this is good enough for the launcher/clipboard resurrection checkpoint.
+- 2026-05-30: Native launcher resurrection started. =root/Launcher.qml= owns the overlay layer, focus policy, screen targeting, signal-file toggle, and click-out mask. =modules/launcher/LauncherView.qml= owns app/window loading, fuzzy scoring, keyboard navigation, row rendering, and activation. =scripts/launcher-toggle= now signals the native overlay; =scripts/launcher-fuzzel= keeps the old fuzzel launcher available as a fallback.
 
 ** Test Notes
 :PROPERTIES:
@@ -223,6 +226,7 @@ This is a direction, not a mandate to create empty folders. Split only when a mo
 - 2026-05-27: =wlctl 0.1.6= binary package built and ran on the NixOS host. =nix eval --impure .#nixosConfigurations.nixos.config.environment.systemPackages --apply builtins.length= returned =206= after adding the package and launcher fallback.
 - 2026-05-30: Native wallpaper manager live test passed on NixOS. Quickshell restarted cleanly, the wallpaper selector opens from the bar icon, static wallpapers render, animated GIF wallpapers render, static/animated switching works in both directions, and state persists in =~/.local/state/quickshell/wallpaper.json=. =awww= remains installed and wired as fallback until a separate cutover cleanup removes it.
 - 2026-05-30: Native wallpaper full-screen layer test passed. =hyprctl layers -j= reports =qs-wallpaper= at =y=0= and full monitor height on both HDMI-A-1 and eDP-1 after Quickshell restart.
+- 2026-05-30: Native launcher first slice live-tested on NixOS. Quickshell restarts with =Configuration Loaded=, =scripts/launcher-toggle= opens the =qs-launcher= overlay, the layer appears on the focused monitor, a second toggle closes it, and no new journal errors were produced by the launcher slice. User-facing typing/app activation still needs hands-on testing before replacing the clipboard path.
 
 ** Known Lesson
 :PROPERTIES:

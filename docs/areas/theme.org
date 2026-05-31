@@ -96,7 +96,7 @@ These can change without =nrs=, usually after =theme-select toggle= or =theme-se
 - Starship uses =STARSHIP_CONFIG=; new prompts pick up the generated config.
 - zsh and fzf use =~/.config/theme/current/env=; existing shells may need to source it again or start fresh.
 - fuzzel uses =fuzzel.ini= on the next launch.
-- The launcher and clipboard picker explicitly pass the generated fuzzel config. Plain manual =fuzzel= uses =config/fuzzel/fuzzel.ini= as a SkyDark fallback.
+- The native Quickshell launcher reads =quickshell.json= through =Theme.qml=. The fuzzel launcher fallback and clipboard picker explicitly pass the generated fuzzel config. Plain manual =fuzzel= uses =config/fuzzel/fuzzel.ini= as a SkyDark fallback.
 - qutebrowser loads =qutebrowser.py=; existing windows may need a reload or restart depending on what qutebrowser has already cached.
 - btop and bat use their generated themes on the next launch or refresh.
 - Yazi reads =~/.config/yazi/theme.toml=, which points at the active generated =yazi.toml=; existing Yazi sessions need restart.
@@ -123,7 +123,7 @@ These are still owned by Nix/Home Manager and need =nrs= or a rebuild when the d
 :END:
 Covered by runtime generation:
 
-- Quickshell, Mako, Kitty, tmux, Starship, fuzzel launcher/clipboard, qutebrowser, btop, bat, Yazi, GTK, Qt, KDE-style globals, zsh/fzf env, and Doom Emacs runtime style state.
+- Quickshell launcher/wallpaper/bar modules, Mako, Kitty, tmux, Starship, fuzzel fallback launcher/clipboard, qutebrowser, btop, bat, Yazi, GTK, Qt, KDE-style globals, zsh/fzf env, and Doom Emacs runtime style state.
 
 Fixed in this pass:
 

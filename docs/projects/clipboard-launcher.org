@@ -6,10 +6,10 @@
 :PROPERTIES:
 :CUSTOM_ID: current
 :END:
-- Current live behavior is script-backed: the Quickshell launcher button opens =scripts/launcher-toggle= on left click and =scripts/clipboard-toggle= on right click.
-- =scripts/launcher-toggle= uses =fuzzel --show drun= with the generated Sky theme config.
-- =scripts/clipboard-toggle= uses =cliphist list | fuzzel --dmenu= and decodes the selected item back to =wl-copy=.
-- The old dedicated Quickshell overlay app is not in the active tree right now. Resurrection should start from history/reference branches and port only the pieces that still fit the current structure.
+- Launcher is native Quickshell again. =scripts/launcher-toggle= signals the =qs-launcher= overlay through =$XDG_RUNTIME_DIR=.
+- The launcher searches open Hyprland windows and desktop apps from =scripts/launcher-apps=.
+- =scripts/launcher-fuzzel= preserves the old fuzzel app launcher as an explicit fallback.
+- Clipboard is still script-backed for now: =scripts/clipboard-toggle= uses =cliphist list | fuzzel --dmenu= and decodes the selected item back to =wl-copy=.
 
 ** Commands
 :PROPERTIES:
@@ -17,6 +17,7 @@
 :END:
 - =systemctl --user restart quickshell=
 - =~/.config/scripts/launcher-toggle=
+- =~/.config/scripts/launcher-fuzzel=
 - =~/.config/scripts/clipboard-toggle=
 
 ** Important Files
@@ -24,18 +25,20 @@
 :CUSTOM_ID: important-files
 :END:
 - [[../../config/quickshell/modules/launcher/LauncherButton.qml][Launcher button]]
+- [[../../config/quickshell/root/Launcher.qml][Launcher root surface]]
+- [[../../config/quickshell/modules/launcher/LauncherView.qml][Launcher view]]
 - [[../../scripts/launcher-toggle][Launcher toggle]]
+- [[../../scripts/launcher-fuzzel][Launcher fuzzel fallback]]
 - [[../../scripts/clipboard-toggle][Clipboard toggle]]
-- Future Quickshell launcher surface should live under =config/quickshell/root/Launcher.qml=.
 - Future Quickshell clipboard surface should live under =config/quickshell/root/Clipboard.qml=.
-- Future implementation modules should live under =config/quickshell/modules/launcher/= and =config/quickshell/modules/clipboard/=.
+- Future clipboard implementation modules should live under =config/quickshell/modules/clipboard/=.
 
 ** Decisions
 :PROPERTIES:
 :CUSTOM_ID: decisions
 :END:
 - Keep launcher and clipboard as separate tools until focus restoration, keyboard navigation, and close behavior are boring and reliable.
-- Keep =fuzzel= scripts as the working fallback until the native Quickshell app can fully replace them.
+- Keep explicit fuzzel fallback scripts until the native Quickshell tools are proven boring and reliable.
 - Use Quickshell screen binding for layer windows.
 - Follow the Quickshell ownership rules: =root/= owns surfaces, =modules/<name>/= owns behavior, =common/= owns reusable primitives only.
 - Avoid full-screen invisible masks unless the overlay is intentionally click-out-to-close and the mask is verified not to steal unrelated input.
@@ -44,8 +47,9 @@
 :PROPERTIES:
 :CUSTOM_ID: next
 :END:
-- Search git history/reference branches for the old launcher and clipboard implementation.
-- Inventory reusable behavior before editing: activation flow, clipboard model, preview rendering, keyboard navigation, focus/close handling, and theme usage.
-- Rebuild the launcher first as a native Quickshell surface while preserving the script fallback.
+- [X] Search git history/reference branches for the old launcher and clipboard implementation.
+- [X] Inventory reusable launcher behavior: activation flow, app/window model, fuzzy scoring, keyboard navigation, focus/close handling, and theme usage.
+- [X] Rebuild the launcher first as a native Quickshell surface while preserving the script fallback.
+- Test launcher typing, row navigation, window focus, and app launching by hand.
 - Rebuild clipboard second, with text history first and image preview only after text selection is reliable.
 - Revisit unified source search only after the separate tools feel boring and reliable.
