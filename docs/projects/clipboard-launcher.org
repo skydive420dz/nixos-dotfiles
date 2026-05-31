@@ -11,6 +11,7 @@
 - Extra terminal-first tools that do not ship desktop entries live in =config/quickshell/modules/launcher/apps.json=.
 - =scripts/launcher-fuzzel= preserves the old fuzzel app launcher as an explicit fallback.
 - Clipboard is native Quickshell again for text history. =scripts/clipboard-toggle= signals the =qs-clipboard= overlay through =$XDG_RUNTIME_DIR=.
+- Image clipboard entries are detected from =cliphist list= binary markers and get a selected-item thumbnail preview generated under =$XDG_RUNTIME_DIR=.
 - =scripts/clipboard-fuzzel= preserves the old fuzzel clipboard picker as an explicit fallback.
 
 ** Commands
@@ -74,6 +75,7 @@
 - [X] Press =Delete=, or =Backspace= with an empty query, and confirm the selected item is removed from history.
 - [X] Press =Esc= and confirm the clipboard picker closes.
 - [X] Click outside the clipboard picker and confirm it closes without stealing later input.
+- [ ] Select an image clipboard entry and confirm the thumbnail preview appears.
 - [ ] Run =~/.config/scripts/clipboard-fuzzel= and confirm the fallback clipboard picker still works.
-- Add image preview only after text selection is boring and reliable.
+- Keep image preview thumbnail-only until the text/image picker stays boring in daily use.
 - Revisit unified source search only after the separate tools feel boring and reliable.

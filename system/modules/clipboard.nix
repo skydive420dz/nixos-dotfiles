@@ -6,6 +6,7 @@
 #                     ~/.cache/cliphist/db, last ~750 entries by default)
 #   wl-clip-persist — keep clipboard contents alive after source app closes
 #   wl-clipboard    — provides wl-copy / wl-paste, used by cliphist + scripts
+#   imagemagick     — creates thumbnails for native Quickshell image previews
 #   cliphist-wipe   — small wrapper: clears history + shows a toast notification
 #
 # Hyprland integration lives in config/hypr/hyprland.lua because it needs
@@ -37,6 +38,7 @@ in
 {
   environment.systemPackages = with pkgs; [
     cliphist
+    imagemagick
     wl-clip-persist
     wl-clipboard
     cliphist-wipe

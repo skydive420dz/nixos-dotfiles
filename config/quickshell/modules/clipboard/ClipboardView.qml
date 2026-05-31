@@ -14,10 +14,15 @@ Item {
     property bool open: false
     property bool closing: false
     property string query: ""
+    property string previewPath: ""
+    property string previewTarget: ""
+    property bool previewLoading: false
     property int selectedIndex: 0
     property var entries: []
     readonly property var results: filteredResults()
-    readonly property int panelWidth: 620
+    readonly property var selectedEntry: selectedIndex >= 0 && selectedIndex < results.length ? results[selectedIndex] : null
+    readonly property bool previewVisible: !!selectedEntry && selectedEntry.isImage
+    readonly property int panelWidth: previewVisible ? 760 : 620
     readonly property int panelTopMargin: Theme.barHeight + 20
     readonly property int panelSpacing: 10
     readonly property int controlHeight: Theme.pillHeight
@@ -25,9 +30,15 @@ Item {
     readonly property int rowHeight: 58
     readonly property int visibleRows: Math.min(results.length, 8)
     readonly property int iconBoxSize: 42
+    readonly property int previewWidth: 220
+    readonly property int previewHeight: root.visibleRows * root.rowHeight
     readonly property color panelColor: Qt.rgba(Theme.panel.r, Theme.panel.g, Theme.panel.b, 0.94)
     readonly property color controlColor: Qt.rgba(Theme.panelAlt.r, Theme.panelAlt.g, Theme.panelAlt.b, 0.96)
     readonly property color chipColor: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.90)
+    readonly property string runtimeDir: Quickshell.env("XDG_RUNTIME_DIR") || ("/run/user/" + Quickshell.env("UID"))
+
+    onSelectedEntryChanged: refreshPreview()
+    onOpenChanged: refreshPreview()
 
     function show() {
         closing = false;
@@ -54,18 +65,29 @@ Item {
         var id = tab >= 0 ? line.slice(0, tab) : line;
         var preview = tab >= 0 ? line.slice(tab + 1) : line;
         var cleanPreview = preview.replace(/\s+/g, " ").trim();
+        var image = isImagePreview(cleanPreview);
+        var detail = image ? cleanPreview.replace("[[", "").replace("]]", "") : "Text";
 
         return {
             "id": id,
-            "preview": cleanPreview.length > 0 ? cleanPreview : "Clipboard item",
-            "detail": "Text",
+            "preview": image ? "Image clipboard item" : (cleanPreview.length > 0 ? cleanPreview : "Clipboard item"),
+            "detail": detail,
+            "isImage": image,
             "raw": line,
             "index": index
         };
     }
 
+    function isImagePreview(preview) {
+        var text = normalize(preview);
+        if (text.indexOf("[[ binary data") !== 0)
+            return false;
+
+        return text.indexOf(" png ") >= 0 || text.indexOf(" jpg ") >= 0 || text.indexOf(" jpeg ") >= 0 || text.indexOf(" webp ") >= 0 || text.indexOf(" gif ") >= 0 || text.indexOf(" bmp ") >= 0;
+    }
+
     function score(entry, needle) {
-        var haystack = normalize(entry.preview);
+        var haystack = normalize(entry.preview + " " + entry.detail);
         if (needle.length === 0)
             return entry.index;
         if (haystack.indexOf(needle) === 0)
@@ -109,6 +131,7 @@ Item {
     function selectResult(index) {
         if (root.results.length === 0) {
             selectedIndex = 0;
+            refreshPreview();
             return;
         }
 
@@ -135,6 +158,31 @@ Item {
         selectedIndex = Math.min(selectedIndex, Math.max(results.length - 2, 0));
     }
 
+    function previewFileFor(item) {
+        var safeId = String(item.id || item.index).replace(/[^A-Za-z0-9_.-]/g, "_");
+        return runtimeDir + "/qs-clipboard-preview-" + safeId + ".png";
+    }
+
+    function refreshPreview() {
+        var item = selectedEntry;
+        if (!open || !item || !item.isImage) {
+            previewPath = "";
+            previewLoading = false;
+            return;
+        }
+
+        var target = previewFileFor(item);
+        previewTarget = target;
+        previewPath = "";
+        previewLoading = true;
+        if (previewProc.running)
+            return;
+
+        previewProc.activeTarget = target;
+        previewProc.command = ["bash", "-lc", "out=$1; raw=$2; if [ ! -s \"$out\" ]; then printf '%s' \"$raw\" | cliphist decode | magick - -auto-orient -thumbnail 420x280 -strip png:\"$out\"; fi", "clipboard-preview", target, item.raw];
+        previewProc.running = true;
+    }
+
     Timer {
         id: closeTimer
 
@@ -142,6 +190,9 @@ Item {
         onTriggered: {
             root.query = "";
             root.selectedIndex = 0;
+            root.previewPath = "";
+            root.previewTarget = "";
+            root.previewLoading = false;
             root.closing = false;
         }
     }
@@ -159,6 +210,25 @@ Item {
             root.entries = lines.map((line, index) => root.parseEntry(line, index));
             root.selectedIndex = 0;
             stdout.buffer = "";
+        }
+    }
+
+    Process {
+        id: previewProc
+
+        property string activeTarget: ""
+
+        onExited: {
+            if (activeTarget === root.previewTarget && root.previewTarget.length > 0)
+                root.previewPath = "file://" + activeTarget + "?v=" + Date.now();
+            else if (activeTarget === root.previewTarget)
+                root.previewPath = "";
+
+            root.previewLoading = false;
+            activeTarget = "";
+
+            if (root.open && root.selectedEntry && root.selectedEntry.isImage && root.previewPath.length === 0)
+                root.refreshPreview();
         }
     }
 
@@ -293,79 +363,112 @@ Item {
                 }
             }
 
-            ListView {
-                id: resultList
-
+            RowLayout {
                 Layout.fillWidth: true
-                Layout.preferredHeight: root.visibleRows * root.rowHeight
                 visible: root.visibleRows > 0
-                clip: true
-                interactive: root.results.length > root.visibleRows
-                boundsBehavior: Flickable.StopAtBounds
-                model: root.results
+                spacing: root.panelSpacing
 
-                delegate: Rectangle {
-                    required property var modelData
-                    required property int index
+                ListView {
+                    id: resultList
 
-                    width: ListView.view.width
-                    height: root.rowHeight
-                    radius: Theme.radius
-                    color: index === root.selectedIndex ? root.controlColor : "transparent"
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: root.visibleRows * root.rowHeight
+                    clip: true
+                    interactive: root.results.length > root.visibleRows
+                    boundsBehavior: Flickable.StopAtBounds
+                    model: root.results
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 12
-                        anchors.rightMargin: 12
-                        spacing: 12
+                    delegate: Rectangle {
+                        required property var modelData
+                        required property int index
 
-                        Rectangle {
-                            Layout.preferredWidth: root.iconBoxSize
-                            Layout.preferredHeight: root.iconBoxSize
-                            radius: Theme.radiusSmall
-                            color: root.chipColor
+                        width: ListView.view.width
+                        height: root.rowHeight
+                        radius: Theme.radius
+                        color: index === root.selectedIndex ? root.controlColor : "transparent"
 
-                            Text {
-                                anchors.centerIn: parent
-                                text: ""
-                                color: index === root.selectedIndex ? Theme.accent : Theme.muted
-                                font.family: Theme.iconFont
-                                font.pixelSize: 16
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 12
+                            anchors.rightMargin: 12
+                            spacing: 12
+
+                            Rectangle {
+                                Layout.preferredWidth: root.iconBoxSize
+                                Layout.preferredHeight: root.iconBoxSize
+                                radius: Theme.radiusSmall
+                                color: root.chipColor
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: modelData.isImage ? "" : ""
+                                    color: index === root.selectedIndex ? Theme.accent : Theme.muted
+                                    font.family: Theme.iconFont
+                                    font.pixelSize: 16
+                                }
+                            }
+
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 1
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: modelData.preview
+                                    color: Theme.text
+                                    font.family: Theme.font
+                                    font.pixelSize: Theme.fontSize + 2
+                                    elide: Text.ElideRight
+                                    maximumLineCount: 1
+                                }
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: modelData.detail
+                                    color: Theme.muted
+                                    font.family: Theme.font
+                                    font.pixelSize: Theme.fontSizeSmall + 1
+                                    elide: Text.ElideRight
+                                    maximumLineCount: 1
+                                }
                             }
                         }
 
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: 1
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
 
-                            Text {
-                                Layout.fillWidth: true
-                                text: modelData.preview
-                                color: Theme.text
-                                font.family: Theme.font
-                                font.pixelSize: Theme.fontSize + 2
-                                elide: Text.ElideRight
-                                maximumLineCount: 1
-                            }
-
-                            Text {
-                                Layout.fillWidth: true
-                                text: modelData.detail
-                                color: Theme.muted
-                                font.family: Theme.font
-                                font.pixelSize: Theme.fontSizeSmall + 1
-                                elide: Text.ElideRight
-                                maximumLineCount: 1
-                            }
+                            onEntered: root.selectedIndex = index
+                            onClicked: root.activate(index)
                         }
                     }
+                }
 
-                    MouseArea {
+                Rectangle {
+                    Layout.preferredWidth: root.previewWidth
+                    Layout.preferredHeight: root.previewHeight
+                    visible: root.previewVisible
+                    radius: Theme.radius
+                    color: root.chipColor
+                    clip: true
+
+                    Image {
                         anchors.fill: parent
-                        hoverEnabled: true
+                        anchors.margins: 10
+                        source: root.previewPath
+                        fillMode: Image.PreserveAspectFit
+                        asynchronous: true
+                        cache: false
+                        visible: root.previewPath.length > 0
+                    }
 
-                        onEntered: root.selectedIndex = index
-                        onClicked: root.activate(index)
+                    Text {
+                        anchors.centerIn: parent
+                        text: root.previewLoading ? "󰔟" : ""
+                        color: Theme.muted
+                        font.family: Theme.iconFont
+                        font.pixelSize: Theme.mediaIconSize
+                        visible: root.previewPath.length === 0
                     }
                 }
             }
