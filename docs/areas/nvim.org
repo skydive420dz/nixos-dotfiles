@@ -17,6 +17,14 @@ Neovim follows the module-directory convention:
 - =config/nvim/lua/sky/environment.lua= owns environment recovery glue, such as stale Hyprland signatures and tmux smart-splits integration.
 - =config/nvim/lua/sky/diagnostics.lua= owns hot-editable diagnostic display defaults.
 - =config/nvim/lua/sky/commands.lua= owns hot-editable helper commands, such as =:LspInfo=, =:LspRestart=, and =:LspLog=.
+- =config/nvim/lua/sky/spelling.lua= owns spelling keymaps.
+- =config/nvim/lua/sky/files.lua= owns MiniFiles and Undotree keymaps.
+- =config/nvim/lua/sky/windows.lua= owns buffer, tab, window, resize, quit, and write keymaps.
+- =config/nvim/lua/sky/formatting.lua= owns formatting keymaps and fallback behavior.
+- =config/nvim/lua/sky/lsp.lua= owns =LspAttach= keymaps and LSP action fallbacks.
+- =config/nvim/lua/sky/tools.lua= owns tool keymaps for Diffview, GrugFar, IconPicker, Lazy, ToggleTerm, and Precognition.
+- =config/nvim/lua/sky/whichkey.lua= owns the custom which-key group labels.
+- =config/nvim/lua/sky/completion.lua= owns completion/snippet navigation glue.
 - =config/nvim/colors/sky.lua= and =config/nvim/lua/sky/theme.lua= own the live Sky colorscheme. Home Manager links that tree to =~/.config/sky-nvim=; NVF prepends it to Neovim's runtimepath.
 
 Keep future Neovim helpers inside =system/modules/programs/nvim/= unless they are shared by another unit.
@@ -25,7 +33,7 @@ Keep future Neovim helpers inside =system/modules/programs/nvim/= unless they ar
 :PROPERTIES:
 :CUSTOM_ID: theme
 :END:
-NVF owns editor plumbing: packages, LSP, mappings, completion, and plugin enablement. Sky owns colors.
+NVF owns editor plumbing: packages, LSP servers, completion engine enablement, plugin enablement, and generated editor packaging. Sky owns colors and custom runtime behavior.
 
 After a rebuild creates the live link, changes under =config/nvim/= are hot editable. Use =:colorscheme sky=, =:SkyThemeReload=, or restart Neovim to pick up theme edits or a new =theme-select= style.
 
@@ -36,13 +44,13 @@ After a rebuild creates the live link, changes under =config/nvim/= are hot edit
 Current split:
 
 - NVF/Nix owns the dependency closure, plugin enablement, language servers, formatters, completion engine, statusline, dashboard, and generated Neovim package.
-- =system/modules/programs/nvim/lua.nix= owns custom behavior that NVF does not express cleanly yet: runtimepath prepending, keymaps, and snippets/completion glue.
-- =config/nvim/= owns hot-editable Sky theme code, option defaults, autocmds, local environment glue, diagnostics display defaults, and helper commands.
+- =system/modules/programs/nvim/lua.nix= owns only the bootstrap bridge that prepends =~/.config/sky-nvim= to runtimepath and loads Sky.
+- =config/nvim/= owns hot-editable Sky theme code, option defaults, autocmds, local environment glue, diagnostics display defaults, helper commands, custom keymaps, LSP attach behavior, formatting fallbacks, tool mappings, which-key labels, and completion/snippet glue.
 
 Pressure points:
 
-- The custom Lua payload is large enough that it behaves like a hidden config inside Nix.
-- Runtime UX changes still require =nrs= unless they live in =config/nvim/=.
+- The custom Lua payload used to behave like a hidden config inside Nix; the active custom behavior now lives under =config/nvim/lua/sky/=.
+- Runtime UX changes should go in =config/nvim/= when possible so they do not require =nrs=.
 - NVF gives a controlled plugin/dependency surface, but plugin interactions still need hand-tuned Lua.
 - Project-specific workarounds do not belong here. NVF should stay a general-purpose editor tool; projects should carry their own metadata.
 
@@ -55,7 +63,7 @@ Keep for now:
 Replacement path if NVF keeps fighting us:
 
 1. Freeze the current NVF behavior in docs and on a branch so rollback is easy.
-2. Move hot-editable Lua from =lua.nix= into =config/nvim/lua/sky/= one concern at a time: options, keymaps, LSP attach behavior, completion glue, diagnostics, and autocmds.
+2. Move hot-editable Lua from =lua.nix= into =config/nvim/lua/sky/= one concern at a time: options, keymaps, LSP attach behavior, completion glue, diagnostics, and autocmds. This is now mostly complete; only the bootstrap bridge remains in Nix.
 3. Leave Nix/NVF owning plugin installation while the Lua moves, so the first migration does not also change the dependency model.
 4. If that split feels better, replace NVF with a smaller Nix-owned Neovim package plus explicit plugins, while keeping =config/nvim/= as the live config root.
 5. Remove NVF only after the non-NVF config reaches feature parity and daily use is boring.

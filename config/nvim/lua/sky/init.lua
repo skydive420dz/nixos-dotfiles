@@ -6,6 +6,14 @@ local modules = {
   "environment",
   "diagnostics",
   "commands",
+  "spelling",
+  "files",
+  "windows",
+  "formatting",
+  "lsp",
+  "tools",
+  "whichkey",
+  "completion",
 }
 
 function M.setup()
