@@ -54,6 +54,8 @@
 - [X] Continue global theme coverage audit.
 - [X] Convert docs from Markdown to Org.
 - [X] Resurrect native Quickshell launcher and clipboard surfaces while keeping the current fuzzel scripts as fallback.
+- [ ] Cut over from =awww= after native wallpaper survives reboot cleanly.
+- [ ] Cut over from fuzzel launcher/clipboard fallbacks after the native tools stay boring.
 - [ ] Add per-monitor wallpaper state if the workflow needs it.
 - [ ] Quickshell project structure/QML metadata follow-up.
 - [ ] NVF reassessment or replacement path.
