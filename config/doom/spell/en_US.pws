@@ -1,4 +1,4 @@
-personal_ws-1.1 en_US 25
+personal_ws-1.1 en_US 24
 avy
 btop
 catppuccin
@@ -18,7 +18,6 @@ neovim's
 nixos
 nrs
 quickshell
-qutebrowser
 repo
 starship
 tmux

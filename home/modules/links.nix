@@ -3,7 +3,7 @@
 # ============================================
 # Three tiers:
 #   1. Native home-manager modules → see other home/modules/*.nix
-#      (programs.aerc, programs.kitty, programs.qutebrowser, etc.)
+#      (programs.aerc, programs.kitty, etc.)
 #   2. xdg.configFile (Nix store, declarative)
 #      Used for stable configs that don't change often. Read-only.
 #      Editing requires rebuild but is fully reproducible.
@@ -30,10 +30,6 @@ let
 
   liveFiles = {
     ".config/hypr/hyprland.lua" = "config/hypr/hyprland.lua";
-    ".config/qutebrowser/bookmarks/urls" = "config/qutebrowser/bookmarks/urls";
-    ".config/qutebrowser/config.py" = "config/qutebrowser/config.py";
-    ".config/qutebrowser/quickmarks" = "config/qutebrowser/quickmarks";
-    ".config/qutebrowser/userstyles.css" = "config/qutebrowser/userstyles.css";
   };
 
   mkLiveLink = path: {

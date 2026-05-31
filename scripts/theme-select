@@ -21,14 +21,12 @@ for generator in "$support_dir"/generators/*.sh; do
 done
 
 write_all_outputs() {
-  prune_retired_outputs
   write_quickshell_theme
   write_kitty_theme
   write_btop_theme
   write_bat_theme
   write_aerc_styleset
   write_mako_config
-  write_qutebrowser_theme
   write_starship_config
   write_tmux_config
   write_nvim_theme
@@ -38,10 +36,6 @@ write_all_outputs() {
   write_qt_config
   write_kdeglobals
   write_env
-}
-
-prune_retired_outputs() {
-  rm -f "$current_dir/fuzzel.ini"
 }
 
 need_jq

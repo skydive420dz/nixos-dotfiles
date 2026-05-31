@@ -8,7 +8,6 @@
 :END:
 - [[../../config/hypr/hyprland.lua][Lua config]]
 - [[../../system/modules/desktop/hyprland.nix][Hyprland system module]]
-- [[../../home/modules/desktop/hyprland.nix][Hyprland home module]]
 
 ** Commands
 :PROPERTIES:

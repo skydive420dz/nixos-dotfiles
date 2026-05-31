@@ -55,7 +55,6 @@ Generated under =~/.config/theme/current/=:
 - =quickshell-signal=
 - =kitty.conf=
 - =mako.conf=
-- =qutebrowser.py=
 - =starship.toml=
 - =tmux.conf=
 - =nvim.lua=
@@ -95,7 +94,6 @@ These can change without =nrs=, usually after =theme-select toggle= or =theme-se
 - Starship uses =STARSHIP_CONFIG=; new prompts pick up the generated config.
 - zsh and fzf use =~/.config/theme/current/env=; existing shells may need to source it again or start fresh.
 - The native Quickshell launcher and clipboard picker read =quickshell.json= through =Theme.qml=.
-- qutebrowser loads =qutebrowser.py=; existing windows may need a reload or restart depending on what qutebrowser has already cached.
 - btop and bat use their generated themes on the next launch or refresh.
 - Yazi reads =~/.config/yazi/theme.toml=, which points at the active generated =yazi.toml=; existing Yazi sessions need restart.
 - aerc loads the generated styleset first through =stylesets-dirs=. Existing sessions need =:reload-config=; new sessions pick it up on launch.
@@ -121,7 +119,7 @@ These are still owned by Nix/Home Manager and need =nrs= or a rebuild when the d
 :END:
 Covered by runtime generation:
 
-- Quickshell launcher/clipboard/wallpaper/bar modules, Mako, Kitty, tmux, Starship, qutebrowser, btop, bat, Yazi, GTK, Qt, KDE-style globals, zsh/fzf env, and Doom Emacs runtime style state.
+- Quickshell launcher/clipboard/wallpaper/bar modules, Mako, Kitty, tmux, Starship, btop, bat, Yazi, GTK, Qt, KDE-style globals, zsh/fzf env, and Doom Emacs runtime style state.
 
 Fixed in this pass:
 

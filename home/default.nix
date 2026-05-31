@@ -4,7 +4,6 @@
   imports = [
     ./home.nix
     ./modules
-    ./modules/desktop/hyprland.nix
     ./modules/programs/btop.nix
     ./modules/programs/git.nix
     ./modules/programs/zsh.nix

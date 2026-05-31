@@ -41,7 +41,7 @@
       symbola # Doom Emacs fallback font for broad Unicode symbols
       liberation_ttf # MS-compatible (Arial/Times/Courier replacements)
       dejavu_fonts # widely-used, good fallback
-      inter # the Inter UI font (your qutebrowser uses it)
+      inter # the Inter UI font
       source-serif # serif option
     ];
 

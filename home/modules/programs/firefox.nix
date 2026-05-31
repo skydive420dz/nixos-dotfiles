@@ -1,8 +1,8 @@
 # ============================================
 # FIREFOX (fallback browser)
 # ============================================
-# Lean Firefox config — qutebrowser is primary, this is fallback for
-# sites qutebrowser breaks on or videos that need full media stack.
+# Lean Firefox config — Brave is primary, this stays as a fallback for
+# sites that need a second browser engine or comparison baseline.
 #
 # Extensions managed declaratively via NUR (firefox-addons input).
 # AdNauseam is NOT here — it's installed manually from getadnauseam.com

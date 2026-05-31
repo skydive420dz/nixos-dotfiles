@@ -29,8 +29,6 @@ result-*
 *.sqlite-*
 *.db
 
-config/qutebrowser/autoconfig.yml
-
 # aerc runtime data
 config/aerc/cache/
 config/aerc/.cache/

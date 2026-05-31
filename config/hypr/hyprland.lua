@@ -261,6 +261,14 @@ hl.window_rule({
 	opacity = opacity.solid_fullscreen,
 })
 
+hl.window_rule({
+	name = "brave-browser",
+	match = { class = "^(brave-browser)$" },
+	opaque = true,
+	force_rgbx = true,
+	opacity = opacity.solid_fullscreen,
+})
+
 centered_float({
 	name = "nvtop_float",
 	match = { title = "^(nvtop_float)$" },
