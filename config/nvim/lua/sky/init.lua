@@ -5,6 +5,7 @@ local modules = {
   "autocmds",
   "environment",
   "diagnostics",
+  "commands",
 }
 
 function M.setup()
