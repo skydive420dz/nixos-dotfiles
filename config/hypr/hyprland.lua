@@ -310,6 +310,13 @@ hl.layer_rule({
 })
 
 hl.layer_rule({
+	name = "qs_launcher_blur",
+	match = { namespace = "^qs-launcher$" },
+	blur = true,
+	ignore_alpha = 0,
+})
+
+hl.layer_rule({
 	name = "fuzzel_fade",
 	match = { namespace = "^fuzzel$" },
 	animation = "fade",
