@@ -7,7 +7,7 @@ Rectangle {
     id: root
 
     Layout.preferredHeight: Theme.pillHeight
-    Layout.preferredWidth: Theme.pillHeight
+    Layout.preferredWidth: Theme.mediaIconSize + Theme.gap * 2
     Layout.alignment: Qt.AlignVCenter
 
     radius: Theme.radius
