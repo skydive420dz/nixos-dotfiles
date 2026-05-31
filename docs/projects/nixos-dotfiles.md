@@ -44,8 +44,7 @@
 - [x] Map which apps are runtime-themed vs rebuild-themed.
 - [x] Clean up `scripts/theme-select` so it stops feeling like one giant
   generator carpet.
-- [ ] Continue global theme coverage audit.
-  - Open: duplicated Emacs theme tokens and inherited palette field names.
+- [x] Continue global theme coverage audit.
 - [ ] Convert docs from Markdown to Org.
 - [ ] Quickshell project structure/QML metadata follow-up.
 - [ ] NVF reassessment or replacement path.

@@ -8,7 +8,9 @@
 
 (defconst sk/theme-default
   '((foreground . "#f0efeb")
+    (foreground-alt . "#ccc4b4")
     (background . "#1a1d21")
+    (background-alt . "#171a1e")
     (surface . "#22262b")
     (surface-strong . "#282c34")
     (border . "#3d424a")
@@ -28,7 +30,15 @@
     (type . "#d4ccb4")
     (builtin . "#b4c4bc")
     (preprocessor . "#ccc4b4")
-    (comment . "#676d77"))
+    (comment . "#676d77")
+    (black . "#22262b")
+    (red . "#cdacac")
+    (green . "#b8c4b8")
+    (yellow . "#d4ccb4")
+    (blue . "#b4bcc4")
+    (magenta . "#ccc4b4")
+    (cyan . "#b4c0c8")
+    (white . "#f0efeb"))
   "Theme tokens mirrored from the global Sky theme selector.")
 
 (defvar sk/theme (copy-tree sk/theme-default)

@@ -5,7 +5,9 @@ write_emacs_theme() {
 
 (setq sk/theme
       '((foreground . "$(hex '.[$style].semantic.foreground')")
+        (foreground-alt . "$(hex '.[$style].palette.fgAlt')")
         (background . "$(hex '.[$style].semantic.background')")
+        (background-alt . "$(hex '.[$style].palette.base1')")
         (surface . "$(hex '.[$style].semantic.surface')")
         (surface-strong . "$(hex '.[$style].semantic.surfaceStrong')")
         (border . "$(hex '.[$style].semantic.border')")
@@ -25,6 +27,14 @@ write_emacs_theme() {
         (type . "$(hex '.[$style].semantic.warning')")
         (builtin . "$(hex '.[$style].palette.teal')")
         (preprocessor . "$(hex '.[$style].palette.orange')")
-        (comment . "$(hex '.[$style].semantic.muted')")))
+        (comment . "$(hex '.[$style].semantic.muted')")
+        (black . "$(hex '.[$style].terminal.black')")
+        (red . "$(hex '.[$style].terminal.red')")
+        (green . "$(hex '.[$style].terminal.green')")
+        (yellow . "$(hex '.[$style].terminal.yellow')")
+        (blue . "$(hex '.[$style].terminal.blue')")
+        (magenta . "$(hex '.[$style].terminal.magenta')")
+        (cyan . "$(hex '.[$style].terminal.cyan')")
+        (white . "$(hex '.[$style].terminal.brightWhite')")))
 EOF
 }

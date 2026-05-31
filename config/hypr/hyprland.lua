@@ -1,7 +1,7 @@
 -- Hyprland Lua config.
 
 local colors = {
-	surface1 = 0xff45475a,
+	shadow = 0xff282c34,
 }
 
 local opacity = {
@@ -106,8 +106,8 @@ hl.config({
 			enabled = false,
 			range = 1,
 			render_power = 6,
-			color = colors.surface1,
-			color_inactive = colors.surface1,
+			color = colors.shadow,
+			color_inactive = colors.shadow,
 		},
 	},
 

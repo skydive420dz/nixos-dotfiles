@@ -2,7 +2,6 @@
 
 let
   theme = import ../../../theme/tokens.nix;
-  colors = theme.palette;
   semantic = theme.semantic;
   terminal = theme.terminal;
 in
@@ -47,20 +46,20 @@ in
       selection_foreground = semantic.selectionForeground;
       selection_background = semantic.selectionBackground;
 
-      cursor = colors.rosewater;
+      cursor = semantic.accent;
       cursor_text_color = semantic.selectionForeground;
-      url_color = colors.rosewater;
+      url_color = semantic.accent;
 
       active_border_color = semantic.accent;
       inactive_border_color = semantic.muted;
       bell_border_color = semantic.warning;
 
       wayland_titlebar_color = "system";
-      active_tab_foreground = colors.crust;
+      active_tab_foreground = semantic.selectionForeground;
       active_tab_background = semantic.accentAlt;
       inactive_tab_foreground = semantic.foreground;
-      inactive_tab_background = colors.mantle;
-      tab_bar_background = colors.crust;
+      inactive_tab_background = semantic.surface;
+      tab_bar_background = semantic.background;
 
       color0 = terminal.black;
       color8 = terminal.brightBlack;

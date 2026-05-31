@@ -6,7 +6,7 @@ in
 {
   "app" = {
     "overall" = {
-      "bg" = p.base;
+      "bg" = p.background;
     };
   };
   "cmp" = {
@@ -39,11 +39,11 @@ in
         "mime" = "{audio,video}/*";
       }
       {
-        "fg" = p.pink;
+        "fg" = p.neutral;
         "mime" = "application/*zip";
       }
       {
-        "fg" = p.pink;
+        "fg" = p.neutral;
         "mime" = "application/x-{tar,bzip*,7z-compressed,xz,rar}";
       }
       {
@@ -51,7 +51,7 @@ in
         "mime" = "application/{pdf,doc,rtf}";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "mime" = "vfs/{absent,stale}";
       }
       {
@@ -82,37 +82,37 @@ in
   };
   "help" = {
     "desc" = {
-      "fg" = p.overlay2;
+      "fg" = p.subtle;
     };
     "footer" = {
-      "bg" = p.surface1;
-      "fg" = p.text;
+      "bg" = p.surfaceStrong;
+      "fg" = p.foreground;
     };
     "hovered" = {
-      "bg" = p.surface2;
+      "bg" = p.surfaceRaised;
       "bold" = true;
     };
     "on" = {
       "fg" = p.teal;
     };
     "run" = {
-      "fg" = p.pink;
+      "fg" = p.neutral;
     };
   };
   "icon" = {
     "exts" = [
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "otf";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "import";
         "text" = "";
       }
       {
-        "fg" = p.mauve;
+        "fg" = p.neutral;
         "name" = "krz";
         "text" = "";
       }
@@ -122,27 +122,27 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "ttf";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "webpack";
         "text" = "󰜫";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "dart";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "vsh";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "doc";
         "text" = "󰈬";
       }
@@ -152,22 +152,22 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "ex";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "hx";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "fodt";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "mojo";
         "text" = "";
       }
@@ -177,22 +177,22 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "nix";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "cshtml";
         "text" = "󱦗";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "fish";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "ply";
         "text" = "󰆧";
       }
@@ -202,7 +202,7 @@ in
         "text" = "󰻫";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "gemspec";
         "text" = "";
       }
@@ -212,17 +212,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "csh";
         "text" = "";
       }
       {
-        "fg" = p.text;
+        "fg" = p.foreground;
         "name" = "cmake";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "fodp";
         "text" = "";
       }
@@ -242,12 +242,12 @@ in
         "text" = "󰺾";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = "less";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "sh";
         "text" = "";
       }
@@ -262,7 +262,7 @@ in
         "text" = "󰌪";
       }
       {
-        "fg" = p.crust;
+        "fg" = p.baseLow;
         "name" = "dll";
         "text" = "";
       }
@@ -272,7 +272,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "sqlite3";
         "text" = "";
       }
@@ -282,27 +282,27 @@ in
         "text" = "󰡨";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "ksh";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "rmd";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "wv";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "xml";
         "text" = "󰗀";
       }
       {
-        "fg" = p.text;
+        "fg" = p.foreground;
         "name" = "markdown";
         "text" = "";
       }
@@ -312,7 +312,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "3gp";
         "text" = "";
       }
@@ -322,17 +322,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "flac";
         "text" = "";
       }
       {
-        "fg" = p.mauve;
+        "fg" = p.neutral;
         "name" = "gpr";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "huff";
         "text" = "󰡘";
       }
@@ -342,32 +342,32 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "gv";
         "text" = "󱁉";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "bmp";
         "text" = "";
       }
       {
-        "fg" = p.subtext1;
+        "fg" = p.subtle;
         "name" = "lock";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "sha384";
         "text" = "󰕥";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "cobol";
         "text" = "⚙";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "cob";
         "text" = "⚙";
       }
@@ -382,17 +382,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "qm";
         "text" = "";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = "ebuild";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "mustache";
         "text" = "";
       }
@@ -412,47 +412,47 @@ in
         "text" = "󰻫";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "rar";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "gradle";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "gnumakefile";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "applescript";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "elm";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "ebook";
         "text" = "";
       }
       {
-        "fg" = p.mauve;
+        "fg" = p.neutral;
         "name" = "kra";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "tf";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "xls";
         "text" = "󰈛";
       }
@@ -467,17 +467,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "kicad_pcb";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "cfg";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "ape";
         "text" = "";
       }
@@ -487,72 +487,72 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "yml";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "swift";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "eln";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "sol";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "awk";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "7z";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "apl";
         "text" = "⍝";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "epp";
         "text" = "";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = "app";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "dot";
         "text" = "󱁉";
       }
       {
-        "fg" = p.mauve;
+        "fg" = p.neutral;
         "name" = "kpp";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "eot";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "hpp";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "spec.tsx";
         "text" = "";
       }
@@ -562,7 +562,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "cxxm";
         "text" = "";
       }
@@ -582,12 +582,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "yaml";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "xz";
         "text" = "";
       }
@@ -602,22 +602,22 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "signature";
         "text" = "λ";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "3mf";
         "text" = "󰆧";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "jpg";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "xpi";
         "text" = "";
       }
@@ -627,47 +627,47 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "pot";
         "text" = "";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = "bin";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "xlsx";
         "text" = "󰈛";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "aac";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "kicad_sym";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "xcstrings";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "lff";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "xcf";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "azcli";
         "text" = "";
       }
@@ -682,32 +682,32 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "xaml";
         "text" = "󰙳";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "md5";
         "text" = "󰕥";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "xm";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "sln";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "jl";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "ml";
         "text" = "";
       }
@@ -722,42 +722,42 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "wvc";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "wrz";
         "text" = "󰆧";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "csproj";
         "text" = "󰪮";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "wrl";
         "text" = "󰆧";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "wma";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "woff2";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "woff";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "tscn";
         "text" = "";
       }
@@ -767,7 +767,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "webm";
         "text" = "";
       }
@@ -777,17 +777,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.text;
+        "fg" = p.foreground;
         "name" = "log";
         "text" = "󰌱";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "wav";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "wasm";
         "text" = "";
       }
@@ -797,7 +797,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "gif";
         "text" = "";
       }
@@ -807,12 +807,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "aiff";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "sha256";
         "text" = "󰕥";
       }
@@ -822,7 +822,7 @@ in
         "text" = "󰻫";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "vsix";
         "text" = "";
       }
@@ -832,12 +832,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = "diff";
         "text" = "";
       }
       {
-        "fg" = p.maroon;
+        "fg" = p.danger;
         "name" = "drl";
         "text" = "";
       }
@@ -852,7 +852,7 @@ in
         "text" = "󰍛";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "🔥";
         "text" = "";
       }
@@ -862,17 +862,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "fsi";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "mm";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "bz";
         "text" = "";
       }
@@ -887,17 +887,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "gz";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "cpp";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "ui";
         "text" = "";
       }
@@ -907,7 +907,7 @@ in
         "text" = "󰈙";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "spec.ts";
         "text" = "";
       }
@@ -917,57 +917,57 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "typoscript";
         "text" = "";
       }
       {
-        "fg" = p.sky;
+        "fg" = p.accent;
         "name" = "typ";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "txz";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "test.ts";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "tsx";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "mk";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "webp";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "opus";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "bicep";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "ts";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "tres";
         "text" = "";
       }
@@ -977,22 +977,22 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "cxx";
         "text" = "";
       }
       {
-        "fg" = p.flamingo;
+        "fg" = p.danger;
         "name" = "iso";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "ixx";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "hxx";
         "text" = "";
       }
@@ -1007,7 +1007,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "ini";
         "text" = "";
       }
@@ -1017,37 +1017,37 @@ in
         "text" = "󰲹";
       }
       {
-        "fg" = p.flamingo;
+        "fg" = p.danger;
         "name" = "image";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "tfvars";
         "text" = "";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = "tex";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "cbl";
         "text" = "⚙";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "flc";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "elc";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "test.tsx";
         "text" = "";
       }
@@ -1057,22 +1057,22 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "sql";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "test.jsx";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "htm";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "gcode";
         "text" = "󰐫";
       }
@@ -1082,32 +1082,32 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "ino";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "tcl";
         "text" = "󰛓";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "cljs";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "tsconfig";
         "text" = "";
       }
       {
-        "fg" = p.flamingo;
+        "fg" = p.danger;
         "name" = "img";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "t";
         "text" = "";
       }
@@ -1117,12 +1117,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = "out";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "jsx";
         "text" = "";
       }
@@ -1132,22 +1132,22 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "edn";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "rss";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "flf";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "cache";
         "text" = "";
       }
@@ -1157,17 +1157,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "cppm";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "svelte";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "mo";
         "text" = "∞";
       }
@@ -1177,12 +1177,12 @@ in
         "text" = "󰍛";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "ko";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "suo";
         "text" = "";
       }
@@ -1192,27 +1192,27 @@ in
         "text" = "󰻫";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "icalendar";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "go";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "sublime";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "stl";
         "text" = "󰆧";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "mobi";
         "text" = "";
       }
@@ -1227,7 +1227,7 @@ in
         "text" = "󰲹";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "cpy";
         "text" = "⚙";
       }
@@ -1242,7 +1242,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "po";
         "text" = "";
       }
@@ -1252,17 +1252,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "exs";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "odp";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "dump";
         "text" = "";
       }
@@ -1282,32 +1282,32 @@ in
         "text" = "󰻫";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "aif";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "strings";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "cp";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "fsscript";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "mli";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "bak";
         "text" = "󰁯";
       }
@@ -1317,42 +1317,42 @@ in
         "text" = "󰨖";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "toml";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "makefile";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "php";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "zst";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "spec.jsx";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "kbx";
         "text" = "󰯄";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "fbx";
         "text" = "󰆧";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "blend";
         "text" = "󰂫";
       }
@@ -1367,17 +1367,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "so";
         "text" = "";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = "desktop";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "sml";
         "text" = "λ";
       }
@@ -1387,22 +1387,22 @@ in
         "text" = "󰻫";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "pp";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "ps1";
         "text" = "󰨊";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "dropbox";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "kicad_mod";
         "text" = "";
       }
@@ -1412,7 +1412,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "slim";
         "text" = "";
       }
@@ -1427,7 +1427,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "xul";
         "text" = "";
       }
@@ -1437,7 +1437,7 @@ in
         "text" = "󰻫";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "glb";
         "text" = "";
       }
@@ -1447,22 +1447,22 @@ in
         "text" = "󰈧";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "sha512";
         "text" = "󰕥";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "ics";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "mdx";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "sha1";
         "text" = "󰕥";
       }
@@ -1477,12 +1477,12 @@ in
         "text" = "󰨖";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "godot";
         "text" = "";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "ifb";
         "text" = "";
       }
@@ -1492,27 +1492,27 @@ in
         "text" = "";
       }
       {
-        "fg" = p.crust;
+        "fg" = p.baseLow;
         "name" = "lib";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "luac";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "heex";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "scm";
         "text" = "󰘧";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "psd1";
         "text" = "󰨊";
       }
@@ -1527,7 +1527,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "kts";
         "text" = "";
       }
@@ -1537,7 +1537,7 @@ in
         "text" = "󰍛";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "mts";
         "text" = "";
       }
@@ -1547,7 +1547,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "pck";
         "text" = "";
       }
@@ -1557,12 +1557,12 @@ in
         "text" = "󰗆";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "rlib";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "cljd";
         "text" = "";
       }
@@ -1582,32 +1582,32 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "haml";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "d.ts";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "razor";
         "text" = "󱦘";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "rake";
         "text" = "";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = "patch";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "cuh";
         "text" = "";
       }
@@ -1622,7 +1622,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "psb";
         "text" = "";
       }
@@ -1632,7 +1632,7 @@ in
         "text" = ">";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "mov";
         "text" = "";
       }
@@ -1662,7 +1662,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "obj";
         "text" = "󰆧";
       }
@@ -1677,7 +1677,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = "exe";
         "text" = "";
       }
@@ -1702,12 +1702,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "git";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "psd";
         "text" = "";
       }
@@ -1722,27 +1722,27 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "psm1";
         "text" = "󰨊";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "dconf";
         "text" = "";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "config.ru";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "prisma";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "conf";
         "text" = "";
       }
@@ -1752,12 +1752,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = "o";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "mp4";
         "text" = "";
       }
@@ -1767,22 +1767,22 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "kicad_prl";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "bz3";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "asc";
         "text" = "󰦝";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "png";
         "text" = "";
       }
@@ -1792,12 +1792,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "pm";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "h";
         "text" = "";
       }
@@ -1807,32 +1807,32 @@ in
         "text" = "󰲹";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "ipynb";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "pl";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "ads";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "sqlite";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "pdf";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "pcm";
         "text" = "";
       }
@@ -1842,17 +1842,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "a";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "R";
         "text" = "󰟔";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "ogg";
         "text" = "";
       }
@@ -1867,7 +1867,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "jxl";
         "text" = "";
       }
@@ -1882,12 +1882,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "bqn";
         "text" = "⎉";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "cts";
         "text" = "";
       }
@@ -1897,12 +1897,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "rs";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "mpp";
         "text" = "";
       }
@@ -1917,7 +1917,7 @@ in
         "text" = "󰈧";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "jpeg";
         "text" = "";
       }
@@ -1942,12 +1942,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "eex";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "tbc";
         "text" = "󰛓";
       }
@@ -1957,47 +1957,47 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "sha224";
         "text" = "󰕥";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "xcplayground";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "el";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "m4v";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "m4a";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "cs";
         "text" = "󰌛";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "hs";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "tgz";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "fs";
         "text" = "";
       }
@@ -2017,7 +2017,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "cast";
         "text" = "";
       }
@@ -2027,22 +2027,22 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "lua";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "lhs";
         "text" = "";
       }
       {
-        "fg" = p.text;
+        "fg" = p.foreground;
         "name" = "md";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "leex";
         "text" = "";
       }
@@ -2052,27 +2052,27 @@ in
         "text" = "";
       }
       {
-        "fg" = p.subtext1;
+        "fg" = p.subtle;
         "name" = "lck";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "kt";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "bicepparam";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "hex";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "zig";
         "text" = "";
       }
@@ -2087,7 +2087,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "kicad_dru";
         "text" = "";
       }
@@ -2097,12 +2097,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "f#";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "odt";
         "text" = "";
       }
@@ -2112,22 +2112,22 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "vala";
         "text" = "";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "erb";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "mp3";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "bz2";
         "text" = "";
       }
@@ -2137,17 +2137,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "cr";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "f90";
         "text" = "󱈚";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "jwmrc";
         "text" = "";
       }
@@ -2182,17 +2182,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "hh";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "sig";
         "text" = "λ";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "html";
         "text" = "";
       }
@@ -2202,12 +2202,12 @@ in
         "text" = "󰻫";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "kicad_wks";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "hbs";
         "text" = "";
       }
@@ -2217,7 +2217,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "gresource";
         "text" = "";
       }
@@ -2227,7 +2227,7 @@ in
         "text" = "󰨖";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "ical";
         "text" = "";
       }
@@ -2247,17 +2247,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "gd";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "fsx";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "mkv";
         "text" = "";
       }
@@ -2267,12 +2267,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "kicad_sch";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "epub";
         "text" = "";
       }
@@ -2282,12 +2282,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = "magnet";
         "text" = "";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = "elf";
         "text" = "";
       }
@@ -2297,7 +2297,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "svg";
         "text" = "󰜡";
       }
@@ -2307,7 +2307,7 @@ in
         "text" = "󰻫";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "docx";
         "text" = "󰈬";
       }
@@ -2317,17 +2317,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "db";
         "text" = "";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "rb";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "r";
         "text" = "󰟔";
       }
@@ -2337,12 +2337,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "cow";
         "text" = "󰆚";
       }
       {
-        "fg" = p.pink;
+        "fg" = p.neutral;
         "name" = "gleam";
         "text" = "";
       }
@@ -2352,7 +2352,7 @@ in
         "text" = "󰍛";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "kicad_pro";
         "text" = "";
       }
@@ -2362,34 +2362,34 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "zip";
         "text" = "";
       }
     ];
     "files" = [
       {
-        "fg" = p.mauve;
+        "fg" = p.neutral;
         "name" = "kritadisplayrc";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = ".gtkrc-2.0";
         "text" = "";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "bspwmrc";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "webpack";
         "text" = "󰜫";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "tsconfig.json";
         "text" = "";
       }
@@ -2399,7 +2399,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "gemfile$";
         "text" = "";
       }
@@ -2409,12 +2409,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "avif";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "fp-info-cache";
         "text" = "";
       }
@@ -2424,7 +2424,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "robots.txt";
         "text" = "󰚩";
       }
@@ -2434,7 +2434,7 @@ in
         "text" = "󰡨";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = ".git-blame-ignore-revs";
         "text" = "";
       }
@@ -2444,7 +2444,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "hyprpaper.conf";
         "text" = "";
       }
@@ -2454,7 +2454,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "rakefile";
         "text" = "";
       }
@@ -2464,7 +2464,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.text;
+        "fg" = p.foreground;
         "name" = "cmakelists.txt";
         "text" = "";
       }
@@ -2479,22 +2479,22 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "readme";
         "text" = "󰂺";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "settings.gradle";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "gruntfile.coffee";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = ".eslintignore";
         "text" = "";
       }
@@ -2519,17 +2519,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "rmd";
         "text" = "";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = "vagrantfile$";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = ".Xauthority";
         "text" = "";
       }
@@ -2549,12 +2549,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "build.zig.zon";
         "text" = "";
       }
       {
-        "fg" = p.surface1;
+        "fg" = p.surfaceStrong;
         "name" = ".ds_store";
         "text" = "";
       }
@@ -2579,7 +2579,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = ".mailmap";
         "text" = "󰊢";
       }
@@ -2589,27 +2589,27 @@ in
         "text" = "󰓆";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "svelte.config.js";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "eslint.config.ts";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "config";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = ".gitlab-ci.yml";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = ".gitconfig";
         "text" = "";
       }
@@ -2619,7 +2619,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = ".xinitrc";
         "text" = "";
       }
@@ -2629,7 +2629,7 @@ in
         "text" = "󰓙";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "sxhkdrc";
         "text" = "";
       }
@@ -2639,12 +2639,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "tailwind.config.mjs";
         "text" = "󱏿";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "ext_typoscript_setup.txt";
         "text" = "";
       }
@@ -2659,12 +2659,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = ".nanorc";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "commit_editmsg";
         "text" = "";
       }
@@ -2674,17 +2674,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "fp-lib-table";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = ".editorconfig";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "justfile";
         "text" = "";
       }
@@ -2699,7 +2699,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = ".clang-format";
         "text" = "";
       }
@@ -2714,7 +2714,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "go.mod";
         "text" = "";
       }
@@ -2724,7 +2724,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "brewfile";
         "text" = "";
       }
@@ -2739,17 +2739,17 @@ in
         "text" = "󰡨";
       }
       {
-        "fg" = p.overlay0;
+        "fg" = p.dim;
         "name" = ".settings.json";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "tailwind.config.js";
         "text" = "󱏿";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = ".clang-tidy";
         "text" = "";
       }
@@ -2764,7 +2764,7 @@ in
         "text" = "󱄆";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "xsettingsd.conf";
         "text" = "";
       }
@@ -2774,12 +2774,12 @@ in
         "text" = "󱄆";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "eslint.config.cjs";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "sym-lib-table";
         "text" = "";
       }
@@ -2809,17 +2809,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = ".pre-commit-config.yaml";
         "text" = "󰛢";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "i3blocks.conf";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "xorg.conf";
         "text" = "";
       }
@@ -2829,7 +2829,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "vlcrc";
         "text" = "󰕼";
       }
@@ -2854,27 +2854,27 @@ in
         "text" = "󰣇";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "tailwind.config.ts";
         "text" = "󱏿";
       }
       {
-        "fg" = p.subtext1;
+        "fg" = p.subtle;
         "name" = "security.md";
         "text" = "󰒃";
       }
       {
-        "fg" = p.subtext1;
+        "fg" = p.subtle;
         "name" = "security";
         "text" = "󰒃";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = ".eslintrc";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "gradle.properties";
         "text" = "";
       }
@@ -2884,22 +2884,22 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "PrusaSlicerGcodeViewer.ini";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "PrusaSlicer.ini";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "procfile";
         "text" = "";
       }
       {
-        "fg" = p.base;
+        "fg" = p.background;
         "name" = "mpv.conf";
         "text" = "";
       }
@@ -2909,7 +2909,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "i3status.conf";
         "text" = "";
       }
@@ -2919,7 +2919,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = ".pylintrc";
         "text" = "";
       }
@@ -2939,32 +2939,32 @@ in
         "text" = "󰡨";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "eslint.config.mjs";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "gruntfile.js";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "bun.lockb";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = ".gitattributes";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "gruntfile.ts";
         "text" = "";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "pom.xml";
         "text" = "";
       }
@@ -2974,7 +2974,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.surface0;
+        "fg" = p.surface;
         "name" = "package-lock.json";
         "text" = "";
       }
@@ -2999,12 +2999,12 @@ in
         "text" = "󱄆";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "mix.lock";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "makefile";
         "text" = "";
       }
@@ -3014,17 +3014,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay2;
+        "fg" = p.subtle;
         "name" = "lxde-rc.xml";
         "text" = "";
       }
       {
-        "fg" = p.mauve;
+        "fg" = p.neutral;
         "name" = "kritarc";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "gtkrc";
         "text" = "";
       }
@@ -3059,7 +3059,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "i18n.config.ts";
         "text" = "󰗊";
       }
@@ -3069,32 +3069,32 @@ in
         "text" = "󰜘";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = ".gitmodules";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "gradle-wrapper.properties";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "hypridle.conf";
         "text" = "";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "vercel.json";
         "text" = "▲";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "hyprlock.conf";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "go.sum";
         "text" = "";
       }
@@ -3104,7 +3104,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "gruntfile.babel.js";
         "text" = "";
       }
@@ -3114,22 +3114,22 @@ in
         "text" = "󰡨";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "i18n.config.js";
         "text" = "󰗊";
       }
       {
-        "fg" = p.rosewater;
+        "fg" = p.foreground;
         "name" = "readme.md";
         "text" = "󰂺";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "gradlew";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "go.work";
         "text" = "";
       }
@@ -3139,7 +3139,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = "gnumakefile";
         "text" = "";
       }
@@ -3154,12 +3154,12 @@ in
         "text" = "󰡨";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "eslint.config.js";
         "text" = "";
       }
       {
-        "fg" = p.sapphire;
+        "fg" = p.accentDim;
         "name" = "hyprland.conf";
         "text" = "";
       }
@@ -3169,7 +3169,7 @@ in
         "text" = "󰡨";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "groovy";
         "text" = "";
       }
@@ -3179,12 +3179,12 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = "platformio.ini";
         "text" = "";
       }
       {
-        "fg" = p.surface2;
+        "fg" = p.surfaceRaised;
         "name" = "build.gradle";
         "text" = "";
       }
@@ -3204,7 +3204,7 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = ".xsession";
         "text" = "";
       }
@@ -3234,17 +3234,17 @@ in
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = ".Xresources";
         "text" = "";
       }
       {
-        "fg" = p.peach;
+        "fg" = p.warm;
         "name" = ".gitignore";
         "text" = "";
       }
       {
-        "fg" = p.overlay1;
+        "fg" = p.muted;
         "name" = ".justfile";
         "text" = "";
       }
@@ -3253,15 +3253,15 @@ in
   "indicator" = {
     "current" = {
       "bg" = p.blue;
-      "fg" = p.base;
+      "fg" = p.background;
     };
     "parent" = {
-      "bg" = p.text;
-      "fg" = p.base;
+      "bg" = p.foreground;
+      "fg" = p.background;
     };
     "preview" = {
-      "bg" = p.text;
-      "fg" = p.base;
+      "bg" = p.foreground;
+      "fg" = p.background;
     };
   };
   "input" = {
@@ -3276,20 +3276,20 @@ in
   };
   "mgr" = {
     "border_style" = {
-      "fg" = p.overlay1;
+      "fg" = p.muted;
     };
     "border_symbol" = "│";
     "count_copied" = {
       "bg" = p.green;
-      "fg" = p.base;
+      "fg" = p.background;
     };
     "count_cut" = {
       "bg" = p.red;
-      "fg" = p.base;
+      "fg" = p.background;
     };
     "count_selected" = {
       "bg" = p.blue;
-      "fg" = p.base;
+      "fg" = p.background;
     };
     "cwd" = {
       "fg" = p.teal;
@@ -3300,7 +3300,7 @@ in
     };
     "find_position" = {
       "bg" = "reset";
-      "fg" = p.pink;
+      "fg" = p.neutral;
       "italic" = true;
     };
     "marker_copied" = {
@@ -3322,31 +3322,31 @@ in
   };
   "mode" = {
     "normal_alt" = {
-      "bg" = p.surface0;
+      "bg" = p.surface;
       "fg" = p.blue;
     };
     "normal_main" = {
       "bg" = p.blue;
       "bold" = true;
-      "fg" = p.base;
+      "fg" = p.background;
     };
     "select_alt" = {
-      "bg" = p.surface0;
+      "bg" = p.surface;
       "fg" = p.green;
     };
     "select_main" = {
       "bg" = p.green;
       "bold" = true;
-      "fg" = p.base;
+      "fg" = p.background;
     };
     "unset_alt" = {
-      "bg" = p.surface0;
-      "fg" = p.flamingo;
+      "bg" = p.surface;
+      "fg" = p.danger;
     };
     "unset_main" = {
-      "bg" = p.flamingo;
+      "bg" = p.danger;
       "bold" = true;
-      "fg" = p.base;
+      "fg" = p.background;
     };
   };
   "notify" = {
@@ -3362,7 +3362,7 @@ in
   };
   "pick" = {
     "active" = {
-      "fg" = p.pink;
+      "fg" = p.neutral;
     };
     "border" = {
       "fg" = p.blue;
@@ -3392,7 +3392,7 @@ in
       "fg" = p.yellow;
     };
     "perm_sep" = {
-      "fg" = p.overlay1;
+      "fg" = p.muted;
     };
     "perm_type" = {
       "fg" = p.blue;
@@ -3406,10 +3406,10 @@ in
     };
     "progress_label" = {
       "bold" = true;
-      "fg" = p.white;
+      "fg" = p.foreground;
     };
     "progress_normal" = {
-      "bg" = p.surface1;
+      "bg" = p.surfaceStrong;
       "fg" = p.green;
     };
     "sep_left" = {
@@ -3423,13 +3423,13 @@ in
   };
   "tabs" = {
     "active" = {
-      "bg" = p.text;
+      "bg" = p.foreground;
       "bold" = true;
-      "fg" = p.base;
+      "fg" = p.background;
     };
     "inactive" = {
-      "bg" = p.surface1;
-      "fg" = p.text;
+      "bg" = p.surfaceStrong;
+      "fg" = p.foreground;
     };
   };
   "tasks" = {
@@ -3438,7 +3438,7 @@ in
     };
     "hovered" = {
       "bold" = true;
-      "fg" = p.pink;
+      "fg" = p.neutral;
     };
     "title" = {};
   };
@@ -3447,17 +3447,17 @@ in
       "fg" = p.teal;
     };
     "desc" = {
-      "fg" = p.pink;
+      "fg" = p.neutral;
     };
     "mask" = {
-      "bg" = p.surface0;
+      "bg" = p.surface;
     };
     "rest" = {
-      "fg" = p.overlay2;
+      "fg" = p.subtle;
     };
     "separator" = "  ";
     "separator_style" = {
-      "fg" = p.surface2;
+      "fg" = p.surfaceRaised;
     };
   };
 }

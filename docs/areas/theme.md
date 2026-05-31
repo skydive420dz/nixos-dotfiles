@@ -27,13 +27,14 @@ but Quickshell does not own the palette.
 - `scripts/theme-select.d/state.sh`: current-style selection helpers.
 - `scripts/theme-select.d/consumers.sh`: session environment and live reloads.
 - `scripts/theme-select.d/generators/`: per-output-family runtime generators.
-- `theme/tokens.nix`: Nix-side fallback/default tokens.
+- `theme/tokens.nix`: Nix-side fallback/default tokens plus semantic aliases
+  for rebuild-time consumers.
 - `theme/plymouth.nix`: rebuild-time Sky Plymouth theme package.
 - `config/quickshell/common/Theme.qml`: runtime reader for Quickshell tokens.
 - `config/doom/theme.el`: loads the active Sky theme in Doom Emacs.
 - `config/doom/themes/sky-theme-common.el`: shared Doom face definitions.
-- `config/doom/themes/sky-dark-theme.el`: native Doom `SkyDark` theme.
-- `config/doom/themes/sky-light-theme.el`: native Doom `SkyLight` theme.
+- `config/doom/themes/sky-dark-theme.el`: native Doom `SkyDark` theme wrapper.
+- `config/doom/themes/sky-light-theme.el`: native Doom `SkyLight` theme wrapper.
 - `config/nvim/colors/sky.lua`: live Neovim colorscheme entrypoint.
 - `config/nvim/lua/sky/theme.lua`: live Neovim Sky highlight definitions.
 - Home Manager modules install packages, link scripts, and set fallback session
@@ -138,15 +139,17 @@ Fixed in this pass:
 - aerc now reads the generated Sky styleset before the static SkyDark fallback.
 - NVF no longer declares Catppuccin/Mocha. Neovim loads the live Sky
   colorscheme from `config/nvim/` through `~/.config/sky-nvim`.
+- Nix fallbacks for Kitty and Mako now read semantic Sky tokens instead of
+  inherited palette names.
+- `theme/yazi.nix` now uses semantic Sky aliases from `theme/tokens.nix`.
+- Old Catppuccin-style palette aliases were removed from `theme/styles.json`.
+- Doom native theme wrappers now read generated runtime tokens instead of
+  duplicating the dark and light color tables.
+- The stale Catppuccin shadow color in `config/hypr/hyprland.lua` was renamed
+  and replaced with a Sky value.
 
 Known open items:
 
-- Doom Emacs works with native Sky themes, but the theme files duplicate color
-  values from `theme/styles.json`. A later cleanup can generate those files or
-  load tokens from a single source.
-- `theme/yazi.nix` and a few fallback modules still use old palette field names
-  like `rosewater` and `mauve`. The values are Sky values, but the names are
-  inherited vocabulary and may be worth renaming once the palette settles.
 - `config/quickshell/common/Theme.qml` intentionally keeps hard-coded SkyDark
   fallback colors for startup before generated runtime state exists.
 
