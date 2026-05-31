@@ -1,9 +1,25 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 let
-  tokens = import ../../../theme/tokens.nix;
+  styles = builtins.fromJSON (builtins.readFile ../../../theme/styles.json);
+  themeLib = import ../../../theme/lib.nix;
+  toml = pkgs.formats.toml { };
+  mkYaziTheme =
+    styleName:
+    toml.generate "yazi-${styleName}.toml" (
+      import ../../../theme/yazi.nix {
+        palette = (themeLib.forStyle styles.${styleName}).palette;
+      }
+    );
 in
 {
+  xdg.configFile = {
+    "theme/yazi/SkyDark.toml".source = mkYaziTheme "SkyDark";
+    "theme/yazi/SkyLight.toml".source = mkYaziTheme "SkyLight";
+    "yazi/theme.toml".source =
+      config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/theme/current/yazi.toml";
+  };
+
   programs.yazi = {
     enable = true;
     package = pkgs.yazi;
@@ -61,10 +77,6 @@ in
         desc = "Enter directory or open file";
       }
     ];
-
-    theme = import ../../../theme/yazi.nix {
-      inherit (tokens) palette;
-    };
 
     plugins = {
       ouch = pkgs.writeTextDir "init.lua" ''

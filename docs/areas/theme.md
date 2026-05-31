@@ -29,6 +29,8 @@ but Quickshell does not own the palette.
 - `scripts/theme-select.d/generators/`: per-output-family runtime generators.
 - `theme/tokens.nix`: Nix-side fallback/default tokens plus semantic aliases
   for rebuild-time consumers.
+- `theme/lib.nix`: shared Nix helper for deriving Sky semantic palette aliases
+  from any style in `theme/styles.json`.
 - `theme/plymouth.nix`: rebuild-time Sky Plymouth theme package.
 - `config/quickshell/common/Theme.qml`: runtime reader for Quickshell tokens.
 - `config/doom/theme.el`: loads the active Sky theme in Doom Emacs.
@@ -58,6 +60,7 @@ Generated under `~/.config/theme/current/`:
 - `tmux.conf`
 - `nvim.lua`
 - `emacs-theme.el`
+- `yazi.toml`
 - `aerc/stylesets/sky`
 - `env`
 
@@ -66,6 +69,8 @@ Generated outside the current bundle:
 - `~/.config/btop/themes/sky.theme`
 - `~/.config/bat/config`
 - `~/.config/bat/themes/Sky.tmTheme`
+- `~/.config/theme/yazi/SkyDark.toml`
+- `~/.config/theme/yazi/SkyLight.toml`
 - `~/.config/gtk-2.0/gtkrc`
 - `~/.config/gtk-3.0/settings.ini`
 - `~/.config/gtk-3.0/gtk.css`
@@ -96,6 +101,8 @@ These can change without `nrs`, usually after `theme-select toggle` or
 - qutebrowser loads `qutebrowser.py`; existing windows may need a reload or
   restart depending on what qutebrowser has already cached.
 - btop and bat use their generated themes on the next launch or refresh.
+- Yazi reads `~/.config/yazi/theme.toml`, which points at the active generated
+  `yazi.toml`; existing Yazi sessions need restart.
 - aerc loads the generated styleset first through `stylesets-dirs`. Existing
   sessions need `:reload-config`; new sessions pick it up on launch.
 - Neovim prepends `~/.config/sky-nvim` to runtimepath and loads the live
@@ -125,8 +132,8 @@ definition changes.
 Covered by runtime generation:
 
 - Quickshell, Mako, Kitty, tmux, Starship, fuzzel launcher/clipboard,
-  qutebrowser, btop, bat, GTK, Qt, KDE-style globals, zsh/fzf env, and Doom
-  Emacs runtime style state.
+  qutebrowser, btop, bat, Yazi, GTK, Qt, KDE-style globals, zsh/fzf env, and
+  Doom Emacs runtime style state.
 
 Fixed in this pass:
 
@@ -147,6 +154,8 @@ Fixed in this pass:
   duplicating the dark and light color tables.
 - The stale Catppuccin shadow color in `config/hypr/hyprland.lua` was renamed
   and replaced with a Sky value.
+- Yazi now reads the generated runtime `yazi.toml` instead of a static
+  Home Manager theme symlink.
 
 Known open items:
 

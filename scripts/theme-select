@@ -33,6 +33,7 @@ write_all_outputs() {
   write_tmux_config
   write_nvim_theme
   write_emacs_theme
+  write_yazi_theme
   write_gtk_config
   write_qt_config
   write_kdeglobals
