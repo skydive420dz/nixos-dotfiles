@@ -22,3 +22,36 @@ Keep future Neovim helpers inside =system/modules/programs/nvim/= unless they ar
 NVF owns editor plumbing: packages, LSP, mappings, completion, and plugin enablement. Sky owns colors.
 
 After a rebuild creates the live link, changes under =config/nvim/= are hot editable. Use =:colorscheme sky=, =:SkyThemeReload=, or restart Neovim to pick up theme edits or a new =theme-select= style.
+
+** NVF Reassessment
+:PROPERTIES:
+:CUSTOM_ID: nvf-reassessment
+:END:
+Current split:
+
+- NVF/Nix owns the dependency closure, plugin enablement, language servers, formatters, completion engine, statusline, dashboard, and generated Neovim package.
+- =system/modules/programs/nvim/lua.nix= owns custom behavior that NVF does not express cleanly: runtimepath prepending, LSP helper commands, keymaps, terminal fixes, diagnostics, snippets/completion glue, and editor-local autocmds.
+- =config/nvim/= owns hot-editable Sky theme code only.
+
+Pressure points:
+
+- The custom Lua payload is large enough that it behaves like a hidden config inside Nix.
+- Runtime UX changes still require =nrs= unless they live in =config/nvim/=.
+- NVF gives a controlled plugin/dependency surface, but plugin interactions still need hand-tuned Lua.
+- Project-specific workarounds do not belong here. NVF should stay a general-purpose editor tool; projects should carry their own metadata.
+
+Keep for now:
+
+- Keep NVF as the stable package/plugin/LSP owner while it remains boring enough.
+- Keep the QML language-server wrapper generic: Qt imports come from Nix packages, and Quickshell imports are included only when the platform package exists.
+- Keep Sky theme runtime code in =config/nvim/=.
+
+Replacement path if NVF keeps fighting us:
+
+1. Freeze the current NVF behavior in docs and on a branch so rollback is easy.
+2. Move hot-editable Lua from =lua.nix= into =config/nvim/lua/sky/= one concern at a time: options, keymaps, LSP attach behavior, completion glue, diagnostics, and autocmds.
+3. Leave Nix/NVF owning plugin installation while the Lua moves, so the first migration does not also change the dependency model.
+4. If that split feels better, replace NVF with a smaller Nix-owned Neovim package plus explicit plugins, while keeping =config/nvim/= as the live config root.
+5. Remove NVF only after the non-NVF config reaches feature parity and daily use is boring.
+
+Do not start this migration as a drive-by cleanup. It is a separate branch and a separate headspace.
