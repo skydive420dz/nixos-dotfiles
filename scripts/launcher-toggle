@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
-theme_config="$config_home/theme/current/fuzzel.ini"
+runtime_dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+target_screen="${1:-}"
 
-if [ ! -r "$theme_config" ]; then
-  "$HOME/.config/scripts/theme-select" apply >/dev/null 2>&1 || true
-fi
-
-exec fuzzel --config="$theme_config" --show drun --prompt "Apps "
+mkdir -p "$runtime_dir"
+printf '%s\n' "$target_screen" > "$runtime_dir/qs-launcher-target"
+printf '%s\n' "$(date +%s%N)" > "$runtime_dir/qs-launcher-toggle"

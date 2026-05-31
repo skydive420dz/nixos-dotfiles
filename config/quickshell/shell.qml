@@ -29,5 +29,7 @@ ShellRoot {
 
     WallpaperPicker {}
 
+    Launcher {}
+
     Osd {}
 }
