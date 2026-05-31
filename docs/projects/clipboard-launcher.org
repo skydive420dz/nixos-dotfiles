@@ -75,7 +75,7 @@
 - [X] Press =Delete=, or =Backspace= with an empty query, and confirm the selected item is removed from history.
 - [X] Press =Esc= and confirm the clipboard picker closes.
 - [X] Click outside the clipboard picker and confirm it closes without stealing later input.
-- [ ] Select an image clipboard entry and confirm the thumbnail preview appears.
+- [X] Select an image clipboard entry and confirm the thumbnail preview appears.
 - [ ] Run =~/.config/scripts/clipboard-fuzzel= and confirm the fallback clipboard picker still works.
 - Keep image preview thumbnail-only until the text/image picker stays boring in daily use.
 - Revisit unified source search only after the separate tools feel boring and reliable.

@@ -53,6 +53,7 @@
 - [X] Clean up =scripts/theme-select= so it stops feeling like one giant generator carpet.
 - [X] Continue global theme coverage audit.
 - [X] Convert docs from Markdown to Org.
-- [ ] Resurrect native Quickshell launcher and clipboard surfaces while keeping the current fuzzel scripts as fallback.
+- [X] Resurrect native Quickshell launcher and clipboard surfaces while keeping the current fuzzel scripts as fallback.
+- [ ] Add per-monitor wallpaper state if the workflow needs it.
 - [ ] Quickshell project structure/QML metadata follow-up.
 - [ ] NVF reassessment or replacement path.

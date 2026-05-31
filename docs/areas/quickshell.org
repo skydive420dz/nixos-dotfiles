@@ -237,6 +237,7 @@ This is a direction, not a mandate to create empty folders. Split only when a mo
 - 2026-05-30: Native clipboard hand test passed for the core close/restore path. Click-out close and =Esc= close are clean, the picker feels responsive, and selecting a history entry returns focus to the previous window as intended. Search navigation, history deletion, and =clipboard-fuzzel= fallback remain unclaimed until explicitly tested.
 - 2026-05-30: Native clipboard mechanics approved. Search/filtering, row navigation, selection/copy focus restore, deletion, =Esc= close, and click-out close all behave as intended. =scripts/clipboard-fuzzel= remains available but was not tested because it is temporary fallback.
 - 2026-05-30: Native clipboard image preview added. Image entries are detected from =cliphist list= binary markers, use a photo glyph in the result row, and generate a selected-entry thumbnail under =$XDG_RUNTIME_DIR= through =cliphist decode | magick=. =system/modules/clipboard.nix= now owns =imagemagick= explicitly so the preview path does not depend on unrelated Emacs packages.
+- 2026-05-30: Clipboard image preview and wallpaper selector polish passed user hand/visual testing. Per-monitor wallpaper state is not needed right now and stays on the longer-term todo list instead of complicating the current picker.
 
 ** Known Lesson
 :PROPERTIES:
