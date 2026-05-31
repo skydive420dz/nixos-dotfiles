@@ -31,5 +31,7 @@ ShellRoot {
 
     Launcher {}
 
+    Clipboard {}
+
     Osd {}
 }

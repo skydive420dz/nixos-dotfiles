@@ -203,6 +203,7 @@ This is a direction, not a mandate to create empty folders. Split only when a mo
 - 2026-05-30: Native launcher resurrection started. =root/Launcher.qml= owns the overlay layer, focus policy, screen targeting, signal-file toggle, and click-out mask. =modules/launcher/LauncherView.qml= owns app loading, fuzzy scoring, keyboard navigation, row rendering, and activation. =scripts/launcher-toggle= now signals the native overlay; =scripts/launcher-fuzzel= keeps the old fuzzel launcher available as a fallback.
 - 2026-05-30: Native launcher results are apps-only by default. The old open-window results were removed to reduce noise; workspace/window navigation remains outside the launcher unless a future explicit window-search mode earns its place.
 - 2026-05-30: Launcher app discovery uses desktop entries plus =modules/launcher/apps.json= for terminal-first tools that do not provide useful desktop files. Current custom entries include =BlueTUI=, =WireMix=, and =Neovim=.
+- 2026-05-30: Native clipboard resurrection started. =root/Clipboard.qml= owns the overlay layer, focus policy, screen targeting, signal-file toggle, and click-out mask. =modules/clipboard/ClipboardView.qml= owns =cliphist list= loading, text filtering, keyboard navigation, copy-back through =wl-copy=, and item deletion. =scripts/clipboard-toggle= now signals the native overlay; =scripts/clipboard-fuzzel= keeps the old fuzzel picker available as a fallback. Image preview is intentionally deferred until text history is boring and reliable.
 
 ** Test Notes
 :PROPERTIES:

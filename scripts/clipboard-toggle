@@ -1,15 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
-theme_config="$config_home/theme/current/fuzzel.ini"
+runtime_dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+target_screen="${1:-}"
 
-if [ ! -r "$theme_config" ]; then
-    "$HOME/.config/scripts/theme-select" apply >/dev/null 2>&1 || true
-fi
-
-selection=$(cliphist list | fuzzel --config="$theme_config" --dmenu --prompt "Clipboard " || true)
-
-if [[ -n "${selection:-}" ]]; then
-    printf '%s' "$selection" | cliphist decode | wl-copy
-fi
+mkdir -p "$runtime_dir"
+printf '%s\n' "$target_screen" > "$runtime_dir/qs-clipboard-target"
+printf '%s\n' "$(date +%s%N)" > "$runtime_dir/qs-clipboard-toggle"
