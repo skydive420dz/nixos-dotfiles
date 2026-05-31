@@ -214,7 +214,7 @@ This is a direction, not a mandate to create empty folders. Split only when a mo
 - 2026-05-17: Status network extraction tested live. Quickshell reports =Configuration Loaded=, network/traffic rendering behaves as expected, and no visible anomalies were detected.
 - 2026-05-27: Live CAVA media analyzer tested after =nrs=; =cava 0.10.7= is on the NixOS system path, Quickshell starts cleanly, and the user confirmed the live media graph is up and running.
 - 2026-05-27: =wlctl 0.1.6= binary package built and ran on the NixOS host. =nix eval --impure .#nixosConfigurations.nixos.config.environment.systemPackages --apply builtins.length= returned =206= after adding the package and launcher fallback.
-- 2026-05-30: Native wallpaper manager static check: new QML files parse with =qmlformat=. Live Quickshell restart and selector behavior still need to be tested before =awww= can be considered replaceable.
+- 2026-05-30: Native wallpaper manager live test passed on NixOS. Quickshell restarted cleanly, the wallpaper selector opens from the bar icon, static wallpapers render, animated GIF wallpapers render, static/animated switching works in both directions, and state persists in =~/.local/state/quickshell/wallpaper.json=. =awww= remains installed and wired as fallback until a separate cutover cleanup removes it.
 
 ** Known Lesson
 :PROPERTIES:
