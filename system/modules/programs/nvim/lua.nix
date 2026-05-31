@@ -7,6 +7,13 @@
       vim.opt.runtimepath:prepend(sky_nvim)
     end
 
+    local ok_sky, sky = pcall(require, "sky")
+    if ok_sky then
+      sky.setup()
+    else
+      vim.notify("Sky live config unavailable: " .. tostring(sky), vim.log.levels.WARN, { title = "Neovim" })
+    end
+
     local ok, err = pcall(vim.cmd.colorscheme, "sky")
     if not ok then
       vim.notify("Sky colorscheme unavailable: " .. tostring(err), vim.log.levels.WARN, { title = "Theme" })
@@ -14,13 +21,6 @@
   '';
 
   navigation = ''
-    -- Health check path fixes
-    vim.opt.runtimepath:append(vim.fn.stdpath("data") .. "/site")
-    vim.opt.packpath:append(vim.fn.stdpath("data") .. "/site")
-
-    -- Clipboard fix
-    vim.opt.clipboard = 'unnamedplus'
-
     local function lsp_clients_for_buffer()
       return vim.lsp.get_clients({ bufnr = 0 })
     end
@@ -83,14 +83,6 @@
       end,
     })
 
-    -- Persistent undo history for Undotree
-    local undo_dir = vim.fn.stdpath("state") .. "/undo"
-    vim.fn.mkdir(undo_dir, "p")
-    vim.opt.undofile = true
-    vim.opt.undodir = undo_dir .. "//"
-    vim.opt.undolevels = 10000
-    vim.opt.undoreload = 10000
-
     -- Neovim terminals inherit from the Neovim process, so recover the
     -- Hyprland instance when Neovim starts from a stale environment.
     if (vim.env.HYPRLAND_INSTANCE_SIGNATURE == nil or vim.env.HYPRLAND_INSTANCE_SIGNATURE == "") and vim.env.XDG_RUNTIME_DIR then
@@ -134,8 +126,6 @@
     end
 
     -- Spelling
-    vim.opt.spell = true
-    vim.opt.spelllang = { "en_us" }
     vim.keymap.set("n", "]s", "]s", { desc = "Next spelling error" })
     vim.keymap.set("n", "[s", "[s", { desc = "Previous spelling error" })
     vim.keymap.set("n", "<leader>zg", "zg", { desc = "Add word to dictionary" })

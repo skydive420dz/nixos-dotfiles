@@ -10,7 +10,9 @@ Neovim follows the module-directory convention:
 
 - =system/modules/programs/nvim/default.nix= imports local pieces.
 - =system/modules/programs/nvim/nvim.nix= owns the main =programs.nvf= module.
-- =system/modules/programs/nvim/lua.nix= owns custom Lua injected through =luaConfigRC=.
+- =system/modules/programs/nvim/lua.nix= owns the NVF bootstrap Lua injected through =luaConfigRC=.
+- =config/nvim/lua/sky/init.lua= is the live config entrypoint loaded after NVF prepends =~/.config/sky-nvim= to runtimepath.
+- =config/nvim/lua/sky/options.lua= owns hot-editable editor option defaults that no longer need an =nrs= for every tweak.
 - =config/nvim/colors/sky.lua= and =config/nvim/lua/sky/theme.lua= own the live Sky colorscheme. Home Manager links that tree to =~/.config/sky-nvim=; NVF prepends it to Neovim's runtimepath.
 
 Keep future Neovim helpers inside =system/modules/programs/nvim/= unless they are shared by another unit.
@@ -30,8 +32,8 @@ After a rebuild creates the live link, changes under =config/nvim/= are hot edit
 Current split:
 
 - NVF/Nix owns the dependency closure, plugin enablement, language servers, formatters, completion engine, statusline, dashboard, and generated Neovim package.
-- =system/modules/programs/nvim/lua.nix= owns custom behavior that NVF does not express cleanly: runtimepath prepending, LSP helper commands, keymaps, terminal fixes, diagnostics, snippets/completion glue, and editor-local autocmds.
-- =config/nvim/= owns hot-editable Sky theme code only.
+- =system/modules/programs/nvim/lua.nix= owns custom behavior that NVF does not express cleanly yet: runtimepath prepending, LSP helper commands, keymaps, terminal fixes, diagnostics, snippets/completion glue, and editor-local autocmds.
+- =config/nvim/= owns hot-editable Sky theme code and the first migrated live option defaults.
 
 Pressure points:
 
