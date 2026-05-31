@@ -50,6 +50,14 @@
 - [X] Search git history/reference branches for the old launcher and clipboard implementation.
 - [X] Inventory reusable launcher behavior: activation flow, app/window model, fuzzy scoring, keyboard navigation, focus/close handling, and theme usage.
 - [X] Rebuild the launcher first as a native Quickshell surface while preserving the script fallback.
-- Test launcher typing, row navigation, window focus, and app launching by hand.
+- [ ] Open native launcher with the normal launcher bind.
+- [ ] Type a query and confirm matching apps/windows appear.
+- [ ] Navigate rows with arrow keys.
+- [ ] Navigate rows with =Ctrl-j= and =Ctrl-k=.
+- [ ] Press =Enter= on an app result and confirm it launches.
+- [ ] Press =Enter= on a window result and confirm it focuses the existing window.
+- [ ] Press =Esc= and confirm the launcher closes.
+- [ ] Click outside the launcher and confirm it closes without stealing later input.
+- [ ] Run =~/.config/scripts/launcher-fuzzel= and confirm the fallback launcher still works.
 - Rebuild clipboard second, with text history first and image preview only after text selection is reliable.
 - Revisit unified source search only after the separate tools feel boring and reliable.
