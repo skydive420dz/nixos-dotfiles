@@ -17,7 +17,6 @@ Item {
     property string query: ""
     property int selectedIndex: 0
     property var apps: []
-    property var windows: []
     readonly property var results: filteredResults()
     readonly property int panelWidth: 620
     readonly property int panelTopMargin: Theme.barHeight + 20
@@ -39,8 +38,6 @@ Item {
         selectedIndex = 0;
         if (!loadProc.running)
             loadProc.running = true;
-        if (!windowsProc.running)
-            windowsProc.running = true;
         search.forceActiveFocus();
     }
 
@@ -88,22 +85,9 @@ Item {
             return [];
 
         var pool = [];
-        for (var w = 0; w < windows.length; w++) {
-            var win = windows[w];
-            pool.push({
-                "type": "window",
-                "name": win.title || win.class || "Window",
-                "subtitle": win.class ? "Window - " + win.class : "Window",
-                "search": (win.class || "") + " " + (win.initialClass || ""),
-                "icon": "",
-                "address": win.address || ""
-            });
-        }
-
         for (var i = 0; i < apps.length; i++) {
             var app = apps[i];
             pool.push({
-                "type": "app",
                 "name": app.name,
                 "subtitle": app.generic || app.comment || app.exec,
                 "search": app.desktop + " " + app.generic + " " + app.comment,
@@ -119,7 +103,7 @@ Item {
             if (rank >= 0) {
                 matches.push({
                     "item": pool[p],
-                    "rank": rank + (pool[p].type === "window" ? 2 : 10)
+                    "rank": rank
                 });
             }
         }
@@ -143,9 +127,7 @@ Item {
         if (!item)
             return;
 
-        if (item.type === "window")
-            Quickshell.execDetached(["hyprctl", "dispatch", "focuswindow", "address:" + item.address]);
-        else if (item.terminal)
+        if (item.terminal)
             Quickshell.execDetached(["bash", "-lc", "uwsm app -- kitty -e " + item.exec]);
         else
             Quickshell.execDetached(["bash", "-lc", "uwsm app -- " + item.exec]);
@@ -177,24 +159,6 @@ Item {
                 root.apps = JSON.parse(stdout.buffer.trim());
             } catch (e) {
                 root.apps = [];
-            }
-            stdout.buffer = "";
-        }
-    }
-
-    Process {
-        id: windowsProc
-
-        command: ["hyprctl", "clients", "-j"]
-        stdout: SplitParser {
-            property string buffer: ""
-            onRead: data => buffer += data + "\n"
-        }
-        onExited: {
-            try {
-                root.windows = JSON.parse(stdout.buffer.trim()).filter(win => !win.hidden);
-            } catch (e) {
-                root.windows = [];
             }
             stdout.buffer = "";
         }
@@ -334,15 +298,15 @@ Item {
                                 anchors.centerIn: parent
                                 width: root.iconSize
                                 height: root.iconSize
-                                source: Quickshell.iconPath(modelData.type === "window" ? "preferences-system-windows" : (modelData.icon || "application-x-executable"), "application-x-executable")
+                                source: Quickshell.iconPath(modelData.icon || "application-x-executable", "application-x-executable")
                                 asynchronous: true
                                 mipmap: true
                             }
 
                             Text {
                                 anchors.centerIn: parent
-                                visible: modelData.type === "window" || modelData.icon.length === 0
-                                text: modelData.type === "window" ? "󰖲" : "󰣆"
+                                visible: modelData.icon.length === 0
+                                text: "󰣆"
                                 color: index === root.selectedIndex ? Theme.accent : Theme.muted
                                 font.family: Theme.iconFont
                                 font.pixelSize: 15
@@ -370,23 +334,6 @@ Item {
                                 font.pixelSize: Theme.fontSizeSmall + 1
                                 elide: Text.ElideRight
                                 visible: text.length > 0
-                            }
-                        }
-
-                        Rectangle {
-                            Layout.preferredWidth: typeLabel.implicitWidth + 14
-                            Layout.preferredHeight: 22
-                            radius: Theme.radiusSmall
-                            color: root.chipColor
-
-                            Text {
-                                id: typeLabel
-
-                                anchors.centerIn: parent
-                                text: modelData.type === "window" ? "Window" : "App"
-                                color: Theme.muted
-                                font.family: Theme.font
-                                font.pixelSize: Theme.fontSizeSmall
                             }
                         }
                     }

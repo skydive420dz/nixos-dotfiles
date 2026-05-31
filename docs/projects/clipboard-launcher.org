@@ -7,7 +7,7 @@
 :CUSTOM_ID: current
 :END:
 - Launcher is native Quickshell again. =scripts/launcher-toggle= signals the =qs-launcher= overlay through =$XDG_RUNTIME_DIR=.
-- The launcher searches open Hyprland windows and desktop apps from =scripts/launcher-apps=.
+- The launcher searches desktop apps from =scripts/launcher-apps=.
 - =scripts/launcher-fuzzel= preserves the old fuzzel app launcher as an explicit fallback.
 - Clipboard is still script-backed for now: =scripts/clipboard-toggle= uses =cliphist list | fuzzel --dmenu= and decodes the selected item back to =wl-copy=.
 
@@ -40,6 +40,7 @@
 - Keep launcher and clipboard as separate tools until focus restoration, keyboard navigation, and close behavior are boring and reliable.
 - Keep explicit fuzzel fallback scripts until the native Quickshell tools are proven boring and reliable.
 - Use Quickshell screen binding for layer windows.
+- Keep native launcher results apps-only by default. Window search is noise for the current workflow and can return later as an explicit mode if it earns its place.
 - Follow the Quickshell ownership rules: =root/= owns surfaces, =modules/<name>/= owns behavior, =common/= owns reusable primitives only.
 - Avoid full-screen invisible masks unless the overlay is intentionally click-out-to-close and the mask is verified not to steal unrelated input.
 
@@ -48,14 +49,13 @@
 :CUSTOM_ID: next
 :END:
 - [X] Search git history/reference branches for the old launcher and clipboard implementation.
-- [X] Inventory reusable launcher behavior: activation flow, app/window model, fuzzy scoring, keyboard navigation, focus/close handling, and theme usage.
+- [X] Inventory reusable launcher behavior: activation flow, app model, fuzzy scoring, keyboard navigation, focus/close handling, and theme usage.
 - [X] Rebuild the launcher first as a native Quickshell surface while preserving the script fallback.
 - [ ] Open native launcher with the normal launcher bind.
-- [ ] Type a query and confirm matching apps/windows appear.
+- [ ] Type a query and confirm matching apps appear.
 - [ ] Navigate rows with arrow keys.
 - [ ] Navigate rows with =Ctrl-j= and =Ctrl-k=.
 - [ ] Press =Enter= on an app result and confirm it launches.
-- [ ] Press =Enter= on a window result and confirm it focuses the existing window.
 - [ ] Press =Esc= and confirm the launcher closes.
 - [ ] Click outside the launcher and confirm it closes without stealing later input.
 - [ ] Run =~/.config/scripts/launcher-fuzzel= and confirm the fallback launcher still works.
