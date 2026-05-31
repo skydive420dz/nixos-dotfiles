@@ -11,7 +11,7 @@ QtObject {
     readonly property string home: Quickshell.env("HOME")
     readonly property string configHome: Quickshell.env("XDG_CONFIG_HOME") || (home + "/.config")
     readonly property string stateHome: Quickshell.env("XDG_STATE_HOME") || (home + "/.local/state")
-    readonly property string wallpaperDir: Quickshell.env("SKY_WALLPAPER_DIR") || (home + "/nixos-dotfiles/wallpapers")
+    readonly property string wallpaperDir: Quickshell.env("SKY_WALLPAPER_DIR") || (home + "/Projects/nixos-dotfiles/wallpapers")
     readonly property string stateDir: stateHome + "/quickshell"
     readonly property string stateFile: stateDir + "/wallpaper.json"
     readonly property string signalFile: stateDir + "/wallpaper-signal"

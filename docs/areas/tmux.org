@@ -37,9 +37,9 @@ Current entry points:
 Initial recipes:
 
 - =main= starts in =$HOME=.
-- =dots= starts in =$HOME/nixos-dotfiles=, with a =files= window split between =yazi= and a terminal, plus a second =term= window.
-- =qs= starts in =$HOME/nixos-dotfiles=, with a =vim= window opened on =config/quickshell/shell.qml=, plus a second =term= window.
-- =notes= starts in =$HOME/nixos-dotfiles/docs= and opens =README.org=.
+- =dots= starts in =$HOME/Projects/nixos-dotfiles=, with a =files= window split between =yazi= and a terminal, plus a second =term= window.
+- =qs= starts in =$HOME/Projects/nixos-dotfiles=, with a =vim= window opened on =config/quickshell/shell.qml=, plus a second =term= window.
+- =notes= starts in =$HOME/Projects/nixos-dotfiles/docs= and opens =README.org=.
 
 Later session work should extend the same backend instead of adding parallel aliases. Richer recipes can add windows, panes, and startup commands once the base switcher feels right.
 

@@ -25,6 +25,6 @@
 :CUSTOM_ID: remote-nixos-checkout
 :END:
 - Host: =192.168.1.175=
-- Repo: =~/nixos-dotfiles=
+- Repo: =~/Projects/nixos-dotfiles=
 
 When live-syncing files directly to NixOS, remember the remote checkout can look dirty even after local commits are pushed. Clean it by fetching/resetting only after preserving any real local diff.

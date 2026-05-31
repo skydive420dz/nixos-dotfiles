@@ -45,7 +45,7 @@
       hostname = "nixos";
       system = "x86_64-linux";
       homeDirectory = "/home/${username}";
-      repoPath = "${homeDirectory}/nixos-dotfiles";
+      repoPath = "${homeDirectory}/Projects/nixos-dotfiles";
 
       specialArgs = {
         inherit

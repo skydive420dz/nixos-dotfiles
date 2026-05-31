@@ -8,7 +8,7 @@
       tmux_bin="${pkgs.tmux}/bin/tmux"
       fzf_bin="${pkgs.fzf}/bin/fzf"
       home_dir="${config.home.homeDirectory}"
-      repo_dir="$home_dir/nixos-dotfiles"
+      repo_dir="$home_dir/Projects/nixos-dotfiles"
       docs_dir="$repo_dir/docs"
 
       session_table() {
