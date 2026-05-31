@@ -98,7 +98,7 @@ Item {
                     spacing: 10
 
                     Repeater {
-                        model: WallpaperStore.wallpapers
+                        model: WallpaperStore.selectorOpen ? WallpaperStore.wallpapers : []
 
                         delegate: Rectangle {
                             id: wallpaperCard

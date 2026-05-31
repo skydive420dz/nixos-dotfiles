@@ -121,7 +121,7 @@ QtObject {
         ]
         stdout: SplitParser {
             property string buffer: ""
-            onRead: data => buffer += data
+            onRead: data => buffer += data + "\n"
         }
         onExited: {
             root.applyWallpaperList(stdout.buffer);
