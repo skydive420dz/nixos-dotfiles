@@ -12,12 +12,22 @@ ShellRoot {
 
     Variants {
         model: Quickshell.screens
+        delegate: Wallpaper {
+            required property var modelData
+            screen: modelData
+        }
+    }
+
+    Variants {
+        model: Quickshell.screens
         delegate: Bar {
             required property var modelData
             screen: modelData
             mediaController: rootMediaController
         }
     }
+
+    WallpaperPicker {}
 
     Osd {}
 }

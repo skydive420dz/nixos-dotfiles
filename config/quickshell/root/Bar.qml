@@ -9,6 +9,7 @@ import "../modules/media"
 import "../modules/status"
 import "../modules/theme"
 import "../modules/tray"
+import "../modules/wallpaper"
 import "../modules/window"
 import "../modules/workspaces"
 
@@ -80,6 +81,8 @@ PanelWindow {
         }
 
         ThemeToggle {}
+
+        WallpaperButton {}
 
         Tray {
             panelWindow: root

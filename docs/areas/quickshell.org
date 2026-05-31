@@ -189,6 +189,7 @@ This is a direction, not a mandate to create empty folders. Split only when a mo
 - 2026-05-29: =modules/status/Network.qml= owns dynamic network icon selection. Ethernet uses the wired icon, Wi-Fi uses signal-strength icons, and the disconnected state uses the no-network icon. Keep icon wells fixed-width so dynamic glyphs do not disturb the cluster spacing.
 - 2026-05-29: =modules/media/MediaAnalyzer.qml= now shares the dotted-column visual language with the network graph while keeping a single upward spectrum. Live CAVA samples drive the graph when available, and the fake animation remains only as a no-sample fallback.
 - 2026-05-29: QML project metadata stays portable through =config/quickshell/qmldir=. NVF stays generic and only supplies Qt/QML tooling plus generic QML project-root markers. Generated =.qmlls.ini= files remain ignored because they can contain machine-local Quickshell build paths.
+- 2026-05-30: Native wallpaper management started inside Quickshell without removing the existing =awww= fallback. =root/Wallpaper.qml= owns the per-screen background layer, =root/WallpaperPicker.qml= owns the selector overlay surface, and =modules/wallpaper/= owns the bar icon, selector UI, file list, current wallpaper state, and state persistence. The current wallpaper is stored at =~/.config/quickshell/state/wallpaper.json=. The default wallpaper directory is =$HOME/nixos-dotfiles/wallpapers= and can be overridden with =SKY_WALLPAPER_DIR=. Do not remove =awww= package/service/startup wiring until the native path passes live testing.
 
 ** Test Notes
 :PROPERTIES:
@@ -213,6 +214,7 @@ This is a direction, not a mandate to create empty folders. Split only when a mo
 - 2026-05-17: Status network extraction tested live. Quickshell reports =Configuration Loaded=, network/traffic rendering behaves as expected, and no visible anomalies were detected.
 - 2026-05-27: Live CAVA media analyzer tested after =nrs=; =cava 0.10.7= is on the NixOS system path, Quickshell starts cleanly, and the user confirmed the live media graph is up and running.
 - 2026-05-27: =wlctl 0.1.6= binary package built and ran on the NixOS host. =nix eval --impure .#nixosConfigurations.nixos.config.environment.systemPackages --apply builtins.length= returned =206= after adding the package and launcher fallback.
+- 2026-05-30: Native wallpaper manager static check: new QML files parse with =qmlformat=. Live Quickshell restart and selector behavior still need to be tested before =awww= can be considered replaceable.
 
 ** Known Lesson
 :PROPERTIES:

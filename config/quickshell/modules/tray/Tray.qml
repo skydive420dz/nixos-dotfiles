@@ -6,9 +6,15 @@ import Quickshell.Services.SystemTray
 RowLayout {
     id: trayRoot
 
-    Layout.preferredHeight: Theme.pillHeight
+    readonly property int itemCount: SystemTray.items.values.length
+
+    implicitWidth: itemCount > 0 ? itemCount * Theme.iconSize + Math.max(0, itemCount - 1) * spacing : 0
+    implicitHeight: Theme.pillHeight
+    Layout.preferredWidth: visible ? implicitWidth : 0
+    Layout.preferredHeight: visible ? implicitHeight : 0
+    Layout.alignment: Qt.AlignVCenter
     spacing: Theme.gap
-    visible: SystemTray.items.values.length > 0
+    visible: itemCount > 0
 
     required property var panelWindow
 
