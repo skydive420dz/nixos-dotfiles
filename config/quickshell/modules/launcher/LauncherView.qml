@@ -47,8 +47,6 @@ Item {
     function close() {
         closing = true;
         open = false;
-        query = "";
-        selectedIndex = 0;
         closeTimer.restart();
     }
 
@@ -159,7 +157,11 @@ Item {
         id: closeTimer
 
         interval: 150
-        onTriggered: root.closing = false
+        onTriggered: {
+            root.query = "";
+            root.selectedIndex = 0;
+            root.closing = false;
+        }
     }
 
     Process {
