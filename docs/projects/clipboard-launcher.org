@@ -8,6 +8,7 @@
 :END:
 - Launcher is native Quickshell again. =scripts/launcher-toggle= signals the =qs-launcher= overlay through =$XDG_RUNTIME_DIR=.
 - The launcher searches desktop apps from =scripts/launcher-apps=.
+- Extra terminal-first tools that do not ship desktop entries live in =config/quickshell/modules/launcher/apps.json=.
 - =scripts/launcher-fuzzel= preserves the old fuzzel app launcher as an explicit fallback.
 - Clipboard is still script-backed for now: =scripts/clipboard-toggle= uses =cliphist list | fuzzel --dmenu= and decodes the selected item back to =wl-copy=.
 
@@ -27,6 +28,7 @@
 - [[../../config/quickshell/modules/launcher/LauncherButton.qml][Launcher button]]
 - [[../../config/quickshell/root/Launcher.qml][Launcher root surface]]
 - [[../../config/quickshell/modules/launcher/LauncherView.qml][Launcher view]]
+- [[../../config/quickshell/modules/launcher/apps.json][Launcher custom apps]]
 - [[../../scripts/launcher-toggle][Launcher toggle]]
 - [[../../scripts/launcher-fuzzel][Launcher fuzzel fallback]]
 - [[../../scripts/clipboard-toggle][Clipboard toggle]]
@@ -53,6 +55,7 @@
 - [X] Rebuild the launcher first as a native Quickshell surface while preserving the script fallback.
 - [ ] Open native launcher with the normal launcher bind.
 - [ ] Type a query and confirm matching apps appear.
+- [ ] Confirm =BlueTUI=, =WireMix=, and =Neovim= appear from the custom launcher app list.
 - [ ] Navigate rows with arrow keys.
 - [ ] Navigate rows with =Ctrl-j= and =Ctrl-k=.
 - [ ] Press =Enter= on an app result and confirm it launches.

@@ -67,7 +67,51 @@ def read_entry(path):
     }
 
 
+def custom_app_paths():
+    config_home = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+    yield config_home / "quickshell" / "modules" / "launcher" / "apps.json"
+
+
+def read_custom_apps(path):
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+    if not isinstance(payload, list):
+        return []
+
+    apps = []
+    for item in payload:
+        if not isinstance(item, dict):
+            continue
+
+        name = str(item.get("name", "")).strip()
+        exec_cmd = str(item.get("exec", "")).strip()
+        if not name or not exec_cmd:
+            continue
+
+        apps.append(
+            {
+                "name": name,
+                "generic": str(item.get("generic", "")).strip(),
+                "comment": str(item.get("comment", "")).strip(),
+                "icon": str(item.get("icon", "")).strip(),
+                "exec": exec_cmd,
+                "terminal": bool(item.get("terminal", False)),
+                "desktop": str(item.get("desktop", path.name)).strip() or path.name,
+            }
+        )
+
+    return apps
+
+
 apps = {}
+for path in custom_app_paths():
+    if path.is_file():
+        for app in read_custom_apps(path):
+            apps[app["name"].casefold()] = app
+
 for directory in app_dirs():
     for path in directory.glob("*.desktop"):
         app = read_entry(path)

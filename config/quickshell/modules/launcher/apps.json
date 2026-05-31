@@ -1,0 +1,29 @@
+[
+  {
+    "name": "BlueTUI",
+    "generic": "Bluetooth manager",
+    "comment": "Manage Bluetooth devices",
+    "icon": "bluetooth",
+    "exec": "kitty --class bluetui -e bluetui",
+    "terminal": false,
+    "desktop": "sky-custom-bluetui"
+  },
+  {
+    "name": "WireMix",
+    "generic": "Audio mixer",
+    "comment": "Manage PipeWire audio",
+    "icon": "audio-card",
+    "exec": "kitty --class wiremix -e wiremix",
+    "terminal": false,
+    "desktop": "sky-custom-wiremix"
+  },
+  {
+    "name": "Neovim",
+    "generic": "Text editor",
+    "comment": "Open Neovim in Kitty",
+    "icon": "nvim",
+    "exec": "nvim",
+    "terminal": true,
+    "desktop": "sky-custom-neovim"
+  }
+]

@@ -30,6 +30,7 @@ The current =main= branch is the sober working shell. The old modular shell live
 - [[../../config/quickshell/qmldir][QML module index]]
 - [[../../config/quickshell/modules/launcher/LauncherButton.qml][Launcher button]]
 - [[../../config/quickshell/modules/launcher/LauncherView.qml][Launcher view]]
+- [[../../config/quickshell/modules/launcher/apps.json][Launcher custom apps]]
 - [[../../config/quickshell/modules/media/Media.qml][Media module]]
 - [[../../config/quickshell/modules/media/MediaAnalyzer.qml][Media analyzer]]
 - [[../../config/quickshell/modules/media/MediaController.qml][Media controller]]
@@ -201,6 +202,7 @@ This is a direction, not a mandate to create empty folders. Split only when a mo
 - 2026-05-30: Theme/wallpaper bar action spacing was tightened by narrowing only =modules/theme/ThemeToggle.qml=. The wallpaper button, tray spacing, and status cluster geometry were intentionally left alone. Further pixel polish can happen later, but this is good enough for the launcher/clipboard resurrection checkpoint.
 - 2026-05-30: Native launcher resurrection started. =root/Launcher.qml= owns the overlay layer, focus policy, screen targeting, signal-file toggle, and click-out mask. =modules/launcher/LauncherView.qml= owns app loading, fuzzy scoring, keyboard navigation, row rendering, and activation. =scripts/launcher-toggle= now signals the native overlay; =scripts/launcher-fuzzel= keeps the old fuzzel launcher available as a fallback.
 - 2026-05-30: Native launcher results are apps-only by default. The old open-window results were removed to reduce noise; workspace/window navigation remains outside the launcher unless a future explicit window-search mode earns its place.
+- 2026-05-30: Launcher app discovery uses desktop entries plus =modules/launcher/apps.json= for terminal-first tools that do not provide useful desktop files. Current custom entries include =BlueTUI=, =WireMix=, and =Neovim=.
 
 ** Test Notes
 :PROPERTIES:
