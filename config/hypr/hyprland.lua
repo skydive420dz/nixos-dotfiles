@@ -18,7 +18,7 @@ end
 
 local terminal = "uwsm app -- kitty"
 local file_manager = "uwsm app -- kitty -e yazi"
-local browser = "uwsm app -- firefox"
+local browser = "uwsm app -- brave"
 local menu = "~/.config/scripts/launcher-toggle"
 local clipboard = "~/.config/scripts/clipboard-toggle"
 local snip = "grimblast copy area"
@@ -256,8 +256,6 @@ centered_float({
 hl.window_rule({
 	name = "firefox",
 	match = { class = "^(firefox)$" },
-	opaque = true,
-	force_rgbx = true,
 	opacity = opacity.solid_fullscreen,
 })
 

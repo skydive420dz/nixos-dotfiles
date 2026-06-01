@@ -72,6 +72,14 @@ in
         desc = "Drop to Shell";
       }
       {
+        on = [
+          "g"
+          "T"
+        ];
+        run = ''shell 'rm -rf -- "$HOME/.local/share/Trash/files" "$HOME/.local/share/Trash/info"; mkdir -p "$HOME/.local/share/Trash/files" "$HOME/.local/share/Trash/info"' --confirm'';
+        desc = "Empty Trash";
+      }
+      {
         on = [ "C" ];
         run = "plugin smart-enter";
         desc = "Enter directory or open file";
