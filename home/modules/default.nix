@@ -9,6 +9,7 @@
     ./programs/firefox.nix
     ./programs/fzf.nix
     ./programs/gnupg.nix
+    ./programs/ghostty.nix
     ./programs/kitty.nix
     ./programs/starship.nix
     ./programs/tmux
