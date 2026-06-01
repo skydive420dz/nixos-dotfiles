@@ -19,6 +19,7 @@
 
     cursor-style = block
     cursor-style-blink = false
+    adjust-cursor-thickness = 3
     mouse-hide-while-typing = true
     mouse-scroll-multiplier = 5
     copy-on-select = false
@@ -40,10 +41,12 @@
 
     gtk-single-instance = detect
     shell-integration = detect
-    shell-integration-features = cursor,title,ssh-env
+    shell-integration-features = no-cursor,title,ssh-env
     confirm-close-surface = false
 
-    custom-shader = ${config.xdg.configHome}/ghostty/shaders/cursor-trail.glsl
+    custom-shader = ${config.xdg.configHome}/ghostty/shaders/cursor_blaze.glsl
+    custom-shader = ${config.xdg.configHome}/ghostty/shaders/cursor_smear.glsl
+    custom-shader = ${config.xdg.configHome}/ghostty/shaders/bloom025.glsl
     custom-shader-animation = true
 
     keybind = alt+enter=new_window
