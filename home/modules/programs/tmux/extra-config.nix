@@ -18,6 +18,7 @@
   # =========================================
 
   set -as terminal-features ",xterm-kitty:RGB,xterm-ghostty:RGB,xterm-256color:RGB"
+  set -g allow-passthrough on
 
   # =========================================
   # STATUS BAR
