@@ -27,27 +27,24 @@
     scrollback-limit = 10000000
     scrollbar = never
 
-    window-decoration = auto
+    window-decoration = none
     window-padding-x = 10
     window-padding-y = 10
     window-padding-balance = true
     window-padding-color = background
     window-new-tab-position = end
-    window-show-tab-bar = always
+    window-show-tab-bar = auto
     window-save-state = default
     window-theme = ghostty
-    gtk-titlebar = true
-    gtk-titlebar-style = tabs
-    gtk-wide-tabs = false
+    gtk-titlebar = false
 
     gtk-single-instance = detect
     shell-integration = detect
     shell-integration-features = cursor,title,ssh-env
     confirm-close-surface = false
 
-    # Optional shader playground. Enable after testing the shader manually:
-    # custom-shader = ${config.xdg.configHome}/ghostty/shaders/cursor-trail.glsl
-    # custom-shader-animation = true
+    custom-shader = ${config.xdg.configHome}/ghostty/shaders/cursor-trail.glsl
+    custom-shader-animation = true
 
     keybind = alt+enter=new_window
     keybind = performable:ctrl+h=goto_split:left
@@ -60,8 +57,6 @@
     keybind = alt+l=resize_split:right,10
     keybind = alt+equal=equalize_splits
     keybind = alt+z=toggle_split_zoom
-    keybind = ctrl+alt+y=copy_to_clipboard:mixed
-    keybind = ctrl+alt+p=paste_from_clipboard
     keybind = ctrl+shift+c=copy_to_clipboard
     keybind = ctrl+shift+v=paste_from_clipboard
     keybind = ctrl+shift+comma=reload_config
