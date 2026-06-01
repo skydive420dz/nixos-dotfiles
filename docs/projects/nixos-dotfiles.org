@@ -59,5 +59,6 @@
 - [X] Cut over from fuzzel launcher/clipboard fallbacks after the native tools stay boring.
 - [ ] Polish wallpaper manager with a clearer current marker plus optional history/favorites.
 - [ ] Add per-monitor wallpaper state if the workflow needs it.
+- [ ] Split native wallpaper into its own Quickshell process/service so bar restarts do not reveal stale compositor or old =awww= background state.
 - [X] Quickshell project structure/QML metadata follow-up.
 - [X] NVF reassessment or replacement path.

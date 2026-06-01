@@ -23,6 +23,7 @@ let
   liveDirs = {
     ".config/aerc" = "config/aerc";
     ".config/doom" = "config/doom";
+    ".config/ghostty/shaders" = "config/ghostty/shaders";
     ".config/quickshell" = "config/quickshell";
     ".config/scripts" = "scripts";
     ".config/sky-nvim" = "config/nvim";

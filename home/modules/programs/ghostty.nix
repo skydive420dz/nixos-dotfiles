@@ -21,41 +21,92 @@
     cursor-style-blink = false
     mouse-hide-while-typing = true
     mouse-scroll-multiplier = 5
+    copy-on-select = false
+    selection-clear-on-copy = true
 
     scrollback-limit = 10000000
     scrollbar = never
 
-    window-decoration = none
+    window-decoration = auto
     window-padding-x = 10
     window-padding-y = 10
     window-padding-balance = true
     window-padding-color = background
     window-new-tab-position = end
-    window-show-tab-bar = auto
+    window-show-tab-bar = always
     window-save-state = default
     window-theme = ghostty
+    gtk-titlebar = true
+    gtk-titlebar-style = tabs
+    gtk-wide-tabs = false
 
+    gtk-single-instance = detect
     shell-integration = detect
     shell-integration-features = cursor,title,ssh-env
     confirm-close-surface = false
 
+    # Optional shader playground. Enable after testing the shader manually:
+    # custom-shader = ${config.xdg.configHome}/ghostty/shaders/cursor-trail.glsl
+    # custom-shader-animation = true
+
     keybind = alt+enter=new_window
-    keybind = alt+w=close_surface
-    keybind = alt+right=next_tab
-    keybind = alt+left=previous_tab
-    keybind = alt+backslash=new_split:right
-    keybind = alt+minus=new_split:down
-    keybind = alt+h=goto_split:left
-    keybind = alt+j=goto_split:down
-    keybind = alt+k=goto_split:up
-    keybind = alt+l=goto_split:right
+    keybind = performable:ctrl+h=goto_split:left
+    keybind = performable:ctrl+j=goto_split:down
+    keybind = performable:ctrl+k=goto_split:up
+    keybind = performable:ctrl+l=goto_split:right
+    keybind = alt+h=resize_split:left,10
+    keybind = alt+j=resize_split:down,10
+    keybind = alt+k=resize_split:up,10
+    keybind = alt+l=resize_split:right,10
     keybind = alt+equal=equalize_splits
     keybind = alt+z=toggle_split_zoom
-    keybind = alt+c=copy_to_clipboard
-    keybind = alt+v=paste_from_clipboard
+    keybind = ctrl+alt+y=copy_to_clipboard:mixed
+    keybind = ctrl+alt+p=paste_from_clipboard
     keybind = ctrl+shift+c=copy_to_clipboard
     keybind = ctrl+shift+v=paste_from_clipboard
     keybind = ctrl+shift+comma=reload_config
     keybind = ctrl+shift+p=toggle_command_palette
+
+    keybind = ctrl+space=activate_key_table_once:term
+    keybind = term/r=reload_config
+    keybind = term/o=open_config
+    keybind = term/t=new_tab
+    keybind = term/x=close_tab:this
+    keybind = term/q=close_surface
+    keybind = term/v=new_split:right
+    keybind = term/s=new_split:down
+    keybind = term/z=toggle_split_zoom
+    keybind = term/e=equalize_splits
+    keybind = term/y=copy_to_clipboard:mixed
+    keybind = term/p=paste_from_clipboard
+    keybind = term/c=activate_key_table:select
+    keybind = term/arrow_left=previous_tab
+    keybind = term/arrow_right=next_tab
+    keybind = term/1=goto_tab:1
+    keybind = term/2=goto_tab:2
+    keybind = term/3=goto_tab:3
+    keybind = term/4=goto_tab:4
+    keybind = term/5=goto_tab:5
+    keybind = term/6=goto_tab:6
+    keybind = term/7=goto_tab:7
+    keybind = term/8=goto_tab:8
+    keybind = term/9=last_tab
+
+    keybind = select/escape=deactivate_key_table
+    keybind = select/q=deactivate_key_table
+    keybind = select/h=adjust_selection:left
+    keybind = select/j=adjust_selection:down
+    keybind = select/k=adjust_selection:up
+    keybind = select/l=adjust_selection:right
+    keybind = select/arrow_left=adjust_selection:left
+    keybind = select/arrow_down=adjust_selection:down
+    keybind = select/arrow_up=adjust_selection:up
+    keybind = select/arrow_right=adjust_selection:right
+    keybind = select/page_up=scroll_page_up
+    keybind = select/page_down=scroll_page_down
+    keybind = select/g=scroll_to_top
+    keybind = select/shift+g=scroll_to_bottom
+    keybind = select/y=copy_to_clipboard:mixed
+    keybind = chain=deactivate_key_table
   '';
 }
