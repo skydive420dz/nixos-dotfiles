@@ -54,8 +54,9 @@
     keybind = performable:ctrl+j=goto_split:down
     keybind = performable:ctrl+k=goto_split:up
     keybind = performable:ctrl+l=goto_split:right
-    keybind = performable:ctrl+alt+y=copy_to_clipboard:mixed
-    keybind = ctrl+alt+p=paste_from_clipboard
+    # Direct terminal clipboard keys stay disabled while tmux/app ownership settles.
+    # keybind = performable:ctrl+alt+y=copy_to_clipboard:mixed
+    # keybind = ctrl+alt+p=paste_from_clipboard
     keybind = alt+arrow_left=resize_split:left,5
     keybind = alt+arrow_down=resize_split:down,5
     keybind = alt+arrow_up=resize_split:up,5
