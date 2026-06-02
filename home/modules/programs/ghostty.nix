@@ -19,7 +19,6 @@
 
     cursor-style = block
     cursor-style-blink = false
-    adjust-cursor-thickness = 3
     mouse-hide-while-typing = true
     mouse-scroll-multiplier = 5
     copy-on-select = false
@@ -40,32 +39,33 @@
     gtk-titlebar = false
 
     gtk-single-instance = detect
-    shell-integration = detect
+    shell-integration = zsh
     shell-integration-features = no-cursor,title,ssh-env
-    confirm-close-surface = false
+    confirm-close-surface = true
 
     custom-shader = ${config.xdg.configHome}/ghostty/shaders/cursor_blaze.glsl
     custom-shader = ${config.xdg.configHome}/ghostty/shaders/cursor_smear.glsl
     custom-shader = ${config.xdg.configHome}/ghostty/shaders/bloom025.glsl
     custom-shader-animation = true
+    window-vsync = true
 
     keybind = alt+enter=new_window
     keybind = performable:ctrl+h=goto_split:left
     keybind = performable:ctrl+j=goto_split:down
     keybind = performable:ctrl+k=goto_split:up
     keybind = performable:ctrl+l=goto_split:right
-    keybind = alt+h=resize_split:left,10
-    keybind = alt+j=resize_split:down,10
-    keybind = alt+k=resize_split:up,10
-    keybind = alt+l=resize_split:right,10
+    keybind = performable:ctrl+alt+y=copy_to_clipboard:mixed
+    keybind = ctrl+alt+p=paste_from_clipboard
+    keybind = alt+arrow_left=resize_split:left,5
+    keybind = alt+arrow_down=resize_split:down,5
+    keybind = alt+arrow_up=resize_split:up,5
+    keybind = alt+arrow_right=resize_split:right,5
     keybind = alt+equal=equalize_splits
     keybind = alt+z=toggle_split_zoom
-    keybind = ctrl+shift+c=copy_to_clipboard
-    keybind = ctrl+shift+v=paste_from_clipboard
     keybind = ctrl+shift+comma=reload_config
     keybind = ctrl+shift+p=toggle_command_palette
 
-    keybind = ctrl+space=activate_key_table_once:term
+    keybind = alt+space=activate_key_table_once:term
     keybind = term/r=reload_config
     keybind = term/o=open_config
     keybind = term/t=new_tab
@@ -91,6 +91,8 @@
     keybind = term/9=last_tab
 
     keybind = select/escape=deactivate_key_table
+    # Selection table: start with a mouse selection, then use Alt+Space c.
+    # h/j/k/l or arrows extend the existing selection; y copies and exits.
     keybind = select/q=deactivate_key_table
     keybind = select/h=adjust_selection:left
     keybind = select/j=adjust_selection:down

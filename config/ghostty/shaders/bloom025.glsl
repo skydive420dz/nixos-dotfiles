@@ -1,14 +1,9 @@
-// Subtle terminal bloom pass for Ghostty.
-// Adapted from qwerasd205's Ghostty bloom shader:
-// https://gist.github.com/qwerasd205/c3da6c610c8ffe17d6d2d3cc7068f17f
-
-const float BLOOM_THRESHOLD = 0.2;
-const float BLOOM_STRENGTH = 0.025;
-
-// Golden spiral samples, [x, y, weight] where weight is inverse distance.
+// source: https://gist.github.com/qwerasd205/c3da6c610c8ffe17d6d2d3cc7068f17f
+// credits: https://github.com/qwerasd205
+// Golden spiral samples, [x, y, weight] weight is inverse of distance.
 const vec3[24] samples = {
   vec3(0.1693761725038636, 0.9855514761735895, 1),
-  vec3(-1.333070830962943, 0.472146332862943, 0.7071067811865475),
+  vec3(-1.333070830962943, 0.4721463328627773, 0.7071067811865475),
   vec3(-0.8464394909806497, -1.51113870578065, 0.5773502691896258),
   vec3(1.554155680728463, -1.2588090085709776, 0.5),
   vec3(1.681364377589461, 1.4741145918052656, 0.4472135954999579),
@@ -31,7 +26,7 @@ const vec3[24] samples = {
   vec3(3.8639122286635708, -2.6589814382925123, 0.21320071635561041),
   vec3(3.3486228404946234, 3.4331800232609, 0.20851441405707477),
   vec3(-2.8769733643574344, 3.9652268864187157, 0.20412414523193154)
-};
+  };
 
 float lum(vec4 c) {
   return 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
@@ -39,16 +34,17 @@ float lum(vec4 c) {
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
   vec2 uv = fragCoord.xy / iResolution.xy;
+
   vec4 color = texture(iChannel0, uv);
-  vec2 pixelStep = vec2(1.414) / iResolution.xy;
+
+  vec2 step = vec2(1.414) / iResolution.xy;
 
   for (int i = 0; i < 24; i++) {
-    vec3 samplePoint = samples[i];
-    vec4 sampleColor = texture(iChannel0, uv + samplePoint.xy * pixelStep);
-    float sampleLum = lum(sampleColor);
-
-    if (sampleLum > BLOOM_THRESHOLD) {
-      color += sampleLum * samplePoint.z * sampleColor * BLOOM_STRENGTH;
+    vec3 s = samples[i];
+    vec4 c = texture(iChannel0, uv + s.xy * step);
+    float l = lum(c);
+    if (l > 0.2) {
+      color += l * s.z * c * 0.025;
     }
   }
 
