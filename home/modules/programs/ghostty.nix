@@ -79,6 +79,8 @@
     keybind = term/y=copy_to_clipboard:mixed
     keybind = term/p=paste_from_clipboard
     keybind = term/c=activate_key_table:select
+    keybind = term/a=select_all
+    keybind = chain=activate_key_table:select
     keybind = term/arrow_left=previous_tab
     keybind = term/arrow_right=next_tab
     keybind = term/1=goto_tab:1
@@ -92,7 +94,8 @@
     keybind = term/9=last_tab
 
     keybind = select/escape=deactivate_key_table
-    # Selection table: start with a mouse selection, then use Alt+Space c.
+    # Selection table: start with a mouse selection and Alt+Space c,
+    # or select the visible screen with Alt+Space a.
     # h/j/k/l or arrows extend the existing selection; y copies and exits.
     keybind = select/q=deactivate_key_table
     keybind = select/h=adjust_selection:left
