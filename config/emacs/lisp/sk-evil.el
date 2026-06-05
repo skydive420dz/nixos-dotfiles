@@ -12,6 +12,11 @@
   (define-key evil-normal-state-map (kbd "s") #'evil-substitute)
   (define-key evil-normal-state-map (kbd "S") #'evil-change-whole-line))
 
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+
 (provide 'sk-evil)
 
 ;;; sk-evil.el ends here

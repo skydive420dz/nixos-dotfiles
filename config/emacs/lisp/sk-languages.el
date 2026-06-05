@@ -23,6 +23,12 @@
 
 (use-package yasnippet
   :config
+  (define-key yas-minor-mode-map (kbd "TAB") #'yas-maybe-expand)
+  (define-key yas-minor-mode-map (kbd "<tab>") #'yas-maybe-expand)
+  (define-key yas-keymap (kbd "TAB") #'yas-next-field-or-maybe-expand)
+  (define-key yas-keymap (kbd "<tab>") #'yas-next-field-or-maybe-expand)
+  (define-key yas-keymap (kbd "<backtab>") #'yas-prev-field)
+  (define-key yas-keymap (kbd "S-TAB") #'yas-prev-field)
   (yas-global-mode 1))
 
 (provide 'sk-languages)

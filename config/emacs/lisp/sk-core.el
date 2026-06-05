@@ -6,8 +6,10 @@
 (setq inhibit-startup-screen t
       ring-bell-function 'ignore
       use-dialog-box nil
-      confirm-kill-emacs #'yes-or-no-p
+      confirm-kill-emacs #'y-or-n-p
       read-process-output-max (* 1024 1024))
+
+(fset #'yes-or-no-p #'y-or-n-p)
 
 (setq backup-directory-alist `(("." . ,(expand-file-name "backups/" user-emacs-directory)))
       auto-save-file-name-transforms `((".*" ,(expand-file-name "auto-save/" user-emacs-directory) t))

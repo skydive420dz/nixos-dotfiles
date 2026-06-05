@@ -2,75 +2,64 @@
 :PROPERTIES:
 :CUSTOM_ID: emacs
 :END:
-This is a serious Doom Emacs experiment, not a Neovim replacement plan.
+Clean Emacs is the active MSI Emacs configuration. Doom remains in the repo as
+frozen reference material while the clean config absorbs the useful behavior.
 
 ** Shape
 :PROPERTIES:
 :CUSTOM_ID: shape
 :END:
-- Nix installs Emacs and the support tools.
-- Doom's live config lives in [[../../config/doom][config/doom]].
-- Home Manager links =~/.config/doom= and =~/.doom.d= to the repo config so editing =init.el=, =config.el=, or Org notes does not require a rebuild.
-- Doom itself is cloned from upstream with =doom-bootstrap=, into =~/.config/emacs=.
-- NixOS runs Emacs as a user daemon; graphical launches use =emacsclient= through the =doom-emacs= wrapper.
+- Nix installs Emacs and external support tools.
+- Clean Emacs lives in [[../../config/emacs][config/emacs]] and is linked to =~/.config/emacs=.
+- Doom lives in [[../../config/doom][config/doom]] and is linked to =~/.config/doom= for reference.
+- Emacs owns Emacs packages, editor behavior, keymaps, completion, LSP client behavior, Org, Dired, terminal integration, and theme faces.
+- Nix owns external tools, language servers, formatters, fonts, services, wrappers, and links.
+- Projects own project-local metadata such as =.dir-locals.el= and language-server hints.
 
 ** Installed By Nix
 :PROPERTIES:
 :CUSTOM_ID: installed-by-nix
 :END:
 - =emacs-pgtk= from the flake's Nixpkgs pin.
-- =doom-emacs= opens a graphical client frame against the daemon.
-- =doom-emacs-terminal= opens a terminal client frame against the daemon.
+- =emacs-sync= loads packages and builds the vterm native module.
 - Core project tools: Git, ripgrep, fd, EditorConfig, tree-sitter.
 - Rich document support: sqlite, gnutls, ImageMagick, zstd, unzip, pandoc, TeX Live Small, aspell English, and Harper.
-- vterm native support: libvterm, cmake, gnumake, gcc, pkg-config.
-- Nix editing support: nil and nixfmt.
-- Lua, QML/Qt, Rust, C, and C++ LSP support: lua-language-server, qt6.qtlanguageserver, rust-analyzer, and clang-tools.
+- Language/tooling support: Nix, Lua, QML/Qt, Rust, C/C++, Python, Haskell, shell, Markdown, YAML, JSON, GLSL, and Emacs Lisp.
 
-** Doom Modules
+** Active Modules
 :PROPERTIES:
-:CUSTOM_ID: doom-modules
+:CUSTOM_ID: active-modules
 :END:
-- Evil mode for Vim muscle memory.
-- Org mode for notes and project planning.
+- Evil and evil-collection for Vim-style editing in normal and special buffers.
+- Vertico, Orderless, Marginalia, Embark, Consult, Corfu, Cape, Yasnippet.
+- Org, notes, agenda, capture, and source-block helpers.
 - Magit for Git.
 - Dired for file management.
-- vterm for the embedded terminal.
-- Vertico/company, LSP, snippets, syntax/spell checking, Markdown, Nix, shell, Lua, QML/Qt, Rust, C/C++, JSON, YAML, and Emacs Lisp.
-- Harper runs through LSP for Org, Markdown, and plain text diagnostics while writing.
+- vterm and eshell for terminal workflows.
+- Doom modeline, Sky theme faces, terminal-frame colors, and relative line numbers.
 
 ** Local Behavior
 :PROPERTIES:
 :CUSTOM_ID: local-behavior
 :END:
-- =config/doom/config.org= is the readable source of truth. =config.el= is kept in sync from it for Doom.
-- =C-h=, =C-j=, =C-k=, and =C-l= move focus between Emacs windows, including inside vterm insert state.
-- Doom's native =SPC w ...= window map is intentionally left to Doom. Do not override =SPC w H/J/K/L= with custom swap/move helpers unless we explicitly decide to replace Doom's defaults.
-- Line numbers are relative in code buffers and disabled in terminal buffers.
-- Spellcheck uses repo-local =config/doom/spell/en_US.pws= for personal words.
-- QML snippets live in =config/doom/snippets/qml-mode=.
-- Sky themes are native Doom themes in =config/doom/themes/=, backed by the global selector output in =~/.config/theme/current/emacs-theme.el=.
-- =SPC h r t= reloads the active Sky theme after =theme-select= changes.
-- The desktop launcher entry named =Emacs= opens =doom-emacs=, so closing the window only closes that frame. The daemon keeps buffers, projects, LSP state, and Org files alive until the user service is restarted or stopped.
+- =config/emacs/README.org= documents the active clean Emacs key surface and module layout.
+- =C-h=, =C-j=, =C-k=, and =C-l= move focus between Emacs windows across normal, insert, special buffers, and vterm.
+- =TAB= and =S-TAB= move buffers globally, but Org and snippets override them locally for their native behavior.
+- Line numbers are relative in code buffers and disabled in prose, Dired, help, vterm, term, shell, and eshell buffers.
+- Yes/no prompts accept =y= and =n= globally.
+- =SPC h r r= reloads clean Emacs modules; =SPC h r t= reloads the Sky theme.
+- Terminal Emacs frames receive the 256-color-safe Sky fallback palette from the old Doom terminal-frame section.
 
 ** Commands
 :PROPERTIES:
 :CUSTOM_ID: commands
 :END:
-After rebuilding once:
+After changing package/module state:
 
 #+begin_src sh
-doom-bootstrap
+emacs-sync
+systemctl --user restart emacs.service
 #+end_src
-
-Then use:
-
-#+begin_src sh
-doom sync
-doom-emacs
-#+end_src
-
-Run =doom sync= after changing =config/doom/init.el= or =config/doom/packages.el=. Most edits to =config.el= and Org files are live after restarting or reloading Emacs.
 
 Daemon/service commands:
 
@@ -78,11 +67,8 @@ Daemon/service commands:
 systemctl --user status emacs.service
 systemctl --user restart emacs.service
 systemctl --user stop emacs.service
-doom-emacs
-doom-emacs-terminal
+emacsclient --create-frame --alternate-editor=emacs
 #+end_src
-
-=SPC h r r= reloads Doom config into the current running daemon. It is useful for small Elisp edits, but it is not a clean process restart. Use =doom sync= plus =systemctl --user restart emacs.service= after changing packages/modules or when the daemon has loaded bad state.
 
 ** Checkpoints
 :PROPERTIES:
@@ -91,3 +77,18 @@ doom-emacs-terminal
 - 2026-05-30: Doom Emacs experiment checkpoint: upstream Doom, repo-local live config, Evil mode, Org/Magit/Dired/vterm, QML/Lua/Nix/Rust/C tooling, inline diagnostics, readable modeline, dashboard logo, relative line numbers, repo-local spell dictionary, and Doom-owned =SPC w ...= window behavior.
 - 2026-05-30: Sky theme checkpoint: native =sky-dark= and =sky-light= Doom themes, shared face definitions, and =SPC h r t= reload for runtime theme changes.
 - 2026-05-31: Emacs daemon checkpoint: NixOS owns an =emacs.service= user daemon, launcher entry opens =doom-emacs= via =emacsclient=, and terminal clients are available through =doom-emacs-terminal=.
+- 2026-06-05: Clean Emacs active checkpoint: =~/.config/emacs= points to =config/emacs=, Doom is frozen reference, clean Evil key layer is usable, Org navigation works, vterm/eshell are ported, Doom modeline is active, terminal frames use Sky fallback colors, and prompts accept =y/n=.
+
+** TODO Next Passes
+:PROPERTIES:
+:CUSTOM_ID: todo-next-passes
+:END:
+#+begin_src text
+TODO Finish Doom muscle-memory key audit for file/project/search/help/buffer edge cases.
+TODO Tune completion across minibuffer, Corfu, snippets, LSP, and prose.
+TODO Polish Doom modeline and Sky theme faces until the UI looks intentional.
+TODO Make Org first-class: notes, agenda, capture templates, source blocks, navigation.
+TODO Sanity-check LSP per language: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown.
+TODO Decide formatting policy and keep it explicit instead of surprise autoformat.
+TODO Keep documenting the clean Emacs layout and user-facing key surface as it changes.
+#+end_src

@@ -8,6 +8,9 @@
 (use-package vertico
   :demand t
   :config
+  (define-key vertico-map (kbd "C-j") #'vertico-next)
+  (define-key vertico-map (kbd "C-k") #'vertico-previous)
+  (define-key vertico-map (kbd "C-l") #'vertico-exit)
   (vertico-mode 1))
 
 (use-package orderless
@@ -42,6 +45,10 @@
         corfu-auto-prefix 2
         corfu-cycle t
         corfu-preview-current nil)
+  (define-key corfu-map (kbd "C-j") #'corfu-next)
+  (define-key corfu-map (kbd "C-k") #'corfu-previous)
+  (define-key corfu-map (kbd "C-l") #'corfu-insert)
+  (define-key corfu-map (kbd "C-h") #'corfu-quit)
   (global-corfu-mode 1))
 
 (use-package cape

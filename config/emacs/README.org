@@ -4,7 +4,8 @@
 * Purpose
 This is the clean personal Emacs configuration experiment.
 
-Doom remains the active Emacs until this config is good enough to replace it.
+This is the active MSI Emacs config. Doom is frozen as reference material under
+=~/.config/doom=.
 
 * Ownership
 #+begin_src text
@@ -59,6 +60,7 @@ The clean config uses Evil plus a small =SPC= leader map.
 
 #+begin_src text
 SPC SPC / SPC :   M-x
+SPC .             find file
 
 SPC f f           find file
 SPC f r           recent file
@@ -66,16 +68,24 @@ SPC f s           save
 SPC f S           write as
 
 SPC b b           switch buffer
+SPC b i           buffer list
 SPC b k           kill buffer
-SPC b n / p       next / previous buffer
 SPC b N           new empty buffer
+TAB / S-TAB       next / previous buffer outside Org/snippets
 
 SPC w v / s       split right / below
+SPC w w / W       next / previous window
 SPC w x           close window
 SPC w o           only window
 SPC w =           balance windows
+SPC w u / U       undo / redo window layout
 SPC w h/j/k/l     move between windows
 SPC w H/J/K/L     resize current window
+
+SPC t n           new tab
+SPC t x           close tab
+SPC t o           only tab
+SPC t [ / ]       previous / next tab
 
 SPC p f           project file
 SPC p p           switch project
@@ -101,14 +111,33 @@ SPC n a           agenda
 
 SPC o d           Dired
 SPC o t           vterm
+SPC o e           eshell
+SPC o E           named eshell
 
-SPC t l           line numbers
-SPC t w           visual wrap
+SPC T l           line numbers
+SPC T w           visual wrap
 
 SPC h k/f/v/m/b   describe key/function/variable/mode/bindings
+SPC h r r         reload config
 SPC h r t         reload Sky theme
 SPC q q           save buffers and quit
-SPC q Q           quit immediately
+SPC q a           save buffers and quit Emacs
+SPC q w           save current file buffer and quit
+SPC q f           force quit Emacs
+#+end_src
+
+* Org Navigation
+#+begin_src text
+TAB / S-TAB       cycle heading / global cycle
+[[ / ]]           previous / next visible heading
+[h / ]h           previous / next visible heading
+[s / ]s           previous / next same-level heading
+gh               up to parent heading
+gj / gk           next / previous visible heading
+gl               org-goto
+za / zA           cycle heading / global cycle
+> / <             demote / promote subtree
+M-j / M-k         move subtree down / up
 #+end_src
 
 * Binding Migration
@@ -116,13 +145,24 @@ This table tracks Doom key behavior as it moves into the clean config.
 
 #+begin_src text
 Old key        Doom command/function             Clean equivalent                  Status
+SPC .          find-file                         find-file                         done
 s              evil-substitute                   evil-substitute                   done
 S              evil-change-whole-line            evil-change-whole-line            done
 [[             org-previous-visible-heading      org-previous-visible-heading      done
 ]]             org-next-visible-heading          org-next-visible-heading          done
+TAB in org     org-cycle                         org-cycle                         done
+S-TAB in org   org-shifttab                      org-shifttab                      done
 C-h/j/k/l      evil-window-left/down/up/right    same Evil window commands         done
 vterm C-h/j/k/l evil-window-left/down/up/right   same Evil window commands         done
+SPC h r r      reload config                     sk/reload-config                  done
 SPC h r t      sk/load-sky-theme                 sk/load-theme                     done, renamed
+SPC b i        ibuffer                           ibuffer                           done
+SPC b k        kill buffer                       sk/kill-current-buffer            done
+SPC w w/W      next/previous window              sk/next-window/sk/previous-window done
+SPC w u/U      winner undo/redo                  winner-undo/winner-redo           done
+SPC t n/x/o    tab actions                       tab-new/tab-close/tab-close-other done
+SPC o e/E      eshell/named eshell               eshell/eshell-new                 done
+SPC o t        vterm                             vterm                             done
 SPC s i        consult-imenu                     consult-imenu                     done
 SPC s I        consult-imenu-multi               consult-imenu-multi               done
 SPC p f        projectile-find-file              project-find-file                 done, project.el
@@ -137,6 +177,17 @@ SPC n c        org-capture                       org-capture                    
 dired h        dired-up-directory                dired-up-directory                done
 dired l        dired-find-file                   dired-find-file                   done
 dired RET      dired-find-file                   dired-find-file                   done
+#+end_src
+
+* TODO Next Emacs Passes
+#+begin_src text
+TODO Finish Doom muscle-memory key audit for file/project/search/help/buffer edge cases.
+TODO Tune completion across minibuffer, Corfu, snippets, LSP, and prose.
+TODO Polish Doom modeline and Sky theme faces until the UI looks intentional.
+TODO Make Org first-class: notes, agenda, capture templates, source blocks, navigation.
+TODO Sanity-check LSP per language: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown.
+TODO Decide formatting policy and keep it explicit instead of surprise autoformat.
+TODO Keep documenting the clean Emacs layout and user-facing key surface as it changes.
 #+end_src
 
 * Rule
