@@ -6,8 +6,6 @@
 }:
 
 let
-  doomDir = "${config.home.homeDirectory}/.config/doom";
-  emacsDir = "${config.home.homeDirectory}/.config/emacs";
   aspellWithEnglish = pkgs.aspellWithDicts (
     dicts: with dicts; [
       en
@@ -23,39 +21,23 @@ let
   qmllsWrapped = pkgs.writeShellScriptBin "qmlls-wrapped" ''
     exec ${pkgs.qt6.qtdeclarative}/bin/qmlls ${qmlImportArgs} "$@"
   '';
-  doomBootstrap = pkgs.writeShellScriptBin "doom-bootstrap" ''
-    set -euo pipefail
-
-    export DOOMDIR="${doomDir}"
-    emacs_dir="${emacsDir}"
-
-    if [ ! -d "$emacs_dir/.git" ]; then
-      git clone --depth 1 https://github.com/doomemacs/doomemacs "$emacs_dir"
-    else
-      git -C "$emacs_dir" pull --ff-only
-    fi
-
-    "$emacs_dir/bin/doom" install
-    "$emacs_dir/bin/doom" sync
-  '';
-  doomEmacs = pkgs.writeShellScriptBin "doom-emacs" ''
-    if ! ${pkgs.emacs-pgtk}/bin/emacsclient --eval t >/dev/null 2>&1; then
-      ${pkgs.systemd}/bin/systemctl --user start emacs.service >/dev/null 2>&1 || true
-    fi
-
-    exec ${pkgs.emacs-pgtk}/bin/emacsclient --create-frame --alternate-editor=${lib.escapeShellArg "${pkgs.emacs-pgtk}/bin/emacs"} "$@"
-  '';
-  doomEmacsTerminal = pkgs.writeShellScriptBin "doom-emacs-terminal" ''
-    if ! ${pkgs.emacs-pgtk}/bin/emacsclient --eval t >/dev/null 2>&1; then
-      ${pkgs.systemd}/bin/systemctl --user start emacs.service >/dev/null 2>&1 || true
-    fi
-
-    exec ${pkgs.emacs-pgtk}/bin/emacsclient --tty --alternate-editor=${lib.escapeShellArg "${pkgs.emacs-pgtk}/bin/emacs"} "$@"
-  '';
-  emacsRuntimePackages = with pkgs; [
+  emacsRuntimeTools = with pkgs; [
     emacs-pgtk
 
-    # Core Doom/project tooling.
+    # Shell/build tools used by Emacs packages with native modules.
+    bashInteractive
+    coreutils
+    findutils
+    perl
+    cmake
+    gnumake
+    gcc
+    libtool
+    autoconf
+    automake
+    pkg-config
+
+    # Core editor/project tooling.
     git
     ripgrep
     fd
@@ -73,20 +55,32 @@ let
     aspellWithEnglish
     harper
 
-    # vterm native module support.
-    libvterm
-    cmake
-    gnumake
-    gcc
-    libtool
-    autoconf
-    automake
-    pkg-config
-
-    # Language server support for the Emacs experiment.
+    # Language server support.
+    nodejs
+    typescript
+    typescript-language-server
+    prettier
+    html-tidy
+    stylelint
+    jsbeautifier
     lua
     lua-language-server
     stylua
+    basedpyright
+    pipenv
+    black
+    isort
+    ruff
+    python3Packages.pyflakes
+    python3Packages.pytest
+    haskell-language-server
+    ghc
+    cabal-install
+    haskellPackages.hoogle
+    vscode-langservers-extracted
+    yaml-language-server
+    bash-language-server
+    marksman
     qt6.qtlanguageserver
     rust-analyzer
     rustc
@@ -96,35 +90,60 @@ let
     shellcheck
     shfmt
     glslang
+    glsl_analyzer
     qmllsWrapped
 
-    # Nix editing support for the Emacs experiment.
+    # Nix editing support.
     nil
     nixfmt
-
-    doomBootstrap
-    doomEmacs
-    doomEmacsTerminal
   ];
   emacsRuntimePath =
-    "/etc/profiles/per-user/${config.home.username}/bin:" + lib.makeBinPath emacsRuntimePackages;
+    "/run/current-system/sw/bin:/etc/profiles/per-user/${config.home.username}/bin:"
+    + lib.makeBinPath emacsRuntimeTools;
+  emacsSync = pkgs.writeShellScriptBin "emacs-sync" ''
+    set -euo pipefail
+
+    export PATH="${emacsRuntimePath}:''${PATH-}"
+
+    ${pkgs.emacs-pgtk}/bin/emacs --batch \
+      -l "$HOME/.config/emacs/early-init.el" \
+      -l "$HOME/.config/emacs/init.el" \
+      --eval "(message \"emacs packages loaded\")"
+
+    vterm_dir="$(
+      find "$HOME/.cache/emacs/elpa" \
+        -maxdepth 1 \
+        -type d \
+        -name 'vterm-*' \
+      | sort \
+      | tail -n 1
+    )"
+
+    if [ -z "$vterm_dir" ]; then
+      echo "emacs-sync: vterm package directory not found" >&2
+      exit 1
+    fi
+
+    cmake -S "$vterm_dir" -B "$vterm_dir/build" -DUSE_SYSTEM_LIBVTERM=Off
+    cmake --build "$vterm_dir/build"
+    test -f "$vterm_dir/vterm-module.so"
+
+    ${pkgs.emacs-pgtk}/bin/emacs --batch \
+      -l "$HOME/.config/emacs/early-init.el" \
+      -l "$HOME/.config/emacs/init.el" \
+      --eval "(progn (require 'vterm) (message \"emacs-sync complete\"))"
+  '';
 in
 {
-  home.packages = emacsRuntimePackages;
-
-  home.sessionPath = [
-    "${emacsDir}/bin"
+  home.packages = emacsRuntimeTools ++ [
+    emacsSync
   ];
-
-  home.sessionVariables = {
-    DOOMDIR = doomDir;
-  };
 
   xdg.desktopEntries.emacs = {
     name = "Emacs";
     genericName = "Text Editor";
-    comment = "Edit text with the Doom Emacs daemon";
-    exec = "doom-emacs %F";
+    comment = "Edit text with Emacs";
+    exec = "emacsclient --create-frame --alternate-editor=emacs %F";
     icon = "emacs";
     terminal = false;
     categories = [
@@ -148,7 +167,6 @@ in
 
     Service = {
       Environment = [
-        "DOOMDIR=${doomDir}"
         "PATH=${emacsRuntimePath}"
       ];
       ExecStart = "${pkgs.emacs-pgtk}/bin/emacs --fg-daemon";

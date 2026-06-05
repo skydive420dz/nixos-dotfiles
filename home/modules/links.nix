@@ -23,6 +23,7 @@ let
   liveDirs = {
     ".config/aerc" = "config/aerc";
     ".config/doom" = "config/doom";
+    ".config/emacs" = "config/emacs";
     ".config/ghostty/shaders" = "config/ghostty/shaders";
     ".config/quickshell" = "config/quickshell";
     ".config/scripts" = "scripts";
@@ -52,5 +53,10 @@ in
   # No rebuild needed.
   home.file =
     builtins.mapAttrs (_: mkLiveLink) liveDirs
-    // builtins.mapAttrs (_: mkLiveLink) liveFiles;
+    // builtins.mapAttrs (_: mkLiveLink) liveFiles
+    // {
+      ".config/emacs" = (mkLiveLink "config/emacs") // {
+        force = true;
+      };
+    };
 }

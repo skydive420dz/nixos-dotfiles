@@ -1,0 +1,17 @@
+;;; sk-evil.el --- Evil editing -*- lexical-binding: t; -*-
+
+(use-package evil
+  :demand t
+  :init
+  (setq evil-want-keybinding nil
+        evil-want-integration t
+        evil-want-C-u-scroll t
+        evil-respect-visual-line-mode t)
+  :config
+  (evil-mode 1)
+  (define-key evil-normal-state-map (kbd "s") #'evil-substitute)
+  (define-key evil-normal-state-map (kbd "S") #'evil-change-whole-line))
+
+(provide 'sk-evil)
+
+;;; sk-evil.el ends here

@@ -1,0 +1,147 @@
+#+title: Sky Emacs
+#+startup: overview
+
+* Purpose
+This is the clean personal Emacs configuration experiment.
+
+Doom remains the active Emacs until this config is good enough to replace it.
+
+* Ownership
+#+begin_src text
+Nix owns external tools, language servers, formatters, fonts, services, wrappers, and links.
+Emacs owns Emacs packages, editor behavior, keymaps, completion, LSP client behavior, Org, Dired, terminal, and theme faces.
+Projects own project-local metadata such as .dir-locals.el and language-server hints.
+#+end_src
+
+* Commands
+After Home Manager links this directory to =~/.config/emacs=:
+
+#+begin_src sh
+emacs-sync
+emacs
+#+end_src
+
+Doom is frozen as reference material under =~/.config/doom=.
+
+* Runtime State
+Runtime/package state belongs outside the repo:
+
+#+begin_src text
+~/.cache/emacs/
+#+end_src
+
+The source tree should stay limited to hand-written config files.
+
+* Layout
+#+begin_src text
+early-init.el
+init.el
+lisp/
+  sk-core.el
+  sk-package.el
+  sk-ui.el
+  sk-theme.el
+  sk-evil.el
+  sk-completion.el
+  sk-lsp.el
+  sk-org.el
+  sk-notes.el
+  sk-dired.el
+  sk-terminal.el
+  sk-project.el
+  sk-git.el
+  sk-languages.el
+  sk-keybindings.el
+#+end_src
+
+* Survival Keys
+The clean config uses Evil plus a small =SPC= leader map.
+
+#+begin_src text
+SPC SPC / SPC :   M-x
+
+SPC f f           find file
+SPC f r           recent file
+SPC f s           save
+SPC f S           write as
+
+SPC b b           switch buffer
+SPC b k           kill buffer
+SPC b n / p       next / previous buffer
+SPC b N           new empty buffer
+
+SPC w v / s       split right / below
+SPC w x           close window
+SPC w o           only window
+SPC w =           balance windows
+SPC w h/j/k/l     move between windows
+SPC w H/J/K/L     resize current window
+
+SPC p f           project file
+SPC p p           switch project
+SPC p s           project search
+SPC p b           project buffer
+SPC p g           Magit status
+SPC p t           project terminal
+SPC p n           project notes
+
+SPC s s           search current buffer
+SPC s p           ripgrep project/directory
+SPC s i           outline/imenu
+SPC s I           outline/imenu across buffers
+
+SPC g g           Magit status
+
+SPC n i           inbox
+SPC n d           daily note
+SPC n t           topic note
+SPC n p           project note
+SPC n c           capture
+SPC n a           agenda
+
+SPC o d           Dired
+SPC o t           vterm
+
+SPC t l           line numbers
+SPC t w           visual wrap
+
+SPC h k/f/v/m/b   describe key/function/variable/mode/bindings
+SPC h r t         reload Sky theme
+SPC q q           save buffers and quit
+SPC q Q           quit immediately
+#+end_src
+
+* Binding Migration
+This table tracks Doom key behavior as it moves into the clean config.
+
+#+begin_src text
+Old key        Doom command/function             Clean equivalent                  Status
+s              evil-substitute                   evil-substitute                   done
+S              evil-change-whole-line            evil-change-whole-line            done
+[[             org-previous-visible-heading      org-previous-visible-heading      done
+]]             org-next-visible-heading          org-next-visible-heading          done
+C-h/j/k/l      evil-window-left/down/up/right    same Evil window commands         done
+vterm C-h/j/k/l evil-window-left/down/up/right   same Evil window commands         done
+SPC h r t      sk/load-sky-theme                 sk/load-theme                     done, renamed
+SPC s i        consult-imenu                     consult-imenu                     done
+SPC s I        consult-imenu-multi               consult-imenu-multi               done
+SPC p f        projectile-find-file              project-find-file                 done, project.el
+SPC p s        projectile-ripgrep                consult-ripgrep                   done, project.el
+SPC p p        projectile-switch-project         project-switch-project            done, project.el
+SPC p g        magit-status                      magit-status                      done
+SPC p t        sk/project-vterm                  sk/project-vterm                  done, clean helper
+SPC p n        sk/project-notes                  sk/project-notes                  done, clean helper
+SPC n i        sk/org-open-inbox                 sk/org-open-inbox                 done
+SPC n d        sk/org-open-daily-note            sk/org-open-daily-note            done
+SPC n c        org-capture                       org-capture                       done
+dired h        dired-up-directory                dired-up-directory                done
+dired l        dired-find-file                   dired-find-file                   done
+dired RET      dired-find-file                   dired-find-file                   done
+#+end_src
+
+* Rule
+Keep every module small enough to understand.
+
+No hidden Doom layer.
+No giant inline Nix strings.
+No global behavior that is not documented and tested per buffer class.
