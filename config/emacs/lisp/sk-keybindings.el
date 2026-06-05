@@ -5,6 +5,16 @@
 
 (require 'windmove)
 (require 'winner)
+(require 'project)
+(require 'subr-x)
+(require 'seq)
+(require 'recentf)
+(require 'eglot)
+(require 'flymake)
+(require 'eldoc)
+(require 'compile)
+(require 'xref)
+(require 'dired-x)
 
 (winner-mode 1)
 
@@ -17,6 +27,276 @@
   "Kill the current buffer without asking for a buffer name."
   (interactive)
   (kill-buffer (current-buffer)))
+
+(defun sk/switch-to-last-buffer ()
+  "Switch to the previously visited buffer."
+  (interactive)
+  (switch-to-buffer (other-buffer (current-buffer) 1)))
+
+(defun sk/user-buffer-p (buffer)
+  "Return non-nil when BUFFER is a user-facing buffer."
+  (let ((name (buffer-name buffer)))
+    (and name (not (string-prefix-p " " name)))))
+
+(defun sk/kill-all-buffers ()
+  "Kill user-facing buffers."
+  (interactive)
+  (mapc (lambda (buffer)
+          (when (and (buffer-live-p buffer)
+                     (sk/user-buffer-p buffer))
+            (kill-buffer buffer)))
+        (buffer-list)))
+
+(defun sk/kill-other-buffers ()
+  "Kill user-facing buffers except the current buffer."
+  (interactive)
+  (let ((current (current-buffer)))
+    (mapc (lambda (buffer)
+            (when (and (not (eq buffer current))
+                       (buffer-live-p buffer)
+                       (sk/user-buffer-p buffer))
+              (kill-buffer buffer)))
+          (buffer-list))))
+
+(defun sk/kill-buried-buffers ()
+  "Kill user-facing buffers that are not visible in any window."
+  (interactive)
+  (let ((visible (mapcar #'window-buffer (window-list nil 'no-minibuf t))))
+    (mapc (lambda (buffer)
+            (when (and (not (memq buffer visible))
+                       (buffer-live-p buffer)
+                       (sk/user-buffer-p buffer))
+              (kill-buffer buffer)))
+          (buffer-list))))
+
+(defun sk/yank-buffer-contents ()
+  "Copy the current buffer contents to the kill ring."
+  (interactive)
+  (kill-new (buffer-substring-no-properties (point-min) (point-max)))
+  (message "Copied buffer contents"))
+
+(defun sk/current-file ()
+  "Return the current buffer file or raise a user error."
+  (or (buffer-file-name)
+      (user-error "Current buffer is not visiting a file")))
+
+(defun sk/find-file-here ()
+  "Find a file from the current file's directory."
+  (interactive)
+  (let ((default-directory (or (file-name-directory (buffer-file-name))
+                               default-directory)))
+    (call-interactively #'find-file)))
+
+(defun sk/copy-current-file (target)
+  "Copy the current file to TARGET."
+  (interactive
+   (let ((file (sk/current-file)))
+     (list (read-file-name "Copy current file to: "
+                           (file-name-directory file)
+                           nil nil
+                           (file-name-nondirectory file)))))
+  (copy-file (sk/current-file) target 1)
+  (message "Copied file to %s" target))
+
+(defun sk/delete-current-file ()
+  "Move the current file to trash, then kill its buffer."
+  (interactive)
+  (let ((file (sk/current-file)))
+    (when (yes-or-no-p (format "Move %s to trash? " file))
+      (delete-file file t)
+      (kill-buffer (current-buffer))
+      (message "Moved file to trash: %s" file))))
+
+(defun sk/rename-current-file (target)
+  "Rename or move the current file to TARGET."
+  (interactive
+   (let ((file (sk/current-file)))
+     (list (read-file-name "Rename/move current file to: "
+                           (file-name-directory file)
+                           nil nil
+                           (file-name-nondirectory file)))))
+  (rename-file (sk/current-file) target 1)
+  (set-visited-file-name target t t))
+
+(defun sk/sudo-file-name (file)
+  "Return a TRAMP sudo path for FILE."
+  (concat "/sudo:root@localhost:" (expand-file-name file)))
+
+(defun sk/sudo-find-file (file)
+  "Open FILE through sudo."
+  (interactive "FSudo find file: ")
+  (find-file (sk/sudo-file-name file)))
+
+(defun sk/sudo-current-file ()
+  "Reopen the current file through sudo."
+  (interactive)
+  (find-alternate-file (sk/sudo-file-name (sk/current-file))))
+
+(defun sk/current-file-path (&optional relative)
+  "Return the current file path, optionally RELATIVE to project root."
+  (let ((file (sk/current-file)))
+    (if (not relative)
+        file
+      (if-let ((project (project-current nil)))
+          (file-relative-name file (project-root project))
+        (file-name-nondirectory file)))))
+
+(defun sk/yank-current-file-path ()
+  "Copy the current file path to the kill ring."
+  (interactive)
+  (let ((path (sk/current-file-path)))
+    (kill-new path)
+    (message "Copied %s" path)))
+
+(defun sk/yank-current-file-path-relative ()
+  "Copy the project-relative current file path to the kill ring."
+  (interactive)
+  (let ((path (sk/current-file-path t)))
+    (kill-new path)
+    (message "Copied %s" path)))
+
+(defun sk/read-project-root ()
+  "Return the current project root or raise a user error."
+  (or (when-let ((project (project-current nil)))
+        (project-root project))
+      (user-error "Not in a project")))
+
+(defun sk/search-project ()
+  "Search the current project with ripgrep."
+  (interactive)
+  (consult-ripgrep (sk/read-project-root)))
+
+(defun sk/search-project-symbol-at-point ()
+  "Search the current project for the symbol at point."
+  (interactive)
+  (consult-ripgrep (sk/read-project-root) (thing-at-point 'symbol t)))
+
+(defun sk/search-current-directory ()
+  "Search the current directory with ripgrep."
+  (interactive)
+  (consult-ripgrep default-directory))
+
+(defun sk/search-other-directory (directory)
+  "Search DIRECTORY with ripgrep."
+  (interactive "DSearch directory: ")
+  (consult-ripgrep directory))
+
+(defun sk/search-buffer-symbol-at-point ()
+  "Search the current buffer for the symbol at point."
+  (interactive)
+  (consult-line (thing-at-point 'symbol t)))
+
+(defun sk/project-run-shell-command (command)
+  "Run shell COMMAND from the current project root."
+  (interactive (list (read-shell-command "Project shell command: ")))
+  (let ((default-directory (sk/read-project-root)))
+    (compile command)))
+
+(defun sk/project-run-async-shell-command (command)
+  "Run async shell COMMAND from the current project root."
+  (interactive (list (read-shell-command "Project async shell command: ")))
+  (let ((default-directory (sk/read-project-root)))
+    (async-shell-command command)))
+
+(defun sk/project-compile ()
+  "Run `compile' from the current project root."
+  (interactive)
+  (let ((default-directory (sk/read-project-root)))
+    (call-interactively #'compile)))
+
+(defun sk/project-recompile ()
+  "Run `recompile' from the current project root."
+  (interactive)
+  (let ((default-directory (or (when-let ((project (project-current nil)))
+                                (project-root project))
+                              default-directory)))
+    (recompile)))
+
+(defun sk/project-edit-dir-locals ()
+  "Open the current project's .dir-locals.el file."
+  (interactive)
+  (find-file (expand-file-name ".dir-locals.el" (sk/read-project-root))))
+
+(defun sk/project-find-file-in-other-project ()
+  "Pick another known project and find a file in it."
+  (interactive)
+  (let ((default-directory (project-prompt-project-dir)))
+    (call-interactively #'project-find-file)))
+
+(defun sk/project-save-buffers ()
+  "Save file buffers that belong to the current project."
+  (interactive)
+  (let ((root (sk/read-project-root))
+        (saved 0))
+    (dolist (buffer (buffer-list))
+      (with-current-buffer buffer
+        (when-let ((file (buffer-file-name)))
+          (when (and (buffer-modified-p)
+                     (file-in-directory-p file root))
+            (save-buffer)
+            (setq saved (1+ saved))))))
+    (message "Saved %d project buffer%s" saved (if (= saved 1) "" "s"))))
+
+(defun sk/project-kill-buffers ()
+  "Kill file buffers that belong to the current project."
+  (interactive)
+  (let ((root (sk/read-project-root))
+        (killed 0))
+    (dolist (buffer (buffer-list))
+      (with-current-buffer buffer
+        (when-let ((file (buffer-file-name)))
+          (when (file-in-directory-p file root)
+            (kill-buffer buffer)
+            (setq killed (1+ killed))))))
+    (message "Killed %d project buffer%s" killed (if (= killed 1) "" "s"))))
+
+(defun sk/project-recent-file ()
+  "Find a recent file inside the current project."
+  (interactive)
+  (let* ((root (sk/read-project-root))
+         (files (seq-filter (lambda (file) (file-in-directory-p file root))
+                            recentf-list)))
+    (if files
+        (find-file (completing-read "Recent project file: " files nil t))
+      (user-error "No recent files for this project"))))
+
+(defun sk/code-format-buffer-or-region ()
+  "Format the active region or current buffer explicitly."
+  (interactive)
+  (cond
+   ((eglot-managed-p)
+    (if (use-region-p)
+        (eglot-format (region-beginning) (region-end))
+      (eglot-format-buffer)))
+   ((fboundp 'apheleia-format-buffer)
+    (call-interactively #'apheleia-format-buffer))
+   (t
+    (indent-region (if (use-region-p) (region-beginning) (point-min))
+                   (if (use-region-p) (region-end) (point-max))))))
+
+(defun sk/code-action ()
+  "Run Eglot code actions when available."
+  (interactive)
+  (if (eglot-managed-p)
+      (call-interactively #'eglot-code-actions)
+    (user-error "Current buffer is not managed by Eglot")))
+
+(defun sk/code-rename ()
+  "Rename symbol through Eglot when available."
+  (interactive)
+  (if (eglot-managed-p)
+      (call-interactively #'eglot-rename)
+    (user-error "Current buffer is not managed by Eglot")))
+
+(defun sk/code-symbols ()
+  "Show symbols in the current buffer."
+  (interactive)
+  (consult-imenu))
+
+(defun sk/code-errors ()
+  "Show Flymake diagnostics."
+  (interactive)
+  (call-interactively #'flymake-show-buffer-diagnostics))
 
 (defun sk/save-buffer-and-quit ()
   "Save the current file buffer, then quit this Emacs client/session."
@@ -110,6 +390,9 @@
 (defvar sk/search-map (make-sparse-keymap)
   "Search commands under `sk/leader-map'.")
 
+(defvar sk/code-map (make-sparse-keymap)
+  "Code commands under `sk/leader-map'.")
+
 (defvar sk/git-map (make-sparse-keymap)
   "Git commands under `sk/leader-map'.")
 
@@ -137,9 +420,17 @@
 (define-key sk/leader-map (kbd "SPC") #'execute-extended-command)
 (define-key sk/leader-map (kbd ":") #'execute-extended-command)
 (define-key sk/leader-map (kbd ".") #'find-file)
+(define-key sk/leader-map (kbd ",") #'consult-buffer)
+(define-key sk/leader-map (kbd "`") #'sk/switch-to-last-buffer)
+(define-key sk/leader-map (kbd "/") #'sk/search-project)
+(define-key sk/leader-map (kbd "*") #'sk/search-project-symbol-at-point)
+(define-key sk/leader-map (kbd "u") #'universal-argument)
+(define-key sk/leader-map (kbd "x") #'scratch-buffer)
+(define-key sk/leader-map (kbd "X") #'org-capture)
 (define-key sk/leader-map (kbd "f") sk/file-map)
 (define-key sk/leader-map (kbd "b") sk/buffer-map)
 (define-key sk/leader-map (kbd "w") sk/window-map)
+(define-key sk/leader-map (kbd "c") sk/code-map)
 (define-key sk/leader-map (kbd "p") sk/project-map)
 (define-key sk/leader-map (kbd "s") sk/search-map)
 (define-key sk/leader-map (kbd "g") sk/git-map)
@@ -150,15 +441,44 @@
 (define-key sk/leader-map (kbd "h") sk/help-map)
 (define-key sk/leader-map (kbd "q") sk/quit-map)
 
+(define-key sk/file-map (kbd "C") #'sk/copy-current-file)
+(define-key sk/file-map (kbd "d") #'dired)
+(define-key sk/file-map (kbd "D") #'sk/delete-current-file)
 (define-key sk/file-map (kbd "f") #'find-file)
+(define-key sk/file-map (kbd "F") #'sk/find-file-here)
+(define-key sk/file-map (kbd "l") #'locate)
+(define-key sk/file-map (kbd "R") #'sk/rename-current-file)
 (define-key sk/file-map (kbd "r") #'consult-recent-file)
 (define-key sk/file-map (kbd "s") #'save-buffer)
 (define-key sk/file-map (kbd "S") #'write-file)
+(define-key sk/file-map (kbd "u") #'sk/sudo-find-file)
+(define-key sk/file-map (kbd "U") #'sk/sudo-current-file)
+(define-key sk/file-map (kbd "y") #'sk/yank-current-file-path)
+(define-key sk/file-map (kbd "Y") #'sk/yank-current-file-path-relative)
 
+(define-key sk/buffer-map (kbd "[") #'previous-buffer)
+(define-key sk/buffer-map (kbd "]") #'next-buffer)
 (define-key sk/buffer-map (kbd "b") #'consult-buffer)
+(define-key sk/buffer-map (kbd "d") #'sk/kill-current-buffer)
 (define-key sk/buffer-map (kbd "i") #'ibuffer)
 (define-key sk/buffer-map (kbd "k") #'sk/kill-current-buffer)
+(define-key sk/buffer-map (kbd "K") #'sk/kill-all-buffers)
+(define-key sk/buffer-map (kbd "l") #'sk/switch-to-last-buffer)
+(define-key sk/buffer-map (kbd "m") #'bookmark-set)
+(define-key sk/buffer-map (kbd "M") #'bookmark-delete)
+(define-key sk/buffer-map (kbd "n") #'next-buffer)
 (define-key sk/buffer-map (kbd "N") #'sk/new-empty-buffer)
+(define-key sk/buffer-map (kbd "O") #'sk/kill-other-buffers)
+(define-key sk/buffer-map (kbd "p") #'previous-buffer)
+(define-key sk/buffer-map (kbd "r") #'revert-buffer)
+(define-key sk/buffer-map (kbd "R") #'rename-buffer)
+(define-key sk/buffer-map (kbd "s") #'save-buffer)
+(define-key sk/buffer-map (kbd "S") #'save-some-buffers)
+(define-key sk/buffer-map (kbd "x") #'scratch-buffer)
+(define-key sk/buffer-map (kbd "X") #'scratch-buffer)
+(define-key sk/buffer-map (kbd "y") #'sk/yank-buffer-contents)
+(define-key sk/buffer-map (kbd "z") #'bury-buffer)
+(define-key sk/buffer-map (kbd "Z") #'sk/kill-buried-buffers)
 
 (define-key sk/window-map (kbd "v") #'sk/split-window-right-and-focus)
 (define-key sk/window-map (kbd "s") #'sk/split-window-below-and-focus)
@@ -178,18 +498,51 @@
 (define-key sk/window-map (kbd "K") #'sk/resize-window-up)
 (define-key sk/window-map (kbd "L") #'sk/resize-window-right)
 
+(define-key sk/code-map (kbd "a") #'sk/code-action)
+(define-key sk/code-map (kbd "c") #'compile)
+(define-key sk/code-map (kbd "C") #'recompile)
+(define-key sk/code-map (kbd "d") #'xref-find-definitions)
+(define-key sk/code-map (kbd "D") #'xref-find-references)
+(define-key sk/code-map (kbd "f") #'sk/code-format-buffer-or-region)
+(define-key sk/code-map (kbd "i") #'eglot-find-implementation)
+(define-key sk/code-map (kbd "k") #'eldoc-doc-buffer)
+(define-key sk/code-map (kbd "r") #'sk/code-rename)
+(define-key sk/code-map (kbd "t") #'eglot-find-typeDefinition)
+(define-key sk/code-map (kbd "w") #'delete-trailing-whitespace)
+(define-key sk/code-map (kbd "x") #'sk/code-errors)
+
+(define-key sk/project-map (kbd ".") #'sk/search-project-symbol-at-point)
+(define-key sk/project-map (kbd "!") #'sk/project-run-shell-command)
+(define-key sk/project-map (kbd "&") #'sk/project-run-async-shell-command)
+(define-key sk/project-map (kbd "c") #'sk/project-compile)
+(define-key sk/project-map (kbd "C") #'sk/project-recompile)
+(define-key sk/project-map (kbd "e") #'sk/project-edit-dir-locals)
 (define-key sk/project-map (kbd "f") #'project-find-file)
+(define-key sk/project-map (kbd "F") #'sk/project-find-file-in-other-project)
+(define-key sk/project-map (kbd "k") #'sk/project-kill-buffers)
+(define-key sk/project-map (kbd "o") #'find-sibling-file)
 (define-key sk/project-map (kbd "p") #'project-switch-project)
+(define-key sk/project-map (kbd "r") #'sk/project-recent-file)
+(define-key sk/project-map (kbd "R") #'project-compile)
+(define-key sk/project-map (kbd "S") #'sk/project-save-buffers)
 (define-key sk/project-map (kbd "s") #'consult-ripgrep)
 (define-key sk/project-map (kbd "b") #'consult-project-buffer)
 (define-key sk/project-map (kbd "g") #'magit-status)
 (define-key sk/project-map (kbd "t") #'sk/project-vterm)
 (define-key sk/project-map (kbd "n") #'sk/project-notes)
 
+(define-key sk/search-map (kbd ".") #'sk/search-project-symbol-at-point)
+(define-key sk/search-map (kbd "b") #'consult-line)
+(define-key sk/search-map (kbd "B") #'consult-line-multi)
+(define-key sk/search-map (kbd "d") #'sk/search-current-directory)
+(define-key sk/search-map (kbd "D") #'sk/search-other-directory)
+(define-key sk/search-map (kbd "f") #'locate)
 (define-key sk/search-map (kbd "s") #'consult-line)
+(define-key sk/search-map (kbd "S") #'sk/search-buffer-symbol-at-point)
 (define-key sk/search-map (kbd "p") #'consult-ripgrep)
 (define-key sk/search-map (kbd "i") #'consult-imenu)
 (define-key sk/search-map (kbd "I") #'consult-imenu-multi)
+(define-key sk/search-map (kbd "m") #'bookmark-jump)
 
 (define-key sk/git-map (kbd "g") #'magit-status)
 
@@ -201,9 +554,13 @@
 (define-key sk/notes-map (kbd "a") #'org-agenda)
 
 (define-key sk/open-map (kbd "d") #'dired)
+(define-key sk/open-map (kbd "b") #'browse-url-of-file)
 (define-key sk/open-map (kbd "e") #'eshell)
 (define-key sk/open-map (kbd "E") #'eshell-new)
+(define-key sk/open-map (kbd "f") #'make-frame)
+(define-key sk/open-map (kbd "F") #'select-frame-by-name)
 (define-key sk/open-map (kbd "t") #'vterm)
+(define-key sk/open-map (kbd "-") #'dired-jump)
 
 (define-key sk/toggle-map (kbd "l") #'display-line-numbers-mode)
 (define-key sk/toggle-map (kbd "w") #'visual-line-mode)
@@ -238,9 +595,24 @@
   (which-key-mode 1)
   (which-key-add-key-based-replacements
     "SPC f" "files"
+    "SPC f C" "copy current file"
+    "SPC f D" "delete current file"
+    "SPC f F" "find from here"
+    "SPC f R" "rename current file"
+    "SPC f u" "sudo find file"
+    "SPC f U" "sudo current file"
+    "SPC f y" "copy file path"
+    "SPC f Y" "copy project path"
     "SPC b" "buffers"
     "SPC b i" "buffer list"
     "SPC b k" "kill buffer"
+    "SPC b K" "kill all buffers"
+    "SPC b O" "kill other buffers"
+    "SPC b x" "scratch buffer"
+    "SPC b X" "scratch buffer"
+    "SPC b y" "copy buffer contents"
+    "SPC b z" "bury buffer"
+    "SPC b Z" "kill buried buffers"
     "SPC w" "windows"
     "SPC w w" "next window"
     "SPC w W" "previous window"
@@ -248,13 +620,39 @@
     "SPC w o" "only window"
     "SPC w u" "undo window layout"
     "SPC w U" "redo window layout"
+    "SPC c" "code"
+    "SPC c a" "code action"
+    "SPC c c" "compile"
+    "SPC c d" "definition"
+    "SPC c D" "references"
+    "SPC c f" "format explicitly"
+    "SPC c r" "rename symbol"
+    "SPC c x" "diagnostics"
     "SPC p" "projects"
+    "SPC p !" "project shell command"
+    "SPC p &" "project async command"
+    "SPC p ." "search symbol in project"
+    "SPC p c" "compile project"
+    "SPC p e" "edit dir-locals"
+    "SPC p k" "kill project buffers"
+    "SPC p r" "recent project file"
+    "SPC p S" "save project buffers"
     "SPC s" "search"
+    "SPC s ." "search project symbol"
+    "SPC s b" "search buffer"
+    "SPC s B" "search open buffers"
+    "SPC s d" "search current directory"
+    "SPC s D" "search other directory"
+    "SPC s S" "search symbol in buffer"
     "SPC g" "git"
     "SPC n" "notes"
     "SPC o" "open"
+    "SPC o -" "dired jump"
+    "SPC o b" "browser"
     "SPC o e" "eshell"
     "SPC o E" "named eshell"
+    "SPC o f" "new frame"
+    "SPC o F" "select frame"
     "SPC o t" "vterm"
     "SPC t" "tabs"
     "SPC t n" "new tab"
@@ -270,14 +668,19 @@
 (with-eval-after-load 'evil
   (dolist (map (list evil-normal-state-map
                      evil-visual-state-map
-                     evil-motion-state-map
-                     evil-insert-state-map
-                     evil-replace-state-map
-                     evil-emacs-state-map))
+                     evil-motion-state-map))
     (define-key map (kbd "C-h") #'evil-window-left)
     (define-key map (kbd "C-j") #'evil-window-down)
     (define-key map (kbd "C-k") #'evil-window-up)
     (define-key map (kbd "C-l") #'evil-window-right))
+
+  (dolist (map (list evil-insert-state-map
+                     evil-replace-state-map
+                     evil-emacs-state-map))
+    (define-key map (kbd "C-h") #'sk/completion-quit-or-window-left)
+    (define-key map (kbd "C-j") #'sk/completion-next-or-window-down)
+    (define-key map (kbd "C-k") #'sk/completion-previous-or-window-up)
+    (define-key map (kbd "C-l") #'sk/completion-accept-or-window-right))
 
   (dolist (map (list evil-normal-state-map
                      evil-visual-state-map

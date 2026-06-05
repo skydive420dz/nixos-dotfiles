@@ -41,7 +41,7 @@
   :demand t
   :config
   (setq corfu-auto t
-        corfu-auto-delay 0.12
+        corfu-auto-delay 0.05
         corfu-auto-prefix 2
         corfu-cycle t
         corfu-preview-current nil)
@@ -51,13 +51,46 @@
   (define-key corfu-map (kbd "C-h") #'corfu-quit)
   (global-corfu-mode 1))
 
+(defun sk/completion-active-p ()
+  "Return non-nil when in-buffer completion is active."
+  (bound-and-true-p completion-in-region-mode))
+
+(defun sk/completion-next-or-window-down ()
+  "Select the next completion candidate or move to the window below."
+  (interactive)
+  (if (sk/completion-active-p)
+      (corfu-next)
+    (evil-window-down)))
+
+(defun sk/completion-previous-or-window-up ()
+  "Select the previous completion candidate or move to the window above."
+  (interactive)
+  (if (sk/completion-active-p)
+      (corfu-previous)
+    (evil-window-up)))
+
+(defun sk/completion-accept-or-window-right ()
+  "Accept the current completion candidate or move to the right window."
+  (interactive)
+  (if (sk/completion-active-p)
+      (corfu-insert)
+    (evil-window-right)))
+
+(defun sk/completion-quit-or-window-left ()
+  "Quit completion or move to the left window."
+  (interactive)
+  (if (sk/completion-active-p)
+      (corfu-quit)
+    (evil-window-left)))
+
 (use-package cape
   :after corfu
   :config
   (defun sk/capf-code-defaults ()
     "Add conservative fallback CAPFs for code/config buffers."
     (add-hook 'completion-at-point-functions #'cape-file 20 t)
-    (add-hook 'completion-at-point-functions #'cape-dabbrev 40 t))
+    (add-hook 'completion-at-point-functions #'cape-dabbrev 40 t)
+    (add-hook 'completion-at-point-functions #'cape-keyword 60 t))
 
   (defun sk/capf-prose-defaults ()
     "Add only safe prose CAPFs."

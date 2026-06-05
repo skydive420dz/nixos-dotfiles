@@ -12,6 +12,18 @@
 (use-package rust-mode
   :mode "\\.rs\\'")
 
+(use-package haskell-mode
+  :mode "\\.hs\\'")
+
+(use-package typescript-mode
+  :mode ("\\.ts\\'" "\\.tsx\\'"))
+
+(use-package web-mode
+  :mode "\\.html\\'")
+
+(use-package json-mode
+  :mode "\\.json\\'")
+
 (use-package markdown-mode
   :mode "\\.md\\'")
 

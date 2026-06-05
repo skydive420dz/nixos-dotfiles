@@ -13,7 +13,8 @@
               (when (fboundp 'evil-local-set-key)
                 (evil-local-set-key 'normal (kbd "h") #'dired-up-directory)
                 (evil-local-set-key 'normal (kbd "l") #'dired-find-file)
-                (evil-local-set-key 'normal (kbd "RET") #'dired-find-file)))))
+                (evil-local-set-key 'normal (kbd "RET") #'dired-find-file)
+                (evil-local-set-key 'normal (kbd "SPC m h") #'dired-omit-mode)))))
 
 (provide 'sk-dired)
 

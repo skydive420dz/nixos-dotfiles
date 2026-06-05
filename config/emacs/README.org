@@ -61,16 +61,45 @@ The clean config uses Evil plus a small =SPC= leader map.
 #+begin_src text
 SPC SPC / SPC :   M-x
 SPC .             find file
+SPC ,             switch buffer
+SPC `             last buffer
+SPC /             search project
+SPC *             search symbol at point in project
+SPC u             universal argument
+SPC x             scratch buffer
+SPC X             org capture
 
 SPC f f           find file
+SPC f d           Dired
 SPC f r           recent file
 SPC f s           save
 SPC f S           write as
+SPC f C           copy current file
+SPC f D           delete current file to trash
+SPC f F           find file from current file directory
+SPC f l           locate file
+SPC f R           rename/move current file
+SPC f u           sudo find file
+SPC f U           reopen current file with sudo
+SPC f y           copy current file path
+SPC f Y           copy project-relative file path
 
 SPC b b           switch buffer
 SPC b i           buffer list
 SPC b k           kill buffer
 SPC b N           new empty buffer
+SPC b [ / ]       previous / next buffer
+SPC b d           kill buffer
+SPC b K           kill all buffers
+SPC b l           last buffer
+SPC b m / M       set / delete bookmark
+SPC b n / p       next / previous buffer
+SPC b O           kill other buffers
+SPC b r / R       revert / rename buffer
+SPC b s / S       save buffer / save some buffers
+SPC b x / X       scratch buffer
+SPC b y           copy buffer contents
+SPC b z / Z       bury buffer / kill buried buffers
 TAB / S-TAB       next / previous buffer outside Org/snippets
 
 SPC w v / s       split right / below
@@ -82,23 +111,51 @@ SPC w u / U       undo / redo window layout
 SPC w h/j/k/l     move between windows
 SPC w H/J/K/L     resize current window
 
+SPC c a           code action
+SPC c c / C       compile / recompile
+SPC c d / D       definition / references
+SPC c f           format buffer or region explicitly
+SPC c i           implementation
+SPC c k           documentation buffer
+SPC c r           rename symbol
+SPC c t           type definition
+SPC c w           delete trailing whitespace
+SPC c x           diagnostics
+
 SPC t n           new tab
 SPC t x           close tab
 SPC t o           only tab
 SPC t [ / ]       previous / next tab
 
 SPC p f           project file
+SPC p F           file in other project
 SPC p p           switch project
 SPC p s           project search
 SPC p b           project buffer
 SPC p g           Magit status
 SPC p t           project terminal
 SPC p n           project notes
+SPC p .           search symbol at point in project
+SPC p ! / &       shell / async shell command in project
+SPC p c / C       compile / recompile project
+SPC p e           edit project .dir-locals.el
+SPC p k           kill project buffers
+SPC p o           find sibling file
+SPC p r           recent project file
+SPC p S           save project buffers
 
+SPC s .           search symbol at point in project
+SPC s b           search current buffer
+SPC s B           search all open buffers
+SPC s d           search current directory
+SPC s D           search other directory
+SPC s f           locate file
 SPC s s           search current buffer
+SPC s S           search symbol at point in buffer
 SPC s p           ripgrep project/directory
 SPC s i           outline/imenu
 SPC s I           outline/imenu across buffers
+SPC s m           jump bookmark
 
 SPC g g           Magit status
 
@@ -109,10 +166,14 @@ SPC n p           project note
 SPC n c           capture
 SPC n a           agenda
 
+SPC o -           Dired jump to current file
+SPC o b           open current file in browser
 SPC o d           Dired
 SPC o t           vterm
 SPC o e           eshell
 SPC o E           named eshell
+SPC o f           new frame
+SPC o F           select frame
 
 SPC T l           line numbers
 SPC T w           visual wrap
@@ -140,12 +201,66 @@ za / zA           cycle heading / global cycle
 M-j / M-k         move subtree down / up
 #+end_src
 
+* Org Localleader
+In Org and Agenda buffers, =SPC m= mirrors Doom's localleader shape for
+mode-local actions. This keeps global =SPC n= for opening notes and uses
+=SPC m= for operating on the current Org item, table, subtree, or agenda row.
+
+#+begin_src text
+SPC m t           TODO state for current heading
+SPC m T           TODO list
+SPC m '           edit source block
+SPC m e           export
+SPC m x           toggle checkbox
+SPC m q           set tags
+SPC m A           archive subtree
+
+SPC m d d/s/t/T   deadline / schedule / timestamp / inactive timestamp
+SPC m c i/o/g/r   clock in / out / goto / resolve clocks
+SPC m p d/p/u     priority down / set / up
+SPC m r r         refile
+SPC m s h/j/k/l   promote / move down / move up / demote subtree
+SPC m s n/N       narrow to subtree / widen
+SPC m b ...       table actions
+SPC m a ...       attachment actions
+
+Agenda:
+SPC m t           TODO state for agenda item
+SPC m q           set tags
+SPC m r           refile
+SPC m d d/s       deadline / schedule
+SPC m c i/o/g/r   clock in / out / goto / clock report
+SPC m p d/p/u     priority down / set / up
+C-SPC             show and scroll agenda item
+#+end_src
+
+* Mode Polish
+#+begin_src text
+Dired:
+SPC m h           toggle omitted files
+
+Magit:
+q / Q             bury Magit buffer / quit Magit session
+[ / ]             previous / next sibling section
+gr / gR           refresh / refresh all
+gz                refresh status buffer
+gd                jump diffstat or diff in diff buffers
+TAB               toggle section
+#+end_src
+
 * Binding Migration
 This table tracks Doom key behavior as it moves into the clean config.
 
 #+begin_src text
 Old key        Doom command/function             Clean equivalent                  Status
 SPC .          find-file                         find-file                         done
+SPC ,          switch-to-buffer                  consult-buffer                    done
+SPC `          evil-switch-to-windows-last-buffer sk/switch-to-last-buffer         done
+SPC /          search project                    sk/search-project                 done
+SPC *          search symbol in project          sk/search-project-symbol-at-point done
+SPC u          universal-argument                universal-argument                done
+SPC x          doom/toggle-scratch-buffer        scratch-buffer                    done
+SPC X          org-capture                       org-capture                       done
 s              evil-substitute                   evil-substitute                   done
 S              evil-change-whole-line            evil-change-whole-line            done
 [[             org-previous-visible-heading      org-previous-visible-heading      done
@@ -158,6 +273,31 @@ SPC h r r      reload config                     sk/reload-config               
 SPC h r t      sk/load-sky-theme                 sk/load-theme                     done, renamed
 SPC b i        ibuffer                           ibuffer                           done
 SPC b k        kill buffer                       sk/kill-current-buffer            done
+SPC b [/]/n/p  previous/next buffer              previous-buffer/next-buffer       done
+SPC b d        kill buffer                       sk/kill-current-buffer            done
+SPC b K/O      kill all/other buffers            sk helpers                        done
+SPC b l        last buffer                       sk/switch-to-last-buffer          done
+SPC b m/M      bookmark set/delete               bookmark-set/bookmark-delete      done
+SPC b r/R      revert/rename buffer              revert-buffer/rename-buffer       done
+SPC b s/S      save/save some buffers            save-buffer/save-some-buffers     done
+SPC b x/X      scratch buffer                    scratch-buffer                    done
+SPC b y        yank buffer contents              sk/yank-buffer-contents           done
+SPC b z/Z      bury/kill buried buffers          bury-buffer/sk helper             done
+SPC f d        dired                             dired                             done
+SPC f C        copy current file                 sk/copy-current-file              done
+SPC f D        delete current file               sk/delete-current-file to trash   done
+SPC f F        find file from here               sk/find-file-here                 done
+SPC f l        locate file                       locate                            done
+SPC f R        rename/move current file          sk/rename-current-file            done
+SPC f u/U      sudo find/current file            sk sudo helpers                   done
+SPC f y/Y      yank absolute/project path        sk path helpers                   done
+SPC c a/r      code action/rename                Eglot actions                     done
+SPC c c/C      compile/recompile                 compile/recompile                 done
+SPC c d/D      definition/references             xref                              done
+SPC c f        format buffer/region              explicit Eglot/indent helper      done
+SPC c i/t      implementation/type definition    Eglot                             done
+SPC c k        documentation                     eldoc-doc-buffer                  done
+SPC c w/x      whitespace/diagnostics            delete-trailing/Flymake           done
 SPC w w/W      next/previous window              sk/next-window/sk/previous-window done
 SPC w u/U      winner undo/redo                  winner-undo/winner-redo           done
 SPC t n/x/o    tab actions                       tab-new/tab-close/tab-close-other done
@@ -166,27 +306,59 @@ SPC o t        vterm                             vterm                          
 SPC s i        consult-imenu                     consult-imenu                     done
 SPC s I        consult-imenu-multi               consult-imenu-multi               done
 SPC p f        projectile-find-file              project-find-file                 done, project.el
+SPC p F        find file in other project        sk/project-find-file-in-other-project done
 SPC p s        projectile-ripgrep                consult-ripgrep                   done, project.el
 SPC p p        projectile-switch-project         project-switch-project            done, project.el
 SPC p g        magit-status                      magit-status                      done
 SPC p t        sk/project-vterm                  sk/project-vterm                  done, clean helper
 SPC p n        sk/project-notes                  sk/project-notes                  done, clean helper
+SPC p ./!/&    project symbol/shell commands     sk helpers                        done
+SPC p c/C      project compile/recompile         sk helpers                        done
+SPC p e        edit .dir-locals                  sk/project-edit-dir-locals        done
+SPC p k/S/r/o  kill/save/recent/sibling          sk/built-in helpers               done
+SPC s ./S      search symbol at point            sk search helpers                 done
+SPC s b/B      search buffer/open buffers        consult-line/consult-line-multi   done
+SPC s d/D      search current/other directory    sk search helpers                 done
+SPC s f/m      locate/bookmark                   locate/bookmark-jump              done
+SPC o -        dired-jump                        dired-jump                        done
+SPC o b        browse-url-of-file                browse-url-of-file                done
+SPC o f/F      make/select frame                 make-frame/select-frame-by-name   done
 SPC n i        sk/org-open-inbox                 sk/org-open-inbox                 done
 SPC n d        sk/org-open-daily-note            sk/org-open-daily-note            done
+SPC n t        sk/org-open-topic-note            sk/org-open-topic-note            done
+SPC n p        sk/org-open-project-note          sk/org-open-project-note          done
 SPC n c        org-capture                       org-capture                       done
+SPC n a        org-agenda                        org-agenda                        done
+C-c n a        org-agenda                        org-agenda                        done
 dired h        dired-up-directory                dired-up-directory                done
 dired l        dired-find-file                   dired-find-file                   done
 dired RET      dired-find-file                   dired-find-file                   done
+dired SPC m h  dired-omit-mode                   dired-omit-mode                   done
+magit q/Q      quit Magit buffer/session         magit bury/quit session           done
+magit [/]/TAB  section navigation/toggle         Magit built-ins                   done
+magit gr/gR/gz refresh                           Magit built-ins                   done
+magit gd       jump diffstat/diff                magit-jump-to-diffstat-or-diff   done
+org SPC m t    org-todo                         org-todo                         done
+agenda SPC m t org-agenda-todo                  org-agenda-todo                  done
+org SPC m d    date/deadline localleader         same built-in Org commands       done
+org SPC m c    clock localleader                 same built-in Org commands       done
+org SPC m p    priority localleader              same built-in Org commands       done
+org SPC m r    refile localleader                org-refile                       done
+org SPC m s    subtree localleader               same built-in Org commands       done
+org SPC m b    table localleader                 same built-in Org commands       done
+org SPC m a    attachment localleader            same built-in Org commands       done
 #+end_src
 
 * TODO Next Emacs Passes
 #+begin_src text
-TODO Finish Doom muscle-memory key audit for file/project/search/help/buffer edge cases.
+DONE Finish Doom muscle-memory key audit for core file/project/search/help/buffer/mode keys.
+TODO Watch for real-use key edge cases and add them deliberately as they come up.
 TODO Tune completion across minibuffer, Corfu, snippets, LSP, and prose.
 TODO Polish Doom modeline and Sky theme faces until the UI looks intentional.
 TODO Make Org first-class: notes, agenda, capture templates, source blocks, navigation.
-TODO Sanity-check LSP per language: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown.
+DONE Sanity-check LSP per language: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown/Org prose, YAML/JSON, web basics.
 TODO Decide formatting policy and keep it explicit instead of surprise autoformat.
+TODO Decide Emacs tree-sitter grammar ownership before enabling tsx-ts/js-ts modes.
 TODO Keep documenting the clean Emacs layout and user-facing key surface as it changes.
 #+end_src
 

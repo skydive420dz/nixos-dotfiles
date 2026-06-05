@@ -109,6 +109,7 @@
 (global-set-key (kbd "C-c n t") #'sk/org-open-topic-note)
 (global-set-key (kbd "C-c n p") #'sk/org-open-project-note)
 (global-set-key (kbd "C-c n c") #'org-capture)
+(global-set-key (kbd "C-c n a") #'org-agenda)
 
 (provide 'sk-notes)
 
