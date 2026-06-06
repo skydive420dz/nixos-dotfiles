@@ -77,7 +77,7 @@ emacsclient --create-frame --alternate-editor=emacs
 :END:
 - 2026-05-30: Doom Emacs experiment checkpoint: upstream Doom, repo-local live config, Evil mode, Org/Magit/Dired/vterm, QML/Lua/Nix/Rust/C tooling, inline diagnostics, readable modeline, dashboard logo, relative line numbers, repo-local spell dictionary, and Doom-owned =SPC w ...= window behavior.
 - 2026-05-30: Sky theme checkpoint: native =sky-dark= and =sky-light= Doom themes, shared face definitions, and =SPC h r t= reload for runtime theme changes.
-- 2026-05-31: Emacs daemon checkpoint: NixOS owns an =emacs.service= user daemon, launcher entry opens =doom-emacs= via =emacsclient=, and terminal clients are available through =doom-emacs-terminal=.
+- 2026-05-31: Doom-era daemon checkpoint: NixOS owned an =emacs.service= user daemon, launcher entry opened =doom-emacs= via =emacsclient=, and terminal clients were available through =doom-emacs-terminal=.
 - 2026-06-05: Clean Emacs active checkpoint: =~/.config/emacs= points to =config/emacs=, Doom is frozen reference, clean Evil key layer is usable, Org navigation works, vterm/eshell are ported, Doom modeline is active, terminal frames use Sky fallback colors, and prompts accept =y/n=.
 
 ** Checklist
@@ -111,6 +111,7 @@ Stable enough to treat as current baseline:
 - [X] Formatting policy is explicit/manual: =SPC c f= uses the tracked formatter map, no format-on-save hook exists, and unknown modes fall back to Eglot/indentation.
 - [X] Tree-sitter grammar ownership is explicit: Nix provides parser libraries, clean Emacs remaps only languages with available built-in TS modes, and NVF remains untouched.
 - [X] Syntax highlighting asks for maximum font-lock decoration, and Eglot keeps project servers alive instead of autoshutting them down during normal buffer churn.
+- [X] vterm =C-h/j/k/l= window navigation uses the same =windmove-*= path as the global completion/window wrappers.
 
 Next passes:
 
@@ -119,6 +120,7 @@ Next passes:
 - [ ] Observe completion documentation richness during real use; =M-d= can show popup docs when the active source/server provides them, but file/dabbrev/keyword/snippet sources are usually sparse.
 - [ ] Watch vterm/eshell during real use and tune only concrete rough edges.
 - [ ] Watch routed Tree-sitter modes during real use and fall back only if a TS mode is worse than the classic mode.
+- [ ] Decide whether clean Emacs should consume generated =theme-select= runtime tokens or keep its local =sky-night= palette.
 - [ ] Choose extra TS major-mode packages for QML and Org only if they beat the current classic modes.
 - [ ] Make Org first-class: refine custom agenda views and daily review habits.
 - [ ] Keep documenting the clean Emacs layout and user-facing key surface as it changes.
@@ -126,3 +128,6 @@ Next passes:
 - [ ] Sensible tab and indentation configs nvf reference.
 - [ ] Ledger Mode
 - [ ] Rainbow Mode togglable
+- [ ] Dired preview
+- [ ] eww, email, rss
+- [ ] 
