@@ -197,28 +197,28 @@
   (interactive)
   (if (sk/completion-active-p)
       (corfu-next)
-    (evil-window-down)))
+    (windmove-down)))
 
 (defun sk/completion-previous-or-window-up ()
   "Select the previous completion candidate or move to the window above."
   (interactive)
   (if (sk/completion-active-p)
       (corfu-previous)
-    (evil-window-up)))
+    (windmove-up)))
 
 (defun sk/completion-accept-or-window-right ()
   "Accept the current completion candidate or move to the right window."
   (interactive)
   (if (sk/completion-active-p)
       (corfu-insert)
-    (evil-window-right)))
+    (windmove-right)))
 
 (defun sk/completion-quit-or-window-left ()
   "Quit completion or move to the left window."
   (interactive)
   (if (sk/completion-active-p)
       (corfu-quit)
-    (evil-window-left)))
+    (windmove-left)))
 
 (provide 'sk-completion)
 
