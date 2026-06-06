@@ -198,7 +198,6 @@
    `(term-color-magenta ((t (:foreground ,magenta :background ,magenta))))
    `(term-color-cyan ((t (:foreground ,cyan :background ,cyan))))
    `(term-color-white ((t (:foreground ,white :background ,white))))
-   `(vterm-color-default ((t (:foreground ,fg :background ,bg))))
    `(vterm-color-black ((t (:foreground ,black :background ,black))))
    `(vterm-color-red ((t (:foreground ,red :background ,red))))
    `(vterm-color-green ((t (:foreground ,green :background ,green))))
