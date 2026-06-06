@@ -44,14 +44,19 @@
       "selectionBackground": "#b4c0c8"
     },
     "editorSyntax": {
-      "comment": "#9aa1ac",
-      "string": "#a8d8b0",
-      "function": "#8ecae6",
-      "keyword": "#c4a7e7",
-      "number": "#f2cc8f",
-      "type": "#94d2bd",
-      "builtin": "#b8e0d2",
-      "preprocessor": "#e5989b"
+      "comment": "#7f8a99",
+      "doc": "#8fb2a6",
+      "string": "#9fcfc4",
+      "function": "#8edbd6",
+      "keyword": "#8fb8ff",
+      "number": "#c9bda4",
+      "type": "#b9c7e6",
+      "builtin": "#9ccfd8",
+      "variable": "#ffd7a8",
+      "property": "#aebfd0",
+      "operator": "#d5dde5",
+      "punctuation": "#9fa7b2",
+      "preprocessor": "#d6a2a8"
     },
     "terminal": {
       "black": "#22262b",
@@ -118,12 +123,17 @@
     },
     "editorSyntax": {
       "comment": "#6f767d",
-      "string": "#3f7d55",
-      "function": "#246a8f",
-      "keyword": "#6f4aa8",
-      "number": "#8a5a00",
-      "type": "#226f68",
-      "builtin": "#2f766f",
+      "doc": "#5f7f68",
+      "string": "#2f7768",
+      "function": "#006f87",
+      "keyword": "#245fba",
+      "number": "#7a6500",
+      "type": "#5d66a8",
+      "builtin": "#22717a",
+      "variable": "#7a4f00",
+      "property": "#526b82",
+      "operator": "#4f5963",
+      "punctuation": "#747b83",
       "preprocessor": "#9a4d4d"
     },
     "terminal": {

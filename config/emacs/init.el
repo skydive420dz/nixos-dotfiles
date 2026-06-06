@@ -9,6 +9,8 @@
 (when (file-exists-p custom-file)
   (load custom-file nil t))
 
+(setq load-prefer-newer t)
+
 (defvar sk/lisp-directory
   (expand-file-name "lisp" sk/user-directory)
   "Directory for Sky Emacs modules.")
