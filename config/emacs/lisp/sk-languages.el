@@ -3,6 +3,9 @@
 (use-package nix-mode
   :mode "\\.nix\\'")
 
+(use-package nix-ts-mode
+  :commands nix-ts-mode)
+
 (use-package lua-mode
   :mode "\\.lua\\'")
 
@@ -15,6 +18,9 @@
 (use-package haskell-mode
   :mode "\\.hs\\'")
 
+(use-package haskell-ts-mode
+  :commands haskell-ts-mode)
+
 (use-package typescript-mode
   :mode ("\\.ts\\'" "\\.tsx\\'"))
 
@@ -26,6 +32,9 @@
 
 (use-package markdown-mode
   :mode "\\.md\\'")
+
+(use-package markdown-ts-mode
+  :commands markdown-ts-mode)
 
 (use-package yaml-mode
   :mode "\\.ya?ml\\'")

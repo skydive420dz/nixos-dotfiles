@@ -18,7 +18,7 @@ end
 
 local terminal = "uwsm app -- ghostty"
 local file_manager = "uwsm app -- ghostty -e yazi"
-local editor = "uwsm app -- emacs"
+local editor = "uwsm app -- emacsclient --create-frame --alternate-editor=emacs"
 local browser = "uwsm app -- brave"
 local menu = "~/.config/scripts/launcher-toggle"
 local clipboard = "~/.config/scripts/clipboard-toggle"

@@ -123,11 +123,15 @@
     (add-hook 'completion-at-point-functions #'cape-dabbrev 40 t)))
 
 (dolist (hook '(prog-mode-hook conf-mode-hook
-                nix-mode-hook qml-mode-hook lua-mode-hook glsl-mode-hook
+                nix-mode-hook nix-ts-mode-hook
+                qml-mode-hook
+                lua-mode-hook lua-ts-mode-hook
+                haskell-mode-hook haskell-ts-mode-hook
+                glsl-mode-hook
                 yaml-mode-hook json-mode-hook))
   (add-hook hook #'sk/capf-code-defaults))
 
-(dolist (hook '(org-mode-hook markdown-mode-hook text-mode-hook))
+(dolist (hook '(org-mode-hook markdown-mode-hook markdown-ts-mode-hook text-mode-hook))
   (add-hook hook #'sk/capf-prose-defaults))
 
 (global-set-key (kbd "M-/") #'completion-at-point)
@@ -141,19 +145,28 @@
   (and (not (minibufferp))
        (not (memq major-mode sk/completion-disabled-modes))
        (or (derived-mode-p 'prog-mode 'text-mode 'conf-mode)
-           (memq major-mode '(nix-mode qml-mode lua-mode
-                              yaml-mode json-mode markdown-mode org-mode)))))
+           (memq major-mode '(nix-mode nix-ts-mode
+                              qml-mode
+                              lua-mode lua-ts-mode
+                              yaml-mode yaml-ts-mode
+                              json-mode json-ts-mode
+                              markdown-mode markdown-ts-mode
+                              org-mode)))))
 
 (defun sk/completion-code-buffer-p ()
   "Return non-nil when code/config fallback CAPFs should be active."
   (or (derived-mode-p 'prog-mode 'conf-mode)
-      (memq major-mode '(nix-mode qml-mode lua-mode
-                         yaml-mode json-mode glsl-mode))))
+      (memq major-mode '(nix-mode nix-ts-mode
+                         qml-mode
+                         lua-mode lua-ts-mode
+                         yaml-mode yaml-ts-mode
+                         json-mode json-ts-mode
+                         glsl-mode))))
 
 (defun sk/completion-prose-buffer-p ()
   "Return non-nil when prose fallback CAPFs should be active."
   (or (derived-mode-p 'text-mode)
-      (memq major-mode '(markdown-mode org-mode))))
+      (memq major-mode '(markdown-mode markdown-ts-mode org-mode))))
 
 (defun sk/refresh-completion-modes ()
   "Reapply completion minor modes to existing buffers after config reloads."

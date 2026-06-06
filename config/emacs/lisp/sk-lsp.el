@@ -9,21 +9,27 @@
   '(c-mode c++-mode c-ts-mode c++-ts-mode
     rust-mode rust-ts-mode
     python-mode python-ts-mode
-    lua-mode
-    nix-mode
+    lua-mode lua-ts-mode
+    nix-mode nix-ts-mode
     qml-mode
-    js-mode typescript-mode
-    web-mode html-mode mhtml-mode css-mode css-ts-mode
+    js-mode js-ts-mode typescript-mode typescript-ts-mode tsx-ts-mode
+    web-mode html-mode html-ts-mode mhtml-mode css-mode css-ts-mode
     sh-mode bash-ts-mode
-    glsl-mode
-    haskell-mode
+    glsl-mode glsl-ts-mode
+    haskell-mode haskell-ts-mode
     yaml-mode yaml-ts-mode
     json-mode json-ts-mode
-    markdown-mode org-mode text-mode)
+    markdown-mode markdown-ts-mode org-mode text-mode)
   "Major modes that should start Eglot when their server is available.")
 
 (defconst sk/eglot-server-programs
   '((((qml-mode :language-id "qml")) . ("qmlls-wrapped"))
+    (((lua-mode :language-id "lua")
+      (lua-ts-mode :language-id "lua"))
+     . ("lua-language-server"))
+    (((nix-mode :language-id "nix")
+      (nix-ts-mode :language-id "nix"))
+     . ("nil"))
     (((json-mode :language-id "json")
       (json-ts-mode :language-id "json")
       (js-json-mode :language-id "json"))
@@ -31,28 +37,43 @@
     (((yaml-mode :language-id "yaml")
       (yaml-ts-mode :language-id "yaml"))
      . ("yaml-language-server" "--stdio"))
-    (((glsl-mode :language-id "glsl")) . ("glsl_analyzer" "--stdio"))
-    (((haskell-mode :language-id "haskell")) . ("haskell-language-server-wrapper" "--lsp"))
+    (((glsl-mode :language-id "glsl")
+      (glsl-ts-mode :language-id "glsl"))
+     . ("glsl_analyzer" "--stdio"))
+    (((haskell-mode :language-id "haskell")
+      (haskell-ts-mode :language-id "haskell"))
+     . ("haskell-language-server-wrapper" "--lsp"))
     (((python-mode :language-id "python")
       (python-ts-mode :language-id "python"))
      . ("basedpyright-langserver" "--stdio"))
     (((web-mode :language-id "html")
       (html-mode :language-id "html")
+      (html-ts-mode :language-id "html")
       (mhtml-mode :language-id "html"))
      . ("vscode-html-language-server" "--stdio"))
     ((css-mode css-ts-mode) . ("vscode-css-language-server" "--stdio"))
     (((js-mode :language-id "javascript")
-      (typescript-mode :language-id "typescript"))
+      (js-ts-mode :language-id "javascript")
+      (typescript-mode :language-id "typescript")
+      (typescript-ts-mode :language-id "typescript")
+      (tsx-ts-mode :language-id "typescriptreact"))
      . ("typescript-language-server" "--stdio"))
     (((markdown-mode :language-id "markdown")
+      (markdown-ts-mode :language-id "markdown")
       (org-mode :language-id "org")
       (text-mode :language-id "plaintext"))
      . ("harper-ls" "--stdio")))
   "Sky-specific Eglot server mappings, ordered from specific to broad.")
 
+(defun sk/eglot-buffer-eligible-p ()
+  "Return non-nil when the current buffer is a real file buffer for Eglot."
+  (and buffer-file-name
+       (not (string-prefix-p " " (buffer-name)))))
+
 (defun sk/eglot-ensure ()
   "Start Eglot for supported buffers."
   (when (and (memq major-mode sk/eglot-managed-modes)
+             (sk/eglot-buffer-eligible-p)
              (not (eglot-managed-p)))
     (condition-case err
         (progn
@@ -69,19 +90,19 @@
   :hook ((c-mode c++-mode c-ts-mode c++-ts-mode
           rust-mode rust-ts-mode
           python-mode python-ts-mode
-          lua-mode
-          nix-mode
+          lua-mode lua-ts-mode
+          nix-mode nix-ts-mode
           qml-mode
-          js-mode typescript-mode
-          web-mode html-mode mhtml-mode css-mode css-ts-mode
+          js-mode js-ts-mode typescript-mode typescript-ts-mode tsx-ts-mode
+          web-mode html-mode html-ts-mode mhtml-mode css-mode css-ts-mode
           sh-mode bash-ts-mode
-          glsl-mode
-          haskell-mode
+          glsl-mode glsl-ts-mode
+          haskell-mode haskell-ts-mode
           yaml-mode yaml-ts-mode
           json-mode json-ts-mode
-          markdown-mode org-mode text-mode) . sk/eglot-ensure)
+          markdown-mode markdown-ts-mode org-mode text-mode) . sk/eglot-ensure)
   :config
-  (setq eglot-autoshutdown t
+  (setq eglot-autoshutdown nil
         eglot-workspace-configuration
         '(:nil (:nix (:flake (:autoArchive t)))))
   (dolist (server sk/eglot-server-programs)

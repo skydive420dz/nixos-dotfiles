@@ -298,6 +298,8 @@
     "sk-ui"
     "sk-evil"
     "sk-completion"
+    "sk-languages"
+    "sk-treesit"
     "sk-lsp"
     "sk-format"
     "sk-org"
@@ -306,7 +308,6 @@
     "sk-terminal"
     "sk-project"
     "sk-git"
-    "sk-languages"
     "sk-keybindings")
   "Sky Emacs modules to reload with `sk/reload-config'.")
 

@@ -278,7 +278,9 @@
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
-     (shell . t)))
+     (shell . t)
+     (python . t)
+     (lua . t)))
   (require 'org-tempo)
   (dolist (template '(("sh" . "src sh")
                       ("bash" . "src bash")

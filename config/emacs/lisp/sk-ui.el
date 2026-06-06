@@ -1,6 +1,6 @@
 ;;; sk-ui.el --- UI settings -*- lexical-binding: t; -*-
 
-(set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 160)
+(set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 120)
 
 ;; Keep MSI opaque by default. Transparency was measured as a real redraw cost.
 (add-to-list 'default-frame-alist '(alpha . 100))

@@ -25,6 +25,7 @@ frozen reference material while the clean config absorbs the useful behavior.
 - Core project tools: Git, ripgrep, fd, EditorConfig, tree-sitter.
 - Rich document support: sqlite, gnutls, ImageMagick, zstd, unzip, pandoc, TeX Live Small, aspell English, and Harper.
 - Language/tooling support: Nix, Lua, QML/Qt, Rust, C/C++, Python, Haskell, shell, Markdown, YAML, JSON, GLSL, and Emacs Lisp.
+- Tree-sitter parser bundle for clean Emacs, exposed through =SK_EMACS_TREE_SITTER_GRAMMAR_PATH=.
 
 ** Active Modules
 :PROPERTIES:
@@ -96,7 +97,7 @@ Stable enough to treat as current baseline:
 - [X] Org notes root, capture templates, daily/topic/project helpers, and recursive agenda file discovery are active.
 - [X] Org agenda refresh, refile targets, and daily review helper are active.
 - [X] Org source-block insertion, editing, tangling, and source-block navigation helpers are active.
-- [X] Org Babel has safe execution enabled for Emacs Lisp and shell.
+- [X] Org Babel execution policy is documented: executable languages are Emacs Lisp, shell/bash, Python, and Lua; other source templates remain notes-only until a real execution workflow appears.
 - [X] Yasnippet is active globally, QML snippets are tracked under clean Emacs, snippet triggers complete through Corfu, and prose buffers have file plus dabbrev completion fallbacks.
 - [X] Doom muscle-memory key audit is complete for the core file, project, search, help, buffer, mode, window, notes, Org, Dired, Magit, vterm, and eshell surfaces currently in daily use.
 - [X] Daily notes workflow is active: inbox, daily/topic/project notes, capture templates, agenda refresh, and daily review are wired.
@@ -108,6 +109,8 @@ Stable enough to treat as current baseline:
 - [X] Terminal ANSI, term, and vterm faces use the Sky palette instead of Emacs' stock =red3=/=blue2=/=green3= colors.
 - [X] Language sanity probe passed for Rust, C, Python, Haskell, and YAML: each opened in the expected mode, attached to the expected Eglot server, had Corfu active, and exposed snippets before Eglot completion.
 - [X] Formatting policy is explicit/manual: =SPC c f= uses the tracked formatter map, no format-on-save hook exists, and unknown modes fall back to Eglot/indentation.
+- [X] Tree-sitter grammar ownership is explicit: Nix provides parser libraries, clean Emacs remaps only languages with available built-in TS modes, and NVF remains untouched.
+- [X] Syntax highlighting asks for maximum font-lock decoration, and Eglot keeps project servers alive instead of autoshutting them down during normal buffer churn.
 
 Next passes:
 
@@ -115,9 +118,11 @@ Next passes:
 - [ ] Tune completion across minibuffer, Corfu, LSP, and real project buffers after daily use exposes friction.
 - [ ] Observe completion documentation richness during real use; =M-d= can show popup docs when the active source/server provides them, but file/dabbrev/keyword/snippet sources are usually sparse.
 - [ ] Watch vterm/eshell during real use and tune only concrete rough edges.
-- [ ] Decide Tree-sitter policy: where it is worth using, where native modes are enough.
-- [ ] Make Org first-class: refine custom agenda views, source-block execution policy, and daily review habits.
-- [ ] Decide which additional Org Babel languages to enable beyond Emacs Lisp and shell.
+- [ ] Watch routed Tree-sitter modes during real use and fall back only if a TS mode is worse than the classic mode.
+- [ ] Choose extra TS major-mode packages for QML and Org only if they beat the current classic modes.
+- [ ] Make Org first-class: refine custom agenda views and daily review habits.
 - [ ] Keep documenting the clean Emacs layout and user-facing key surface as it changes.
 - [ ] Check the possibility of transparency rules through hyperland instead of native alpha.
 - [ ] Sensible tab and indentation configs nvf reference.
+- [ ] Ledger Mode
+- [ ] Rainbow Mode togglable

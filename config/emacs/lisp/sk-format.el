@@ -7,7 +7,9 @@
 
 (defvar sk/formatter-alist
   '((nix-mode . ("nixfmt"))
+    (nix-ts-mode . ("nixfmt"))
     (lua-mode . ("stylua" "-"))
+    (lua-ts-mode . ("stylua" "-"))
     (qml-mode . ("qmlformat" "--indent-width" "2" "--column-width" "-1" :file))
     (rust-mode . ("rustfmt"))
     (c-mode . ("clang-format"))
@@ -38,7 +40,9 @@ Commands containing `:file' receive a temporary file path instead.")
         ('python-ts-mode ".py")
         ('rust-mode ".rs")
         ('nix-mode ".nix")
+        ('nix-ts-mode ".nix")
         ('lua-mode ".lua")
+        ('lua-ts-mode ".lua")
         (_ ".txt"))))
 
 (defun sk/formatter-command ()

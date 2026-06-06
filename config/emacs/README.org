@@ -290,6 +290,36 @@ SPC m p d/p/u     priority down / set / up
 C-SPC             show and scroll agenda item
 #+end_src
 
+* Org Babel Policy
+Org source blocks are split between executable languages and note/template
+languages.
+
+Executable languages:
+
+#+begin_src text
+emacs-lisp
+shell / bash
+python
+lua
+#+end_src
+
+Template-only languages:
+
+#+begin_src text
+nix
+qml
+rust
+c / c++
+haskell
+json
+yaml
+glsl
+#+end_src
+
+Execution still asks for confirmation through =org-confirm-babel-evaluate=.
+Add another executable language only when there is a real workflow for running
+that language from Org, not merely because we want a source-block template.
+
 * Mode Polish
 #+begin_src text
 Dired:
@@ -350,6 +380,56 @@ Documentation availability depends on the completion source. LSP candidates may
 provide docs. File names, keywords, dabbrev, snippets, and many local symbols
 usually do not. Snippet triggers are offered in Corfu for code buffers and
 expand when accepted. Current tracked snippets cover QML/Quickshell.
+
+* Tree-Sitter Policy
+Nix owns Tree-sitter parser delivery for clean Emacs. Emacs reads the parser
+bundle from =SK_EMACS_TREE_SITTER_GRAMMAR_PATH= and only remaps modes when both
+the grammar and built-in TS major mode are available.
+
+=font-lock-maximum-decoration= is set to =t= so modes use their richest
+available highlighting level. This only affects faces that the major mode
+actually marks; it does not invent semantic highlighting for underpowered modes.
+
+Routed to built-in TS modes:
+
+#+begin_src text
+python        python-ts-mode
+rust          rust-ts-mode
+c / c++       c-ts-mode / c++-ts-mode
+shell         bash-ts-mode
+lua           lua-ts-mode
+nix           nix-ts-mode
+haskell       haskell-ts-mode
+markdown      markdown-ts-mode
+json          json-ts-mode
+yaml          yaml-ts-mode
+css           css-ts-mode
+javascript    js-ts-mode
+typescript    typescript-ts-mode / tsx-ts-mode
+toml          toml-ts-mode
+html          html-ts-mode
+#+end_src
+
+Grammar available, classic mode retained until we deliberately choose an Emacs
+TS mode package or confirm the built-in mode exists:
+
+#+begin_src text
+qml
+glsl
+org
+#+end_src
+
+QML remains classic because this package set does not provide a usable
+=qml-ts-mode=. Do not fake QML highlighting with ad hoc regex rules; revisit
+when a real Tree-sitter major mode is available.
+
+NVF is not edited by this policy. It remains a reference and already owns its
+own Tree-sitter setup through NVF.
+
+* LSP Policy
+Eglot is the clean Emacs LSP client. Servers are started for real file buffers
+only, and =eglot-autoshutdown= stays disabled so project language servers are
+not repeatedly started and killed during normal buffer churn.
 
 * Binding Migration
 This table tracks Doom key behavior as it moves into the clean config.
@@ -466,7 +546,8 @@ DONE Polish Doom modeline and Sky theme faces until the UI looks intentional.
 TODO Make Org first-class: notes, agenda, capture templates, source blocks, navigation.
 DONE Sanity-check LSP per language: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown/Org prose, YAML/JSON, web basics.
 TODO Decide formatting policy and keep it explicit instead of surprise autoformat.
-TODO Decide Emacs tree-sitter grammar ownership before enabling tsx-ts/js-ts modes.
+DONE Decide Emacs tree-sitter grammar ownership before enabling tsx-ts/js-ts modes.
+TODO Choose extra TS major-mode packages for QML and Org if they beat the classic modes.
 TODO Keep documenting the clean Emacs layout and user-facing key surface as it changes.
 #+end_src
 

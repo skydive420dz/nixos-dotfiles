@@ -7,6 +7,8 @@
       ring-bell-function 'ignore
       use-dialog-box nil
       confirm-kill-emacs #'y-or-n-p
+      font-lock-maximum-decoration t
+      treesit-font-lock-level 4
       read-process-output-max (* 1024 1024))
 
 (fset #'yes-or-no-p #'y-or-n-p)

@@ -21,6 +21,8 @@
 (require 'sk-ui)
 (require 'sk-evil)
 (require 'sk-completion)
+(require 'sk-languages)
+(require 'sk-treesit)
 (require 'sk-lsp)
 (require 'sk-format)
 (require 'sk-org)
@@ -29,7 +31,6 @@
 (require 'sk-terminal)
 (require 'sk-project)
 (require 'sk-git)
-(require 'sk-languages)
 (require 'sk-keybindings)
 
 (provide 'init)

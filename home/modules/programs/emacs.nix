@@ -21,6 +21,40 @@ let
   qmllsWrapped = pkgs.writeShellScriptBin "qmlls-wrapped" ''
     exec ${pkgs.qt6.qtdeclarative}/bin/qmlls ${qmlImportArgs} "$@"
   '';
+  emacsTreeSitterGrammars = with pkgs.tree-sitter-grammars; {
+    bash = tree-sitter-bash;
+    c = tree-sitter-c;
+    cpp = tree-sitter-cpp;
+    css = tree-sitter-css;
+    glsl = tree-sitter-glsl;
+    haskell = tree-sitter-haskell;
+    html = tree-sitter-html;
+    javascript = tree-sitter-javascript;
+    json = tree-sitter-json;
+    lua = tree-sitter-lua;
+    markdown = tree-sitter-markdown;
+    markdown-inline = tree-sitter-markdown-inline;
+    nix = tree-sitter-nix;
+    org = tree-sitter-org;
+    python = tree-sitter-python;
+    qmljs = tree-sitter-qmljs;
+    rust = tree-sitter-rust;
+    toml = tree-sitter-toml;
+    tsx = tree-sitter-tsx;
+    typescript = tree-sitter-typescript;
+    yaml = tree-sitter-yaml;
+  };
+  emacsTreeSitterGrammarBundle = pkgs.runCommand "emacs-tree-sitter-grammars" { } (
+    ''
+      mkdir -p "$out/lib"
+    ''
+    + lib.concatStringsSep "\n" (
+      lib.mapAttrsToList (language: grammar: ''
+        ln -s ${grammar}/parser "$out/lib/libtree-sitter-${language}.so"
+      '') emacsTreeSitterGrammars
+    )
+  );
+  emacsTreeSitterGrammarPath = "${emacsTreeSitterGrammarBundle}/lib";
   emacsRuntimeTools = with pkgs; [
     emacs-pgtk
 
@@ -104,6 +138,7 @@ let
     set -euo pipefail
 
     export PATH="${emacsRuntimePath}:''${PATH-}"
+    export SK_EMACS_TREE_SITTER_GRAMMAR_PATH="${emacsTreeSitterGrammarPath}"
 
     ${pkgs.emacs-pgtk}/bin/emacs --batch \
       -l "$HOME/.config/emacs/early-init.el" \
@@ -135,6 +170,8 @@ let
   '';
 in
 {
+  home.sessionVariables.SK_EMACS_TREE_SITTER_GRAMMAR_PATH = emacsTreeSitterGrammarPath;
+
   home.packages = emacsRuntimeTools ++ [
     emacsSync
   ];
@@ -168,6 +205,7 @@ in
     Service = {
       Environment = [
         "PATH=${emacsRuntimePath}"
+        "SK_EMACS_TREE_SITTER_GRAMMAR_PATH=${emacsTreeSitterGrammarPath}"
       ];
       ExecStart = "${pkgs.emacs-pgtk}/bin/emacs --fg-daemon";
       Restart = "on-failure";
