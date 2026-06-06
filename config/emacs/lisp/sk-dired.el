@@ -22,7 +22,9 @@
   :commands (dired-preview-mode dired-preview-global-mode)
   :config
   (setq dired-preview-delay 0.35
-        dired-preview-max-size (expt 2 20)
+        dired-preview-max-size (expt 2 25)
+        dired-preview-image-extensions-regexp
+        "\\.\\(png\\|jpe?g\\|webp\\|gif\\|tiff?\\|svg\\|xpm\\|xbm\\|pbm\\)\\'"
         dired-preview-ignored-extensions-regexp
         (concat "\\."
                 "\\(gz\\|zst\\|tar\\|xz\\|rar\\|zip\\|iso\\|epub\\)"
