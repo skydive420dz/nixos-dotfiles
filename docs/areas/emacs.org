@@ -93,6 +93,8 @@ Stable enough to treat as current baseline:
 - [X] Doom modeline-style UI and Sky theme faces are active.
 - [X] vterm builds through =emacs-sync=.
 - [X] Current state is checkpointed in Git.
+- [X] Org notes root, capture templates, daily/topic/project helpers, and recursive agenda file discovery are active.
+- [X] Org Babel has safe execution enabled for Emacs Lisp and shell.
 
 Next passes:
 
@@ -101,7 +103,8 @@ Next passes:
 - [ ] Confirm completion documentation behavior per source: LSP docs, snippets, file names, dabbrev, keywords.
 - [ ] Polish vterm and eshell faces/ergonomics until they feel like real terminals.
 - [ ] Decide Tree-sitter policy: where it is worth using, where native modes are enough.
-- [ ] Make Org first-class: notes, agenda, capture templates, source blocks, navigation, and daily workflow.
+- [ ] Make Org first-class: refine agenda views, refile targets, source-block workflow, and daily review flow.
+- [ ] Decide which additional Org Babel languages to enable beyond Emacs Lisp and shell.
 - [ ] Sanity-check LSP per language in real files: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown/Org, YAML/JSON, GLSL.
 - [ ] Decide formatting policy and keep it explicit instead of surprise autoformat.
 - [ ] Keep documenting the clean Emacs layout and user-facing key surface as it changes.

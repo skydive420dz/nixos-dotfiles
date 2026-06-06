@@ -193,6 +193,10 @@
         org-log-done 'time
         org-image-actual-width nil
         org-ellipsis "")
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (shell . t)))
   (require 'org-tempo)
   (dolist (template '(("sh" . "src sh")
                       ("el" . "src emacs-lisp")

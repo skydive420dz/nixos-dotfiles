@@ -5,6 +5,16 @@
 (defvar sk/org-notes-root (expand-file-name "~/Documents/notes/")
   "Root directory for personal Org notes.")
 
+(defun sk/org-agenda-note-files ()
+  "Return every Org note file under `sk/org-notes-root'."
+  (when (file-directory-p sk/org-notes-root)
+    (directory-files-recursively sk/org-notes-root "\\.org\\'")))
+
+(defun sk/org-refresh-agenda-files ()
+  "Refresh `org-agenda-files' from the note tree."
+  (interactive)
+  (setq org-agenda-files (sk/org-agenda-note-files)))
+
 (defun sk/org--slugify (text)
   "Return a simple filename slug for TEXT."
   (let* ((downcased (downcase text))
@@ -20,7 +30,9 @@
               "#+date: " (format-time-string "%Y-%m-%d") "\n"
               "#+startup: overview\n\n")
       (when body
-        (insert body))))
+        (insert body)))
+    (when (boundp 'org-agenda-files)
+      (sk/org-refresh-agenda-files)))
   file)
 
 (defun sk/org-inbox-file ()
@@ -80,7 +92,7 @@
   (find-file (sk/org-project-file)))
 
 (setq org-directory sk/org-notes-root
-      org-agenda-files (list org-directory)
+      org-agenda-files (sk/org-agenda-note-files)
       org-default-notes-file (sk/org-inbox-file))
 
 (setq org-capture-templates
