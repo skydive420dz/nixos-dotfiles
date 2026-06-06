@@ -27,6 +27,6 @@ Text {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: Quickshell.execDetached(["bash", "-lc", "uwsm app -- kitty --class bluetui -e bluetui"])
+        onClicked: Quickshell.execDetached(["bash", "-lc", "uwsm app -- ghostty --gtk-single-instance=false --class=bluetui --title=bluetui -e bluetui"])
     }
 }

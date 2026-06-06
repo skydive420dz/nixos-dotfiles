@@ -43,6 +43,16 @@
       "selectionForeground": "#1a1d21",
       "selectionBackground": "#b4c0c8"
     },
+    "editorSyntax": {
+      "comment": "#9aa1ac",
+      "string": "#a8d8b0",
+      "function": "#8ecae6",
+      "keyword": "#c4a7e7",
+      "number": "#f2cc8f",
+      "type": "#94d2bd",
+      "builtin": "#b8e0d2",
+      "preprocessor": "#e5989b"
+    },
     "terminal": {
       "black": "#22262b",
       "brightBlack": "#3d424a",
@@ -105,6 +115,16 @@
       "muted": "#7d7a75",
       "selectionForeground": "#f0efeb",
       "selectionBackground": "#64757d"
+    },
+    "editorSyntax": {
+      "comment": "#6f767d",
+      "string": "#3f7d55",
+      "function": "#246a8f",
+      "keyword": "#6f4aa8",
+      "number": "#8a5a00",
+      "type": "#226f68",
+      "builtin": "#2f766f",
+      "preprocessor": "#9a4d4d"
     },
     "terminal": {
       "black": "#e0dcd4",

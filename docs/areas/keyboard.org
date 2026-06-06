@@ -110,7 +110,7 @@ Observed terminal escape output during first pass:
 | Physical key          | Terminal output                           | Notes                                                                      |
 |-----------------------+-------------------------------------------+----------------------------------------------------------------------------|
 | F1-F12 plain          | =^[OP= through =^[[24~=                   | Terminal sees literal F1-F12                                               |
-| PrintScreen row key   | =^[[57361u=                               | Kitty/terminal extended key encoding                                       |
-| Media play key        | =^[[57428u=                               | Kitty encodes this as =MEDIA_PLAY=; wired to existing Quickshell MPRIS IPC |
+| PrintScreen row key   | =^[[57361u=                               | Terminal extended key encoding                                             |
+| Media play key        | =^[[57428u=                               | Encoded as =MEDIA_PLAY=; wired to existing Quickshell MPRIS IPC            |
 | Fn+F4 touchpad toggle | =XF86TouchpadToggle= plus noisy modifiers | Wired to native Hyprland per-device toggle                                 |
 | Fn+F11 display mode   | =Super+p=                                 | Parked until we want an explicit monitor-mode workflow                     |

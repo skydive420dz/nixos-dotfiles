@@ -130,7 +130,7 @@ Item {
             return;
 
         if (item.terminal)
-            Quickshell.execDetached(["bash", "-lc", "uwsm app -- kitty -e " + item.exec]);
+            Quickshell.execDetached(["bash", "-lc", "uwsm app -- ghostty -e " + item.exec]);
         else
             Quickshell.execDetached(["bash", "-lc", "uwsm app -- " + item.exec]);
 

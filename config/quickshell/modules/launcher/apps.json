@@ -4,7 +4,7 @@
     "generic": "Bluetooth manager",
     "comment": "Manage Bluetooth devices",
     "icon": "bluetooth",
-    "exec": "kitty --class bluetui -e bluetui",
+    "exec": "ghostty --gtk-single-instance=false --class=bluetui --title=bluetui -e bluetui",
     "terminal": false,
     "desktop": "sky-custom-bluetui"
   },
@@ -13,14 +13,14 @@
     "generic": "Audio mixer",
     "comment": "Manage PipeWire audio",
     "icon": "audio-card",
-    "exec": "kitty --class wiremix -e wiremix",
+    "exec": "ghostty --gtk-single-instance=false --class=wiremix --title=wiremix -e wiremix",
     "terminal": false,
     "desktop": "sky-custom-wiremix"
   },
   {
     "name": "Neovim",
     "generic": "Text editor",
-    "comment": "Open Neovim in Kitty",
+    "comment": "Open Neovim in Ghostty",
     "icon": "nvim",
     "exec": "nvim",
     "terminal": true,

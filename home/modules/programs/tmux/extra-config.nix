@@ -13,11 +13,15 @@
 
   set -ga update-environment " WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP HYPRLAND_INSTANCE_SIGNATURE"
 
+  # Keep tmux-owned prompts and panes on a block cursor by default.
+  set -g prompt-cursor-style block
+  set -gp cursor-style block
+
   # =========================================
   # TRUECOLOR
   # =========================================
 
-  set -as terminal-features ",xterm-kitty:RGB,xterm-ghostty:RGB,xterm-256color:RGB"
+  set -as terminal-features ",xterm-ghostty:RGB,xterm-256color:RGB"
   set -g allow-passthrough on
 
   # =========================================

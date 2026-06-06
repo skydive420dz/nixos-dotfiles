@@ -36,6 +36,7 @@
     window-show-tab-bar = auto
     window-save-state = default
     window-theme = ghostty
+    quit-after-last-window-closed = false
     gtk-titlebar = false
 
     gtk-single-instance = detect
@@ -113,4 +114,7 @@
     keybind = select/y=copy_to_clipboard:mixed
     keybind = chain=deactivate_key_table
   '';
+
+  xdg.configFile."systemd/user/graphical-session.target.wants/app-com.mitchellh.ghostty.service".source =
+    "${pkgs.ghostty}/share/systemd/user/app-com.mitchellh.ghostty.service";
 }

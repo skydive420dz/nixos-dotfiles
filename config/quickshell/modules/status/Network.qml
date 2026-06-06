@@ -35,8 +35,8 @@ Item {
 
     function launcherCommand() {
         if (kind === "wifi")
-            return "if command -v wlctl >/dev/null 2>&1; then uwsm app -- kitty --class wlctl -e wlctl; else uwsm app -- kitty --class nmtui -e nmtui; fi";
-        return "uwsm app -- kitty --class nmtui -e nmtui";
+            return "if command -v wlctl >/dev/null 2>&1; then uwsm app -- ghostty --gtk-single-instance=false --class=wlctl --title=wlctl -e wlctl; else uwsm app -- ghostty --gtk-single-instance=false --class=nmtui --title=nmtui -e nmtui; fi";
+        return "uwsm app -- ghostty --gtk-single-instance=false --class=nmtui --title=nmtui -e nmtui";
     }
 
     RowLayout {

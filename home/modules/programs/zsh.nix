@@ -26,8 +26,8 @@
       vim = "nvim";
       ls = "ls --color=auto";
       cat = "bat";
-      btop = "kitty --title btop_float -e btop";
-      nvtop = "kitty --title nvtop_float -e nvtop";
+      btop = "ghostty --title=btop_float -e btop";
+      nvtop = "ghostty --title=nvtop_float -e nvtop";
       tm = "tmux-session main";
       tmd = "tmux-session dots";
       discord = "vesktop --use-gl=desktop --enable-features=UseOzonePlatform --ozone-platform=wayland";
@@ -58,7 +58,7 @@
       if [[ -o interactive ]] \
         && [ -z "$TMUX" ] \
         && [ -z "$NO_TMUX_AUTO" ] \
-        && { [ "$TERM" = "xterm-kitty" ] || [ -n "$KITTY_WINDOW_ID" ]; }; then
+        && [ "$TERM" = "xterm-ghostty" ]; then
         tmux-session main
       fi
 

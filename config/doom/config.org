@@ -118,9 +118,28 @@ Small utility functions used by later sections.
 (defun sk/disable-line-numbers ()
   (display-line-numbers-mode -1))
 
+(defun sk/add-disable-line-numbers-hook (hook)
+  (remove-hook hook #'sk/disable-line-numbers)
+  (add-hook hook #'sk/disable-line-numbers t))
+
 (map! :leader
       :desc "Reload Sky theme"
       "h r t" #'sk/load-sky-theme)
+#+end_src
+
+* Line Numbers
+Keep visible line numbers for code, but remove the gutter from prose, notes, help, and file-management buffers.
+
+#+begin_src emacs-lisp
+(dolist (hook '(org-mode-hook
+                doom-docs-org-mode-hook
+                markdown-mode-hook
+                text-mode-hook
+                dired-mode-hook
+                help-mode-hook
+                helpful-mode-hook
+                Info-mode-hook))
+  (sk/add-disable-line-numbers-hook hook))
 #+end_src
 
 * Evil
@@ -131,6 +150,9 @@ Disable Doom's snipe override so =s= and =S= behave like Vim again.
   (evil-snipe-mode -1)
   (evil-snipe-override-mode -1))
 
+(after! evil-escape
+  (evil-escape-mode -1))
+
 (after! evil
   (define-key evil-normal-state-map (kbd "s") #'evil-substitute)
   (define-key evil-normal-state-map (kbd "S") #'evil-change-whole-line))
@@ -139,6 +161,54 @@ Disable Doom's snipe override so =s= and =S= behave like Vim again.
   (map! :map evil-org-mode-map
         :n "[[" #'org-previous-visible-heading
         :n "]]" #'org-next-visible-heading))
+#+end_src
+
+* Responsiveness
+Reduce small UI delays so typing, Corfu completions, LSP updates, and key-hint popups feel closer to Neovim.
+
+#+begin_src emacs-lisp
+(after! which-key
+  (setq which-key-idle-delay 0.25
+        which-key-idle-secondary-delay 0.05))
+
+(after! corfu
+  (setq corfu-auto t
+        corfu-auto-delay 0.05
+        corfu-auto-prefix 2
+        corfu-cycle t
+        corfu-preview-current nil)
+  (global-corfu-mode 1)
+
+  (defun sk/prose-completion-quiet ()
+    "Keep Corfu available in prose buffers without automatic popups."
+    (setq-local corfu-auto nil))
+
+  (dolist (hook '(org-mode-hook
+                  doom-docs-org-mode-hook
+                  markdown-mode-hook
+                  text-mode-hook))
+    (add-hook hook #'sk/prose-completion-quiet)))
+
+(after! cape
+  (defun sk/add-cape-completions ()
+    "Add general completion sources for buffers without rich LSP data."
+    (add-hook 'completion-at-point-functions #'cape-file 10 t)
+    (add-hook 'completion-at-point-functions #'cape-dabbrev 20 t)
+    (add-hook 'completion-at-point-functions #'cape-keyword 30 t))
+
+  (dolist (hook '(prog-mode-hook
+                  conf-mode-hook))
+    (add-hook hook #'sk/add-cape-completions)))
+
+(after! lsp-mode
+  (setq lsp-completion-provider :none
+        lsp-idle-delay 0.15)
+  (add-to-list 'lsp-disabled-clients 'glslls)
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection '("glsl_analyzer" "--stdio"))
+    :activation-fn (lsp-activate-on "glsl")
+    :server-id 'glsl-analyzer)))
 #+end_src
 
 * Window Navigation
@@ -156,6 +226,81 @@ Use the same directional muscle memory as our Neovim setups for moving between w
         :i "C-j" #'evil-window-down
         :i "C-k" #'evil-window-up
         :i "C-l" #'evil-window-right))
+#+end_src
+
+* Workflow Polish Trial
+Borrow a few small workflow ideas from daviwil's Emacs config while keeping them Doom-native and easy to revert.
+
+#+begin_src emacs-lisp
+(set-popup-rule! "^\\*\\(?:doom:vterm-popup\\|vterm\\|terminal\\|term\\|shell\\|eshell\\).*\\*$"
+  :side 'bottom :size 0.32 :select t :quit nil :ttl nil)
+
+(set-popup-rule! "^\\*\\(?:Help\\|helpful\\|Apropos\\|Info\\|Warnings\\|Messages\\).*\\*$"
+  :side 'right :size 0.42 :select t :quit t :ttl nil)
+
+(set-popup-rule! "^\\*\\(?:xref\\|Occur\\|grep\\|rg\\|compilation\\|Flycheck errors\\).*\\*$"
+  :side 'bottom :size 0.30 :select t :quit nil :ttl nil)
+
+(setq xref-search-program 'ripgrep
+      grep-command "rg -nS --no-heading ")
+
+(defvar sk/centered-text-width 96
+  "Target text width for centered prose buffers.")
+
+(defun sk/centered-text-adjust-margins ()
+  (when sk/centered-text-mode
+    (let ((margin (max 0 (truncate (/ (- (window-width) sk/centered-text-width) 2.0)))))
+      (set-window-margins nil margin margin))))
+
+(define-minor-mode sk/centered-text-mode
+  "Center prose buffers with window margins."
+  :lighter " Center"
+  (if sk/centered-text-mode
+      (progn
+        (visual-line-mode 1)
+        (add-hook 'window-configuration-change-hook #'sk/centered-text-adjust-margins nil t)
+        (sk/centered-text-adjust-margins))
+    (remove-hook 'window-configuration-change-hook #'sk/centered-text-adjust-margins t)
+    (set-window-margins nil nil nil)))
+
+(dolist (hook '(org-mode-hook
+                doom-docs-org-mode-hook
+                markdown-mode-hook
+                text-mode-hook))
+  (add-hook hook #'sk/centered-text-mode))
+#+end_src
+
+* Navigation And Projects
+Shape Doom's existing Consult and Projectile commands into a small NVF-like command layer.
+
+#+begin_src emacs-lisp
+(defun sk/project-root ()
+  "Return the current Projectile project root, or nil outside a project."
+  (when (bound-and-true-p projectile-mode)
+    (ignore-errors (projectile-project-root))))
+
+(defun sk/project-vterm ()
+  "Open vterm from the project root when possible."
+  (interactive)
+  (let ((default-directory (or (sk/project-root) default-directory)))
+    (+vterm/here)))
+
+(defun sk/project-notes ()
+  "Open the dotfiles project notes."
+  (interactive)
+  (find-file (expand-file-name "org/dotfiles.org" doom-user-dir)))
+
+(map! :leader
+      (:prefix ("s" . "search")
+       :desc "Symbols in buffer" "i" #'consult-imenu
+       :desc "Symbols in open buffers" "I" #'consult-imenu-multi)
+      (:prefix ("p" . "project")
+       :desc "Find file" "f" #'projectile-find-file
+       :desc "Search project" "s" #'projectile-ripgrep
+       :desc "Switch project" "p" #'projectile-switch-project
+       :desc "Magit status" "g" #'magit-status
+       :desc "Project terminal" "t" #'sk/project-vterm
+       :desc "Project notes" "n" #'sk/project-notes))
 #+end_src
 
 * Diagnostics
@@ -192,6 +337,36 @@ Keep Doom's modeline simple, but style it closer to the Vim/NVF look: clear acti
 Apply our token colors to syntax, line numbers, selections, Evil goggles, and Avy hints.
 
 #+begin_src emacs-lisp
+(use-package! rainbow-mode
+  :hook ((css-mode
+          css-ts-mode
+          emacs-lisp-mode
+          js-mode
+          js-ts-mode
+          json-mode
+          json-ts-mode
+          lua-mode
+          lua-ts-mode
+          nix-mode
+          nix-ts-mode
+          org-mode
+          qml-mode
+          qml-ts-mode
+          typescript-mode
+          typescript-ts-mode
+          web-mode) . rainbow-mode))
+
+(use-package! indent-bars
+  :hook ((prog-mode conf-mode) . indent-bars-mode)
+  :config
+  (setq indent-bars-color '(highlight :face-bg t :blend 0.18)
+        indent-bars-color-by-depth nil
+        indent-bars-highlight-current-depth nil
+        indent-bars-display-on-blank-lines nil
+        indent-bars-pattern "."
+        indent-bars-width-frac 0.12
+        indent-bars-pad-frac 0.12))
+
 (after! evil-goggles
   (setq evil-goggles-duration 0.18
         evil-goggles-pulse nil)
@@ -205,27 +380,123 @@ Apply our token colors to syntax, line numbers, selections, Evil goggles, and Av
 Configure notes, captures, and executable Org Babel blocks.
 
 #+begin_src emacs-lisp
-(setq org-directory (expand-file-name "org" doom-user-dir)
+(defvar sk/org-notes-root (expand-file-name "~/Documents/notes/")
+  "Root directory for personal Org notes.")
+
+(defun sk/org--slugify (text)
+  "Return a simple filename slug for TEXT."
+  (let* ((downcased (downcase text))
+         (clean (replace-regexp-in-string "[^[:alnum:]]+" "-" downcased)))
+    (string-trim clean "-" "-")))
+
+(defun sk/org--ensure-file (file title &optional body)
+  "Create FILE with TITLE and optional BODY when it does not exist."
+  (make-directory (file-name-directory file) t)
+  (unless (file-exists-p file)
+    (with-temp-file file
+      (insert "#+title: " title "\n"
+              "#+date: " (format-time-string "%Y-%m-%d") "\n"
+              "#+startup: overview\n\n")
+      (when body
+        (insert body))))
+  file)
+
+(defun sk/org-inbox-file ()
+  "Return the personal inbox file, creating it if needed."
+  (sk/org--ensure-file
+   (expand-file-name "inbox.org" sk/org-notes-root)
+   "Inbox"
+   "* Inbox\n"))
+
+(defun sk/org-daily-file ()
+  "Return today's daily note file, creating it if needed."
+  (let* ((year (format-time-string "%Y"))
+         (date (format-time-string "%Y-%m-%d"))
+         (file (expand-file-name (concat "daily/" year "/" date ".org") sk/org-notes-root)))
+    (sk/org--ensure-file
+     file
+     date
+     "* Today\n** Focus\n** Tasks\n** Notes\n** Questions\n** Follow-up\n")))
+
+(defun sk/org-topic-file ()
+  "Prompt for a topic note and return its file path, creating it if needed."
+  (let* ((year (format-time-string "%Y"))
+         (title (read-string "Topic: "))
+         (slug (sk/org--slugify title))
+         (date (format-time-string "%Y-%m-%d"))
+         (file (expand-file-name (concat "topics/" year "/" date "-" slug ".org") sk/org-notes-root)))
+    (sk/org--ensure-file file title "* Notes\n")))
+
+(defun sk/org-project-file ()
+  "Prompt for a project note and return its file path, creating it if needed."
+  (let* ((name (read-string "Project: "))
+         (slug (sk/org--slugify name))
+         (file (expand-file-name (concat "projects/" slug ".org") sk/org-notes-root)))
+    (sk/org--ensure-file
+     file
+     name
+     "* Overview\n* Tasks\n* Notes\n* Decisions\n* Follow-up\n")))
+
+(defun sk/org-open-daily-note ()
+  "Open today's daily note."
+  (interactive)
+  (find-file (sk/org-daily-file)))
+
+(defun sk/org-open-inbox ()
+  "Open the personal inbox."
+  (interactive)
+  (find-file (sk/org-inbox-file)))
+
+(setq org-directory sk/org-notes-root
       org-agenda-files (list org-directory)
-      org-default-notes-file (expand-file-name "inbox.org" org-directory)
+      org-default-notes-file (sk/org-inbox-file)
       org-startup-indented t
       org-hide-emphasis-markers t
       org-log-done 'time
       org-image-actual-width nil)
 
 (setq org-capture-templates
-      '(("t" "Todo" entry
-         (file+headline "inbox.org" "Inbox")
+      '(("i" "Inbox note" entry
+         (file+headline sk/org-inbox-file "Inbox")
+         "* %?\n  %U\n"
+         :empty-lines 1)
+        ("t" "Todo" entry
+         (file+headline sk/org-inbox-file "Inbox")
          "* TODO %?\n  %U\n")
-        ("q" "Quickshell note" entry
-         (file+headline "quickshell.org" "Notes")
-         "* %?\n  %U\n")
-        ("d" "Dotfiles note" entry
-         (file+headline "dotfiles.org" "Notes")
-         "* %?\n  %U\n")))
+        ("d" "Daily note" entry
+         (file+headline sk/org-daily-file "Notes")
+         "* %?\n  %U\n"
+         :empty-lines 1)
+        ("T" "Topic note" entry
+         (file+headline sk/org-topic-file "Notes")
+         "* %?\n  %U\n"
+         :empty-lines 1)
+        ("p" "Project note" entry
+         (file+headline sk/org-project-file "Notes")
+         "* %?\n  %U\n"
+         :empty-lines 1)))
+
+(map! :leader
+      (:prefix ("n" . "notes")
+       :desc "Open inbox" "i" #'sk/org-open-inbox
+       :desc "Open today's daily note" "d" #'sk/org-open-daily-note
+       :desc "Capture note" "c" #'org-capture))
 
 (after! org
   (setq org-ellipsis "")
+  (require 'org-tempo)
+  (dolist (template '(("sh" . "src sh")
+                      ("el" . "src emacs-lisp")
+                      ("nix" . "src nix")
+                      ("lua" . "src lua")
+                      ("qml" . "src qml")
+                      ("rs" . "src rust")
+                      ("c" . "src c")
+                      ("json" . "src json")
+                      ("yaml" . "src yaml")))
+    (setq org-structure-template-alist
+          (assoc-delete-all (car template) org-structure-template-alist))
+    (add-to-list 'org-structure-template-alist template))
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((C . t)
@@ -235,8 +506,6 @@ Configure notes, captures, and executable Org Babel blocks.
      (shell . t))))
 #+end_src
 
-#+RESULTS:
-
 * Terminal And Dired
 Use zsh in vterm, keep terminal buffers clean, and make Dired list directories first.
 
@@ -244,9 +513,15 @@ Use zsh in vterm, keep terminal buffers clean, and make Dired list directories f
 (setq vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=Off"
       vterm-always-compile-module t
       vterm-shell "zsh"
-      dired-listing-switches "-alh --group-directories-first")
+      dired-listing-switches "-alh --group-directories-first"
+      delete-by-moving-to-trash t)
 
 (after! dired
+  (setq dired-dwim-target t
+        dired-kill-when-opening-new-dired-buffer t
+        dired-omit-verbose nil)
+  (add-hook 'dired-mode-hook #'dired-hide-details-mode)
+  (add-hook 'dired-mode-hook #'hl-line-mode)
   (map! :map dired-mode-map
         :n "h" #'dired-up-directory
         :n "l" #'dired-find-file
@@ -255,12 +530,43 @@ Use zsh in vterm, keep terminal buffers clean, and make Dired list directories f
 (after! vterm
   (sk/load-sky-theme)
   (add-hook 'vterm-mode-hook #'evil-insert-state)
-  (add-hook 'vterm-mode-hook #'sk/disable-line-numbers))
+  (sk/add-disable-line-numbers-hook 'vterm-mode-hook))
 
 (dolist (hook '(term-mode-hook
                 shell-mode-hook
                 eshell-mode-hook))
-  (add-hook hook #'sk/disable-line-numbers))
+  (sk/add-disable-line-numbers-hook hook))
+
+;; A function for easily creating multiple buffers of 'eshell'.
+;; NOTE: `C-u M-x eshell` would also create new 'eshell' buffers.
+(defun eshell-new (name)
+  "Create new eshell buffer named NAME."
+  (interactive "sName: ")
+  (setq name (concat "$" name))
+  (eshell)
+  (rename-buffer name))
+
+(use-package! eshell-syntax-highlighting
+  :after esh-mode
+  :config
+  (eshell-syntax-highlighting-global-mode +1))
+
+;; eshell-syntax-highlighting -- adds fish/zsh-like syntax highlighting.
+;; eshell-rc-script -- your profile for eshell; like a bashrc for eshell.
+;; eshell-aliases-file -- sets an aliases file for the eshell.
+
+(setq eshell-rc-script (concat user-emacs-directory "eshell/profile")
+      eshell-aliases-file (concat user-emacs-directory "eshell/aliases")
+      eshell-history-size 5000
+      eshell-buffer-maximum-lines 5000
+      eshell-hist-ignoredups t
+      eshell-scroll-to-bottom-on-input t
+      eshell-destroy-buffer-when-process-dies t
+      eshell-visual-commands '("bash" "fish" "ssh" "top" "zsh"))
+
+(after! corfu
+  (add-hook 'eshell-mode-hook (lambda () (corfu-mode -1))))
+
 #+end_src
 
 * Formatting
@@ -295,8 +601,11 @@ Register Harper for prose diagnostics in Org, Markdown, and text buffers.
 #+begin_src emacs-lisp
 (after! lsp-mode
   (require 'lsp-qml)
-  (setq lsp-qml-server-command "qmlls-wrapped"
-        lsp-semantic-tokens-enable t)
+  (setq lsp-clients-lua-language-server-command '("lua-language-server")
+        lsp-nix-nil-auto-eval-inputs t
+        lsp-qml-server-command "qmlls-wrapped")
+  (lsp-register-custom-settings
+   '(("nil.nix.flake.autoArchive" t t)))
   (add-hook 'qml-mode-hook #'lsp-deferred)
   (add-to-list 'lsp-language-id-configuration '(org-mode . "org"))
   (add-to-list 'lsp-language-id-configuration '(doom-docs-org-mode . "org"))
@@ -309,6 +618,9 @@ Register Harper for prose diagnostics in Org, Markdown, and text buffers.
     :server-id 'harper-ls))
   (dolist (hook '(org-mode-hook doom-docs-org-mode-hook markdown-mode-hook text-mode-hook))
     (add-hook hook #'lsp-deferred)))
+
+(after! lsp-pyright
+  (setq lsp-pyright-langserver-command "basedpyright"))
 #+end_src
 
 * Magit

@@ -30,7 +30,7 @@ Rectangle {
         var klass = activeClass.toLowerCase();
         if (klass.indexOf("firefox") >= 0)
             return activeTitle.replace(/ [—–] Mozilla Firefox$/, "").replace(/ Mozilla Firefox$/, "");
-        if (klass === "kitty")
+        if (klass === "ghostty" || klass.indexOf("ghostty") >= 0)
             return "Terminal";
         if (klass === "vesktop" || klass === "discord")
             return "Discord";

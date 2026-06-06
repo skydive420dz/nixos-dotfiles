@@ -31,6 +31,6 @@ Text {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: Quickshell.execDetached(["bash", "-lc", "uwsm app -- kitty --class wiremix -e wiremix"])
+        onClicked: Quickshell.execDetached(["bash", "-lc", "uwsm app -- ghostty --gtk-single-instance=false --class=wiremix --title=wiremix -e wiremix"])
     }
 }

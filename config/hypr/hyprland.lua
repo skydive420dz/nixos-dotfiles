@@ -16,8 +16,9 @@ local function centered_float(opts)
 	hl.window_rule(opts)
 end
 
-local terminal = "uwsm app -- kitty"
-local file_manager = "uwsm app -- kitty -e yazi"
+local terminal = "uwsm app -- ghostty"
+local file_manager = "uwsm app -- ghostty -e yazi"
+local editor = "uwsm app -- emacs"
 local browser = "uwsm app -- brave"
 local menu = "~/.config/scripts/launcher-toggle"
 local clipboard = "~/.config/scripts/clipboard-toggle"
@@ -170,6 +171,7 @@ local main_mod = "CTRL + ALT"
 
 hl.bind(main_mod .. " + Return", hl.dsp.exec_cmd(terminal))
 hl.bind(main_mod .. " + W", hl.dsp.exec_cmd(browser))
+hl.bind(main_mod .. " + T", hl.dsp.exec_cmd(editor))
 hl.bind(main_mod .. " + E", hl.dsp.exec_cmd(file_manager))
 hl.bind(main_mod .. " + SPACE", hl.dsp.exec_cmd(menu))
 hl.bind(main_mod .. " + S", hl.dsp.exec_cmd(snip))
@@ -179,7 +181,7 @@ hl.bind(main_mod .. " + Q", hl.dsp.window.close())
 hl.bind(main_mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(main_mod .. " + M", hl.dsp.exec_cmd("uwsm stop"))
 hl.bind(main_mod .. " + SHIFT + Return", hl.dsp.layout("swapwithmaster master ignoremaster"))
-hl.bind(main_mod .. " + SHIFT + D", hl.dsp.exec_cmd("kitty --title tmux_main tmux new -A -s dots"))
+hl.bind(main_mod .. " + SHIFT + D", hl.dsp.exec_cmd("ghostty --title=tmux_main -e tmux new -A -s dots"))
 
 hl.bind(main_mod .. " + SHIFT + l ", hl.dsp.layout("rollnext master ignoremaster"))
 hl.bind(main_mod .. " + SHIFT + h ", hl.dsp.layout("rollprev master ignoremaster"))
@@ -281,21 +283,21 @@ centered_float({
 
 centered_float({
 	name = "bluetooth_applet",
-	match = { class = "^(bluetui)$" },
+	match = { title = "^(bluetui)$" },
 	size = { 600, 600 },
 	opacity = opacity.solid,
 })
 
 centered_float({
 	name = "wifi_applet",
-	match = { class = "^(nmtui|wlctl)$" },
+	match = { title = "^(nmtui|wlctl)$" },
 	size = { 600, 600 },
 	opacity = opacity.solid,
 })
 
 centered_float({
 	name = "sound_applet",
-	match = { class = "^(wiremix)$" },
+	match = { title = "^(wiremix)$" },
 	size = { 700, 500 },
 	opacity = opacity.solid,
 })

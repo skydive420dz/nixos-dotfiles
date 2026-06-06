@@ -53,7 +53,6 @@ Generated under =~/.config/theme/current/=:
 
 - =quickshell.json=
 - =quickshell-signal=
-- =kitty.conf=
 - =ghostty.conf=
 - =mako.conf=
 - =starship.toml=
@@ -90,7 +89,6 @@ These can change without =nrs=, usually after =theme-select toggle= or =theme-se
 
 - Quickshell reads =quickshell.json= and watches =quickshell-signal=. The selector also restarts =quickshell.service=.
 - Mako is restarted and reads =mako.conf=.
-- Kitty reloads through =kitty @ load-config=.
 - Ghostty reads =ghostty.conf= from its generated config include. Existing windows can reload with =Ctrl+Shift+,=; some options only affect new terminals.
 - tmux reloads through =tmux source-file ~/.config/theme/current/tmux.conf=.
 - Starship uses =STARSHIP_CONFIG=; new prompts pick up the generated config.
@@ -122,7 +120,7 @@ These are still owned by Nix/Home Manager and need =nrs= or a rebuild when the d
 :END:
 Covered by runtime generation:
 
-- Quickshell launcher/clipboard/wallpaper/bar modules, Mako, Kitty, Ghostty, tmux, Starship, btop, bat, Yazi, GTK, Qt, KDE-style globals, zsh/fzf env, and Doom Emacs runtime style state.
+- Quickshell launcher/clipboard/wallpaper/bar modules, Mako, Ghostty, tmux, Starship, btop, bat, Yazi, GTK, Qt, KDE-style globals, zsh/fzf env, and Doom Emacs runtime style state.
 
 Fixed in this pass:
 
@@ -130,7 +128,7 @@ Fixed in this pass:
 - Plymouth now uses the local Sky theme package from =theme/plymouth.nix= instead of Catppuccin Mocha.
 - aerc now reads the generated Sky styleset before the static SkyDark fallback.
 - NVF no longer declares Catppuccin/Mocha. Neovim loads the live Sky colorscheme from =config/nvim/= through =~/.config/sky-nvim=.
-- Nix fallbacks for Kitty and Mako now read semantic Sky tokens instead of inherited palette names.
+- Nix fallback theming for Mako now reads semantic Sky tokens instead of inherited palette names.
 - =theme/yazi.nix= now uses semantic Sky aliases from =theme/tokens.nix=.
 - Old Catppuccin-style palette aliases were removed from =theme/styles.json=.
 - Doom native theme wrappers now read generated runtime tokens instead of duplicating the dark and light color tables.

@@ -15,5 +15,6 @@
     ./programs/tmux
     ./programs/yazi.nix
     ./programs/vesktop.nix
+    ./programs/wezterm.nix
   ];
 }

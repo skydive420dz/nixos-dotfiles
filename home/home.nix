@@ -18,7 +18,6 @@
       grimblast
       jq
       wiremix
-      kitty
       btop
       nvtopPackages.full
       psmisc

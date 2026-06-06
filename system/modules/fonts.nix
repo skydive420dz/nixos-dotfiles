@@ -13,7 +13,7 @@
 #
 # After applying:
 #   sudo fc-cache -fv
-#   pkill kitty   # restart kitty to pick up new font cache
+#   pkill ghostty   # restart Ghostty to pick up new font cache
 
 { pkgs, ... }:
 

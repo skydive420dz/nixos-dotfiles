@@ -8,6 +8,8 @@ __pycache__/
 *.swo
 .DS_Store
 *~
+\#*\#
+.\#*
 Session.vim
 docs/vim
 .direnv/
@@ -44,3 +46,12 @@ nvim.log
 
 # Doom runtime/cache state belongs outside git.
 config/doom/.local/
+
+# Clean Emacs experiment runtime/cache state belongs outside git.
+config/emacs/**/*.elc
+config/emacs/auto-save/
+config/emacs/auto-save-list/
+config/emacs/backups/
+config/emacs/eln-cache/
+config/emacs/elpa/
+config/emacs/snippets/

@@ -3,7 +3,7 @@
 # ============================================
 # Three tiers:
 #   1. Native home-manager modules → see other home/modules/*.nix
-#      (programs.aerc, programs.kitty, etc.)
+#      (programs.aerc, programs.ghostty, etc.)
 #   2. xdg.configFile (Nix store, declarative)
 #      Used for stable configs that don't change often. Read-only.
 #      Editing requires rebuild but is fully reproducible.
@@ -28,6 +28,7 @@ let
     ".config/quickshell" = "config/quickshell";
     ".config/scripts" = "scripts";
     ".config/sky-nvim" = "config/nvim";
+    ".config/wezterm" = "config/wezterm";
   };
 
   liveFiles = {
