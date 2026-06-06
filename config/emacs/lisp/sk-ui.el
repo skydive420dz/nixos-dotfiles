@@ -89,10 +89,18 @@
         doom-modeline-bar-width 4
         doom-modeline-window-width-limit 80
         doom-modeline-buffer-file-name-style 'relative-to-project
+        doom-modeline-buffer-encoding nil
         doom-modeline-major-mode-icon t
         doom-modeline-major-mode-color-icon t
         doom-modeline-buffer-state-icon t
+        doom-modeline-buffer-modification-icon t
         doom-modeline-vcs-max-length 24
+        doom-modeline-env-version nil
+        doom-modeline-github nil
+        doom-modeline-gnus nil
+        doom-modeline-irc nil
+        doom-modeline-persp-name nil
+        doom-modeline-workspace-name nil
         doom-modeline-modal-icon nil
         doom-modeline-enable-word-count nil)
   (doom-modeline-mode 1))

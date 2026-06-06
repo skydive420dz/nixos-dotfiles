@@ -25,6 +25,13 @@
   :config
   (marginalia-mode 1))
 
+(use-package savehist
+  :ensure nil
+  :demand t
+  :config
+  (add-to-list 'savehist-additional-variables 'corfu-history)
+  (savehist-mode 1))
+
 (use-package consult
   :bind (("C-s" . consult-line)
          ("C-x b" . consult-buffer)
@@ -44,16 +51,94 @@
         corfu-auto-delay 0.05
         corfu-auto-prefix 2
         corfu-cycle t
+        corfu-on-exact-match nil
+        corfu-popupinfo-delay '(0.45 . 0.15)
+        corfu-popupinfo-max-height 16
+        corfu-popupinfo-min-height 3
         corfu-preview-current nil)
   (define-key corfu-map (kbd "C-j") #'corfu-next)
   (define-key corfu-map (kbd "C-k") #'corfu-previous)
   (define-key corfu-map (kbd "C-l") #'corfu-insert)
   (define-key corfu-map (kbd "C-h") #'corfu-quit)
+  (define-key corfu-map (kbd "M-d") #'corfu-popupinfo-toggle)
+  (corfu-history-mode 1)
+  (corfu-popupinfo-mode 1)
   (global-corfu-mode 1))
+
+(use-package cape
+  :demand t
+  :after corfu)
+
+(defun sk/capf-code-defaults ()
+  "Add conservative fallback CAPFs for code/config buffers."
+  (when (fboundp 'cape-file)
+    (add-hook 'completion-at-point-functions #'cape-file 20 t))
+  (when (fboundp 'cape-dabbrev)
+    (add-hook 'completion-at-point-functions #'cape-dabbrev 40 t))
+  (when (fboundp 'cape-keyword)
+    (add-hook 'completion-at-point-functions #'cape-keyword 60 t)))
+
+(defun sk/capf-prose-defaults ()
+  "Add only safe prose CAPFs."
+  (when (fboundp 'cape-file)
+    (add-hook 'completion-at-point-functions #'cape-file 20 t)))
+
+(dolist (hook '(prog-mode-hook conf-mode-hook
+                nix-mode-hook qml-mode-hook lua-mode-hook glsl-mode-hook
+                yaml-mode-hook json-mode-hook))
+  (add-hook hook #'sk/capf-code-defaults))
+
+(dolist (hook '(org-mode-hook markdown-mode-hook text-mode-hook))
+  (add-hook hook #'sk/capf-prose-defaults))
+
+(global-set-key (kbd "M-/") #'completion-at-point)
+
+(defvar sk/completion-disabled-modes
+  '(vterm-mode term-mode shell-mode eshell-mode)
+  "Major modes where Corfu should stay off.")
+
+(defun sk/completion-buffer-p ()
+  "Return non-nil when Corfu should be active in the current buffer."
+  (and (not (minibufferp))
+       (not (memq major-mode sk/completion-disabled-modes))
+       (or (derived-mode-p 'prog-mode 'text-mode 'conf-mode)
+           (memq major-mode '(nix-mode qml-mode lua-mode
+                              yaml-mode json-mode markdown-mode org-mode)))))
+
+(defun sk/completion-code-buffer-p ()
+  "Return non-nil when code/config fallback CAPFs should be active."
+  (or (derived-mode-p 'prog-mode 'conf-mode)
+      (memq major-mode '(nix-mode qml-mode lua-mode
+                         yaml-mode json-mode glsl-mode))))
+
+(defun sk/completion-prose-buffer-p ()
+  "Return non-nil when prose fallback CAPFs should be active."
+  (or (derived-mode-p 'text-mode)
+      (memq major-mode '(markdown-mode org-mode))))
+
+(defun sk/refresh-completion-modes ()
+  "Reapply completion minor modes to existing buffers after config reloads."
+  (interactive)
+  (global-corfu-mode 1)
+  (dolist (buffer (buffer-list))
+    (with-current-buffer buffer
+      (cond
+       ((sk/completion-code-buffer-p)
+        (sk/capf-code-defaults))
+       ((sk/completion-prose-buffer-p)
+        (sk/capf-prose-defaults)))
+      (when (fboundp 'corfu-mode)
+        (if (sk/completion-buffer-p)
+            (corfu-mode 1)
+          (corfu-mode -1))))))
 
 (defun sk/completion-active-p ()
   "Return non-nil when in-buffer completion is active."
-  (bound-and-true-p completion-in-region-mode))
+  ;; Evil insert-state maps can take precedence over `corfu-map', so the
+  ;; C-h/j/k/l wrappers need to recognize Corfu's active candidate list.
+  (or (bound-and-true-p completion-in-region-mode)
+      (and (boundp 'corfu--candidates)
+           corfu--candidates)))
 
 (defun sk/completion-next-or-window-down ()
   "Select the next completion candidate or move to the window below."
@@ -82,25 +167,6 @@
   (if (sk/completion-active-p)
       (corfu-quit)
     (evil-window-left)))
-
-(use-package cape
-  :after corfu
-  :config
-  (defun sk/capf-code-defaults ()
-    "Add conservative fallback CAPFs for code/config buffers."
-    (add-hook 'completion-at-point-functions #'cape-file 20 t)
-    (add-hook 'completion-at-point-functions #'cape-dabbrev 40 t)
-    (add-hook 'completion-at-point-functions #'cape-keyword 60 t))
-
-  (defun sk/capf-prose-defaults ()
-    "Add only safe prose CAPFs."
-    (add-hook 'completion-at-point-functions #'cape-file 20 t))
-
-  (dolist (hook '(prog-mode-hook conf-mode-hook))
-    (add-hook hook #'sk/capf-code-defaults))
-
-  (dolist (hook '(org-mode-hook markdown-mode-hook text-mode-hook))
-    (add-hook hook #'sk/capf-prose-defaults)))
 
 (provide 'sk-completion)
 

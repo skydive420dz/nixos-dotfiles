@@ -84,11 +84,13 @@ emacsclient --create-frame --alternate-editor=emacs
 :CUSTOM_ID: todo-next-passes
 :END:
 #+begin_src text
-TODO Finish Doom muscle-memory key audit for file/project/search/help/buffer edge cases.
-TODO Tune completion across minibuffer, Corfu, snippets, LSP, and prose.
-TODO Polish Doom modeline and Sky theme faces until the UI looks intentional.
-TODO Make Org first-class: notes, agenda, capture templates, source blocks, navigation.
-TODO Sanity-check LSP per language: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown.
-TODO Decide formatting policy and keep it explicit instead of surprise autoformat.
-TODO Keep documenting the clean Emacs layout and user-facing key surface as it changes.
+  TODO Finish Doom muscle-memory key audit for file/project/search/help/buffer edge cases.
+  TODO Tune completion across minibuffer, Corfu, snippets, LSP, and prose.
+  TODO Polish Doom modeline and Sky theme faces until the UI looks intentional.
+  TODO vterm and eshell polish - faces like we had in doom.
+  TODO treesitter?
+  TODO Make Org first-class: notes, agenda, capture templates, source blocks, navigation.
+  TODO Sanity-check LSP per language: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown.
+  TODO Decide formatting policy and keep it explicit instead of surprise autoformat.
+  TODO Keep documenting the clean Emacs layout and user-facing key surface as it changes.
 #+end_src

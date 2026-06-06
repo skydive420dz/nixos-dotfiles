@@ -248,6 +248,48 @@ gd                jump diffstat or diff in diff buffers
 TAB               toggle section
 #+end_src
 
+* Modeline And Theme
+Modeline ownership is split deliberately:
+
+#+begin_src text
+sk-ui.el          Doom modeline layout and noise knobs
+sk-theme.el       Sky face colors for mode-line and doom-modeline faces
+#+end_src
+
+The modeline should stay compact and useful:
+
+#+begin_src text
+active window     clear Sky surface background, accent bar, readable file/project state
+inactive window   dim background, muted text, no heavy border
+status colors     success/warning/danger tokens for LSP, diagnostics, and modified state
+noise policy      hide encoding/env/workspace/chat counters unless we decide they matter
+#+end_src
+
+* Completion
+Completion is layered deliberately:
+
+#+begin_src text
+minibuffer        Vertico + Orderless + Marginalia + Consult + Embark
+buffer popup      Corfu
+buffer sources    Eglot CAPFs first, then conservative Cape fallbacks
+history           savehist persists Corfu selection history
+docs              Corfu popupinfo shows candidate documentation when the source provides it
+#+end_src
+
+Completion keys:
+
+#+begin_src text
+C-j / C-k         next / previous completion candidate
+C-l               accept completion candidate
+C-h               quit completion popup
+M-/               start completion at point; Corfu displays the popup
+M-d               toggle Corfu documentation popup while completion is open
+#+end_src
+
+Documentation availability depends on the completion source. LSP candidates may
+provide docs; file names, keywords, dabbrev, and many local symbols usually do
+not.
+
 * Binding Migration
 This table tracks Doom key behavior as it moves into the clean config.
 
@@ -354,7 +396,7 @@ org SPC m a    attachment localleader            same built-in Org commands     
 DONE Finish Doom muscle-memory key audit for core file/project/search/help/buffer/mode keys.
 TODO Watch for real-use key edge cases and add them deliberately as they come up.
 TODO Tune completion across minibuffer, Corfu, snippets, LSP, and prose.
-TODO Polish Doom modeline and Sky theme faces until the UI looks intentional.
+DONE Polish Doom modeline and Sky theme faces until the UI looks intentional.
 TODO Make Org first-class: notes, agenda, capture templates, source blocks, navigation.
 DONE Sanity-check LSP per language: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown/Org prose, YAML/JSON, web basics.
 TODO Decide formatting policy and keep it explicit instead of surprise autoformat.

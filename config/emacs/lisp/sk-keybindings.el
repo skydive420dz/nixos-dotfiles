@@ -326,8 +326,12 @@
 (defun sk/reload-config ()
   "Reload the clean Sky Emacs config modules."
   (interactive)
+  (when (fboundp 'corfu-quit)
+    (ignore-errors (corfu-quit)))
   (dolist (file sk/reload-module-files)
     (load (expand-file-name file sk/lisp-directory) nil 'nomessage))
+  (when (fboundp 'sk/refresh-completion-modes)
+    (sk/refresh-completion-modes))
   (message "Sky Emacs config reloaded"))
 
 (defun sk/split-window-right-and-focus ()
@@ -666,17 +670,12 @@
     "SPC q" "quit"))
 
 (with-eval-after-load 'evil
-  (dolist (map (list evil-normal-state-map
-                     evil-visual-state-map
-                     evil-motion-state-map))
-    (define-key map (kbd "C-h") #'evil-window-left)
-    (define-key map (kbd "C-j") #'evil-window-down)
-    (define-key map (kbd "C-k") #'evil-window-up)
-    (define-key map (kbd "C-l") #'evil-window-right))
-
   (dolist (map (list evil-insert-state-map
                      evil-replace-state-map
-                     evil-emacs-state-map))
+                     evil-emacs-state-map
+                     evil-normal-state-map
+                     evil-visual-state-map
+                     evil-motion-state-map))
     (define-key map (kbd "C-h") #'sk/completion-quit-or-window-left)
     (define-key map (kbd "C-j") #'sk/completion-next-or-window-down)
     (define-key map (kbd "C-k") #'sk/completion-previous-or-window-up)
