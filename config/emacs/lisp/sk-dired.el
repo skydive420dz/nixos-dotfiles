@@ -1,5 +1,19 @@
 ;;; sk-dired.el --- File management -*- lexical-binding: t; -*-
 
+(defun sk/dired-next-line ()
+  "Move to the next Dired line and refresh preview immediately."
+  (interactive)
+  (dired-next-line 1)
+  (when (bound-and-true-p dired-preview-mode)
+    (dired-preview-trigger :no-delay)))
+
+(defun sk/dired-previous-line ()
+  "Move to the previous Dired line and refresh preview immediately."
+  (interactive)
+  (dired-previous-line 1)
+  (when (bound-and-true-p dired-preview-mode)
+    (dired-preview-trigger :no-delay)))
+
 (use-package dired
   :ensure nil
   :config
@@ -12,6 +26,8 @@
             (lambda ()
               (when (fboundp 'evil-local-set-key)
                 (evil-local-set-key 'normal (kbd "h") #'dired-up-directory)
+                (evil-local-set-key 'normal (kbd "j") #'sk/dired-next-line)
+                (evil-local-set-key 'normal (kbd "k") #'sk/dired-previous-line)
                 (evil-local-set-key 'normal (kbd "l") #'dired-find-file)
                 (evil-local-set-key 'normal (kbd "RET") #'dired-find-file)
                 (evil-local-set-key 'normal (kbd "SPC m h") #'dired-omit-mode)
@@ -25,7 +41,7 @@
         dired-preview-display-action-alist
         '((display-buffer-in-side-window)
           (side . bottom)
-          (window-height . 0.18)
+          (window-height . 0.12)
           (preserve-size . (nil . t)))
         dired-preview-max-size (expt 2 25)
         dired-preview-image-extensions-regexp
