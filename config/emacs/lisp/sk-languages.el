@@ -34,9 +34,13 @@
   :mode "\\.glsl\\'")
 
 (use-package yasnippet
+  :demand t
   :config
-  (define-key yas-minor-mode-map (kbd "TAB") #'yas-maybe-expand)
-  (define-key yas-minor-mode-map (kbd "<tab>") #'yas-maybe-expand)
+  (setq yas-snippet-dirs (list (expand-file-name "snippets" sk/user-directory)))
+  (define-key yas-minor-mode-map (kbd "TAB") nil)
+  (define-key yas-minor-mode-map (kbd "<tab>") nil)
+  (define-key yas-minor-mode-map (kbd "<backtab>") nil)
+  (define-key yas-minor-mode-map (kbd "S-TAB") nil)
   (define-key yas-keymap (kbd "TAB") #'yas-next-field-or-maybe-expand)
   (define-key yas-keymap (kbd "<tab>") #'yas-next-field-or-maybe-expand)
   (define-key yas-keymap (kbd "<backtab>") #'yas-prev-field)

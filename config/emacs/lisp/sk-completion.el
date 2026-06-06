@@ -69,6 +69,38 @@
   :demand t
   :after corfu)
 
+(defun sk/yas-snippet-candidates ()
+  "Return snippet trigger/name pairs for the current major mode."
+  (when (and (bound-and-true-p yas-minor-mode)
+             (fboundp 'yas--get-snippet-tables)
+             (fboundp 'yas--all-templates))
+    (delete-dups
+     (delq nil
+           (mapcar (lambda (template)
+                     (let ((key (yas--template-key template)))
+                       (when (and key (not (string= key "")))
+                         (cons key (yas--template-name template)))))
+                   (yas--all-templates
+                    (yas--get-snippet-tables major-mode)))))))
+
+(defun sk/yas-capf ()
+  "Complete Yasnippet triggers with Corfu and expand on accept."
+  (when-let* ((candidates (sk/yas-snippet-candidates))
+              (bounds (bounds-of-thing-at-point 'symbol))
+              (start (car bounds))
+              (end (cdr bounds)))
+    (list start end (mapcar #'car candidates)
+          :exclusive 'no
+          :annotation-function
+          (lambda (candidate)
+            (when-let ((name (cdr (assoc candidate candidates))))
+              (concat " " name)))
+          :company-kind (lambda (_) 'snippet)
+          :exit-function
+          (lambda (_candidate status)
+            (when (memq status '(finished exact sole))
+              (yas-expand))))))
+
 (defun sk/capf-code-defaults ()
   "Add conservative fallback CAPFs for code/config buffers."
   (when (fboundp 'cape-file)
@@ -76,12 +108,19 @@
   (when (fboundp 'cape-dabbrev)
     (add-hook 'completion-at-point-functions #'cape-dabbrev 40 t))
   (when (fboundp 'cape-keyword)
-    (add-hook 'completion-at-point-functions #'cape-keyword 60 t)))
+    (add-hook 'completion-at-point-functions #'cape-keyword 60 t))
+  (setq-local completion-at-point-functions
+              (cons #'sk/yas-capf
+                    (remq #'sk/yas-capf completion-at-point-functions))))
 
 (defun sk/capf-prose-defaults ()
-  "Add only safe prose CAPFs."
+  "Add safe prose CAPFs."
+  (setq-local completion-at-point-functions
+              (remq #'ispell-completion-at-point completion-at-point-functions))
   (when (fboundp 'cape-file)
-    (add-hook 'completion-at-point-functions #'cape-file 20 t)))
+    (add-hook 'completion-at-point-functions #'cape-file 20 t))
+  (when (fboundp 'cape-dabbrev)
+    (add-hook 'completion-at-point-functions #'cape-dabbrev 40 t)))
 
 (dolist (hook '(prog-mode-hook conf-mode-hook
                 nix-mode-hook qml-mode-hook lua-mode-hook glsl-mode-hook

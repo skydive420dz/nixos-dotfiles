@@ -330,6 +330,8 @@
     (ignore-errors (corfu-quit)))
   (dolist (file sk/reload-module-files)
     (load (expand-file-name file sk/lisp-directory) nil 'nomessage))
+  (when (fboundp 'yas-reload-all)
+    (yas-reload-all))
   (when (fboundp 'sk/refresh-completion-modes)
     (sk/refresh-completion-modes))
   (message "Sky Emacs config reloaded"))

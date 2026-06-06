@@ -283,7 +283,11 @@ Completion is layered deliberately:
 #+begin_src text
 minibuffer        Vertico + Orderless + Marginalia + Consult + Embark
 buffer popup      Corfu
-buffer sources    Eglot CAPFs first, then conservative Cape fallbacks
+code sources      snippet triggers first, then mode/LSP CAPFs and Cape fallbacks
+prose sources     Org/text CAPFs first, then Cape file and dabbrev
+snippets          Yasnippet is active globally; repo snippets live in config/emacs/snippets
+snippet source    snippet triggers appear in Corfu for code buffers
+snippet fields    TAB / S-TAB move next / previous while a snippet is active
 history           savehist persists Corfu selection history
 docs              Corfu popupinfo shows candidate documentation when the source provides it
 #+end_src
@@ -299,8 +303,9 @@ M-d               toggle Corfu documentation popup while completion is open
 #+end_src
 
 Documentation availability depends on the completion source. LSP candidates may
-provide docs; file names, keywords, dabbrev, and many local symbols usually do
-not.
+provide docs. File names, keywords, dabbrev, snippets, and many local symbols
+usually do not. Snippet triggers are offered in Corfu for code buffers and
+expand when accepted. Current tracked snippets cover QML/Quickshell.
 
 * Binding Migration
 This table tracks Doom key behavior as it moves into the clean config.
