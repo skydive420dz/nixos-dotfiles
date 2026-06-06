@@ -324,6 +324,7 @@ that language from Org, not merely because we want a source-block template.
 #+begin_src text
 Dired:
 SPC m h           toggle omitted files
+SPC m p           toggle preview
 
 Magit:
 q / Q             bury Magit buffer / quit Magit session
@@ -521,6 +522,7 @@ dired h        dired-up-directory                dired-up-directory             
 dired l        dired-find-file                   dired-find-file                   done
 dired RET      dired-find-file                   dired-find-file                   done
 dired SPC m h  dired-omit-mode                   dired-omit-mode                   done
+dired SPC m p  dired-preview-mode                dired-preview-mode                done
 magit q/Q      quit Magit buffer/session         magit bury/quit session           done
 magit [/]/TAB  section navigation/toggle         Magit built-ins                   done
 magit gr/gR/gz refresh                           Magit built-ins                   done

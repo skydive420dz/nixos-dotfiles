@@ -14,7 +14,19 @@
                 (evil-local-set-key 'normal (kbd "h") #'dired-up-directory)
                 (evil-local-set-key 'normal (kbd "l") #'dired-find-file)
                 (evil-local-set-key 'normal (kbd "RET") #'dired-find-file)
-                (evil-local-set-key 'normal (kbd "SPC m h") #'dired-omit-mode)))))
+                (evil-local-set-key 'normal (kbd "SPC m h") #'dired-omit-mode)
+                (evil-local-set-key 'normal (kbd "SPC m p") #'dired-preview-mode)))))
+
+(use-package dired-preview
+  :after dired
+  :commands (dired-preview-mode dired-preview-global-mode)
+  :config
+  (setq dired-preview-delay 0.35
+        dired-preview-max-size (expt 2 20)
+        dired-preview-ignored-extensions-regexp
+        (concat "\\."
+                "\\(gz\\|zst\\|tar\\|xz\\|rar\\|zip\\|iso\\|epub\\)"
+                "\\'")))
 
 (provide 'sk-dired)
 

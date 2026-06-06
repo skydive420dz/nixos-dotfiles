@@ -115,6 +115,7 @@ Stable enough to treat as current baseline:
 - [X] Clean Emacs consumes generated =theme-select= runtime tokens from =~/.config/theme/current/emacs-theme.el=, with local fallback tokens for startup safety.
 - [X] Harper stays enabled for prose buffers, but Eglot workspace configuration is now scoped per server so Harper receives only documented =:harper-ls= settings and Nix receives only the =nil= flake autoArchive setting.
 - [X] Org presentation faces live in the Sky theme: headings, source blocks, metadata, TODO/DONE, links, tables, tags, and inline code/verbatim use runtime Sky tokens.
+- [X] Dired preview is available as an explicit per-buffer toggle at =SPC m p= inside Dired.
 
 Next passes:
 
@@ -133,6 +134,6 @@ Next passes:
 - [ ] Sensible tab and indentation configs nvf reference.
 - [ ] Ledger Mode.
 - [ ] Rainbow Mode togglable.
-- [ ] Dired preview.
+- [X] Dired preview.
 - [ ] eww, email, rss.
 - [X] Make Org pretty again. 
