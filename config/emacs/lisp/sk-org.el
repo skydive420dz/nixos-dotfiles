@@ -330,6 +330,14 @@
     (with-eval-after-load 'evil
       (evil-define-key '(normal motion) org-agenda-mode-map (kbd "SPC m") sk/org-agenda-localleader-map))))
 
+(use-package org-superstar
+  :hook (org-mode . org-superstar-mode)
+  :custom
+  (org-superstar-remove-leading-stars t)
+  (org-superstar-headline-bullets-list '("●" "○" "◆" "◇" "✦" "✧"))
+  (org-superstar-item-bullet-alist '((?+ . ?•)
+                                     (?- . ?–))))
+
 (provide 'sk-org)
 
 ;;; sk-org.el ends here

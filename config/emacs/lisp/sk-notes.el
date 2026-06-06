@@ -93,11 +93,38 @@
   (interactive)
   (find-file (sk/org-project-file)))
 
+(defun sk/org-open-notes-root ()
+  "Open the personal notes root in Dired."
+  (interactive)
+  (dired sk/org-notes-root))
+
+(defun sk/org-find-note ()
+  "Find a note under `sk/org-notes-root'."
+  (interactive)
+  (if (fboundp 'consult-find)
+      (consult-find sk/org-notes-root)
+    (find-file (read-file-name "Find note: " sk/org-notes-root))))
+
+(defun sk/org-search-notes ()
+  "Search the personal notes tree."
+  (interactive)
+  (if (fboundp 'consult-ripgrep)
+      (consult-ripgrep sk/org-notes-root)
+    (rgrep (read-string "Search notes: ")
+           "*.org"
+           sk/org-notes-root)))
+
 (defun sk/org-agenda ()
   "Refresh note discovery, then open Org agenda."
   (interactive)
   (sk/org-refresh-agenda-files)
   (call-interactively #'org-agenda))
+
+(defun sk/org-todo-agenda ()
+  "Refresh note discovery, then open the Org TODO agenda."
+  (interactive)
+  (sk/org-refresh-agenda-files)
+  (org-agenda nil "t"))
 
 (defun sk/org-daily-review ()
   "Open today's note and the daily agenda dashboard."
@@ -152,8 +179,12 @@
 (global-set-key (kbd "C-c n d") #'sk/org-open-daily-note)
 (global-set-key (kbd "C-c n t") #'sk/org-open-topic-note)
 (global-set-key (kbd "C-c n p") #'sk/org-open-project-note)
+(global-set-key (kbd "C-c n o") #'sk/org-open-notes-root)
+(global-set-key (kbd "C-c n f") #'sk/org-find-note)
+(global-set-key (kbd "C-c n s") #'sk/org-search-notes)
 (global-set-key (kbd "C-c n c") #'org-capture)
 (global-set-key (kbd "C-c n a") #'sk/org-agenda)
+(global-set-key (kbd "C-c n T") #'sk/org-todo-agenda)
 (global-set-key (kbd "C-c n r") #'sk/org-daily-review)
 (global-set-key (kbd "C-c n R") #'sk/org-refresh-agenda-files)
 

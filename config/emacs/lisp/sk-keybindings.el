@@ -544,8 +544,12 @@
 (define-key sk/notes-map (kbd "d") #'sk/org-open-daily-note)
 (define-key sk/notes-map (kbd "t") #'sk/org-open-topic-note)
 (define-key sk/notes-map (kbd "p") #'sk/org-open-project-note)
+(define-key sk/notes-map (kbd "o") #'sk/org-open-notes-root)
+(define-key sk/notes-map (kbd "f") #'sk/org-find-note)
+(define-key sk/notes-map (kbd "s") #'sk/org-search-notes)
 (define-key sk/notes-map (kbd "c") #'org-capture)
 (define-key sk/notes-map (kbd "a") #'sk/org-agenda)
+(define-key sk/notes-map (kbd "T") #'sk/org-todo-agenda)
 (define-key sk/notes-map (kbd "r") #'sk/org-daily-review)
 (define-key sk/notes-map (kbd "R") #'sk/org-refresh-agenda-files)
 
@@ -645,10 +649,14 @@
     "SPC n a" "agenda"
     "SPC n c" "capture"
     "SPC n d" "daily note"
+    "SPC n f" "find note"
     "SPC n i" "inbox"
+    "SPC n o" "open notes folder"
     "SPC n p" "project note"
     "SPC n r" "daily review"
     "SPC n R" "refresh agenda"
+    "SPC n s" "search notes"
+    "SPC n T" "TODO agenda"
     "SPC n t" "topic note"
     "SPC o" "open"
     "SPC o -" "dired jump"
