@@ -39,6 +39,9 @@
 (defvar sk/org-table-toggle-map (make-sparse-keymap)
   "Org table toggle commands under `sk/org-table-map'.")
 
+(defvar sk/org-babel-map (make-sparse-keymap)
+  "Org source-block commands under `sk/org-localleader-map'.")
+
 (defvar sk/org-agenda-localleader-map (make-sparse-keymap)
   "Org agenda commands under the Doom-style local leader.")
 
@@ -50,6 +53,42 @@
 
 (defvar sk/org-agenda-priority-map (make-sparse-keymap)
   "Org agenda priority commands under `sk/org-agenda-localleader-map'.")
+
+(defvar sk/org-source-block-languages
+  '("emacs-lisp" "sh" "bash" "nix" "lua" "qml" "rust" "c" "python" "haskell" "json" "yaml" "glsl")
+  "Languages offered when inserting Org source blocks.")
+
+(defun sk/org-source-block-language-at-point ()
+  "Return the Org source-block language at point, when point is in one."
+  (when (derived-mode-p 'org-mode)
+    (let ((context (org-element-context)))
+      (when (eq (org-element-type context) 'src-block)
+        (org-element-property :language context)))))
+
+(defun sk/org-read-source-block-language ()
+  "Read an Org source-block language with a useful default."
+  (let ((default (or (sk/org-source-block-language-at-point) "emacs-lisp")))
+    (completing-read
+     (format "Source language (%s): " default)
+     sk/org-source-block-languages nil nil nil nil default)))
+
+(defun sk/org-insert-source-block (language)
+  "Insert an Org source block for LANGUAGE, wrapping the active region if any."
+  (interactive (list (sk/org-read-source-block-language)))
+  (let ((has-region (use-region-p)))
+    (if has-region
+        (let* ((beg (region-beginning))
+               (end (region-end))
+               (body (buffer-substring-no-properties beg end)))
+          (delete-region beg end)
+          (insert "#+begin_src " language "\n" body)
+          (when (and (> (length body) 0)
+                     (not (eq (aref body (1- (length body))) ?\n)))
+            (insert "\n"))
+          (insert "#+end_src\n")
+          (deactivate-mark))
+      (insert "#+begin_src " language "\n\n#+end_src")
+      (forward-line -1))))
 
 (define-key sk/org-localleader-map (kbd "#") #'org-update-statistics-cookies)
 (define-key sk/org-localleader-map (kbd "'") #'org-edit-special)
@@ -71,6 +110,7 @@
 (define-key sk/org-localleader-map (kbd "T") #'org-todo-list)
 (define-key sk/org-localleader-map (kbd "x") #'org-toggle-checkbox)
 (define-key sk/org-localleader-map (kbd "a") sk/org-attach-map)
+(define-key sk/org-localleader-map (kbd "B") sk/org-babel-map)
 (define-key sk/org-localleader-map (kbd "b") sk/org-table-map)
 (define-key sk/org-localleader-map (kbd "c") sk/org-clock-map)
 (define-key sk/org-localleader-map (kbd "d") sk/org-date-map)
@@ -163,6 +203,15 @@
 (define-key sk/org-table-toggle-map (kbd "f") #'org-table-toggle-formula-debugger)
 (define-key sk/org-table-toggle-map (kbd "o") #'org-table-toggle-coordinate-overlays)
 
+(define-key sk/org-babel-map (kbd "'") #'org-edit-special)
+(define-key sk/org-babel-map (kbd "e") #'org-babel-execute-src-block)
+(define-key sk/org-babel-map (kbd "g") #'org-babel-goto-named-src-block)
+(define-key sk/org-babel-map (kbd "i") #'sk/org-insert-source-block)
+(define-key sk/org-babel-map (kbd "n") #'org-babel-next-src-block)
+(define-key sk/org-babel-map (kbd "p") #'org-babel-previous-src-block)
+(define-key sk/org-babel-map (kbd "r") #'org-babel-remove-result)
+(define-key sk/org-babel-map (kbd "t") #'org-babel-tangle)
+
 (define-key sk/org-agenda-localleader-map (kbd "t") #'org-agenda-todo)
 (define-key sk/org-agenda-localleader-map (kbd "q") #'org-agenda-set-tags)
 (define-key sk/org-agenda-localleader-map (kbd "r") #'org-agenda-refile)
@@ -192,21 +241,31 @@
         org-hide-emphasis-markers t
         org-log-done 'time
         org-image-actual-width nil
-        org-ellipsis "")
+        org-ellipsis ""
+        org-src-fontify-natively t
+        org-src-tab-acts-natively t
+        org-src-window-setup 'current-window
+        org-edit-src-content-indentation 0
+        org-src-preserve-indentation nil
+        org-confirm-babel-evaluate t)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
      (shell . t)))
   (require 'org-tempo)
   (dolist (template '(("sh" . "src sh")
+                      ("bash" . "src bash")
                       ("el" . "src emacs-lisp")
                       ("nix" . "src nix")
                       ("lua" . "src lua")
                       ("qml" . "src qml")
                       ("rs" . "src rust")
                       ("c" . "src c")
+                      ("py" . "src python")
+                      ("hs" . "src haskell")
                       ("json" . "src json")
-                      ("yaml" . "src yaml")))
+                      ("yaml" . "src yaml")
+                      ("glsl" . "src glsl")))
     (setq org-structure-template-alist
           (assoc-delete-all (car template) org-structure-template-alist))
     (add-to-list 'org-structure-template-alist template))

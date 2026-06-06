@@ -13,7 +13,9 @@
 (defun sk/org-refresh-agenda-files ()
   "Refresh `org-agenda-files' from the note tree."
   (interactive)
-  (setq org-agenda-files (sk/org-agenda-note-files)))
+  (setq org-agenda-files (sk/org-agenda-note-files))
+  (when (called-interactively-p 'interactive)
+    (message "Org agenda files refreshed: %d" (length org-agenda-files))))
 
 (defun sk/org--slugify (text)
   "Return a simple filename slug for TEXT."
@@ -91,9 +93,39 @@
   (interactive)
   (find-file (sk/org-project-file)))
 
+(defun sk/org-agenda ()
+  "Refresh note discovery, then open Org agenda."
+  (interactive)
+  (sk/org-refresh-agenda-files)
+  (call-interactively #'org-agenda))
+
+(defun sk/org-daily-review ()
+  "Open today's note and the daily agenda dashboard."
+  (interactive)
+  (sk/org-refresh-agenda-files)
+  (find-file (sk/org-daily-file))
+  (let ((daily-window (selected-window)))
+    (split-window-right)
+    (other-window 1)
+    (org-agenda nil "d")
+    (select-window daily-window)))
+
 (setq org-directory sk/org-notes-root
       org-agenda-files (sk/org-agenda-note-files)
-      org-default-notes-file (sk/org-inbox-file))
+      org-default-notes-file (sk/org-inbox-file)
+      org-refile-targets '((org-agenda-files :maxlevel . 3))
+      org-refile-use-outline-path 'file
+      org-outline-path-complete-in-steps nil
+      org-refile-allow-creating-parent-nodes 'confirm)
+
+(setq org-agenda-custom-commands
+      '(("d" "Daily review"
+         ((agenda "" ((org-agenda-span 'day)
+                      (org-agenda-overriding-header "Today")))
+          (todo "TODO" ((org-agenda-overriding-header "Open tasks")))))
+        ("w" "Week"
+         agenda ""
+         ((org-agenda-span 'week)))))
 
 (setq org-capture-templates
       '(("i" "Inbox note" entry
@@ -121,7 +153,9 @@
 (global-set-key (kbd "C-c n t") #'sk/org-open-topic-note)
 (global-set-key (kbd "C-c n p") #'sk/org-open-project-note)
 (global-set-key (kbd "C-c n c") #'org-capture)
-(global-set-key (kbd "C-c n a") #'org-agenda)
+(global-set-key (kbd "C-c n a") #'sk/org-agenda)
+(global-set-key (kbd "C-c n r") #'sk/org-daily-review)
+(global-set-key (kbd "C-c n R") #'sk/org-refresh-agenda-files)
 
 (provide 'sk-notes)
 

@@ -555,7 +555,9 @@
 (define-key sk/notes-map (kbd "t") #'sk/org-open-topic-note)
 (define-key sk/notes-map (kbd "p") #'sk/org-open-project-note)
 (define-key sk/notes-map (kbd "c") #'org-capture)
-(define-key sk/notes-map (kbd "a") #'org-agenda)
+(define-key sk/notes-map (kbd "a") #'sk/org-agenda)
+(define-key sk/notes-map (kbd "r") #'sk/org-daily-review)
+(define-key sk/notes-map (kbd "R") #'sk/org-refresh-agenda-files)
 
 (define-key sk/open-map (kbd "d") #'dired)
 (define-key sk/open-map (kbd "b") #'browse-url-of-file)

@@ -165,6 +165,8 @@ SPC n t           topic note
 SPC n p           project note
 SPC n c           capture
 SPC n a           agenda
+SPC n r           daily review
+SPC n R           refresh agenda files
 
 SPC o -           Dired jump to current file
 SPC o b           open current file in browser
@@ -222,7 +224,17 @@ SPC m r r         refile
 SPC m s h/j/k/l   promote / move down / move up / demote subtree
 SPC m s n/N       narrow to subtree / widen
 SPC m b ...       table actions
+SPC m B ...       source-block actions
 SPC m a ...       attachment actions
+
+Source blocks:
+SPC m B '         edit source block
+SPC m B i         insert source block, or wrap active region
+SPC m B e         execute current source block, using loaded Babel languages
+SPC m B r         remove source-block result
+SPC m B t         tangle current Org file
+SPC m B n/p       next / previous source block
+SPC m B g         goto named source block
 
 Agenda:
 SPC m t           TODO state for agenda item
@@ -370,8 +382,12 @@ SPC n d        sk/org-open-daily-note            sk/org-open-daily-note         
 SPC n t        sk/org-open-topic-note            sk/org-open-topic-note            done
 SPC n p        sk/org-open-project-note          sk/org-open-project-note          done
 SPC n c        org-capture                       org-capture                       done
-SPC n a        org-agenda                        org-agenda                        done
-C-c n a        org-agenda                        org-agenda                        done
+SPC n a        sk/org-agenda                     sk/org-agenda                     done, refreshes note discovery
+SPC n r        sk/org-daily-review               sk/org-daily-review               done
+SPC n R        sk/org-refresh-agenda-files       sk/org-refresh-agenda-files       done
+C-c n a        sk/org-agenda                     sk/org-agenda                     done, refreshes note discovery
+C-c n r        sk/org-daily-review               sk/org-daily-review               done
+C-c n R        sk/org-refresh-agenda-files       sk/org-refresh-agenda-files       done
 dired h        dired-up-directory                dired-up-directory                done
 dired l        dired-find-file                   dired-find-file                   done
 dired RET      dired-find-file                   dired-find-file                   done
@@ -388,6 +404,7 @@ org SPC m p    priority localleader              same built-in Org commands     
 org SPC m r    refile localleader                org-refile                       done
 org SPC m s    subtree localleader               same built-in Org commands       done
 org SPC m b    table localleader                 same built-in Org commands       done
+org SPC m B    source-block localleader          sk/org-babel-map                 done
 org SPC m a    attachment localleader            same built-in Org commands       done
 #+end_src
 

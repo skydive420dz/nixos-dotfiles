@@ -37,6 +37,14 @@ Goal: keep the MSI Bravo 15 C7V keyboard behavior documented while Kanata replac
 
 Laptop keyboard spec from MSI: blue keyboard with anti-ghost key, 99-key layout. Anti-ghosting helps with simultaneous key presses, but Linux/Kanata still only can remap keys that emit visible input events.
 
+2026-06-05 follow-up: Kanata can remain =active (running)= after a device
+hotplug/re-enumeration while its =/run/kanata-*/...= symlink still points to
+the old =/dev/input/event*= node. The DrunkDeer instance hit this after the
+keyboard disappeared and returned as a new event device; restarting
+=kanata-internal.service= and =kanata-drunkdeer.service= recovered it. Later
+investigate the trigger and decide whether a udev/systemd restart hook is worth
+adding.
+
 ** Hardware-Specific Decisions
 :PROPERTIES:
 :CUSTOM_ID: hardware-specific-decisions
