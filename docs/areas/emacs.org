@@ -113,6 +113,7 @@ Stable enough to treat as current baseline:
 - [X] Syntax highlighting asks for maximum font-lock decoration, and Eglot keeps project servers alive instead of autoshutting them down during normal buffer churn.
 - [X] vterm =C-h/j/k/l= window navigation uses the same =windmove-*= path as the global completion/window wrappers.
 - [X] Clean Emacs consumes generated =theme-select= runtime tokens from =~/.config/theme/current/emacs-theme.el=, with local fallback tokens for startup safety.
+- [X] Harper stays enabled for prose buffers, but Eglot workspace configuration is now scoped per server so Harper receives only documented =:harper-ls= settings and Nix receives only the =nil= flake autoArchive setting.
 
 Next passes:
 
@@ -121,6 +122,7 @@ Next passes:
 - [ ] Observe completion documentation richness during real use; =M-d= can show popup docs when the active source/server provides them, but file/dabbrev/keyword/snippet sources are usually sparse.
 - [ ] Watch vterm/eshell during real use and tune only concrete rough edges.
 - [ ] Watch routed Tree-sitter modes during real use and fall back only if a TS mode is worse than the classic mode.
+- [ ] Watch Harper during real prose editing; if crashes return, narrow it deliberately by mode instead of disabling diagnostics globally.
 - [ ] Test and tune SkyLight syntax/modeline colors after real light-mode use.
 - [ ] Consider dedicated global modeline tokens only if generic Sky tokens stop matching the custom modeline.
 - [ ] Choose extra TS major-mode packages for QML and Org only if they beat the current classic modes.

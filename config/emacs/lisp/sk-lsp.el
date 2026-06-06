@@ -65,6 +65,41 @@
      . ("harper-ls" "--stdio")))
   "Sky-specific Eglot server mappings, ordered from specific to broad.")
 
+(defun sk/eglot-workspace-configuration (server)
+  "Return per-server workspace configuration for SERVER.
+
+Keep config payloads scoped to the server that requested them. Some language
+servers are strict about unknown configuration shapes, so avoid sending the Nix
+server config to prose servers like Harper."
+  (let ((language-ids (eglot--language-ids server)))
+    (cond
+     ((member "nix" language-ids)
+      '(:nil (:nix (:flake (:autoArchive t)))))
+     ((seq-intersection '("markdown" "org" "plaintext") language-ids #'string=)
+      '(:harper-ls (:userDictPath ""
+                    :workspaceDictPath ""
+                    :fileDictPath ""
+                    :linters (:SpellCheck t
+                              :SpelledNumbers :json-false
+                              :AnA t
+                              :SentenceCapitalization t
+                              :UnclosedQuotes t
+                              :WrongQuotes :json-false
+                              :LongSentences t
+                              :RepeatedWords t
+                              :Spaces t
+                              :Matcher t
+                              :CorrectNumberSuffix t)
+                    :codeActions (:ForceStable :json-false)
+                    :markdown (:IgnoreLinkTitle :json-false)
+                    :diagnosticSeverity "hint"
+                    :isolateEnglish :json-false
+                    :dialect "American"
+                    :maxFileLength 120000
+                    :ignoredLintsPath ""
+                    :excludePatterns [])))
+     (t nil))))
+
 (defun sk/eglot-buffer-eligible-p ()
   "Return non-nil when the current buffer is a real file buffer for Eglot."
   (and buffer-file-name
@@ -104,7 +139,7 @@
   :config
   (setq eglot-autoshutdown nil
         eglot-workspace-configuration
-        '(:nil (:nix (:flake (:autoArchive t)))))
+        #'sk/eglot-workspace-configuration)
   (dolist (server sk/eglot-server-programs)
     (setq eglot-server-programs
           (seq-remove (lambda (entry)
