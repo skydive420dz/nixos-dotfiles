@@ -114,6 +114,7 @@ Stable enough to treat as current baseline:
 - [X] vterm =C-h/j/k/l= window navigation uses the same =windmove-*= path as the global completion/window wrappers.
 - [X] Clean Emacs consumes generated =theme-select= runtime tokens from =~/.config/theme/current/emacs-theme.el=, with local fallback tokens for startup safety.
 - [X] Harper stays enabled for prose buffers, but Eglot workspace configuration is now scoped per server so Harper receives only documented =:harper-ls= settings and Nix receives only the =nil= flake autoArchive setting.
+- [X] Org presentation faces live in the Sky theme: headings, source blocks, metadata, TODO/DONE, links, tables, tags, and inline code/verbatim use runtime Sky tokens.
 
 Next passes:
 
@@ -134,4 +135,4 @@ Next passes:
 - [ ] Rainbow Mode togglable.
 - [ ] Dired preview.
 - [ ] eww, email, rss.
-- [ ] Make Org pretty again. 
+- [X] Make Org pretty again. 
