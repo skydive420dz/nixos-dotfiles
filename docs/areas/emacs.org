@@ -126,6 +126,7 @@ Stable enough to treat as current baseline:
 - [X] Formatting policy is explicit/manual: =SPC c f= uses the tracked formatter map, no format-on-save hook exists, and unknown modes fall back to Eglot/indentation.
 - [X] Tree-sitter grammar ownership is explicit: Nix provides parser libraries, clean Emacs remaps only languages with available built-in TS modes, and NVF remains untouched.
 - [X] Syntax highlighting asks for maximum font-lock decoration, and Eglot keeps project servers alive instead of autoshutting them down during normal buffer churn.
+- [X] Code navigation baseline is validated in real repo buffers: =SPC c d/D/i/t/r/a/x= use Eglot/xref/Flymake where available, =SPC c s= opens the current-buffer symbol outline, and =SPC s i/I= remain global Imenu search commands.
 - [X] vterm =C-h/j/k/l= window navigation uses the same =windmove-*= path as the global completion/window wrappers.
 - [X] Clean Emacs consumes generated =theme-select= runtime tokens from =~/.config/theme/current/emacs-theme.el=, with local fallback tokens for startup safety.
 - [X] Harper stays enabled for prose buffers, but Eglot workspace configuration is now scoped per server so Harper receives only documented =:harper-ls= settings and Nix receives only the =nil= flake autoArchive setting.

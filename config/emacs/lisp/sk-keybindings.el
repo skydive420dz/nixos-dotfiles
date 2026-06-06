@@ -501,6 +501,7 @@
 (define-key sk/code-map (kbd "i") #'eglot-find-implementation)
 (define-key sk/code-map (kbd "k") #'eldoc-doc-buffer)
 (define-key sk/code-map (kbd "r") #'sk/code-rename)
+(define-key sk/code-map (kbd "s") #'sk/code-symbols)
 (define-key sk/code-map (kbd "t") #'eglot-find-typeDefinition)
 (define-key sk/code-map (kbd "w") #'delete-trailing-whitespace)
 (define-key sk/code-map (kbd "x") #'sk/code-errors)
@@ -627,6 +628,7 @@
     "SPC c D" "references"
     "SPC c f" "format explicitly"
     "SPC c r" "rename symbol"
+    "SPC c s" "symbols"
     "SPC c x" "diagnostics"
     "SPC p" "projects"
     "SPC p !" "project shell command"
