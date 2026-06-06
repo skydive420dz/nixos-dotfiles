@@ -112,6 +112,7 @@ Stable enough to treat as current baseline:
 - [X] Tree-sitter grammar ownership is explicit: Nix provides parser libraries, clean Emacs remaps only languages with available built-in TS modes, and NVF remains untouched.
 - [X] Syntax highlighting asks for maximum font-lock decoration, and Eglot keeps project servers alive instead of autoshutting them down during normal buffer churn.
 - [X] vterm =C-h/j/k/l= window navigation uses the same =windmove-*= path as the global completion/window wrappers.
+- [X] Clean Emacs consumes generated =theme-select= runtime tokens from =~/.config/theme/current/emacs-theme.el=, with local fallback tokens for startup safety.
 
 Next passes:
 
@@ -120,14 +121,15 @@ Next passes:
 - [ ] Observe completion documentation richness during real use; =M-d= can show popup docs when the active source/server provides them, but file/dabbrev/keyword/snippet sources are usually sparse.
 - [ ] Watch vterm/eshell during real use and tune only concrete rough edges.
 - [ ] Watch routed Tree-sitter modes during real use and fall back only if a TS mode is worse than the classic mode.
-- [ ] Decide whether clean Emacs should consume generated =theme-select= runtime tokens or keep its local =sky-night= palette.
+- [ ] Test and tune SkyLight syntax/modeline colors after real light-mode use.
+- [ ] Consider dedicated global modeline tokens only if generic Sky tokens stop matching the custom modeline.
 - [ ] Choose extra TS major-mode packages for QML and Org only if they beat the current classic modes.
 - [ ] Make Org first-class: refine custom agenda views and daily review habits.
 - [ ] Keep documenting the clean Emacs layout and user-facing key surface as it changes.
 - [ ] Check the possibility of transparency rules through hyperland instead of native alpha.
 - [ ] Sensible tab and indentation configs nvf reference.
-- [ ] Ledger Mode
-- [ ] Rainbow Mode togglable
-- [ ] Dired preview
-- [ ] eww, email, rss
-- [ ] 
+- [ ] Ledger Mode.
+- [ ] Rainbow Mode togglable.
+- [ ] Dired preview.
+- [ ] eww, email, rss.
+- [ ] Make Org pretty again. 
