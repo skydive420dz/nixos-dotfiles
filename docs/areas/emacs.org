@@ -107,6 +107,7 @@ Stable enough to treat as current baseline:
 - [X] Eshell has a Sky prompt with =λ=, no line numbers, Corfu disabled, syntax highlighting enabled, and live-editable =profile=/=aliases= files under =config/emacs/eshell=.
 - [X] Terminal ANSI, term, and vterm faces use the Sky palette instead of Emacs' stock =red3=/=blue2=/=green3= colors.
 - [X] Language sanity probe passed for Rust, C, Python, Haskell, and YAML: each opened in the expected mode, attached to the expected Eglot server, had Corfu active, and exposed snippets before Eglot completion.
+- [X] Formatting policy is explicit/manual: =SPC c f= uses the tracked formatter map, no format-on-save hook exists, and unknown modes fall back to Eglot/indentation.
 
 Next passes:
 
@@ -117,6 +118,6 @@ Next passes:
 - [ ] Decide Tree-sitter policy: where it is worth using, where native modes are enough.
 - [ ] Make Org first-class: refine custom agenda views, source-block execution policy, and daily review habits.
 - [ ] Decide which additional Org Babel languages to enable beyond Emacs Lisp and shell.
-- [ ] Decide formatting policy and keep it explicit instead of surprise autoformat.
 - [ ] Keep documenting the clean Emacs layout and user-facing key surface as it changes.
 - [ ] Check the possibility of transparency rules through hyperland instead of native alpha.
+- [ ] Sensible tab and indentation configs nvf reference.

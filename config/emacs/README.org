@@ -45,6 +45,7 @@ lisp/
   sk-evil.el
   sk-completion.el
   sk-lsp.el
+  sk-format.el
   sk-org.el
   sk-notes.el
   sk-dired.el
@@ -188,6 +189,28 @@ SPC q a           save buffers and quit Emacs
 SPC q w           save current file buffer and quit
 SPC q f           force quit Emacs
 #+end_src
+
+* Formatting
+Formatting is explicit only. There is no format-on-save hook.
+
+#+begin_src text
+SPC c f           format active region or current buffer
+#+end_src
+
+Known formatter commands:
+
+#+begin_src text
+Nix               nixfmt
+Lua               stylua
+QML               qmlformat --indent-width 2 --column-width -1
+Rust              rustfmt
+C / C++           clang-format
+Python            black
+Shell             shfmt
+JSON / YAML       prettier
+#+end_src
+
+Unknown modes fall back to Eglot formatting when available, then indentation.
 
 * Terminals
 #+begin_src text
@@ -374,7 +397,7 @@ SPC f y/Y      yank absolute/project path        sk path helpers                
 SPC c a/r      code action/rename                Eglot actions                     done
 SPC c c/C      compile/recompile                 compile/recompile                 done
 SPC c d/D      definition/references             xref                              done
-SPC c f        format buffer/region              explicit Eglot/indent helper      done
+SPC c f        format buffer/region              explicit formatter map           done
 SPC c i/t      implementation/type definition    Eglot                             done
 SPC c k        documentation                     eldoc-doc-buffer                  done
 SPC c w/x      whitespace/diagnostics            delete-trailing/Flymake           done

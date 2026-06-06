@@ -22,6 +22,7 @@
 (require 'sk-evil)
 (require 'sk-completion)
 (require 'sk-lsp)
+(require 'sk-format)
 (require 'sk-org)
 (require 'sk-notes)
 (require 'sk-dired)

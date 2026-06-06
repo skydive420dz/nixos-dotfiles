@@ -260,20 +260,6 @@
         (find-file (completing-read "Recent project file: " files nil t))
       (user-error "No recent files for this project"))))
 
-(defun sk/code-format-buffer-or-region ()
-  "Format the active region or current buffer explicitly."
-  (interactive)
-  (cond
-   ((eglot-managed-p)
-    (if (use-region-p)
-        (eglot-format (region-beginning) (region-end))
-      (eglot-format-buffer)))
-   ((fboundp 'apheleia-format-buffer)
-    (call-interactively #'apheleia-format-buffer))
-   (t
-    (indent-region (if (use-region-p) (region-beginning) (point-min))
-                   (if (use-region-p) (region-end) (point-max))))))
-
 (defun sk/code-action ()
   "Run Eglot code actions when available."
   (interactive)
@@ -313,6 +299,7 @@
     "sk-evil"
     "sk-completion"
     "sk-lsp"
+    "sk-format"
     "sk-org"
     "sk-notes"
     "sk-dired"
@@ -509,7 +496,7 @@
 (define-key sk/code-map (kbd "C") #'recompile)
 (define-key sk/code-map (kbd "d") #'xref-find-definitions)
 (define-key sk/code-map (kbd "D") #'xref-find-references)
-(define-key sk/code-map (kbd "f") #'sk/code-format-buffer-or-region)
+(define-key sk/code-map (kbd "f") #'sk/format-buffer-or-region)
 (define-key sk/code-map (kbd "i") #'eglot-find-implementation)
 (define-key sk/code-map (kbd "k") #'eldoc-doc-buffer)
 (define-key sk/code-map (kbd "r") #'sk/code-rename)
