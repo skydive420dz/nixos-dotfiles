@@ -79,18 +79,29 @@ emacsclient --create-frame --alternate-editor=emacs
 - 2026-05-31: Emacs daemon checkpoint: NixOS owns an =emacs.service= user daemon, launcher entry opens =doom-emacs= via =emacsclient=, and terminal clients are available through =doom-emacs-terminal=.
 - 2026-06-05: Clean Emacs active checkpoint: =~/.config/emacs= points to =config/emacs=, Doom is frozen reference, clean Evil key layer is usable, Org navigation works, vterm/eshell are ported, Doom modeline is active, terminal frames use Sky fallback colors, and prompts accept =y/n=.
 
-** TODO Next Passes
+** Checklist
 :PROPERTIES:
-:CUSTOM_ID: todo-next-passes
+:CUSTOM_ID: checklist
 :END:
-#+begin_src text
-  TODO Finish Doom muscle-memory key audit for file/project/search/help/buffer edge cases.
-  TODO Tune completion across minibuffer, Corfu, snippets, LSP, and prose.
-  TODO Polish Doom modeline and Sky theme faces until the UI looks intentional.
-  TODO vterm and eshell polish - faces like we had in doom.
-  TODO treesitter?
-  TODO Make Org first-class: notes, agenda, capture templates, source blocks, navigation.
-  TODO Sanity-check LSP per language: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown.
-  TODO Decide formatting policy and keep it explicit instead of surprise autoformat.
-  TODO Keep documenting the clean Emacs layout and user-facing key surface as it changes.
-#+end_src
+Stable enough to treat as current baseline:
+
+- [X] Clean Emacs is the default MSI Emacs config.
+- [X] Doom remains in the repo as frozen/reference material.
+- [X] =M-/= starts completion and survives =SPC h r r=.
+- [X] =C-h/j/k/l= switch between completion navigation and window navigation.
+- [X] =SPC h r r= reloads clean Emacs modules without breaking completion.
+- [X] Doom modeline-style UI and Sky theme faces are active.
+- [X] vterm builds through =emacs-sync=.
+- [X] Current state is checkpointed in Git.
+
+Next passes:
+
+- [ ] Finish Doom muscle-memory key audit for file, project, search, help, buffer, mode, and Org edge cases.
+- [ ] Tune completion across minibuffer, Corfu, snippets, LSP, and prose.
+- [ ] Confirm completion documentation behavior per source: LSP docs, snippets, file names, dabbrev, keywords.
+- [ ] Polish vterm and eshell faces/ergonomics until they feel like real terminals.
+- [ ] Decide Tree-sitter policy: where it is worth using, where native modes are enough.
+- [ ] Make Org first-class: notes, agenda, capture templates, source blocks, navigation, and daily workflow.
+- [ ] Sanity-check LSP per language in real files: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown/Org, YAML/JSON, GLSL.
+- [ ] Decide formatting policy and keep it explicit instead of surprise autoformat.
+- [ ] Keep documenting the clean Emacs layout and user-facing key surface as it changes.
