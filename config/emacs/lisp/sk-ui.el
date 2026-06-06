@@ -7,7 +7,24 @@
 (add-to-list 'default-frame-alist '(alpha-background . 100))
 
 (setq display-line-numbers-type 'relative)
-(global-display-line-numbers-mode 1)
+
+(defun sk/enable-line-numbers ()
+  "Enable relative line numbers in the current buffer."
+  (display-line-numbers-mode 1))
+
+(defun sk/disable-line-numbers ()
+  "Disable line numbers in the current buffer."
+  (display-line-numbers-mode -1))
+
+(defun sk/apply-line-number-policy ()
+  "Apply the Sky line-number policy to the current buffer."
+  (if (derived-mode-p 'prog-mode)
+      (sk/enable-line-numbers)
+    (sk/disable-line-numbers)))
+
+(global-display-line-numbers-mode -1)
+
+(add-hook 'prog-mode-hook #'sk/enable-line-numbers)
 
 (dolist (hook '(org-mode-hook
                 markdown-mode-hook
@@ -17,8 +34,14 @@
                 term-mode-hook
                 shell-mode-hook
                 eshell-mode-hook
-                help-mode-hook))
-  (add-hook hook (lambda () (display-line-numbers-mode -1))))
+                help-mode-hook
+                special-mode-hook
+                completion-list-mode-hook))
+  (add-hook hook #'sk/disable-line-numbers))
+
+(dolist (buffer (buffer-list))
+  (with-current-buffer buffer
+    (sk/apply-line-number-policy)))
 
 (defconst sk/terminal-frame-colors
   '((background . "color-234")

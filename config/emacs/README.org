@@ -189,6 +189,27 @@ SPC q w           save current file buffer and quit
 SPC q f           force quit Emacs
 #+end_src
 
+* Terminals
+#+begin_src text
+SPC o t           vterm
+SPC o e           eshell
+SPC o E           named eshell
+#+end_src
+
+vterm uses zsh and keeps terminal buffers in insert state with =C-h/j/k/l=
+window movement.
+
+Eshell uses the Sky =λ= prompt, syntax highlighting, no line numbers, and no
+Corfu popup. Its live files are:
+
+#+begin_src text
+config/emacs/eshell/profile
+config/emacs/eshell/aliases
+#+end_src
+
+Keep =aliases= empty until it contains real Eshell alias lines; comment-only
+alias files fail Eshell's alias parser.
+
 * Org Navigation
 #+begin_src text
 TAB / S-TAB       cycle heading / global cycle
