@@ -233,6 +233,33 @@
 (define-key sk/org-agenda-priority-map (kbd "p") #'org-agenda-priority)
 (define-key sk/org-agenda-priority-map (kbd "u") #'org-agenda-priority-up)
 
+(with-eval-after-load 'which-key
+  (which-key-add-key-based-replacements
+    "SPC m" "org"
+    "SPC m '" "edit source block"
+    "SPC m A" "archive subtree"
+    "SPC m B" "source blocks"
+    "SPC m B e" "execute source block"
+    "SPC m B g" "goto named source block"
+    "SPC m B i" "insert source block"
+    "SPC m B n" "next source block"
+    "SPC m B p" "previous source block"
+    "SPC m B r" "remove result"
+    "SPC m B t" "tangle file"
+    "SPC m a" "attachments"
+    "SPC m b" "tables"
+    "SPC m c" "clock"
+    "SPC m d" "dates"
+    "SPC m e" "export"
+    "SPC m g" "goto"
+    "SPC m l" "links"
+    "SPC m p" "priority"
+    "SPC m q" "tags"
+    "SPC m r" "refile"
+    "SPC m s" "subtree"
+    "SPC m t" "todo"
+    "SPC m x" "checkbox"))
+
 (use-package org
   :ensure nil
   :mode ("\\.org\\'" . org-mode)

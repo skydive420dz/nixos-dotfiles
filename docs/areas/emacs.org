@@ -98,19 +98,23 @@ Stable enough to treat as current baseline:
 - [X] Org source-block insertion, editing, tangling, and source-block navigation helpers are active.
 - [X] Org Babel has safe execution enabled for Emacs Lisp and shell.
 - [X] Yasnippet is active globally, QML snippets are tracked under clean Emacs, snippet triggers complete through Corfu, and prose buffers have file plus dabbrev completion fallbacks.
+- [X] Doom muscle-memory key audit is complete for the core file, project, search, help, buffer, mode, window, notes, Org, Dired, Magit, vterm, and eshell surfaces currently in daily use.
+- [X] Daily notes workflow is active: inbox, daily/topic/project notes, capture templates, agenda refresh, and daily review are wired.
+- [X] Kill-oriented bindings are audited: =SPC b k/K= and =SPC p k= use =k= for kill actions, while =x= remains close/scratch/tab behavior where already established.
+- [X] Eglot server routing is validated for real files currently in the repo: Nix -> =nil=, Lua -> =lua-language-server=, QML -> =qmlls-wrapped=, shell -> =bash-language-server=, JSON -> =vscode-json-language-server=, GLSL -> =glsl_analyzer=, Markdown/Org -> =harper-ls=.
+- [X] Completion plumbing is validated in real managed buffers: code/config buffers expose snippets first, then Eglot, then file/dabbrev/keyword fallbacks; prose buffers expose Harper/Eglot plus file/dabbrev fallbacks.
+- [X] Notes and Org localleader commands have which-key labels for the common daily-note, capture, agenda, source-block, table, subtree, clock, date, priority, link, and attachment paths.
 
 Next passes:
 
-- [ ] Finish Doom muscle-memory key audit for file, project, search, help, buffer, mode, and Org edge cases.
+- [ ] Watch for real-use key edge cases and add them deliberately as they come up.
 - [ ] Tune completion across minibuffer, Corfu, LSP, and real project buffers after daily use exposes friction.
-- [ ] Confirm completion documentation behavior in real LSP sessions per language.
+- [ ] Observe completion documentation richness during real use; =M-d= can show popup docs when the active source/server provides them, but file/dabbrev/keyword/snippet sources are usually sparse.
 - [ ] Polish vterm and eshell faces/ergonomics until they feel like real terminals.
 - [ ] Decide Tree-sitter policy: where it is worth using, where native modes are enough.
 - [ ] Make Org first-class: refine custom agenda views, source-block execution policy, and daily review habits.
 - [ ] Decide which additional Org Babel languages to enable beyond Emacs Lisp and shell.
-- [ ] Sanity-check LSP per language in real files: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown/Org, YAML/JSON, GLSL.
+- [ ] Sanity-check LSP for languages not represented by real files in this repo yet: Rust, C/C++, Python, Haskell, and YAML.
 - [ ] Decide formatting policy and keep it explicit instead of surprise autoformat.
 - [ ] Keep documenting the clean Emacs layout and user-facing key surface as it changes.
 - [ ] Check the possibility of transparency rules through hyperland instead of native alpha.
-- [ ] Check k for kill for all.
-- [ ] Workflow daily notes.
