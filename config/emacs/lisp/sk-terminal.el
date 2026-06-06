@@ -12,10 +12,10 @@
         vterm-max-scrollback 10000)
   (sk/load-theme)
   (add-hook 'vterm-mode-hook #'evil-insert-state)
-  (define-key vterm-mode-map (kbd "C-h") #'evil-window-left)
-  (define-key vterm-mode-map (kbd "C-j") #'evil-window-down)
-  (define-key vterm-mode-map (kbd "C-k") #'evil-window-up)
-  (define-key vterm-mode-map (kbd "C-l") #'evil-window-right))
+  (define-key vterm-mode-map (kbd "C-h") #'windmove-left)
+  (define-key vterm-mode-map (kbd "C-j") #'windmove-down)
+  (define-key vterm-mode-map (kbd "C-k") #'windmove-up)
+  (define-key vterm-mode-map (kbd "C-l") #'windmove-right))
 
 (defun eshell-new (name)
   "Create a new eshell buffer named NAME."
