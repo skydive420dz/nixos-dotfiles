@@ -100,9 +100,6 @@ small behavior slices only when they fit the clean Emacs ownership model.
 
 Keepers to test in focused slices:
 
-- DevDocs lookup at point, from the =Devdocs= section. It pre-fills
-  =devdocs-lookup= with the symbol at point and displays docs in a right side
-  window.
 - Popper, from the =Popper= section, as a possible way to tame transient
   buffers such as help, warnings, compilation, shell, and terminal buffers.
 - Smarter keyboard quit, from =gopar/er-keyboard-quit-dwim=, as a possible
@@ -324,10 +321,6 @@ Stable enough to treat as current baseline:
 - [X] Syntax highlighting asks for maximum font-lock decoration, and Eglot keeps project servers alive instead of autoshutting them down during normal buffer churn.
 - [X] Code navigation baseline is validated in real repo buffers: =SPC c d/D/i/t/r/a/x= use Eglot/xref/Flymake where available, =SPC c s= opens the current-buffer symbol outline, and =SPC s i/I= remain global Imenu search commands.
 - [X] =SPC c k= uses a Sky wrapper that asks Eldoc to refresh docs at point before opening the documentation buffer, instead of only showing the last cached Eldoc result.
-- [X] =SPC c K= opens DevDocs lookup at point as an external docs slice, with =SPC u SPC c K= available when DevDocs should prompt for docsets first.
-- [X] =SPC c I= installs DevDocs docsets from inside Emacs by spawning a separate =emacs -Q --batch= process, so synchronous DevDocs network work cannot block the live daemon.
-- [X] DevDocs install jobs no longer auto-pop a log window; =SPC c L= opens the =*DevDocs Install*= buffer only when wanted.
-- [X] =SPC c K= keeps the friendly DevDocs entry point: it looks up installed docs, and when no docset is available it searches the local catalog and starts a safe external install. =SPC u SPC c K= searches/installs docsets directly. =SPC c R= refreshes that local catalog outside the daemon.
 - [X] vterm =C-h/j/k/l= window navigation uses the same =windmove-*= path as the global completion/window wrappers.
 - [X] Clean Emacs consumes generated =theme-select= runtime tokens from =~/.config/theme/current/emacs-theme.el=, with local fallback tokens for startup safety.
 - [X] =SPC h r t= reapplies the enabled Sky theme immediately after runtime token changes instead of lagging one reload behind.
@@ -385,8 +378,7 @@ Next passes:
 - [ ] Choose an extra TS major-mode package for Org only if it beats the current classic mode. QML is already handled by local =sk-qml-ts-mode=.
 - [ ] Borrow =qml-ts-mode= ideas one at a time, starting with imenu/defun navigation or indentation, and validate each against =Bar.qml=, =BarFrame.qml=, and a larger module before keeping it.
 - [ ] Make Org first-class: refine custom agenda views and daily review habits.
-- [X] Try DevDocs lookup at point as a focused slice, using =gopar/.emacs.d=
-  =Devdocs= as reference.
+- [ ] Revisit external documentation lookup later. DevDocs was tested and removed from active config because docset installation was unreliable, especially for large Qt docsets. If revisited, keep it lookup-only for preinstalled docs or use a project-owned offline documentation source.
 - [ ] Evaluate Popper as a focused slice for transient buffers such as help,
   warnings, compilation, shell, and terminal buffers.
 - [ ] Compare current completion layering with =gopar/.emacs.d= =Code

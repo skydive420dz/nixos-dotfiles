@@ -382,7 +382,6 @@
     "sk-qml"
     "sk-lsp"
     "sk-format"
-    "sk-docs"
     "sk-org"
     "sk-notes"
     "sk-dired"
@@ -580,11 +579,7 @@
 (define-key sk/code-map (kbd "D") #'xref-find-references)
 (define-key sk/code-map (kbd "f") #'sk/format-buffer-or-region)
 (define-key sk/code-map (kbd "i") #'eglot-find-implementation)
-(define-key sk/code-map (kbd "I") #'sk/devdocs-install)
 (define-key sk/code-map (kbd "k") #'sk/code-docs)
-(define-key sk/code-map (kbd "K") #'sk/devdocs-lookup)
-(define-key sk/code-map (kbd "L") #'sk/devdocs-open-install-log)
-(define-key sk/code-map (kbd "R") #'sk/devdocs-refresh-catalog)
 (define-key sk/code-map (kbd "r") #'sk/code-rename)
 (define-key sk/code-map (kbd "s") #'sk/code-symbols)
 (define-key sk/code-map (kbd "t") #'eglot-find-typeDefinition)
@@ -714,10 +709,6 @@
     "SPC c d" "definition"
     "SPC c D" "references"
     "SPC c f" "format explicitly"
-    "SPC c I" "install DevDocs"
-    "SPC c K" "DevDocs lookup"
-    "SPC c L" "DevDocs install log"
-    "SPC c R" "refresh DevDocs catalog"
     "SPC c r" "rename symbol"
     "SPC c s" "symbols"
     "SPC c x" "diagnostics"
