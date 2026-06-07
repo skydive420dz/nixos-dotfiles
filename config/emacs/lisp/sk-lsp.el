@@ -3,8 +3,21 @@
 ;; Start with Eglot because it is built into Emacs and keeps the clean config
 ;; smaller. Nix owns the external language-server executables.
 
+(require 'cl-lib)
 (require 'seq)
 (require 'eglot)
+
+(cl-defmethod eglot-register-capability
+  (server (method (eql :workspace/didChangeWatchedFiles)) id &rest params)
+  "Accept qmlls' colon-prefixed watched-file registration method."
+  (apply #'eglot-register-capability
+         server 'workspace/didChangeWatchedFiles id params))
+
+(cl-defmethod eglot-unregister-capability
+  (server (method (eql :workspace/didChangeWatchedFiles)) id &rest params)
+  "Accept qmlls' colon-prefixed watched-file unregistration method."
+  (apply #'eglot-unregister-capability
+         server 'workspace/didChangeWatchedFiles id params))
 
 (defconst sk/eglot-managed-modes
   '(c-mode c++-mode c-ts-mode c++-ts-mode

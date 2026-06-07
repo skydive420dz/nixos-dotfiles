@@ -42,7 +42,12 @@
    '((ui_object_definition
       type_name: (identifier) @font-lock-type-face)
      (ui_property
-      type: (type_identifier) @font-lock-type-face))
+      type: (type_identifier) @font-lock-type-face)
+     (ui_import
+      (identifier) @font-lock-type-face)
+     (ui_import
+      (nested_identifier
+       (identifier) @font-lock-type-face)))
 
    :language 'qmljs
    :feature 'property
