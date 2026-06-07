@@ -274,6 +274,7 @@ Stable enough to treat as current baseline:
 - [X] Magit keeps its core command surface under evil-collection defaults: =h= dispatch, =l= log, =gr/gR= refresh, =x/X= delete/untrack, =p= push, =o/O= reset, and =yy/ys/yb/yr= yank/copy variants.
 - [X] Clean Emacs opens to a minimal Sky home buffer and returns there when our buffer-kill commands leave no ordinary buffers open.
 - [X] =SPC q r= restarts the user Emacs daemon through systemd and opens a fresh graphical client frame.
+- [X] =SPC q r= waits for the restarted daemon socket before reopening a frame and refuses the standalone =emacs= fallback, so Tree-sitter keeps the daemon's Nix-provided grammar environment after restart.
 - [X] =SPC h r s= runs =emacs-sync= in the background with minibuffer status; daemon restart remains explicit through =SPC q r=.
 - [X] Universal editor baseline is audited outside repos: standalone Nix, Lua, QML, Python, Rust, C, Org, shell, JSON, and YAML files open with useful mode/indent/highlight/completion behavior, while project-aware LSP stays additive.
 - [X] Completion sanity probe passed against the live daemon: =M-/=, Corfu =C-j/k/l=, Yasnippet =TAB/S-TAB=, QML snippet completion, empty-prefix manual completion, and standalone Nix =nixd= option completion survive config reload.
