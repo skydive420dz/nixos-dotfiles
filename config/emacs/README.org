@@ -426,6 +426,34 @@ QML uses =sk-qml-ts-mode=, a small local mode backed by the =qmljs=
 Tree-sitter parser. It keeps =qml-mode= as the fallback when the parser is not
 available and avoids ad hoc regex highlighting.
 
+The local QML mode exists because clean Emacs does not currently provide a
+built-in QML TS major mode that covers our Quickshell files well. It owns only
+editor parsing/highlighting policy. Runtime QML structure still belongs to the
+Quickshell tree, its =qmldir= files, and the global project guidelines.
+
+Current QML coverage:
+
+#+begin_src text
+imports             import modules and import paths
+object types         Canvas, PanelWindow, RowLayout, local components
+properties           QML property declarations and bindings
+attached props       WlrLayershell.layer, Layout.fillWidth
+JS blocks            var declarations, initializer uses, binary expressions,
+                     function calls, and function argument identifiers
+constants            true, false, null
+strings/comments     parser-backed string and comment nodes
+#+end_src
+
+QML LSP support stays intentionally modest. =qmlls-wrapped= supplies Qt and
+Quickshell import paths, completion, Eldoc, Flymake, and formatting support,
+but hover prose and jump precision depend on Qt/Quickshell metadata and
+=qmlls= behavior. Sparse hover text is not, by itself, an editor wiring failure.
+
+QML validation must stay light. Repeated automated completion probes can spawn
+many =qmlls= children and wedge the Emacs daemon. Prefer manual checks from a
+real frame. Safe scripted checks should use temp buffers with mode hooks
+disabled and verify only parser/font-lock behavior.
+
 NVF is not edited by this policy. It remains a reference and already owns its
 own Tree-sitter setup through NVF.
 
@@ -551,7 +579,7 @@ TODO Make Org first-class: notes, agenda, capture templates, source blocks, navi
 DONE Sanity-check LSP per language: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown/Org prose, YAML/JSON, web basics.
 TODO Decide formatting policy and keep it explicit instead of surprise autoformat.
 DONE Decide Emacs tree-sitter grammar ownership before enabling tsx-ts/js-ts modes.
-TODO Choose extra TS major-mode packages for QML and Org if they beat the classic modes.
+TODO Choose an extra TS major-mode package for Org if it beats the classic mode. QML is handled by local sk-qml-ts-mode.
 TODO Keep documenting the clean Emacs layout and user-facing key surface as it changes.
 #+end_src
 
