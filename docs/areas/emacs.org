@@ -276,13 +276,15 @@ Stable enough to treat as current baseline:
 - [X] =SPC q r= restarts the user Emacs daemon through systemd and opens a fresh graphical client frame.
 - [X] =SPC h r s= runs =emacs-sync= in the background with minibuffer status; daemon restart remains explicit through =SPC q r=.
 - [X] Universal editor baseline is audited outside repos: standalone Nix, Lua, QML, Python, Rust, C, Org, shell, JSON, and YAML files open with useful mode/indent/highlight/completion behavior, while project-aware LSP stays additive.
+- [X] Completion sanity probe passed against the live daemon: =M-/=, Corfu =C-j/k/l=, Yasnippet =TAB/S-TAB=, QML snippet completion, empty-prefix manual completion, and standalone Nix =nixd= option completion survive config reload.
 
 Next passes:
 
 - [ ] Watch for real-use key edge cases and add them deliberately as they come up.
 - [ ] Mirror portable macOS Emacs hardening on MSI where useful: Dired =ls= capability detection, Tree-sitter grammar fallback path, and =with-editor=/=emacsclient= discovery. Keep macOS window-decoration frame params platform-specific.
-- [ ] Tune completion across minibuffer, Corfu, LSP, and real project buffers after daily use exposes friction.
+- [X] Tune completion across minibuffer, Corfu, LSP, and real project buffers after daily use exposes friction.
 - [ ] Observe completion documentation richness during real use; =M-d= can show popup docs when the active source/server provides them, but file/dabbrev/keyword/snippet sources are usually sparse.
+- [ ] Keep watching completion for real-use edge cases; future changes should be tied to observed failures, not broad rewrites.
 - [ ] Watch vterm/eshell during real use and tune only concrete rough edges.
 - [ ] Watch routed Tree-sitter modes during real use and fall back only if a TS mode is worse than the classic mode.
 - [ ] Watch Harper during real prose editing; if crashes return, narrow it deliberately by mode instead of disabling diagnostics globally.
