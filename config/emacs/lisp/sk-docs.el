@@ -39,7 +39,7 @@ SUCCESS-MESSAGE is shown when the external process exits successfully."
       (insert (format "Starting %s\n\n" name))
       (insert (mapconcat #'shell-quote-argument command " "))
       (insert "\n\n"))
-    (display-buffer buffer)
+    (message "Started %s; use SPC c L for the log" name)
     (make-process
      :name name
      :buffer buffer
@@ -56,6 +56,13 @@ SUCCESS-MESSAGE is shown when the external process exits successfully."
            (if (zerop exit-code)
                (message "%s" success-message)
              (message "%s failed with exit code %s" name exit-code))))))))
+
+(defun sk/devdocs-open-install-log ()
+  "Open the DevDocs install log buffer."
+  (interactive)
+  (if-let* ((buffer (get-buffer sk/devdocs-install-buffer-name)))
+      (pop-to-buffer buffer)
+    (user-error "No DevDocs install log buffer")))
 
 (defun sk/devdocs-lookup (&optional ask-docs)
   "Look up the symbol at point in DevDocs.
