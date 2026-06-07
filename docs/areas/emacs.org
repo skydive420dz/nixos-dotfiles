@@ -356,6 +356,7 @@ Stable enough to treat as current baseline:
 - [X] Prose/Org/Markdown parity pass is audited: Org opens in =org-mode= with =org-superstar= and no line numbers, Markdown opens in =markdown-ts-mode= with Markdown Tree-sitter parsers, plain text opens in =text-mode=, and all three attach to =harper-ls= with Flymake/Eglot diagnostics after Harper warms up. Org source-block language detection, structure templates, edit-special, and execute commands are present; remote scripted Babel execution can block and should be tested manually from a real frame.
 - [X] Shell and YAML config-language parity is clean for external playground files: =bash-ts-mode=/=yaml-ts-mode=, Tree-sitter parsers, =bash-language-server=/=yaml-language-server=, Flymake/Eglot diagnostics, Corfu/Eglot attachment, Eldoc providers, and manual =shfmt=/=prettier --parser yaml= formatting through =SPC c f= all work.
 - [X] GLSL config-language behavior is audited: standalone =.glsl= files open in =glsl-mode=, attach to =glsl_analyzer=, expose Corfu/Eglot completion and Eldoc hover, and format through Eglot. The current server capability set does not advertise diagnostics, so missing GLSL Flymake diagnostics are server capability behavior rather than a mode-routing failure.
+- [X] Explicit formatter audit passed through =sk/format-buffer-or-region= for Nix, Lua, QML, Python, shell, JavaScript, TypeScript, HTML, CSS, JSON, YAML, Rust, C, and C++; representative output was checked for QML, Nix, Python, TypeScript, and C.
 
 Next passes:
 
