@@ -128,7 +128,7 @@ let
     qmllsWrapped
 
     # Nix editing support.
-    nil
+    nixd
     nixfmt
   ];
   emacsRuntimePath =

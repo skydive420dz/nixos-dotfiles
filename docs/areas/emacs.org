@@ -71,7 +71,7 @@ repo, flake, Cargo workspace, or project file.
 
 Current baseline examples:
 
-- Standalone =.nix= opens in =nix-ts-mode= with Tree-sitter, =nil=, =nixfmt=,
+- Standalone =.nix= opens in =nix-ts-mode= with Tree-sitter, =nixd=, =nixfmt=,
   and fallback completion for local bindings and keywords.
 - Standalone =.lua=, =.py=, =.sh=, =.json=, and =.yaml= open in TS modes with
   completion fallbacks and explicit formatters.
@@ -109,17 +109,18 @@ For each configured language, define and audit the full language surface:
 - Formatting behavior: =SPC c f= should be explicit and available for every
   configured language with a known formatter.
 
-Current known parity issue:
+Current Nix parity decision:
 
-- NVF uses =nixd= for Nix while clean Emacs currently uses =nil=. This can
-  explain why Vim/NVF appears to provide richer completion for a standalone Nix
-  file than Emacs. Before changing either side, audit all configured languages
-  for server choice, root/context rules, standalone behavior, and project
-  behavior.
+- NVF uses =nixd= for Nix. Clean Emacs was originally using =nil=, which made
+  standalone files noticeably less rich.
+- A direct clean-Emacs comparison on the same standalone Nix file showed =nixd=
+  completing NixOS/service options and =lib.mk*= helpers where =nil= did not.
+- Clean Emacs now uses =nixd= for Nix to match the richer standalone behavior
+  and align with NVF's server choice.
 
 Target language audit set:
 
-- Nix: =nixd= vs =nil=, standalone option completion, flake/NixOS/Home Manager
+- Nix: =nixd= standalone option completion, flake/NixOS/Home Manager
   context.
 - Lua: =lua-language-server= settings, runtime/library awareness, standalone
   and config-file completion.
@@ -145,14 +146,13 @@ First read-only pass compared static NVF settings, clean Emacs settings, and
 headless standalone-file runtime behavior. Do not treat this as a final tuning
 decision; it is the map for the next slices.
 
-- Nix is the clearest mismatch:
+- Nix was the clearest mismatch:
   - NVF uses =nixd=.
-  - Clean Emacs uses =nil=.
-  - =nixd= is available inside the NVF package closure, but is not currently on
-    the normal Emacs/user runtime path. Switching Emacs to =nixd= requires
-    adding =nixd= to the Emacs runtime tools first.
-  - The observed standalone Nix difference should be tested as =nil= vs =nixd=
-    directly before deciding.
+  - Clean Emacs used =nil=.
+  - A direct clean-Emacs comparison showed =nixd= gives richer standalone Nix
+    completion for =services.= and =lib.mk*=.
+  - Clean Emacs now adds =nixd= to the Emacs runtime tools and routes Nix Eglot
+    buffers to =nixd=.
 - QML is mostly aligned in server choice:
   - NVF uses =qmlls= through =qmlls-wrapped= with Qt/Quickshell import paths.
   - Clean Emacs uses =qmlls-wrapped=.
@@ -174,12 +174,11 @@ decision; it is the map for the next slices.
 
 Next action order:
 
-1. Compare =nil= and =nixd= in clean Emacs on the same standalone Nix file.
-2. If =nixd= matches the desired rich standalone behavior, add =nixd= to the
-   Emacs runtime tools and switch Nix Eglot routing deliberately.
-3. Audit each remaining language in focused slices, using the same standard:
+1. Rebuild/restart and validate =nixd= in clean Emacs on standalone and project
+   Nix files.
+2. Audit each remaining language in focused slices, using the same standard:
    rich standalone behavior first, project metadata as additive depth.
-4. Add missing explicit formatter entries where the language tooling already
+3. Add missing explicit formatter entries where the language tooling already
    exists.
 
 ** Daily Notes Flow
@@ -249,7 +248,7 @@ Stable enough to treat as current baseline:
 - [X] Doom muscle-memory key audit is complete for the core file, project, search, help, buffer, mode, window, notes, Org, Dired, Magit, vterm, and eshell surfaces currently in daily use.
 - [X] Daily notes workflow is active: inbox, daily/topic/project notes, capture templates, agenda refresh, and daily review are wired.
 - [X] Kill-oriented bindings are audited: =SPC b k/K= and =SPC p k= use =k= for kill actions, while =x= remains close/scratch/tab behavior where already established.
-- [X] Eglot server routing is validated for real files currently in the repo: Nix -> =nil=, Lua -> =lua-language-server=, QML -> =qmlls-wrapped=, shell -> =bash-language-server=, JSON -> =vscode-json-language-server=, GLSL -> =glsl_analyzer=, Markdown/Org -> =harper-ls=.
+- [X] Eglot server routing is validated for real files currently in the repo: Nix -> =nixd=, Lua -> =lua-language-server=, QML -> =qmlls-wrapped=, shell -> =bash-language-server=, JSON -> =vscode-json-language-server=, GLSL -> =glsl_analyzer=, Markdown/Org -> =harper-ls=.
 - [X] Completion plumbing is validated in real managed buffers: code/config buffers expose snippets first, then Eglot, then file/dabbrev/keyword fallbacks; prose buffers expose Harper/Eglot plus file/dabbrev fallbacks.
 - [X] Notes and Org localleader commands have which-key labels for the common daily-note, capture, agenda, source-block, table, subtree, clock, date, priority, link, and attachment paths.
 - [X] Eshell has a Sky prompt with =λ=, no line numbers, Corfu disabled, syntax highlighting enabled, and live-editable =profile=/=aliases= files under =config/emacs/eshell=.
@@ -262,7 +261,7 @@ Stable enough to treat as current baseline:
 - [X] vterm =C-h/j/k/l= window navigation uses the same =windmove-*= path as the global completion/window wrappers.
 - [X] Clean Emacs consumes generated =theme-select= runtime tokens from =~/.config/theme/current/emacs-theme.el=, with local fallback tokens for startup safety.
 - [X] =SPC h r t= reapplies the enabled Sky theme immediately after runtime token changes instead of lagging one reload behind.
-- [X] Harper stays enabled for prose buffers, but Eglot workspace configuration is now scoped per server so Harper receives only documented =:harper-ls= settings and Nix receives only the =nil= flake autoArchive setting.
+- [X] Harper stays enabled for prose buffers, but Eglot workspace configuration is now scoped per server so Harper receives only documented =:harper-ls= settings and Nix no longer receives stale =nil=-specific settings after the =nixd= switch.
 - [X] Harper remains active for normal Org/Markdown/text files, while Org agenda generation pauses Eglot autostart so agenda collection does not spawn short-lived Harper servers for every note file.
 - [X] Org presentation faces live in the Sky theme: headings, source blocks, metadata, TODO/DONE, links, tables, tags, and inline code/verbatim use runtime Sky tokens.
 - [X] Org pretty headline markers are active through =org-superstar=, matching the Doom =:lang org +pretty= behavior clean Emacs was missing.
@@ -288,7 +287,7 @@ Next passes:
 - [ ] Watch routed Tree-sitter modes during real use and fall back only if a TS mode is worse than the classic mode.
 - [ ] Watch Harper during real prose editing; if crashes return, narrow it deliberately by mode instead of disabling diagnostics globally.
 - [ ] Run rich language parity audit across NVF and clean Emacs before changing language servers: compare server choice, root/context behavior, standalone behavior, project behavior, completion/docs/diagnostics/formatting, and decide per language.
-- [ ] Decide whether clean Emacs should switch Nix from =nil= to =nixd= or configure =nil= with an equivalent global fallback context.
+- [X] Switch clean Emacs Nix LSP from =nil= to =nixd= after direct standalone-file comparison showed richer =nixd= completion.
 - [ ] Test and tune SkyLight syntax/modeline colors after real light-mode use.
 - [ ] Consider dedicated global modeline tokens only if generic Sky tokens stop matching the custom modeline.
 - [ ] Choose extra TS major-mode packages for QML and Org only if they beat the current classic modes.

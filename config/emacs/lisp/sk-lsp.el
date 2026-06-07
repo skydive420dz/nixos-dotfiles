@@ -30,7 +30,7 @@
      . ("lua-language-server"))
     (((nix-mode :language-id "nix")
       (nix-ts-mode :language-id "nix"))
-     . ("nil"))
+     . ("nixd"))
     (((json-mode :language-id "json")
       (json-ts-mode :language-id "json")
       (js-json-mode :language-id "json"))
@@ -83,9 +83,7 @@ server config to prose servers like Harper."
   (let ((language-ids (eglot--language-ids server)))
     (cond
      ((member "nix" language-ids)
-      '(:nil (:nix (:flake (:autoArchive t
-                            :autoEvalInputs t
-                            :nixpkgsInputName "nixpkgs")))))
+      nil)
      ((seq-intersection '("markdown" "org" "plaintext") language-ids #'string=)
       '(:harper-ls (:userDictPath ""
                     :workspaceDictPath ""
