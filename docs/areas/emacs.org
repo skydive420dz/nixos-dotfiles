@@ -142,6 +142,9 @@ Stable enough to treat as current baseline:
 - [X] Magit uses the Doom-style =evil-collection-magit= model instead of a hand-written key layer.
 - [X] Magit opens in Evil normal state through evil-collection, with documented remaps such as =j/k= for line movement, =C-j/C-k= for section movement, =gj/gk= for sibling sections, =TAB= for section toggles, and =RET= for visiting the selected item.
 - [X] Magit keeps its core command surface under evil-collection defaults: =h= dispatch, =l= log, =gr/gR= refresh, =x/X= delete/untrack, =p= push, =o/O= reset, and =yy/ys/yb/yr= yank/copy variants.
+- [X] Clean Emacs opens to a minimal Sky home buffer and returns there when our buffer-kill commands leave no ordinary buffers open.
+- [X] =SPC q r= restarts the user Emacs daemon through systemd and opens a fresh graphical client frame.
+- [X] =SPC h r s= runs =emacs-sync= in the background with minibuffer status; daemon restart remains explicit through =SPC q r=.
 
 Next passes:
 

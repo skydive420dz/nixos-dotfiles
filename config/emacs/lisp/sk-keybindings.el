@@ -15,6 +15,7 @@
 (require 'compile)
 (require 'xref)
 (require 'dired-x)
+(require 'sk-dashboard)
 
 (winner-mode 1)
 
@@ -26,7 +27,8 @@
 (defun sk/kill-current-buffer ()
   "Kill the current buffer without asking for a buffer name."
   (interactive)
-  (kill-buffer (current-buffer)))
+  (kill-buffer (current-buffer))
+  (sk/show-dashboard-if-no-ordinary-buffers))
 
 (defun sk/switch-to-last-buffer ()
   "Switch to the previously visited buffer."
@@ -36,7 +38,23 @@
 (defun sk/user-buffer-p (buffer)
   "Return non-nil when BUFFER is a user-facing buffer."
   (let ((name (buffer-name buffer)))
-    (and name (not (string-prefix-p " " name)))))
+    (and name
+         (not (string-prefix-p " " name))
+         (not (sk/dashboard-buffer-p buffer)))))
+
+(defun sk/ordinary-buffer-p (buffer)
+  "Return non-nil when BUFFER should keep the home buffer hidden."
+  (let ((name (buffer-name buffer)))
+    (and (buffer-live-p buffer)
+         name
+         (not (string-prefix-p " " name))
+         (not (string-prefix-p "*" name))
+         (not (sk/dashboard-buffer-p buffer)))))
+
+(defun sk/show-dashboard-if-no-ordinary-buffers ()
+  "Show the Sky home buffer when no ordinary buffers remain."
+  (unless (seq-some #'sk/ordinary-buffer-p (buffer-list))
+    (sk/dashboard)))
 
 (defun sk/kill-all-buffers ()
   "Kill user-facing buffers."
@@ -45,7 +63,8 @@
           (when (and (buffer-live-p buffer)
                      (sk/user-buffer-p buffer))
             (kill-buffer buffer)))
-        (buffer-list)))
+        (buffer-list))
+  (sk/dashboard))
 
 (defun sk/kill-other-buffers ()
   "Kill user-facing buffers except the current buffer."
@@ -56,7 +75,8 @@
                        (buffer-live-p buffer)
                        (sk/user-buffer-p buffer))
               (kill-buffer buffer)))
-          (buffer-list))))
+          (buffer-list))
+    (sk/show-dashboard-if-no-ordinary-buffers)))
 
 (defun sk/kill-buried-buffers ()
   "Kill user-facing buffers that are not visible in any window."
@@ -67,7 +87,8 @@
                        (buffer-live-p buffer)
                        (sk/user-buffer-p buffer))
               (kill-buffer buffer)))
-          (buffer-list))))
+          (buffer-list))
+    (sk/show-dashboard-if-no-ordinary-buffers)))
 
 (defun sk/yank-buffer-contents ()
   "Copy the current buffer contents to the kill ring."
@@ -105,6 +126,7 @@
     (when (yes-or-no-p (format "Move %s to trash? " file))
       (delete-file file t)
       (kill-buffer (current-buffer))
+      (sk/show-dashboard-if-no-ordinary-buffers)
       (message "Moved file to trash: %s" file))))
 
 (defun sk/rename-current-file (target)
@@ -154,6 +176,45 @@
   (let ((path (sk/current-file-path t)))
     (kill-new path)
     (message "Copied %s" path)))
+
+(defun sk/restart-emacs-daemon ()
+  "Restart the user Emacs daemon and open a fresh graphical client frame."
+  (interactive)
+  (when (y-or-n-p "Restart Emacs daemon and reopen a frame? ")
+    (save-some-buffers)
+    (let* ((unit (format "sk-emacs-restart-%s" (emacs-pid)))
+           (client-command (if (executable-find "uwsm")
+                               "uwsm app -- emacsclient --create-frame --alternate-editor=emacs"
+                             "emacsclient --create-frame --alternate-editor=emacs"))
+           (restart-command (format "sleep 0.2; systemctl --user restart emacs.service; sleep 0.8; %s"
+                                    client-command)))
+      (unless (executable-find "systemd-run")
+        (user-error "systemd-run is not available"))
+      (start-process "sk-emacs-restart" nil
+                     "systemd-run" "--user" "--quiet" "--collect"
+                     (concat "--unit=" unit)
+                     "sh" "-lc" restart-command)
+      (message "Restarting Emacs daemon..."))))
+
+(defun sk/emacs-sync ()
+  "Run the Emacs package/config sync command in the background."
+  (interactive)
+  (unless (executable-find "emacs-sync")
+    (user-error "emacs-sync is not available"))
+  (let* ((buffer (get-buffer-create " *emacs-sync*"))
+         (process (start-process "emacs-sync" buffer "emacs-sync")))
+    (with-current-buffer buffer
+      (erase-buffer))
+    (set-process-query-on-exit-flag process nil)
+    (set-process-sentinel
+     process
+     (lambda (proc _event)
+       (when (memq (process-status proc) '(exit signal))
+         (if (= (process-exit-status proc) 0)
+             (message "emacs-sync complete")
+           (message "emacs-sync failed; output is in %s"
+                    (buffer-name (process-buffer proc)))))))
+    (message "emacs-sync started...")))
 
 (defun sk/read-project-root ()
   "Return the current project root or raise a user error."
@@ -580,12 +641,14 @@
 (define-key sk/help-map (kbd "r") sk/help-reload-map)
 
 (define-key sk/help-reload-map (kbd "r") #'sk/reload-config)
+(define-key sk/help-reload-map (kbd "s") #'sk/emacs-sync)
 (define-key sk/help-reload-map (kbd "t") #'sk/load-theme)
 
 (define-key sk/quit-map (kbd "q") #'save-buffers-kill-terminal)
 (define-key sk/quit-map (kbd "a") #'save-buffers-kill-emacs)
 (define-key sk/quit-map (kbd "w") #'sk/save-buffer-and-quit)
 (define-key sk/quit-map (kbd "f") #'kill-emacs)
+(define-key sk/quit-map (kbd "r") #'sk/restart-emacs-daemon)
 
 (use-package which-key
   :demand t
@@ -676,8 +739,10 @@
     "SPC h" "help"
     "SPC h r" "reload"
     "SPC h r r" "reload config"
+    "SPC h r s" "sync emacs"
     "SPC h r t" "reload theme"
-    "SPC q" "quit"))
+    "SPC q" "quit"
+    "SPC q r" "restart daemon"))
 
 (with-eval-after-load 'evil
   (dolist (map (list evil-insert-state-map

@@ -21,6 +21,7 @@
 (require 'sk-core)
 (require 'sk-theme)
 (require 'sk-ui)
+(require 'sk-dashboard)
 (require 'sk-evil)
 (require 'sk-completion)
 (require 'sk-languages)
