@@ -4,6 +4,7 @@
 ;; smaller. Nix owns the external language-server executables.
 
 (require 'seq)
+(require 'eglot)
 
 (defconst sk/eglot-managed-modes
   '(c-mode c++-mode c-ts-mode c++-ts-mode
@@ -82,7 +83,9 @@ server config to prose servers like Harper."
   (let ((language-ids (eglot--language-ids server)))
     (cond
      ((member "nix" language-ids)
-      '(:nil (:nix (:flake (:autoArchive t)))))
+      '(:nil (:nix (:flake (:autoArchive t
+                            :autoEvalInputs t
+                            :nixpkgsInputName "nixpkgs")))))
      ((seq-intersection '("markdown" "org" "plaintext") language-ids #'string=)
       '(:harper-ls (:userDictPath ""
                     :workspaceDictPath ""
@@ -113,6 +116,24 @@ server config to prose servers like Harper."
   (and buffer-file-name
        (not sk/org-agenda-generating-p)
        (not (string-prefix-p " " (buffer-name)))))
+
+(defun sk/eglot-configure ()
+  "Apply Sky Eglot defaults immediately and for new buffers."
+  (setq-default eglot-autoshutdown nil
+                eglot-workspace-configuration
+                #'sk/eglot-workspace-configuration)
+  (setq eglot-autoshutdown nil
+        eglot-workspace-configuration
+        #'sk/eglot-workspace-configuration)
+  (dolist (server sk/eglot-server-programs)
+    (setq eglot-server-programs
+          (seq-remove (lambda (entry)
+                        (equal (car entry) (car server)))
+                      eglot-server-programs)))
+  (setq eglot-server-programs
+        (append sk/eglot-server-programs eglot-server-programs)))
+
+(sk/eglot-configure)
 
 (defun sk/eglot-ensure ()
   "Start Eglot for supported buffers."
@@ -146,16 +167,7 @@ server config to prose servers like Harper."
           json-mode json-ts-mode
           markdown-mode markdown-ts-mode org-mode text-mode) . sk/eglot-ensure)
   :config
-  (setq eglot-autoshutdown nil
-        eglot-workspace-configuration
-        #'sk/eglot-workspace-configuration)
-  (dolist (server sk/eglot-server-programs)
-    (setq eglot-server-programs
-          (seq-remove (lambda (entry)
-                        (equal (car entry) (car server)))
-                      eglot-server-programs)))
-  (setq eglot-server-programs
-        (append sk/eglot-server-programs eglot-server-programs)))
+  (sk/eglot-configure))
 
 (with-eval-after-load 'org-agenda
   (advice-remove 'org-agenda #'sk/without-eglot-during-org-agenda)
