@@ -742,6 +742,10 @@
     "SPC h r s" "sync emacs"
     "SPC h r t" "reload theme"
     "SPC q" "quit"
+    "SPC q q" "quit"
+    "SPC q a" "quit emacs"
+    "SPC q w" "write and quit"
+    "SPC q f" "force quit"
     "SPC q r" "restart daemon"))
 
 (with-eval-after-load 'evil

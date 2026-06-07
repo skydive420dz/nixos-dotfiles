@@ -52,6 +52,7 @@ lisp/
   sk-terminal.el
   sk-project.el
   sk-git.el
+  sk-dashboard.el
   sk-languages.el
   sk-keybindings.el
 #+end_src
@@ -183,11 +184,13 @@ SPC T w           visual wrap
 
 SPC h k/f/v/m/b   describe key/function/variable/mode/bindings
 SPC h r r         reload config
+SPC h r s         sync Emacs packages
 SPC h r t         reload Sky theme
 SPC q q           save buffers and quit
 SPC q a           save buffers and quit Emacs
 SPC q w           save current file buffer and quit
 SPC q f           force quit Emacs
+SPC q r           restart daemon and reopen frame
 #+end_src
 
 * Formatting
