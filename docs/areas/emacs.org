@@ -139,6 +139,7 @@ Stable enough to treat as current baseline:
 - [X] Org agenda custom views cover daily review, week, inbox, and follow-up search.
 - [X] Dired preview is available as an explicit per-buffer toggle at =SPC m p= inside Dired.
 - [X] Vim-style =h/j/k/l= navigation is explicit in special buffers used daily: Magit sections, Dired, ibuffer, and help buffers.
+- [X] Magit native commands displaced by =h/j/k/l= navigation remain available under Magit localleader: =SPC m h/j/k/l/L= for dispatch, jump, delete thing, log, and log refresh.
 
 Next passes:
 
