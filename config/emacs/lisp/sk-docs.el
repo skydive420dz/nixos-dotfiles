@@ -1,11 +1,16 @@
 ;;; sk-docs.el --- Documentation helpers -*- lexical-binding: t; -*-
 
 (require 'thingatpt)
+(require 'json)
 (require 'subr-x)
 (require 'use-package)
 
 (defvar sk/devdocs-install-buffer-name "*DevDocs Install*"
   "Buffer used for external DevDocs install jobs.")
+
+(defvar sk/devdocs-catalog-file
+  (expand-file-name "devdocs-docs.json" user-emacs-directory)
+  "Local DevDocs catalog used for safe searchable installs.")
 
 (defun sk/devdocs--library-directory (library)
   "Return the directory containing LIBRARY."
@@ -28,6 +33,31 @@
           "-L" compat-dir
           "-L" devdocs-dir
           "--eval" form)))
+
+(defun sk/devdocs--catalog-candidates ()
+  "Return searchable DevDocs catalog candidates from `sk/devdocs-catalog-file'."
+  (unless (file-readable-p sk/devdocs-catalog-file)
+    (sk/devdocs-refresh-catalog)
+    (user-error "Refreshing DevDocs catalog; try SPC c K again when it finishes"))
+  (let ((docs (with-temp-buffer
+                (insert-file-contents sk/devdocs-catalog-file)
+                (json-parse-buffer :object-type 'alist :array-type 'list)))
+        candidates)
+    (dolist (doc docs (nreverse candidates))
+      (let* ((slug (alist-get 'slug doc))
+             (name (alist-get 'name doc))
+             (version (alist-get 'version doc))
+             (release (alist-get 'release doc))
+             (label (string-join
+                     (delq nil
+                           (list slug
+                                 name
+                                 (unless (string-empty-p (or version ""))
+                                   version)
+                                 (unless (string-empty-p (or release ""))
+                                   release)))
+                     "  ")))
+        (push (cons label slug) candidates)))))
 
 (defun sk/devdocs--start-batch-job (name command success-message)
   "Start external DevDocs job NAME using COMMAND.
@@ -57,6 +87,27 @@ SUCCESS-MESSAGE is shown when the external process exits successfully."
                (message "%s" success-message)
              (message "%s failed with exit code %s" name exit-code))))))))
 
+(defun sk/devdocs-refresh-catalog ()
+  "Refresh the local DevDocs catalog in an external batch Emacs process."
+  (interactive)
+  (let* ((runtime-dir (file-name-as-directory user-emacs-directory))
+         (catalog-file sk/devdocs-catalog-file)
+         (form (format
+                "(progn
+                   (setq user-emacs-directory %S)
+                   (require 'devdocs)
+                   (let ((docs (devdocs--available-docs)))
+                     (let ((coding-system-for-write 'utf-8-unix))
+                       (with-temp-file %S
+                         (insert (json-serialize docs)))))
+                   (message \"DevDocs catalog refreshed\"))"
+                runtime-dir
+                catalog-file)))
+    (sk/devdocs--start-batch-job
+     "devdocs-refresh-catalog"
+     (sk/devdocs--batch-command form)
+     "DevDocs catalog refreshed")))
+
 (defun sk/devdocs-open-install-log ()
   "Open the DevDocs install log buffer."
   (interactive)
@@ -65,15 +116,23 @@ SUCCESS-MESSAGE is shown when the external process exits successfully."
     (user-error "No DevDocs install log buffer")))
 
 (defun sk/devdocs-lookup (&optional ask-docs)
-  "Look up the symbol at point in DevDocs.
+  "Look up the symbol at point in DevDocs, or start a safe install.
 
-With prefix ASK-DOCS, let DevDocs prompt for docsets first.  DevDocs docset
-selection stays package-owned so the config does not carry guessed mappings for
-languages whose upstream docset names change."
+With prefix ASK-DOCS, search the local DevDocs catalog and install a docset
+through `sk/devdocs-install'."
   (interactive "P")
   (require 'devdocs)
-  (let ((query (or (thing-at-point 'symbol t) "")))
-    (devdocs-lookup ask-docs query)))
+  (if ask-docs
+      (call-interactively #'sk/devdocs-install)
+    (let ((query (or (thing-at-point 'symbol t) "")))
+      (condition-case err
+          (devdocs-lookup nil query)
+        (user-error
+         (if (string-match-p "No documents" (error-message-string err))
+             (progn
+               (call-interactively #'sk/devdocs-install)
+               (message "Run SPC c K again after the install finishes"))
+           (signal (car err) (cdr err))))))))
 
 (defun sk/devdocs-install (docset)
   "Install DOCSET through an external batch Emacs process.
@@ -83,9 +142,13 @@ DevDocs network work happens in a separate Emacs process."
   (interactive
    (list
     (string-trim
-     (read-string "Install DevDocs slug: " nil nil
-                  (or (car-safe (bound-and-true-p devdocs-current-docs))
-                      "")))))
+     (let* ((candidates (ignore-errors (sk/devdocs--catalog-candidates)))
+            (choice (if candidates
+                        (completing-read "Install DevDocs: " candidates nil t)
+                      (read-string "Install DevDocs slug: " nil nil
+                                   (or (car-safe (bound-and-true-p devdocs-current-docs))
+                                       "")))))
+       (or (cdr (assoc choice candidates)) choice)))))
   (when (string-empty-p docset)
     (user-error "DevDocs slug is required, for example lua~5.5"))
   (let* ((runtime-dir (file-name-as-directory user-emacs-directory))

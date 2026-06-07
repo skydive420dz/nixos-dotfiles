@@ -121,7 +121,9 @@ SPC c i           implementation
 SPC c I           install DevDocs docset in external batch Emacs
 SPC c k           documentation buffer
 SPC c K           DevDocs lookup at point
+SPC u SPC c K     search/install DevDocs docset
 SPC c L           open DevDocs install log
+SPC c R           refresh DevDocs catalog in external batch Emacs
 SPC c r           rename symbol
 SPC c t           type definition
 SPC c w           delete trailing whitespace
@@ -547,7 +549,9 @@ SPC c i/t      implementation/type definition    Eglot                          
 SPC c I        install DevDocs docset            external batch Emacs             done
 SPC c k        documentation                     eldoc-doc-buffer                  done
 SPC c K        DevDocs lookup at point           devdocs.el wrapper               done
+SPC u SPC c K  search/install DevDocs docset     sk/devdocs-install              done
 SPC c L        DevDocs install log               sk/devdocs-open-install-log      done
+SPC c R        refresh DevDocs catalog           external batch Emacs             done
 SPC c w/x      whitespace/diagnostics            delete-trailing/Flymake           done
 SPC w w/W      next/previous window              sk/next-window/sk/previous-window done
 SPC w u/U      winner undo/redo                  winner-undo/winner-redo           done

@@ -327,6 +327,7 @@ Stable enough to treat as current baseline:
 - [X] =SPC c K= opens DevDocs lookup at point as an external docs slice, with =SPC u SPC c K= available when DevDocs should prompt for docsets first.
 - [X] =SPC c I= installs DevDocs docsets from inside Emacs by spawning a separate =emacs -Q --batch= process, so synchronous DevDocs network work cannot block the live daemon.
 - [X] DevDocs install jobs no longer auto-pop a log window; =SPC c L= opens the =*DevDocs Install*= buffer only when wanted.
+- [X] =SPC c K= keeps the friendly DevDocs entry point: it looks up installed docs, and when no docset is available it searches the local catalog and starts a safe external install. =SPC u SPC c K= searches/installs docsets directly. =SPC c R= refreshes that local catalog outside the daemon.
 - [X] vterm =C-h/j/k/l= window navigation uses the same =windmove-*= path as the global completion/window wrappers.
 - [X] Clean Emacs consumes generated =theme-select= runtime tokens from =~/.config/theme/current/emacs-theme.el=, with local fallback tokens for startup safety.
 - [X] =SPC h r t= reapplies the enabled Sky theme immediately after runtime token changes instead of lagging one reload behind.
