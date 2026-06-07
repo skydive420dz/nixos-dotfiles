@@ -61,8 +61,10 @@
 
 (deftheme sky-night "Sky Night theme for the clean Emacs experiment.")
 
-(defun sk/apply-theme-faces ()
-  "Apply Sky theme faces from runtime or fallback tokens."
+(defun sk/apply-theme-faces (&optional live)
+  "Apply Sky theme faces from runtime or fallback tokens.
+When LIVE is non-nil, also apply the generated face specs to the live
+user theme so runtime token changes take effect immediately."
   (sk/load-runtime-theme)
   (let ((bg (sk/theme-color 'background))
         (bg-dim (sk/theme-color 'background-alt))
@@ -97,8 +99,8 @@
         (magenta (sk/theme-color 'magenta))
         (cyan (sk/theme-color 'cyan))
         (white (sk/theme-color 'white)))
-  (custom-theme-set-faces
-   'sky-night
+  (let ((faces
+         (list
    `(default ((t (:background ,bg :foreground ,fg))))
    `(cursor ((t (:background ,accent))))
    `(fringe ((t (:background ,bg :foreground ,muted))))
@@ -279,6 +281,9 @@
    `(nerd-icons-lsilver ((t (:foreground ,fg))))
    `(nerd-icons-dsilver ((t (:foreground ,muted))))
    `(vertical-border ((t (:foreground ,border)))))))
+    (apply #'custom-theme-set-faces 'sky-night faces)
+    (when live
+      (apply #'custom-theme-set-faces 'user faces)))))
 
 (sk/apply-theme-faces)
 
@@ -287,7 +292,7 @@
 (defun sk/load-theme ()
   "Load the Sky Night theme."
   (interactive)
-  (sk/apply-theme-faces)
+  (sk/apply-theme-faces t)
   (enable-theme 'sky-night))
 
 (provide 'sk-theme)

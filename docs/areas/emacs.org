@@ -130,6 +130,7 @@ Stable enough to treat as current baseline:
 - [X] Code navigation baseline is validated in real repo buffers: =SPC c d/D/i/t/r/a/x= use Eglot/xref/Flymake where available, =SPC c s= opens the current-buffer symbol outline, and =SPC s i/I= remain global Imenu search commands.
 - [X] vterm =C-h/j/k/l= window navigation uses the same =windmove-*= path as the global completion/window wrappers.
 - [X] Clean Emacs consumes generated =theme-select= runtime tokens from =~/.config/theme/current/emacs-theme.el=, with local fallback tokens for startup safety.
+- [X] =SPC h r t= reapplies the enabled Sky theme immediately after runtime token changes instead of lagging one reload behind.
 - [X] Harper stays enabled for prose buffers, but Eglot workspace configuration is now scoped per server so Harper receives only documented =:harper-ls= settings and Nix receives only the =nil= flake autoArchive setting.
 - [X] Harper remains active for normal Org/Markdown/text files, while Org agenda generation pauses Eglot autostart so agenda collection does not spawn short-lived Harper servers for every note file.
 - [X] Org presentation faces live in the Sky theme: headings, source blocks, metadata, TODO/DONE, links, tables, tags, and inline code/verbatim use runtime Sky tokens.
