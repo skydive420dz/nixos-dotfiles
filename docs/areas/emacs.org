@@ -51,6 +51,38 @@ frozen reference material while the clean config absorbs the useful behavior.
 - =SPC h r r= reloads clean Emacs modules; =SPC h r t= reloads the Sky theme.
 - Terminal Emacs frames receive the 256-color-safe Sky fallback palette from the old Doom terminal-frame section.
 
+** Universal Editor Contract
+:PROPERTIES:
+:CUSTOM_ID: universal-editor-contract
+:END:
+Clean Emacs must behave like a useful editor for standalone files, not only for
+known projects. Opening a throwaway file in =~/Documents=, =/tmp=, or a study
+folder should provide the best local behavior available without requiring a Git
+repo, flake, Cargo workspace, or project file.
+
+- Universal baseline: major mode, syntax highlighting, indentation, =M-/=
+  completion, snippets where tracked, file/buffer/keyword completion fallbacks,
+  navigation keys, and explicit formatting where a formatter exists.
+- Project intelligence: LSP diagnostics, xref, project-aware completion, NixOS
+  option graphs, Rust workspaces, and other deep language features are additive
+  when project metadata exists.
+- Degraded standalone behavior should stay quiet and useful. A missing project
+  file should not turn ordinary editing into a broken surface.
+
+Current baseline examples:
+
+- Standalone =.nix= opens in =nix-ts-mode= with Tree-sitter, =nil=, =nixfmt=,
+  and fallback completion for local bindings and keywords.
+- Standalone =.lua=, =.py=, =.sh=, =.json=, and =.yaml= open in TS modes with
+  completion fallbacks and explicit formatters.
+- Standalone =.qml= uses classic =qml-mode=, QML snippets, =qmlls-wrapped=, and
+  =qmlformat= because no better built-in QML TS mode is currently active.
+- Standalone =.rs= uses =rust-ts-mode= and =rustfmt=, but waits for
+  =Cargo.toml= or =rust-project.json= before starting rust-analyzer so study
+  files do not emit workspace errors.
+- Standalone =.c= uses =c-ts-mode= and =clang-format=; =clangd= can add
+  project intelligence when it has enough context.
+
 ** Daily Notes Flow
 :PROPERTIES:
 :CUSTOM_ID: daily-notes-flow
@@ -145,6 +177,7 @@ Stable enough to treat as current baseline:
 - [X] Clean Emacs opens to a minimal Sky home buffer and returns there when our buffer-kill commands leave no ordinary buffers open.
 - [X] =SPC q r= restarts the user Emacs daemon through systemd and opens a fresh graphical client frame.
 - [X] =SPC h r s= runs =emacs-sync= in the background with minibuffer status; daemon restart remains explicit through =SPC q r=.
+- [X] Universal editor baseline is audited outside repos: standalone Nix, Lua, QML, Python, Rust, C, Org, shell, JSON, and YAML files open with useful mode/indent/highlight/completion behavior, while project-aware LSP stays additive.
 
 Next passes:
 

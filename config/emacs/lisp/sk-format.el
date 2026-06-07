@@ -12,6 +12,7 @@
     (lua-ts-mode . ("stylua" "-"))
     (qml-mode . ("qmlformat" "--indent-width" "2" "--column-width" "-1" :file))
     (rust-mode . ("rustfmt"))
+    (rust-ts-mode . ("rustfmt"))
     (c-mode . ("clang-format"))
     (c++-mode . ("clang-format"))
     (c-ts-mode . ("clang-format"))

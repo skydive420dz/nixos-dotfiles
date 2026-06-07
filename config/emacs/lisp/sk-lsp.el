@@ -115,7 +115,10 @@ server config to prose servers like Harper."
   "Return non-nil when the current buffer is a real file buffer for Eglot."
   (and buffer-file-name
        (not sk/org-agenda-generating-p)
-       (not (string-prefix-p " " (buffer-name)))))
+       (not (string-prefix-p " " (buffer-name)))
+       (or (not (memq major-mode '(rust-mode rust-ts-mode)))
+           (locate-dominating-file default-directory "Cargo.toml")
+           (locate-dominating-file default-directory "rust-project.json"))))
 
 (defun sk/eglot-configure ()
   "Apply Sky Eglot defaults immediately and for new buffers."
