@@ -65,6 +65,14 @@
      . ("harper-ls" "--stdio")))
   "Sky-specific Eglot server mappings, ordered from specific to broad.")
 
+(defvar sk/org-agenda-generating-p nil
+  "Non-nil while Org is collecting agenda buffers.")
+
+(defun sk/without-eglot-during-org-agenda (orig-fn &rest args)
+  "Call ORIG-FN with prose Eglot autostart paused for agenda collection."
+  (let ((sk/org-agenda-generating-p t))
+    (apply orig-fn args)))
+
 (defun sk/eglot-workspace-configuration (server)
   "Return per-server workspace configuration for SERVER.
 
@@ -103,6 +111,7 @@ server config to prose servers like Harper."
 (defun sk/eglot-buffer-eligible-p ()
   "Return non-nil when the current buffer is a real file buffer for Eglot."
   (and buffer-file-name
+       (not sk/org-agenda-generating-p)
        (not (string-prefix-p " " (buffer-name)))))
 
 (defun sk/eglot-ensure ()
@@ -147,6 +156,10 @@ server config to prose servers like Harper."
                       eglot-server-programs)))
   (setq eglot-server-programs
         (append sk/eglot-server-programs eglot-server-programs)))
+
+(with-eval-after-load 'org-agenda
+  (advice-remove 'org-agenda #'sk/without-eglot-during-org-agenda)
+  (advice-add 'org-agenda :around #'sk/without-eglot-during-org-agenda))
 
 (provide 'sk-lsp)
 
