@@ -295,7 +295,7 @@ Stable enough to treat as current baseline:
 Next passes:
 
 - [ ] Watch for real-use key edge cases and add them deliberately as they come up.
-- [ ] Mirror portable macOS Emacs hardening on MSI where useful: Dired =ls= capability detection, Tree-sitter grammar fallback path, and =with-editor=/=emacsclient= discovery. Keep macOS window-decoration frame params platform-specific.
+- [X] Mirror portable macOS Emacs hardening on MSI where useful: Dired =ls= capability detection, Tree-sitter grammar fallback path, and =with-editor=/=emacsclient= discovery. Keep macOS window-decoration frame params platform-specific.
 - [ ] Decide whether HTML/CSS diagnostics need a separate validator layer such as project-owned =stylelint= config or an HTML validator; do not fake this with broad parser diagnostics unless it catches real errors.
 - [X] Prose buffers enable =visual-line-mode= by default for Org, Markdown, Markdown TS, and text buffers; code, terminal, Dired, and special buffers keep their existing line-number/wrapping behavior.
 - [X] JSON syntax diagnostics use a local parser-backed Flymake source while =vscode-json-language-server= remains responsible for JSON completion and hover: the installed Emacs 30.2 Eglot path wires publish diagnostics, but the JSON server advertises pull diagnostics. Standalone invalid JSON now reports syntax errors through Flymake without replacing the server or adding regex parsing.

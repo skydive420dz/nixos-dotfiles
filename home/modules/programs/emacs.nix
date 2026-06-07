@@ -176,6 +176,8 @@ in
     emacsSync
   ];
 
+  home.file.".cache/emacs/tree-sitter-grammars".source = emacsTreeSitterGrammarBundle;
+
   xdg.desktopEntries.emacs = {
     name = "Emacs";
     genericName = "Text Editor";
