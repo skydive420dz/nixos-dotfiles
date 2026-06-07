@@ -26,6 +26,10 @@
 
 (add-hook 'prog-mode-hook #'sk/enable-line-numbers)
 
+(defun sk/enable-prose-wrapping ()
+  "Enable visual wrapping for prose buffers."
+  (visual-line-mode 1))
+
 (dolist (hook '(org-mode-hook
                 markdown-mode-hook
                 text-mode-hook
@@ -38,6 +42,12 @@
                 special-mode-hook
                 completion-list-mode-hook))
   (add-hook hook #'sk/disable-line-numbers))
+
+(dolist (hook '(org-mode-hook
+                markdown-mode-hook
+                markdown-ts-mode-hook
+                text-mode-hook))
+  (add-hook hook #'sk/enable-prose-wrapping))
 
 (dolist (buffer (buffer-list))
   (with-current-buffer buffer
