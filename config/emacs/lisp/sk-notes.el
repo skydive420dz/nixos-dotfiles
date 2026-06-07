@@ -152,7 +152,13 @@
           (todo "TODO" ((org-agenda-overriding-header "Open tasks")))))
         ("w" "Week"
          agenda ""
-         ((org-agenda-span 'week)))))
+         ((org-agenda-span 'week)))
+        ("i" "Inbox"
+         tags "CATEGORY=\"inbox\""
+         ((org-agenda-overriding-header "Inbox")))
+        ("f" "Follow-up"
+         search "Follow-up"
+         ((org-agenda-overriding-header "Follow-up")))))
 
 (setq org-capture-templates
       '(("i" "Inbox note" entry

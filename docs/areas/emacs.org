@@ -62,6 +62,7 @@ frozen reference material while the clean config absorbs the useful behavior.
 - =SPC n s= searches all notes under =~/Documents/notes=.
 - =SPC n o= opens the notes root in Dired.
 - =SPC n a= opens the agenda after refreshing note discovery.
+- Agenda custom views include =d= daily review, =w= week, =i= inbox, and =f= follow-up search.
 - =SPC n T= opens the TODO agenda after refreshing note discovery.
 - =SPC n r= opens today's daily note beside the daily review agenda.
 - =SPC n R= refreshes agenda file discovery manually.
@@ -133,6 +134,7 @@ Stable enough to treat as current baseline:
 - [X] Org presentation faces live in the Sky theme: headings, source blocks, metadata, TODO/DONE, links, tables, tags, and inline code/verbatim use runtime Sky tokens.
 - [X] Org pretty headline markers are active through =org-superstar=, matching the Doom =:lang org +pretty= behavior clean Emacs was missing.
 - [X] Org daily notes flow is documented and wired through =SPC n=: inbox, daily, capture, find, search, notes root, agenda, TODO agenda, daily review, and agenda refresh.
+- [X] Org agenda custom views cover daily review, week, inbox, and follow-up search.
 - [X] Dired preview is available as an explicit per-buffer toggle at =SPC m p= inside Dired.
 
 Next passes:
