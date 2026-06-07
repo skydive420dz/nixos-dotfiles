@@ -286,11 +286,14 @@ Stable enough to treat as current baseline:
 - [X] C/C++ parity pass is clean for external playground and temp diagnostics files: =c-ts-mode=/=c++-ts-mode=, Tree-sitter parsers, =clangd=, Flymake/Eglot diagnostics, Corfu/Eglot member completion, Eldoc providers, and manual =clang-format= formatting through =SPC c f= all work.
 - [X] Rust parity pass matches the intentional policy: standalone =.rs= files get =rust-ts-mode=, Tree-sitter, Corfu fallback completion, and manual =rustfmt= without starting Eglot; Cargo projects get =rust-analyzer=, Flymake/Eglot diagnostics, Corfu/Eglot completion, Eldoc providers, and manual =rustfmt= formatting.
 - [X] Nix parity pass is clean for external playground files: =nix-ts-mode=, Tree-sitter parser, =nixd=, Flymake/Eglot diagnostics, Corfu/Eglot option and =lib.mk*= completion, Eldoc providers, and manual =nixfmt= formatting through =SPC c f= all work. Standalone =services.*= and =lib.mk*= completions confirm the =nixd= switch fixed the original rich-completion gap.
+- [X] Shell and YAML config-language parity is clean for external playground files: =bash-ts-mode=/=yaml-ts-mode=, Tree-sitter parsers, =bash-language-server=/=yaml-language-server=, Flymake/Eglot diagnostics, Corfu/Eglot attachment, Eldoc providers, and manual =shfmt=/=prettier --parser yaml= formatting through =SPC c f= all work.
+- [X] GLSL config-language behavior is audited: standalone =.glsl= files open in =glsl-mode=, attach to =glsl_analyzer=, expose Corfu/Eglot completion and Eldoc hover, and format through Eglot. The current server capability set does not advertise diagnostics, so missing GLSL Flymake diagnostics are server capability behavior rather than a mode-routing failure.
 
 Next passes:
 
 - [ ] Watch for real-use key edge cases and add them deliberately as they come up.
 - [ ] Mirror portable macOS Emacs hardening on MSI where useful: Dired =ls= capability detection, Tree-sitter grammar fallback path, and =with-editor=/=emacsclient= discovery. Keep macOS window-decoration frame params platform-specific.
+- [ ] Fix or deliberately replace JSON diagnostics: =json-ts-mode=, =vscode-json-language-server=, Corfu/Eglot completion, and =prettier --parser json= formatting work, but an intentionally invalid standalone JSON file currently reports a local =json-parse-buffer= error without surfacing a Flymake diagnostic from the JSON language server.
 - [X] Tune completion across minibuffer, Corfu, LSP, and real project buffers after daily use exposes friction.
 - [ ] Observe completion documentation richness during real use; =M-d= can show popup docs when the active source/server provides them, but file/dabbrev/keyword/snippet sources are usually sparse.
 - [ ] Keep watching completion for real-use edge cases; future changes should be tied to observed failures, not broad rewrites.
