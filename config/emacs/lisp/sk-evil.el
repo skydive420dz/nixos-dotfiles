@@ -14,6 +14,10 @@
 
 (use-package evil-collection
   :after evil
+  :init
+  (setq evil-collection-magit-use-y-for-yank t
+        evil-collection-magit-want-horizontal-movement nil
+        evil-collection-magit-use-z-for-folds nil)
   :config
   (evil-collection-init))
 

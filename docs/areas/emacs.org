@@ -138,10 +138,10 @@ Stable enough to treat as current baseline:
 - [X] Org daily notes flow is documented and wired through =SPC n=: inbox, daily, capture, find, search, notes root, agenda, TODO agenda, daily review, and agenda refresh.
 - [X] Org agenda custom views cover daily review, week, inbox, and follow-up search.
 - [X] Dired preview is available as an explicit per-buffer toggle at =SPC m p= inside Dired.
-- [X] Vim-style =h/j/k/l= navigation is explicit in special buffers used daily: Magit sections, Dired, ibuffer, and help buffers.
-- [X] Magit native commands displaced by =h/j/k/l= navigation remain available under Magit localleader: =SPC m h/j/k/l/L= for dispatch, jump, delete thing, log, and log refresh.
-- [X] Magit opens in Evil normal state so =SPC m= localleader and =h/j/k/l= section navigation are active in real Magit buffers.
-- [X] Magit =RET= keeps native =magit-visit-thing= behavior for opening the selected file, hunk, commit, or item.
+- [X] Vim-style =h/j/k/l= navigation is explicit in special buffers used daily: Dired, ibuffer, and help buffers.
+- [X] Magit uses the Doom-style =evil-collection-magit= model instead of a hand-written key layer.
+- [X] Magit opens in Evil normal state through evil-collection, with documented remaps such as =j/k= for line movement, =C-j/C-k= for section movement, =gj/gk= for sibling sections, =TAB= for section toggles, and =RET= for visiting the selected item.
+- [X] Magit keeps its core command surface under evil-collection defaults: =h= dispatch, =l= log, =gr/gR= refresh, =x/X= delete/untrack, =p= push, =o/O= reset, and =yy/ys/yb/yr= yank/copy variants.
 
 Next passes:
 
