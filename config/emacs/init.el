@@ -26,6 +26,7 @@
 (require 'sk-completion)
 (require 'sk-languages)
 (require 'sk-treesit)
+(require 'sk-qml)
 (require 'sk-lsp)
 (require 'sk-json)
 (require 'sk-format)

@@ -12,7 +12,7 @@
     python-mode python-ts-mode
     lua-mode lua-ts-mode
     nix-mode nix-ts-mode
-    qml-mode
+    qml-mode sk-qml-ts-mode
     js-mode js-ts-mode typescript-mode typescript-ts-mode tsx-ts-mode
     web-mode html-mode html-ts-mode mhtml-mode css-mode css-ts-mode
     sh-mode bash-ts-mode
@@ -24,7 +24,9 @@
   "Major modes that should start Eglot when their server is available.")
 
 (defconst sk/eglot-server-programs
-  '((((qml-mode :language-id "qml")) . ("qmlls-wrapped"))
+  '((((qml-mode :language-id "qml")
+      (sk-qml-ts-mode :language-id "qml"))
+     . ("qmlls-wrapped"))
     (((lua-mode :language-id "lua")
       (lua-ts-mode :language-id "lua"))
      . ("lua-language-server"))
@@ -180,7 +182,7 @@ server config to prose servers like Harper."
           python-mode python-ts-mode
           lua-mode lua-ts-mode
           nix-mode nix-ts-mode
-          qml-mode
+          qml-mode sk-qml-ts-mode
           js-mode js-ts-mode typescript-mode typescript-ts-mode tsx-ts-mode
           web-mode html-mode html-ts-mode mhtml-mode css-mode css-ts-mode
           sh-mode bash-ts-mode

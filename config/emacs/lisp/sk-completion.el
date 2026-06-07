@@ -132,7 +132,7 @@
 
 (dolist (hook '(prog-mode-hook conf-mode-hook
                 nix-mode-hook nix-ts-mode-hook
-                qml-mode-hook
+                qml-mode-hook sk-qml-ts-mode-hook
                 lua-mode-hook lua-ts-mode-hook
                 haskell-mode-hook haskell-ts-mode-hook
                 glsl-mode-hook
@@ -155,6 +155,7 @@
        (or (derived-mode-p 'prog-mode 'text-mode 'conf-mode)
            (memq major-mode '(nix-mode nix-ts-mode
                               qml-mode
+                              sk-qml-ts-mode
                               lua-mode lua-ts-mode
                               yaml-mode yaml-ts-mode
                               json-mode json-ts-mode
@@ -166,6 +167,7 @@
   (or (derived-mode-p 'prog-mode 'conf-mode)
       (memq major-mode '(nix-mode nix-ts-mode
                          qml-mode
+                         sk-qml-ts-mode
                          lua-mode lua-ts-mode
                          yaml-mode yaml-ts-mode
                          json-mode json-ts-mode

@@ -379,6 +379,7 @@
     "sk-completion"
     "sk-languages"
     "sk-treesit"
+    "sk-qml"
     "sk-lsp"
     "sk-format"
     "sk-org"

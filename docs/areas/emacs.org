@@ -75,8 +75,9 @@ Current baseline examples:
   and fallback completion for local bindings and keywords.
 - Standalone =.lua=, =.py=, =.sh=, =.json=, and =.yaml= open in TS modes with
   completion fallbacks and explicit formatters.
-- Standalone =.qml= uses classic =qml-mode=, QML snippets, =qmlls-wrapped=, and
-  =qmlformat= because no better built-in QML TS mode is currently active.
+- Standalone =.qml= uses =sk-qml-ts-mode= when the =qmljs= Tree-sitter parser is
+  available, with classic =qml-mode= as fallback. QML snippets,
+  =qmlls-wrapped=, and =qmlformat= remain active.
 - Standalone =.rs= uses =rust-ts-mode= and =rustfmt=, but waits for
   =Cargo.toml= or =rust-project.json= before starting rust-analyzer so study
   files do not emit workspace errors.
@@ -156,8 +157,8 @@ decision; it is the map for the next slices.
 - QML is mostly aligned in server choice:
   - NVF uses =qmlls= through =qmlls-wrapped= with Qt/Quickshell import paths.
   - Clean Emacs uses =qmlls-wrapped=.
-  - Clean Emacs still uses classic =qml-mode=; no better built-in QML TS mode is
-    currently active.
+  - Clean Emacs uses local =sk-qml-ts-mode= backed by the =qmljs= Tree-sitter
+    parser, with classic =qml-mode= as fallback.
 - Lua, Python, Rust, C/C++, shell, JSON, YAML, TypeScript, HTML, and CSS need
   per-language runtime checks before changes:
   - Static configuration suggests many servers are similar or equivalent.

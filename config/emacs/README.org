@@ -418,14 +418,13 @@ Grammar available, classic mode retained until we deliberately choose an Emacs
 TS mode package or confirm the built-in mode exists:
 
 #+begin_src text
-qml
 glsl
 org
 #+end_src
 
-QML remains classic because this package set does not provide a usable
-=qml-ts-mode=. Do not fake QML highlighting with ad hoc regex rules; revisit
-when a real Tree-sitter major mode is available.
+QML uses =sk-qml-ts-mode=, a small local mode backed by the =qmljs=
+Tree-sitter parser. It keeps =qml-mode= as the fallback when the parser is not
+available and avoids ad hoc regex highlighting.
 
 NVF is not edited by this policy. It remains a reference and already owns its
 own Tree-sitter setup through NVF.
