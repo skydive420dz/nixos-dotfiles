@@ -392,7 +392,7 @@ Next passes:
 - [ ] Keep documenting the clean Emacs layout and user-facing key surface as it changes.
 - [ ] Check the possibility of transparency rules through hyperland instead of native alpha.
 - [ ] Sensible tab and indentation configs nvf reference.
-- [ ] Ledger Mode.
+- [X] Ledger Mode baseline: Nix owns the =ledger= CLI, Emacs owns =ledger-mode=, private accounting files live outside dotfiles under =~/Documents/finance=, and Ledger buffers expose local =SPC m= helpers for add transaction and reports.
 - [ ] Rainbow Mode togglable.
 - [X] Dired preview.
 - [ ] eww, email, rss.
