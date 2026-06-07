@@ -236,6 +236,25 @@ config/emacs/eshell/aliases
 Keep =aliases= empty until it contains real Eshell alias lines; comment-only
 alias files fail Eshell's alias parser.
 
+* Org Notes
+#+begin_src text
+SPC n i           inbox for unsorted capture
+SPC n d           today's daily note
+SPC n c           capture note/task/daily/topic/project entry
+SPC n f           find note
+SPC n s           search notes
+SPC n o           notes root in Dired
+SPC n a           agenda
+SPC n T           TODO agenda
+SPC n r           daily review
+SPC n R           refresh agenda files
+#+end_src
+
+Daily notes are the working surface. Inbox is for loose thoughts. The daily
+review checklist processes inbox items, clarifies TODOs, moves project/topic
+notes, marks follow-ups, and chooses tomorrow's first focus. The template only
+applies to newly-created daily files.
+
 * Org Navigation
 #+begin_src text
 TAB / S-TAB       cycle heading / global cycle

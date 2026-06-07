@@ -198,6 +198,17 @@ Next action order:
 - =SPC n r= opens today's daily note beside the daily review agenda.
 - =SPC n R= refreshes agenda file discovery manually.
 
+The intended rhythm is small and repeatable:
+
+- Capture loose thoughts to the inbox when they do not yet have a home.
+- Use the daily note as the working surface for the day.
+- During review, process inbox items into tasks, project notes, topic notes, or archive.
+- Clarify TODOs before carrying them forward.
+- Mark follow-ups and choose tomorrow's first focus.
+
+New daily files receive this review checklist automatically. Existing personal
+notes are left untouched.
+
 ** Commands
 :PROPERTIES:
 :CUSTOM_ID: commands
