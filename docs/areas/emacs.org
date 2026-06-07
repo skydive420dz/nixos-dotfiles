@@ -217,11 +217,11 @@ decision; it is the map for the next slices.
   - Clean Emacs currently attaches more servers in the headless standalone probe,
     except Rust, which intentionally waits for =Cargo.toml= or
     =rust-project.json= to avoid standalone workspace errors.
-- Formatter parity is not complete:
-  - Clean Emacs has explicit formatters for Nix, Lua, QML, Rust, C/C++, Python,
-    shell, JSON, and YAML.
-  - Clean Emacs does not yet have explicit TypeScript/JavaScript/CSS/HTML
-    formatter entries, even though those languages have LSP coverage.
+- Formatter parity is explicit:
+  - Clean Emacs has formatter entries for Nix, Lua, QML, Rust, C/C++, Python,
+    shell, JSON, YAML, TypeScript, JavaScript, TSX, HTML, and CSS.
+  - Formatting remains manual through =SPC c f=; there is no format-on-save
+    hook.
 
 Next action order:
 
@@ -229,8 +229,8 @@ Next action order:
    Nix files.
 2. Audit each remaining language in focused slices, using the same standard:
    rich standalone behavior first, project metadata as additive depth.
-3. Add missing explicit formatter entries where the language tooling already
-   exists.
+3. Keep formatter additions explicit and documented when a new language surface
+   becomes part of daily use.
 
 ** Daily Notes Flow
 :PROPERTIES:

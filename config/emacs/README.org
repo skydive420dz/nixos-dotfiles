@@ -211,6 +211,8 @@ C / C++           clang-format
 Python            black
 Shell             shfmt
 JSON / YAML       prettier
+JS / TS / TSX     prettier
+HTML / CSS        prettier
 #+end_src
 
 Unknown modes fall back to Eglot formatting when available, then indentation.
