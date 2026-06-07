@@ -69,6 +69,20 @@
 (defvar sk/org-agenda-generating-p nil
   "Non-nil while Org is collecting agenda buffers.")
 
+(defvar sk/lua-neovim-runtime-path
+  (expand-file-name "lua/neovim-runtime" user-emacs-directory)
+  "Nix-linked Neovim runtime path used by LuaLS for `vim.*' metadata.")
+
+(defun sk/lua-workspace-library ()
+  "Return LuaLS library directories for Neovim-aware Lua buffers."
+  (seq-filter
+   #'file-directory-p
+   (list
+    (expand-file-name "lua" sk/lua-neovim-runtime-path)
+    (expand-file-name "lua/vim/_meta" sk/lua-neovim-runtime-path)
+    (expand-file-name "lua/vim/lsp/_meta" sk/lua-neovim-runtime-path)
+    (expand-file-name "lua/uv" sk/lua-neovim-runtime-path))))
+
 (defun sk/without-eglot-during-org-agenda (orig-fn &rest args)
   "Call ORIG-FN with prose Eglot autostart paused for agenda collection."
   (let ((sk/org-agenda-generating-p t))
@@ -82,6 +96,12 @@ servers are strict about unknown configuration shapes, so avoid sending the Nix
 server config to prose servers like Harper."
   (let ((language-ids (eglot--language-ids server)))
     (cond
+     ((member "lua" language-ids)
+      (list :Lua
+            (list :runtime (list :version "LuaJIT")
+                  :diagnostics (list :globals ["vim" "hl"])
+                  :workspace (list :checkThirdParty :json-false
+                                   :library (vconcat (sk/lua-workspace-library))))))
      ((member "nix" language-ids)
       nil)
      ((member "haskell" language-ids)

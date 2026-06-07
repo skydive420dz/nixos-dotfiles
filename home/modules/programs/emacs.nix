@@ -55,6 +55,7 @@ let
     )
   );
   emacsTreeSitterGrammarPath = "${emacsTreeSitterGrammarBundle}/lib";
+  emacsNeovimRuntimePath = "${pkgs.neovim-unwrapped}/share/nvim/runtime";
   emacsRuntimeTools = with pkgs; [
     emacs-pgtk
 
@@ -177,6 +178,7 @@ in
   ];
 
   home.file.".cache/emacs/tree-sitter-grammars".source = emacsTreeSitterGrammarBundle;
+  home.file.".cache/emacs/lua/neovim-runtime".source = emacsNeovimRuntimePath;
 
   xdg.desktopEntries.emacs = {
     name = "Emacs";
