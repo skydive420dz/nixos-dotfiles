@@ -149,6 +149,7 @@ Stable enough to treat as current baseline:
 Next passes:
 
 - [ ] Watch for real-use key edge cases and add them deliberately as they come up.
+- [ ] Mirror portable macOS Emacs hardening on MSI where useful: Dired =ls= capability detection, Tree-sitter grammar fallback path, and =with-editor=/=emacsclient= discovery. Keep macOS window-decoration frame params platform-specific.
 - [ ] Tune completion across minibuffer, Corfu, LSP, and real project buffers after daily use exposes friction.
 - [ ] Observe completion documentation richness during real use; =M-d= can show popup docs when the active source/server provides them, but file/dabbrev/keyword/snippet sources are usually sparse.
 - [ ] Watch vterm/eshell during real use and tune only concrete rough edges.
