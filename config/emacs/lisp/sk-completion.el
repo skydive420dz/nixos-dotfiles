@@ -5,6 +5,8 @@
 ;; - Corfu for in-buffer completion UI.
 ;; - CAPF sources are added per buffer class, not globally everywhere.
 
+(require 'seq)
+
 (use-package vertico
   :demand t
   :config
@@ -88,18 +90,24 @@
   (when-let* ((candidates (sk/yas-snippet-candidates))
               (bounds (bounds-of-thing-at-point 'symbol))
               (start (car bounds))
-              (end (cdr bounds)))
-    (list start end (mapcar #'car candidates)
-          :exclusive 'no
-          :annotation-function
-          (lambda (candidate)
-            (when-let ((name (cdr (assoc candidate candidates))))
-              (concat " " name)))
-          :company-kind (lambda (_) 'snippet)
-          :exit-function
-          (lambda (_candidate status)
-            (when (memq status '(finished exact sole))
-              (yas-expand))))))
+              (end (cdr bounds))
+              (prefix (buffer-substring-no-properties start end))
+              (matches (seq-filter
+                        (lambda (candidate)
+                          (string-prefix-p prefix (car candidate)))
+                        candidates)))
+    (when matches
+      (list start end (mapcar #'car matches)
+            :exclusive 'no
+            :annotation-function
+            (lambda (candidate)
+              (when-let ((name (cdr (assoc candidate matches))))
+                (concat " " name)))
+            :company-kind (lambda (_) 'snippet)
+            :exit-function
+            (lambda (_candidate status)
+              (when (memq status '(finished exact sole))
+                (yas-expand)))))))
 
 (defun sk/capf-code-defaults ()
   "Add conservative fallback CAPFs for code/config buffers."

@@ -280,6 +280,8 @@ Stable enough to treat as current baseline:
 - [X] Universal editor baseline is audited outside repos: standalone Nix, Lua, QML, Python, Rust, C, Org, shell, JSON, and YAML files open with useful mode/indent/highlight/completion behavior, while project-aware LSP stays additive.
 - [X] Completion sanity probe passed against the live daemon: =M-/=, Corfu =C-j/k/l=, Yasnippet =TAB/S-TAB=, QML snippet completion, empty-prefix manual completion, and standalone Nix =nixd= option completion survive config reload.
 - [X] Lua parity pass is clean for external playground, Neovim config Lua, and Hyprland Lua: =lua-ts-mode=, Tree-sitter parser, =lua-language-server=, Flymake, Corfu/Eglot completion, no observed diagnostics, and manual =stylua= formatting through =SPC c f= all work.
+- [X] QML parity pass is partially validated: external and Quickshell files open in =qml-mode= with =qmlls-wrapped=, Flymake, Corfu, Eldoc providers, QML snippets, and =qmlformat=. Direct =qmlls= completion sees local QML properties and Quickshell singletons from =qmldir=.
+- [X] QML snippet completion now yields only matching snippet prefixes, so =vari= still offers =variants= while member completions like =StatusMetrics.= fall through to =qmlls= instead of being swallowed by the snippet CAPF.
 
 Next passes:
 
@@ -292,6 +294,7 @@ Next passes:
 - [ ] Watch routed Tree-sitter modes during real use and fall back only if a TS mode is worse than the classic mode.
 - [ ] Watch Harper during real prose editing; if crashes return, narrow it deliberately by mode instead of disabling diagnostics globally.
 - [ ] Run rich language parity audit across NVF and clean Emacs before changing language servers: compare server choice, root/context behavior, standalone behavior, project behavior, completion/docs/diagnostics/formatting, and decide per language.
+- [ ] Treat QML LSP as fragile under automated stress: repeated scripted completion probes spawned many =qmlls= children and wedged the Emacs daemon. Prefer manual/light checks until we deliberately add QML/Eglot guardrails.
 - [X] Switch clean Emacs Nix LSP from =nil= to =nixd= after direct standalone-file comparison showed richer =nixd= completion.
 - [ ] Test and tune SkyLight syntax/modeline colors after real light-mode use.
 - [ ] Consider dedicated global modeline tokens only if generic Sky tokens stop matching the custom modeline.
