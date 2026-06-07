@@ -21,6 +21,11 @@
   :bind (("C-c g" . magit-status))
   :config
   (with-eval-after-load 'evil
+    (evil-set-initial-state 'magit-status-mode 'normal)
+    (evil-set-initial-state 'magit-diff-mode 'normal)
+    (evil-set-initial-state 'magit-revision-mode 'normal)
+    (evil-set-initial-state 'magit-process-mode 'normal)
+    (evil-set-initial-state 'magit-stash-mode 'normal)
     (evil-define-key '(normal visual motion) magit-mode-map
       (kbd "h") #'magit-section-up
       (kbd "j") #'magit-section-forward
