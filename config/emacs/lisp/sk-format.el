@@ -5,7 +5,7 @@
 (require 'subr-x)
 (require 'eglot)
 
-(defvar sk/formatter-alist
+(defconst sk/formatter-alist
   '((nix-mode . ("nixfmt"))
     (nix-ts-mode . ("nixfmt"))
     (lua-mode . ("stylua" "-"))
@@ -24,7 +24,18 @@
     (json-mode . ("prettier" "--parser" "json"))
     (json-ts-mode . ("prettier" "--parser" "json"))
     (yaml-mode . ("prettier" "--parser" "yaml"))
-    (yaml-ts-mode . ("prettier" "--parser" "yaml")))
+    (yaml-ts-mode . ("prettier" "--parser" "yaml"))
+    (js-mode . ("prettier" "--parser" "babel"))
+    (js-ts-mode . ("prettier" "--parser" "babel"))
+    (typescript-mode . ("prettier" "--parser" "typescript"))
+    (typescript-ts-mode . ("prettier" "--parser" "typescript"))
+    (tsx-ts-mode . ("prettier" "--parser" "typescript"))
+    (web-mode . ("prettier" "--parser" "html"))
+    (html-mode . ("prettier" "--parser" "html"))
+    (html-ts-mode . ("prettier" "--parser" "html"))
+    (mhtml-mode . ("prettier" "--parser" "html"))
+    (css-mode . ("prettier" "--parser" "css"))
+    (css-ts-mode . ("prettier" "--parser" "css")))
   "Formatter commands keyed by major mode.
 
 Most commands read from stdin and write formatted text to stdout.
