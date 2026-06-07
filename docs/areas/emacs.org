@@ -279,6 +279,7 @@ Stable enough to treat as current baseline:
 - [X] =SPC h r s= runs =emacs-sync= in the background with minibuffer status; daemon restart remains explicit through =SPC q r=.
 - [X] Universal editor baseline is audited outside repos: standalone Nix, Lua, QML, Python, Rust, C, Org, shell, JSON, and YAML files open with useful mode/indent/highlight/completion behavior, while project-aware LSP stays additive.
 - [X] Completion sanity probe passed against the live daemon: =M-/=, Corfu =C-j/k/l=, Yasnippet =TAB/S-TAB=, QML snippet completion, empty-prefix manual completion, and standalone Nix =nixd= option completion survive config reload.
+- [X] Lua parity pass is clean for external playground, Neovim config Lua, and Hyprland Lua: =lua-ts-mode=, Tree-sitter parser, =lua-language-server=, Flymake, Corfu/Eglot completion, no observed diagnostics, and manual =stylua= formatting through =SPC c f= all work.
 
 Next passes:
 
