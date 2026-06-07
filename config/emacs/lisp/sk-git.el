@@ -6,6 +6,10 @@
   :config
   (with-eval-after-load 'evil
     (evil-define-key '(normal visual motion) magit-mode-map
+      (kbd "h") #'magit-section-up
+      (kbd "j") #'magit-section-forward
+      (kbd "k") #'magit-section-backward
+      (kbd "l") #'magit-section-toggle
       (kbd "q") #'magit-mode-bury-buffer
       (kbd "Q") #'magit-quit-session
       (kbd "]") #'magit-section-forward-sibling
@@ -27,6 +31,10 @@
   (add-hook 'magit-mode-hook
             (lambda ()
               (when (fboundp 'evil-local-set-key)
+                (evil-local-set-key 'normal (kbd "h") #'magit-section-up)
+                (evil-local-set-key 'normal (kbd "j") #'magit-section-forward)
+                (evil-local-set-key 'normal (kbd "k") #'magit-section-backward)
+                (evil-local-set-key 'normal (kbd "l") #'magit-section-toggle)
                 (evil-local-set-key 'normal (kbd "TAB") #'magit-section-toggle)
                 (evil-local-set-key 'normal (kbd "<tab>") #'magit-section-toggle)))))
 

@@ -703,6 +703,24 @@
     (define-key map (kbd "<backtab>") #'previous-buffer)
     (define-key map (kbd "S-TAB") #'previous-buffer)))
 
+(with-eval-after-load 'ibuffer
+  (with-eval-after-load 'evil
+    (evil-define-key '(normal motion) ibuffer-mode-map
+      (kbd "h") #'ibuffer-backward-filter-group
+      (kbd "j") #'ibuffer-forward-line
+      (kbd "k") #'ibuffer-backward-line
+      (kbd "l") #'ibuffer-visit-buffer
+      (kbd "RET") #'ibuffer-visit-buffer)))
+
+(with-eval-after-load 'help-mode
+  (with-eval-after-load 'evil
+    (evil-define-key '(normal motion) help-mode-map
+      (kbd "h") #'help-go-back
+      (kbd "j") #'next-line
+      (kbd "k") #'previous-line
+      (kbd "l") #'help-go-forward
+      (kbd "RET") #'push-button)))
+
 (provide 'sk-keybindings)
 
 ;;; sk-keybindings.el ends here

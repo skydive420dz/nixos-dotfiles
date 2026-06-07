@@ -138,6 +138,7 @@ Stable enough to treat as current baseline:
 - [X] Org daily notes flow is documented and wired through =SPC n=: inbox, daily, capture, find, search, notes root, agenda, TODO agenda, daily review, and agenda refresh.
 - [X] Org agenda custom views cover daily review, week, inbox, and follow-up search.
 - [X] Dired preview is available as an explicit per-buffer toggle at =SPC m p= inside Dired.
+- [X] Vim-style =h/j/k/l= navigation is explicit in special buffers used daily: Magit sections, Dired, ibuffer, and help buffers.
 
 Next passes:
 
