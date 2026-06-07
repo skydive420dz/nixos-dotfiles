@@ -50,6 +50,9 @@
       name: (identifier) @font-lock-variable-name-face)
      (ui_binding
       name: (identifier) @font-lock-property-name-face)
+     (ui_binding
+      name: (nested_identifier
+             (identifier) @font-lock-property-name-face))
      (member_expression
       object: (identifier) @font-lock-variable-use-face)
      (member_expression
@@ -66,7 +69,12 @@
    :language 'qmljs
    :feature 'variable
    '((variable_declarator
-      name: (identifier) @font-lock-variable-name-face))
+      name: (identifier) @font-lock-variable-name-face)
+     (ui_binding
+      (expression_statement
+       (identifier) @font-lock-variable-use-face))
+     (binary_expression
+      (identifier) @font-lock-variable-use-face))
 
    :language 'qmljs
    :feature 'constant
