@@ -137,6 +137,51 @@ Target language audit set:
   availability.
 - Org/Markdown/Text: Harper diagnostics and prose completion behavior.
 
+*** 2026-06-07 parity audit findings
+:PROPERTIES:
+:CUSTOM_ID: parity-audit-2026-06-07
+:END:
+First read-only pass compared static NVF settings, clean Emacs settings, and
+headless standalone-file runtime behavior. Do not treat this as a final tuning
+decision; it is the map for the next slices.
+
+- Nix is the clearest mismatch:
+  - NVF uses =nixd=.
+  - Clean Emacs uses =nil=.
+  - =nixd= is available inside the NVF package closure, but is not currently on
+    the normal Emacs/user runtime path. Switching Emacs to =nixd= requires
+    adding =nixd= to the Emacs runtime tools first.
+  - The observed standalone Nix difference should be tested as =nil= vs =nixd=
+    directly before deciding.
+- QML is mostly aligned in server choice:
+  - NVF uses =qmlls= through =qmlls-wrapped= with Qt/Quickshell import paths.
+  - Clean Emacs uses =qmlls-wrapped=.
+  - Clean Emacs still uses classic =qml-mode=; no better built-in QML TS mode is
+    currently active.
+- Lua, Python, Rust, C/C++, shell, JSON, YAML, TypeScript, HTML, and CSS need
+  per-language runtime checks before changes:
+  - Static configuration suggests many servers are similar or equivalent.
+  - Headless NVF standalone probing did not start every expected code server,
+    so do not blindly assume NVF runtime behavior from static configuration.
+  - Clean Emacs currently attaches more servers in the headless standalone probe,
+    except Rust, which intentionally waits for =Cargo.toml= or
+    =rust-project.json= to avoid standalone workspace errors.
+- Formatter parity is not complete:
+  - Clean Emacs has explicit formatters for Nix, Lua, QML, Rust, C/C++, Python,
+    shell, JSON, and YAML.
+  - Clean Emacs does not yet have explicit TypeScript/JavaScript/CSS/HTML
+    formatter entries, even though those languages have LSP coverage.
+
+Next action order:
+
+1. Compare =nil= and =nixd= in clean Emacs on the same standalone Nix file.
+2. If =nixd= matches the desired rich standalone behavior, add =nixd= to the
+   Emacs runtime tools and switch Nix Eglot routing deliberately.
+3. Audit each remaining language in focused slices, using the same standard:
+   rich standalone behavior first, project metadata as additive depth.
+4. Add missing explicit formatter entries where the language tooling already
+   exists.
+
 ** Daily Notes Flow
 :PROPERTIES:
 :CUSTOM_ID: daily-notes-flow
