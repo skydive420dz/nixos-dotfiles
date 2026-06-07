@@ -325,6 +325,7 @@ Stable enough to treat as current baseline:
 - [X] Code navigation baseline is validated in real repo buffers: =SPC c d/D/i/t/r/a/x= use Eglot/xref/Flymake where available, =SPC c s= opens the current-buffer symbol outline, and =SPC s i/I= remain global Imenu search commands.
 - [X] =SPC c k= uses a Sky wrapper that asks Eldoc to refresh docs at point before opening the documentation buffer, instead of only showing the last cached Eldoc result.
 - [X] =SPC c K= opens DevDocs lookup at point as an external docs slice, with =SPC u SPC c K= available when DevDocs should prompt for docsets first.
+- [X] =SPC c I= installs DevDocs docsets from inside Emacs by spawning a separate =emacs -Q --batch= process, so synchronous DevDocs network work cannot block the live daemon.
 - [X] vterm =C-h/j/k/l= window navigation uses the same =windmove-*= path as the global completion/window wrappers.
 - [X] Clean Emacs consumes generated =theme-select= runtime tokens from =~/.config/theme/current/emacs-theme.el=, with local fallback tokens for startup safety.
 - [X] =SPC h r t= reapplies the enabled Sky theme immediately after runtime token changes instead of lagging one reload behind.
