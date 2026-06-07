@@ -83,6 +83,60 @@ Current baseline examples:
 - Standalone =.c= uses =c-ts-mode= and =clang-format=; =clangd= can add
   project intelligence when it has enough context.
 
+** Rich Language Contract
+:PROPERTIES:
+:CUSTOM_ID: rich-language-contract
+:END:
+The universal editor baseline is not the final target. Clean Emacs should aim
+for rich language behavior across every configured language, not only Nix and
+not only files opened inside known repos.
+
+For each configured language, define and audit the full language surface:
+
+- Server choice: use the best practical language server, and prefer parity with
+  the already-working NVF setup when that setup behaves better.
+- Standalone behavior: opening a study/playground file outside a repo should
+  still provide rich completion, hover/docs, diagnostics, snippets, syntax,
+  indentation, and formatting wherever the tooling can honestly support it.
+- Project behavior: project metadata such as =flake.nix=, =Cargo.toml=,
+  =pyproject.toml=, =compile_commands.json=, or QML import metadata should add
+  deeper intelligence, not be a prerequisite for a useful editor.
+- Completion behavior: LSP completion should be combined with snippets,
+  keywords, paths, buffer words, and local symbols so a weak language-server
+  context does not make =M-/= feel dead.
+- Diagnostics behavior: standalone files should not spam project-metadata errors
+  unless the warning is genuinely useful for the edit at hand.
+- Formatting behavior: =SPC c f= should be explicit and available for every
+  configured language with a known formatter.
+
+Current known parity issue:
+
+- NVF uses =nixd= for Nix while clean Emacs currently uses =nil=. This can
+  explain why Vim/NVF appears to provide richer completion for a standalone Nix
+  file than Emacs. Before changing either side, audit all configured languages
+  for server choice, root/context rules, standalone behavior, and project
+  behavior.
+
+Target language audit set:
+
+- Nix: =nixd= vs =nil=, standalone option completion, flake/NixOS/Home Manager
+  context.
+- Lua: =lua-language-server= settings, runtime/library awareness, standalone
+  and config-file completion.
+- QML/Quickshell: =qmlls= behavior, import paths, Quickshell metadata, and
+  snippet completion.
+- Python: =basedpyright= behavior, standalone files, project files, and
+  import/completion quality.
+- Rust: =rust-analyzer= behavior for study files versus Cargo projects.
+- C/C++: =clangd= behavior for standalone files versus compile database
+  projects.
+- Shell: =bash-language-server= behavior and =shfmt=.
+- JSON/YAML: language-server behavior, schemas where useful, and Prettier
+  formatting.
+- TypeScript/JavaScript/CSS/HTML: language-server parity with NVF and formatter
+  availability.
+- Org/Markdown/Text: Harper diagnostics and prose completion behavior.
+
 ** Daily Notes Flow
 :PROPERTIES:
 :CUSTOM_ID: daily-notes-flow
@@ -188,6 +242,8 @@ Next passes:
 - [ ] Watch vterm/eshell during real use and tune only concrete rough edges.
 - [ ] Watch routed Tree-sitter modes during real use and fall back only if a TS mode is worse than the classic mode.
 - [ ] Watch Harper during real prose editing; if crashes return, narrow it deliberately by mode instead of disabling diagnostics globally.
+- [ ] Run rich language parity audit across NVF and clean Emacs before changing language servers: compare server choice, root/context behavior, standalone behavior, project behavior, completion/docs/diagnostics/formatting, and decide per language.
+- [ ] Decide whether clean Emacs should switch Nix from =nil= to =nixd= or configure =nil= with an equivalent global fallback context.
 - [ ] Test and tune SkyLight syntax/modeline colors after real light-mode use.
 - [ ] Consider dedicated global modeline tokens only if generic Sky tokens stop matching the custom modeline.
 - [ ] Choose extra TS major-mode packages for QML and Org only if they beat the current classic modes.
