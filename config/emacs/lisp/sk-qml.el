@@ -75,10 +75,14 @@
    :feature 'variable
    '((variable_declarator
       name: (identifier) @font-lock-variable-name-face)
+     (variable_declarator
+      value: (identifier) @font-lock-variable-use-face)
      (ui_binding
       (expression_statement
        (identifier) @font-lock-variable-use-face))
      (binary_expression
+      (identifier) @font-lock-variable-use-face)
+     (arguments
       (identifier) @font-lock-variable-use-face))
 
    :language 'qmljs
