@@ -30,6 +30,7 @@
 (require 'sk-lsp)
 (require 'sk-json)
 (require 'sk-format)
+(require 'sk-docs)
 (require 'sk-org)
 (require 'sk-notes)
 (require 'sk-dired)
