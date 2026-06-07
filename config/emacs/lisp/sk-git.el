@@ -31,6 +31,8 @@
       (kbd "j") #'magit-section-forward
       (kbd "k") #'magit-section-backward
       (kbd "l") #'magit-section-toggle
+      (kbd "RET") #'magit-visit-thing
+      (kbd "<return>") #'magit-visit-thing
       (kbd "q") #'magit-mode-bury-buffer
       (kbd "Q") #'magit-quit-session
       (kbd "]") #'magit-section-forward-sibling
@@ -57,6 +59,8 @@
                 (evil-local-set-key 'normal (kbd "j") #'magit-section-forward)
                 (evil-local-set-key 'normal (kbd "k") #'magit-section-backward)
                 (evil-local-set-key 'normal (kbd "l") #'magit-section-toggle)
+                (evil-local-set-key 'normal (kbd "RET") #'magit-visit-thing)
+                (evil-local-set-key 'normal (kbd "<return>") #'magit-visit-thing)
                 (evil-local-set-key 'normal (kbd "SPC m") sk/magit-localleader-map)
                 (evil-local-set-key 'normal (kbd "TAB") #'magit-section-toggle)
                 (evil-local-set-key 'normal (kbd "<tab>") #'magit-section-toggle))))
