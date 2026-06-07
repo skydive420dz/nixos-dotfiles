@@ -84,6 +84,59 @@ Current baseline examples:
 - Standalone =.c= uses =c-ts-mode= and =clang-format=; =clangd= can add
   project intelligence when it has enough context.
 
+** Reference Queue
+:PROPERTIES:
+:CUSTOM_ID: reference-queue
+:END:
+Reference configs are research material, not implementation authority. Borrow
+small behavior slices only when they fit the clean Emacs ownership model.
+
+*** gopar/.emacs.d
+:PROPERTIES:
+:CUSTOM_ID: gopar-emacs-reference
+:END:
+- Source: https://github.com/gopar/.emacs.d
+- Local audit clone used during review: =/private/tmp/gopar-emacs=.
+
+Keepers to test in focused slices:
+
+- DevDocs lookup at point, from the =Devdocs= section. It pre-fills
+  =devdocs-lookup= with the symbol at point and displays docs in a right side
+  window.
+- Popper, from the =Popper= section, as a possible way to tame transient
+  buffers such as help, warnings, compilation, shell, and terminal buffers.
+- Smarter keyboard quit, from =gopar/er-keyboard-quit-dwim=, as a possible
+  improvement for escaping active regions, minibuffer prompts, and completion
+  windows without bluntly disrupting the frame.
+
+Good reference, but adapt rather than copy:
+
+- Org workflow ideas from =Org=, =Org Agenda=, and =Org Capture=: richer states
+  such as =NEXT=, =IN-PROGRESS=, and =WAITING=; log drawers; review views; and
+  dependency rules.
+- Completion layering from =Code Completion=: Corfu, Cape, dabbrev, snippets as
+  CAPF, and consult customization. Compare with the current clean Emacs setup
+  before changing anything.
+- vterm/tmux helpers from =Vterm= are interesting, but not current direction
+  while Ghostty/tmux/Emacs terminal responsibilities are still being separated.
+
+Maybe later:
+
+- =keycast= for learning and debugging key usage.
+- =envrc= for project-specific shell environments if Emacs starts missing
+  project runtime variables.
+- =org-modern= and =org-roam= concepts only after the current notes workflow is
+  stable.
+- =aidermacs= only after defining what explicit AI assistance inside Emacs
+  should do.
+
+Pass:
+
+- The giant tangled =README.org= structure as primary config.
+- Machine-specific environment/path setup.
+- Neotree-based pair-programming mode.
+- Broad package sprawl without a concrete workflow need.
+
 ** Rich Language Contract
 :PROPERTIES:
 :CUSTOM_ID: rich-language-contract
@@ -328,6 +381,17 @@ Next passes:
 - [ ] Choose an extra TS major-mode package for Org only if it beats the current classic mode. QML is already handled by local =sk-qml-ts-mode=.
 - [ ] Borrow =qml-ts-mode= ideas one at a time, starting with imenu/defun navigation or indentation, and validate each against =Bar.qml=, =BarFrame.qml=, and a larger module before keeping it.
 - [ ] Make Org first-class: refine custom agenda views and daily review habits.
+- [ ] Try DevDocs lookup at point as a focused slice, using =gopar/.emacs.d=
+  =Devdocs= as reference.
+- [ ] Evaluate Popper as a focused slice for transient buffers such as help,
+  warnings, compilation, shell, and terminal buffers.
+- [ ] Compare current completion layering with =gopar/.emacs.d= =Code
+  Completion= before making future Corfu/Cape/dabbrev/yasnippet-capf changes.
+- [ ] Consider smarter keyboard-quit behavior for active region, minibuffer,
+  and completion escape, using =gopar/er-keyboard-quit-dwim= as reference.
+- [ ] Consider =keycast= for learning/debugging key usage.
+- [ ] Consider =envrc= only if project runtime environments become a concrete
+  Emacs pain point.
 - [ ] Keep documenting the clean Emacs layout and user-facing key surface as it changes.
 - [ ] Check the possibility of transparency rules through hyperland instead of native alpha.
 - [ ] Sensible tab and indentation configs nvf reference.

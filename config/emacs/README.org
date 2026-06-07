@@ -612,7 +612,23 @@ TODO Decide formatting policy and keep it explicit instead of surprise autoforma
 DONE Decide Emacs tree-sitter grammar ownership before enabling tsx-ts/js-ts modes.
 TODO Choose an extra TS major-mode package for Org if it beats the classic mode. QML is handled by local sk-qml-ts-mode.
 TODO Keep documenting the clean Emacs layout and user-facing key surface as it changes.
+TODO Reference audit: gopar/.emacs.d. Treat it as source material only, not structure to copy.
+TODO Try DevDocs as a small docs-at-point slice, inspired by gopar's Devdocs section.
+TODO Evaluate Popper for transient help/warnings/terminal/compilation buffer control.
+TODO Adapt Org TODO/agenda/review ideas slowly: NEXT, IN-PROGRESS, WAITING, log drawers, review views.
+TODO Compare completion layering with gopar's Corfu/Cape/dabbrev/yasnippet-capf setup before changing ours.
+TODO Consider smarter keyboard-quit behavior for minibuffer/completion/region escape.
+TODO Consider keycast for learning/debugging key usage.
+TODO Consider envrc/direnv only if project environments become a real Emacs pain point.
 #+end_src
+
+Reference:
+- https://github.com/gopar/.emacs.d
+- DevDocs: README.org section "Devdocs"
+- Popper: README.org section "Popper"
+- Org workflow: README.org sections "Org", "Org Agenda", and "Org Capture"
+- Completion: README.org section "Code Completion"
+- Smart quit: README.org function =gopar/er-keyboard-quit-dwim=
 
 * Rule
 Keep every module small enough to understand.
