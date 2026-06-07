@@ -84,6 +84,8 @@ server config to prose servers like Harper."
     (cond
      ((member "nix" language-ids)
       nil)
+     ((member "haskell" language-ids)
+      (list :haskell (make-hash-table :test 'equal)))
      ((seq-intersection '("markdown" "org" "plaintext") language-ids #'string=)
       '(:harper-ls (:userDictPath ""
                     :workspaceDictPath ""
