@@ -27,6 +27,7 @@
 (require 'sk-languages)
 (require 'sk-treesit)
 (require 'sk-lsp)
+(require 'sk-json)
 (require 'sk-format)
 (require 'sk-org)
 (require 'sk-notes)

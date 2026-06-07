@@ -293,7 +293,7 @@ Next passes:
 
 - [ ] Watch for real-use key edge cases and add them deliberately as they come up.
 - [ ] Mirror portable macOS Emacs hardening on MSI where useful: Dired =ls= capability detection, Tree-sitter grammar fallback path, and =with-editor=/=emacsclient= discovery. Keep macOS window-decoration frame params platform-specific.
-- [ ] Fix or deliberately replace JSON diagnostics: =json-ts-mode=, =vscode-json-language-server=, Corfu/Eglot completion, and =prettier --parser json= formatting work, but an intentionally invalid standalone JSON file currently reports a local =json-parse-buffer= error without surfacing a Flymake diagnostic from the JSON language server.
+- [X] JSON syntax diagnostics use a local parser-backed Flymake source while =vscode-json-language-server= remains responsible for JSON completion and hover: the installed Emacs 30.2 Eglot path wires publish diagnostics, but the JSON server advertises pull diagnostics. Standalone invalid JSON now reports syntax errors through Flymake without replacing the server or adding regex parsing.
 - [X] Tune completion across minibuffer, Corfu, LSP, and real project buffers after daily use exposes friction.
 - [ ] Observe completion documentation richness during real use; =M-d= can show popup docs when the active source/server provides them, but file/dabbrev/keyword/snippet sources are usually sparse.
 - [ ] Keep watching completion for real-use edge cases; future changes should be tied to observed failures, not broad rewrites.
