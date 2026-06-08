@@ -4,8 +4,8 @@
 * Purpose
 This is the clean personal Emacs configuration experiment.
 
-This is the active MSI Emacs config. Doom is frozen as reference material under
-=~/.config/doom=.
+This is the active clean Emacs config. Doom is frozen as reference material
+under =~/.config/doom=.
 
 * Ownership
 #+begin_src text
@@ -190,7 +190,7 @@ SPC q q           save buffers and quit
 SPC q a           save buffers and quit Emacs
 SPC q w           save current file buffer and quit
 SPC q f           force quit Emacs
-SPC q r           restart daemon and reopen frame
+SPC q r           restart daemon and reopen frame where supported
 #+end_src
 
 * Formatting
@@ -395,6 +395,19 @@ active window     clear Sky surface background, accent bar, readable file/projec
 inactive window   dim background, muted text, no heavy border
 status colors     success/warning/danger tokens for LSP, diagnostics, and modified state
 noise policy      hide encoding/env/workspace/chat counters unless we decide they matter
+#+end_src
+
+=solaire-mode= is enabled to give secondary buffers such as help, Magit, Dired,
+and other utility views a Sky panel background. It should create visual depth
+without changing normal editing buffers.
+
+Utility buffers use a consistent side-window policy:
+
+#+begin_src text
+help / eldoc / apropos       right panel
+dired / ibuffer / magit      right panel
+eshell / vterm               right panel
+warnings / compile output    bottom panel
 #+end_src
 
 * Completion
@@ -627,6 +640,7 @@ org SPC m a    attachment localleader            same built-in Org commands     
 #+begin_src text
 DONE Finish Doom muscle-memory key audit for core file/project/search/help/buffer/mode keys.
 TODO Watch for real-use key edge cases and add them deliberately as they come up.
+TODO Add a macOS LaunchAgent-backed Emacs daemon and make =emacsclient --create-frame= the normal GUI entrypoint.
 TODO Tune completion across minibuffer, Corfu, snippets, LSP, and prose.
 DONE Polish Doom modeline and Sky theme faces until the UI looks intentional.
 TODO Make Org first-class: notes, agenda, capture templates, source blocks, navigation.

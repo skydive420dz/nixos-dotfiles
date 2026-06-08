@@ -393,6 +393,8 @@ Next passes:
 - [ ] Check the possibility of transparency rules through hyperland instead of native alpha.
 - [ ] Sensible tab and indentation configs nvf reference.
 - [X] Ledger Mode baseline: Nix owns the =ledger= CLI, Emacs owns =ledger-mode=, private accounting files live outside dotfiles under =~/Documents/finance=, and Ledger buffers expose local =SPC m= helpers for add transaction and reports.
+- [X] Solaire Mode baseline: secondary buffers use =solaire-mode= with Sky theme faces for panel-style background depth.
+- [X] Utility window baseline: help, eldoc, Dired, ibuffer, Magit, warnings, and compilation buffers use predictable side-window display rules instead of scattered fullscreen/minibuffer defaults.
 - [ ] Rainbow Mode togglable.
 - [X] Dired preview.
 - [ ] eww, email, rss.
