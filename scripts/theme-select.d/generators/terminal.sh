@@ -202,8 +202,9 @@ export BAT_STYLE="numbers,changes,header"
 export STARSHIP_CONFIG="$current_dir/starship.toml"
 export GTK_THEME=$gtk_theme
 export GTK2_RC_FILES="$config_home/gtk-2.0/gtkrc"
-export QT_STYLE_OVERRIDE=fusion
-export QT_QPA_PLATFORMTHEME=qt5ct
+export QT_STYLE_OVERRIDE=Fusion
+export QT_QPA_PLATFORMTHEME=qt6ct
+export QT_QUICK_CONTROLS_STYLE=org.kde.desktop
 export FZF_DEFAULT_OPTS='--color=fg:$(hex '.[$style].semantic.foreground'),bg:$(hex '.[$style].semantic.background'),hl:$(hex '.[$style].semantic.warning'),fg+:$(hex '.[$style].semantic.foreground'),bg+:$(hex '.[$style].semantic.surfaceStrong'),hl+:$(hex '.[$style].semantic.warning'),info:$(hex '.[$style].semantic.accent'),prompt:$(hex '.[$style].semantic.accent'),pointer:$(hex '.[$style].semantic.accent'),marker:$(hex '.[$style].semantic.success'),spinner:$(hex '.[$style].semantic.accent'),header:$(hex '.[$style].semantic.muted'),border:$(hex '.[$style].semantic.border')'
 EOF
 }

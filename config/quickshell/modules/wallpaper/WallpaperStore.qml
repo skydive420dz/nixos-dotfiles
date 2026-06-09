@@ -15,6 +15,8 @@ QtObject {
     readonly property string stateDir: stateHome + "/quickshell"
     readonly property string stateFile: stateDir + "/wallpaper.json"
     readonly property string signalFile: stateDir + "/wallpaper-signal"
+    readonly property string thumbnailDir: stateDir + "/wallpaper-thumbnails"
+    readonly property string ffmpegBin: Quickshell.env("SKY_FFMPEG") || "ffmpeg"
 
     property bool selectorOpen: false
     property string currentPath: wallpaperDir + "/wallpaper-003.gif"
@@ -29,8 +31,46 @@ QtObject {
         return "file://" + path;
     }
 
+    function extension(path) {
+        var name = basename(path).toLowerCase();
+        var dot = name.lastIndexOf(".");
+        return dot >= 0 ? name.slice(dot + 1) : "";
+    }
+
     function isAnimated(path) {
-        return String(path || "").toLowerCase().endsWith(".gif");
+        return extension(path) === "gif";
+    }
+
+    function isVideo(path) {
+        return ["mp4", "m4v", "mov", "webm", "mkv"].indexOf(extension(path)) >= 0;
+    }
+
+    function mediaKind(path) {
+        if (isVideo(path))
+            return "video";
+        return isAnimated(path) ? "animated" : "image";
+    }
+
+    function thumbnailKey(path) {
+        return basename(path).replace(/[^A-Za-z0-9._-]/g, "_");
+    }
+
+    function videoThumbnailPath(path) {
+        return thumbnailDir + "/" + thumbnailKey(path) + ".jpg";
+    }
+
+    function videoThumbnailCommand(path) {
+        var output = videoThumbnailPath(path);
+        var filter = "scale=360:-1:flags=lanczos";
+        var command = "mkdir -p " + JSON.stringify(thumbnailDir)
+            + " && if [ ! -s " + JSON.stringify(output) + " ] || [ " + JSON.stringify(path) + " -nt " + JSON.stringify(output) + " ]; then "
+            + JSON.stringify(ffmpegBin)
+            + " -hide_banner -loglevel error -y -ss 2 -i " + JSON.stringify(path)
+            + " -frames:v 1 -vf " + JSON.stringify(filter)
+            + " -update 1 " + JSON.stringify(output)
+            + "; fi";
+
+        return ["bash", "-lc", command];
     }
 
     function toggleSelector() {
@@ -118,7 +158,7 @@ QtObject {
             "bash",
             "-lc",
             "find " + JSON.stringify(root.wallpaperDir)
-                + " -maxdepth 1 -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' -o -iname '*.gif' \\) 2>/dev/null | sort"
+                + " -maxdepth 1 -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' -o -iname '*.gif' -o -iname '*.mp4' -o -iname '*.m4v' -o -iname '*.mov' -o -iname '*.webm' -o -iname '*.mkv' \\) 2>/dev/null | sort"
         ]
         stdout: SplitParser {
             property string buffer: ""

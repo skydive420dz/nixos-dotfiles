@@ -5,12 +5,30 @@ let
 in
 
 {
+  environment.systemPackages = [
+    pkgs.hyprpolkitagent
+  ];
+
   programs.hyprland = {
     enable = true;
     package = hyprlandPkgs.hyprland;
     portalPackage = hyprlandPkgs.xdg-desktop-portal-hyprland;
     withUWSM = true;
     xwayland.enable = true;
+  };
+
+  systemd.user.services.hyprpolkitagent = {
+    description = "Hyprland Polkit Authentication Agent";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    unitConfig.ConditionEnvironment = "WAYLAND_DISPLAY";
+    serviceConfig = {
+      ExecStart = "${pkgs.hyprpolkitagent}/libexec/hyprpolkitagent";
+      Slice = "session.slice";
+      Restart = "on-failure";
+      TimeoutStopSec = 5;
+    };
   };
 
   xdg.portal = {

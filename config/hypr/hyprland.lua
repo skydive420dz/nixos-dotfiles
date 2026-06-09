@@ -7,7 +7,7 @@ local colors = {
 local opacity = {
 	solid = "1.0 override 1.0 override",
 	solid_fullscreen = "1.0 override 1.0 override 1.0 override",
-	dim_tool = "0.85 override 0.85 override",
+	dim_tool = "0.85 override 0.80 override",
 }
 
 local function centered_float(opts)
@@ -67,7 +67,7 @@ hl.monitor({
 
 hl.on("hyprland.start", function()
 	hl.exec_cmd("uwsm finalize HYPRLAND_INSTANCE_SIGNATURE")
-	hl.exec_cmd("uwsm app -- vesktop -m")
+	hl.exec_cmd("sh -c 'sleep 3; exec uwsm app -- vesktop -m'")
 	hl.exec_cmd("uwsm app -- wl-paste --type text --watch cliphist store")
 	hl.exec_cmd("uwsm app -- wl-paste --type image --watch cliphist store")
 	hl.exec_cmd("uwsm app -- wl-clip-persist --clipboard regular")
@@ -181,7 +181,7 @@ hl.bind(main_mod .. " + Q", hl.dsp.window.close())
 hl.bind(main_mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(main_mod .. " + M", hl.dsp.exec_cmd("uwsm stop"))
 hl.bind(main_mod .. " + SHIFT + Return", hl.dsp.layout("swapwithmaster master ignoremaster"))
-hl.bind(main_mod .. " + SHIFT + D", hl.dsp.exec_cmd("ghostty --title=tmux_main -e tmux new -A -s dots"))
+hl.bind(main_mod .. " + SHIFT + D", hl.dsp.exec_cmd("uwsm app -- ghostty --title=tmux_main -e tmux new -A -s dots"))
 
 hl.bind(main_mod .. " + SHIFT + l ", hl.dsp.layout("rollnext master ignoremaster"))
 hl.bind(main_mod .. " + SHIFT + h ", hl.dsp.layout("rollprev master ignoremaster"))
@@ -259,6 +259,18 @@ hl.window_rule({
 	name = "firefox",
 	match = { class = "^(firefox)$" },
 	opacity = opacity.solid_fullscreen,
+})
+
+hl.window_rule({
+	name = "emacs",
+	match = { class = "^(emacs)$" },
+	opacity = opacity.dim_tool,
+})
+
+hl.window_rule({
+	name = "ghostty",
+	match = { class = "^(com.mitchellh.ghostty)$" },
+	opacity = opacity.dim_tool,
 })
 
 hl.window_rule({

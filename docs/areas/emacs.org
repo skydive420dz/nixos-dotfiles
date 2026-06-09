@@ -37,6 +37,7 @@ frozen reference material while the clean config absorbs the useful behavior.
 - Magit for Git.
 - Dired for file management.
 - vterm and eshell for terminal workflows.
+- DevDocs as a Magit/Dired-style helper panel.
 - Doom modeline, Sky theme faces, terminal-frame colors, and relative line numbers.
 
 ** Local Behavior
@@ -50,6 +51,9 @@ frozen reference material while the clean config absorbs the useful behavior.
 - Yes/no prompts accept =y= and =n= globally.
 - =SPC h r r= reloads clean Emacs modules; =SPC h r t= reloads the Sky theme.
 - Terminal Emacs frames receive the 256-color-safe Sky fallback palette from the old Doom terminal-frame section.
+- =SPC o d= opens the DevDocs helper panel. The panel owns visible
+  install/remove/update/search/open workflows with local keys; DevDocs does not
+  own LSP, completion, or code documentation at point.
 
 ** Universal Editor Contract
 :PROPERTIES:
@@ -358,28 +362,35 @@ Stable enough to treat as current baseline:
 - [X] GLSL config-language behavior is audited: standalone =.glsl= files open in =glsl-mode=, attach to =glsl_analyzer=, expose Corfu/Eglot completion and Eldoc hover, and format through Eglot. The current server capability set does not advertise diagnostics, so missing GLSL Flymake diagnostics are server capability behavior rather than a mode-routing failure.
 - [X] Explicit formatter audit passed through =sk/format-buffer-or-region= for Nix, Lua, QML, Python, shell, JavaScript, TypeScript, HTML, CSS, JSON, YAML, Rust, C, and C++; representative output was checked for QML, Nix, Python, TypeScript, and C.
 
-Next passes:
-
-- [ ] Watch for real-use key edge cases and add them deliberately as they come up.
 - [X] Mirror portable macOS Emacs hardening on MSI where useful: Dired =ls= capability detection, Tree-sitter grammar fallback path, and =with-editor=/=emacsclient= discovery. Keep macOS window-decoration frame params platform-specific.
-- [ ] Decide whether HTML/CSS diagnostics need a separate validator layer such as project-owned =stylelint= config or an HTML validator; do not fake this with broad parser diagnostics unless it catches real errors.
 - [X] Prose buffers enable =visual-line-mode= by default for Org, Markdown, Markdown TS, and text buffers; code, terminal, Dired, and special buffers keep their existing line-number/wrapping behavior.
 - [X] JSON syntax diagnostics use a local parser-backed Flymake source while =vscode-json-language-server= remains responsible for JSON completion and hover: the installed Emacs 30.2 Eglot path wires publish diagnostics, but the JSON server advertises pull diagnostics. Standalone invalid JSON now reports syntax errors through Flymake without replacing the server or adding regex parsing.
 - [X] Tune completion across minibuffer, Corfu, LSP, and real project buffers after daily use exposes friction.
+- [X] Treat QML LSP as fragile under automated stress: repeated scripted completion probes spawned many =qmlls= children and wedged the Emacs daemon. Prefer manual/light checks; current accepted automated check is limited to opening a real QML buffer and verifying =qml-mode=, =qmlls-wrapped= attachment, CAPF, Eldoc, and Flymake providers without firing completion requests.
+- [X] Switch clean Emacs Nix LSP from =nil= to =nixd= after direct standalone-file comparison showed richer =nixd= completion.
+- [X] Sensible tab and indentation baseline: spaces globally, width 4 by default, width 2 for Nix/Lua/QML/JS/TS/JSON/YAML, and no =TAB= / =S-TAB= remaps.
+- [X] Ledger Mode baseline: Nix owns the =ledger= CLI, Emacs owns =ledger-mode=, private accounting files live outside dotfiles under =~/Documents/finance=, and Ledger buffers expose local =SPC m= helpers for add transaction and reports.
+- [X] Solaire Mode baseline: secondary buffers use =solaire-mode= with Sky theme faces for panel-style background depth.
+- [X] Utility window baseline: help, eldoc, Dired, ibuffer, Magit, warnings, and compilation buffers use predictable side-window display rules instead of scattered fullscreen/minibuffer defaults.
+- [X] Spacious Padding baseline: =spacious-padding-mode= adds subtle frame, fringe, divider, and mode/header-line breathing room without changing the editor layout model.
+- [X] Tabline baseline: built-in =tab-line-mode= shows open buffers with Nerd Icons and Sky/modeline-style active and inactive faces.
+
+Next passes:
+
+- [ ] Watch for real-use key edge cases and add them deliberately as they come up.
+- [ ] Decide whether HTML/CSS diagnostics need a separate validator layer such as project-owned =stylelint= config or an HTML validator; do not fake this with broad parser diagnostics unless it catches real errors.
 - [ ] Observe completion documentation richness during real use; =M-d= can show popup docs when the active source/server provides them, but file/dabbrev/keyword/snippet sources are usually sparse.
 - [ ] Keep watching completion for real-use edge cases; future changes should be tied to observed failures, not broad rewrites.
 - [ ] Watch vterm/eshell during real use and tune only concrete rough edges.
 - [ ] Watch routed Tree-sitter modes during real use and fall back only if a TS mode is worse than the classic mode.
 - [ ] Watch Harper during real prose editing; if crashes return, narrow it deliberately by mode instead of disabling diagnostics globally.
 - [ ] Run rich language parity audit across NVF and clean Emacs before changing language servers: compare server choice, root/context behavior, standalone behavior, project behavior, completion/docs/diagnostics/formatting, and decide per language.
-- [X] Treat QML LSP as fragile under automated stress: repeated scripted completion probes spawned many =qmlls= children and wedged the Emacs daemon. Prefer manual/light checks; current accepted automated check is limited to opening a real QML buffer and verifying =qml-mode=, =qmlls-wrapped= attachment, CAPF, Eldoc, and Flymake providers without firing completion requests.
-- [X] Switch clean Emacs Nix LSP from =nil= to =nixd= after direct standalone-file comparison showed richer =nixd= completion.
 - [ ] Test and tune SkyLight syntax/modeline colors after real light-mode use.
 - [ ] Consider dedicated global modeline tokens only if generic Sky tokens stop matching the custom modeline.
 - [ ] Choose an extra TS major-mode package for Org only if it beats the current classic mode. QML is already handled by local =sk-qml-ts-mode=.
 - [ ] Borrow =qml-ts-mode= ideas one at a time, starting with imenu/defun navigation or indentation, and validate each against =Bar.qml=, =BarFrame.qml=, and a larger module before keeping it.
 - [ ] Make Org first-class: refine custom agenda views and daily review habits.
-- [ ] Revisit external documentation lookup later. DevDocs was tested and removed from active config because docset installation was unreliable, especially for large Qt docsets. If revisited, keep it lookup-only for preinstalled docs or use a project-owned offline documentation source.
+- [ ] Revisit optional symbol-at-point DevDocs lookup later. DevDocs is active as a Magit/Dired-style helper panel only; it does not own LSP, completion, or code documentation at point.
 - [ ] Evaluate Popper as a focused slice for transient buffers such as help,
   warnings, compilation, shell, and terminal buffers.
 - [ ] Compare current completion layering with =gopar/.emacs.d= =Code
@@ -391,11 +402,5 @@ Next passes:
   Emacs pain point.
 - [ ] Keep documenting the clean Emacs layout and user-facing key surface as it changes.
 - [ ] Check the possibility of transparency rules through hyperland instead of native alpha.
-- [ ] Sensible tab and indentation configs nvf reference.
-- [X] Ledger Mode baseline: Nix owns the =ledger= CLI, Emacs owns =ledger-mode=, private accounting files live outside dotfiles under =~/Documents/finance=, and Ledger buffers expose local =SPC m= helpers for add transaction and reports.
-- [X] Solaire Mode baseline: secondary buffers use =solaire-mode= with Sky theme faces for panel-style background depth.
-- [X] Utility window baseline: help, eldoc, Dired, ibuffer, Magit, warnings, and compilation buffers use predictable side-window display rules instead of scattered fullscreen/minibuffer defaults.
 - [ ] Rainbow Mode togglable.
-- [X] Dired preview.
 - [ ] eww, email, rss.
-- [X] Make Org pretty again.

@@ -6,6 +6,7 @@
     ./input.nix
     ./users.nix
     ./gaming.nix
+    ./razer.nix
     ./packages.nix
     ./programs/brave.nix
     ./programs/bat.nix

@@ -56,3 +56,11 @@ config/emacs/eln-cache/
 config/emacs/elpa/
 config/emacs/history
 config/emacs/recentf
+
+# Local video wallpapers are large runtime assets, not repo state.
+wallpapers/*.mp4
+wallpapers/*.m4v
+wallpapers/*.mov
+wallpapers/*.webm
+wallpapers/*.mkv
+wallpapers/wallpaper-011.gif

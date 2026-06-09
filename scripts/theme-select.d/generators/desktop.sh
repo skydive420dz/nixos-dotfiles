@@ -57,9 +57,57 @@ EOF
 @define-color theme_bg_color $(hex '.[$style].semantic.background');
 @define-color theme_fg_color $(hex '.[$style].semantic.foreground');
 @define-color theme_base_color $(hex '.[$style].semantic.surface');
+@define-color theme_text_color $(hex '.[$style].semantic.foreground');
 @define-color theme_selected_bg_color $(hex '.[$style].semantic.accent');
 @define-color theme_selected_fg_color $(hex '.[$style].semantic.selectionForeground');
+@define-color accent_color $(hex '.[$style].semantic.accent');
+@define-color accent_bg_color $(hex '.[$style].semantic.accent');
+@define-color accent_fg_color $(hex '.[$style].semantic.selectionForeground');
+@define-color window_bg_color $(hex '.[$style].semantic.background');
+@define-color window_fg_color $(hex '.[$style].semantic.foreground');
+@define-color view_bg_color $(hex '.[$style].semantic.surface');
+@define-color view_fg_color $(hex '.[$style].semantic.foreground');
+@define-color headerbar_bg_color $(hex '.[$style].semantic.background');
+@define-color headerbar_fg_color $(hex '.[$style].semantic.foreground');
+@define-color popover_bg_color $(hex '.[$style].semantic.surface');
+@define-color popover_fg_color $(hex '.[$style].semantic.foreground');
+@define-color card_bg_color $(hex '.[$style].semantic.surface');
+@define-color card_fg_color $(hex '.[$style].semantic.foreground');
 @define-color borders $(hex '.[$style].semantic.border');
+
+window,
+dialog,
+popover,
+popover contents,
+menu {
+  background-color: @window_bg_color;
+  color: @window_fg_color;
+}
+
+popover,
+menu {
+  border: 1px solid @borders;
+}
+
+row:selected,
+menuitem:hover,
+modelbutton:hover {
+  background-color: alpha(@accent_bg_color, 0.22);
+  color: @window_fg_color;
+}
+
+selection,
+row:selected:focus {
+  background-color: @theme_selected_bg_color;
+  color: @theme_selected_fg_color;
+}
+
+button:focus,
+entry:focus,
+combobox:focus {
+  outline-color: @accent_color;
+  border-color: @accent_color;
+}
 EOF
   done
 }
@@ -102,6 +150,29 @@ disabled_colors=$disabled_colors
 inactive_colors=$active_colors
 EOF
 
+    prepare_target "$config_home/$toolkit/qss/Sky.qss"
+    cat > "$config_home/$toolkit/qss/Sky.qss" <<EOF
+QMenu,
+QComboBox QAbstractItemView {
+  background-color: $(hex '.[$style].semantic.surface');
+  color: $(hex '.[$style].semantic.foreground');
+  border: 1px solid $(hex '.[$style].semantic.border');
+  padding: 4px;
+}
+
+QMenu::item,
+QComboBox QAbstractItemView::item {
+  padding: 6px 22px 6px 22px;
+  border-radius: 4px;
+}
+
+QMenu::item:selected,
+QComboBox QAbstractItemView::item:selected {
+  background-color: $(hex '.[$style].semantic.surfaceStrong');
+  color: $(hex '.[$style].semantic.foreground');
+}
+EOF
+
     prepare_target "$config_home/$toolkit/$toolkit.conf"
     cat > "$config_home/$toolkit/$toolkit.conf" <<EOF
 [Appearance]
@@ -125,7 +196,7 @@ gui_effects=@Invalid()
 keyboard_scheme=2
 menus_have_icons=true
 show_shortcuts_in_context_menus=true
-stylesheets=@Invalid()
+stylesheets=$config_home/$toolkit/qss/Sky.qss
 toolbutton_style=4
 underline_shortcut=1
 wheel_scroll_lines=3

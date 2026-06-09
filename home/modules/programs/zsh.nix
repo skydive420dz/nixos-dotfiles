@@ -26,11 +26,11 @@
       vim = "nvim";
       ls = "ls --color=auto";
       cat = "bat";
-      btop = "ghostty --title=btop_float -e btop";
-      nvtop = "ghostty --title=nvtop_float -e nvtop";
+      btop = "uwsm app -- ghostty --title=btop_float -e btop";
+      nvtop = "uwsm app -- ghostty --title=nvtop_float -e nvtop";
       tm = "tmux-session main";
       tmd = "tmux-session dots";
-      discord = "vesktop --use-gl=desktop --enable-features=UseOzonePlatform --ozone-platform=wayland";
+      discord = "uwsm app -- vesktop --use-gl=desktop --enable-features=UseOzonePlatform --ozone-platform=wayland";
     };
 
     initContent = lib.mkBefore ''

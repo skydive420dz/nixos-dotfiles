@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import "../.."
 import QtQuick
 import QtQuick.Layouts
+import Quickshell.Io
 
 Item {
     id: root
@@ -194,7 +195,20 @@ Item {
                             required property var modelData
 
                             readonly property bool selected: modelData === WallpaperStore.currentPath
+                            readonly property bool video: WallpaperStore.isVideo(modelData)
+                            readonly property string thumbnailPath: video ? WallpaperStore.videoThumbnailPath(modelData) : ""
                             readonly property int cardWidth: Math.floor((wallpaperGrid.width - wallpaperGrid.spacing * (wallpaperGrid.columns - 1)) / wallpaperGrid.columns)
+                            property string thumbnailSource: video ? WallpaperStore.fileUrl(thumbnailPath) : ""
+
+                            function reloadThumbnail() {
+                                if (!video)
+                                    return;
+
+                                thumbnailSource = "";
+                                Qt.callLater(function() {
+                                    thumbnailSource = WallpaperStore.fileUrl(thumbnailPath);
+                                });
+                            }
 
                             width: cardWidth
                             height: 128
@@ -218,10 +232,72 @@ Item {
 
                                     Image {
                                         anchors.fill: parent
-                                        source: WallpaperStore.fileUrl(wallpaperCard.modelData)
+                                        visible: !wallpaperCard.video
+                                        source: wallpaperCard.video ? "" : WallpaperStore.fileUrl(wallpaperCard.modelData)
                                         fillMode: Image.PreserveAspectCrop
                                         asynchronous: true
                                         cache: false
+                                    }
+
+                                    Item {
+                                        anchors.fill: parent
+                                        visible: wallpaperCard.video
+
+                                        Image {
+                                            id: videoThumbnail
+
+                                            anchors.fill: parent
+                                            source: wallpaperCard.thumbnailSource
+                                            fillMode: Image.PreserveAspectCrop
+                                            asynchronous: true
+                                            cache: false
+                                            visible: status === Image.Ready
+                                        }
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            visible: videoThumbnail.status !== Image.Ready
+                                            color: Theme.panelAlt
+
+                                            ColumnLayout {
+                                                anchors.centerIn: parent
+                                                spacing: 4
+
+                                                Text {
+                                                    Layout.alignment: Qt.AlignHCenter
+                                                    text: ""
+                                                    color: Theme.accent
+                                                    font.family: Theme.iconFont
+                                                    font.pixelSize: Theme.mediaIconSize + 6
+                                                }
+
+                                                Text {
+                                                    Layout.alignment: Qt.AlignHCenter
+                                                    text: WallpaperStore.extension(wallpaperCard.modelData).toUpperCase()
+                                                    color: Theme.muted
+                                                    font.family: Theme.font
+                                                    font.pixelSize: Theme.fontSizeSmall
+                                                }
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            anchors.top: parent.top
+                                            anchors.left: parent.left
+                                            anchors.margins: 6
+                                            width: 24
+                                            height: 22
+                                            radius: Theme.radiusSmall
+                                            color: Theme.panel
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: ""
+                                                color: Theme.accent
+                                                font.family: Theme.iconFont
+                                                font.pixelSize: Theme.fontSizeSmall
+                                            }
+                                        }
                                     }
 
                                     Rectangle {
@@ -275,6 +351,18 @@ Item {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: WallpaperStore.choose(wallpaperCard.modelData)
+                            }
+
+                            Process {
+                                id: thumbnailProc
+
+                                command: wallpaperCard.video ? WallpaperStore.videoThumbnailCommand(wallpaperCard.modelData) : []
+                                onExited: wallpaperCard.reloadThumbnail()
+                            }
+
+                            Component.onCompleted: {
+                                if (wallpaperCard.video)
+                                    thumbnailProc.running = true;
                             }
                         }
                     }

@@ -8,8 +8,9 @@ update_session_env() {
   export STARSHIP_CONFIG="$current_dir/starship.toml"
   export GTK_THEME="$gtk_theme"
   export GTK2_RC_FILES="$config_home/gtk-2.0/gtkrc"
-  export QT_STYLE_OVERRIDE=fusion
-  export QT_QPA_PLATFORMTHEME=qt5ct
+  export QT_STYLE_OVERRIDE=Fusion
+  export QT_QPA_PLATFORMTHEME=qt6ct
+  export QT_QUICK_CONTROLS_STYLE=org.kde.desktop
 
   systemctl --user set-environment \
     "SKY_THEME=$SKY_THEME" \
@@ -19,11 +20,12 @@ update_session_env() {
     "GTK_THEME=$GTK_THEME" \
     "GTK2_RC_FILES=$GTK2_RC_FILES" \
     "QT_STYLE_OVERRIDE=$QT_STYLE_OVERRIDE" \
-    "QT_QPA_PLATFORMTHEME=$QT_QPA_PLATFORMTHEME" >/dev/null 2>&1 || true
+    "QT_QPA_PLATFORMTHEME=$QT_QPA_PLATFORMTHEME" \
+    "QT_QUICK_CONTROLS_STYLE=$QT_QUICK_CONTROLS_STYLE" >/dev/null 2>&1 || true
 
   dbus-update-activation-environment --systemd \
     SKY_THEME BAT_THEME BAT_STYLE STARSHIP_CONFIG GTK_THEME GTK2_RC_FILES \
-    QT_STYLE_OVERRIDE QT_QPA_PLATFORMTHEME >/dev/null 2>&1 || true
+    QT_STYLE_OVERRIDE QT_QPA_PLATFORMTHEME QT_QUICK_CONTROLS_STYLE >/dev/null 2>&1 || true
 }
 
 reload_consumers() {

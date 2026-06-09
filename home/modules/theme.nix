@@ -11,8 +11,8 @@
   # app color state under ~/.config/theme/current.
   qt = {
     enable = true;
-    platformTheme.name = "qt5ct";
-    style.name = "fusion";
+    platformTheme.name = "qt6ct";
+    style.name = "Fusion";
   };
 
   home.pointerCursor = {

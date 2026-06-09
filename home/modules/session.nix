@@ -13,14 +13,17 @@
     HYPRCURSOR_SIZE = "24";
     GTK_THEME = "Adwaita:dark";
     GTK2_RC_FILES = "${homeDirectory}/.config/gtk-2.0/gtkrc";
-    QT_STYLE_OVERRIDE = "fusion";
-    QT_QPA_PLATFORMTHEME = "qt5ct";
+    QT_STYLE_OVERRIDE = "Fusion";
+    QT_QPA_PLATFORMTHEME = "qt6ct";
+    QT_QUICK_CONTROLS_STYLE = "org.kde.desktop";
     QML2_IMPORT_PATH = lib.makeSearchPath "lib/qt-6/qml" [
       pkgs.qt6.qtdeclarative
+      pkgs.qt6.qtmultimedia
       pkgs.quickshell
     ];
     QT_PLUGIN_PATH = lib.makeSearchPath "lib/qt-6/plugins" [
       pkgs.qt6.qtbase
+      pkgs.qt6.qtmultimedia
       pkgs.quickshell
     ];
 

@@ -139,6 +139,7 @@ Fixed in this pass:
 Known open items:
 
 - =config/quickshell/common/Theme.qml= intentionally keeps hard-coded SkyDark fallback colors for startup before generated runtime state exists.
+- =hyprpolkitagent= authentication dialogs remain visually inconsistent even after GTK/Qt env cleanup. Current global contract is =GTK_THEME=Adwaita:dark=, =QT_STYLE_OVERRIDE=Fusion=, =QT_QPA_PLATFORMTHEME=qt6ct=, and =QT_QUICK_CONTROLS_STYLE=org.kde.desktop=. Logs no longer show the old lowercase =fusion= QML module error, so future work should evaluate a better Polkit agent or an upstream/package-level hyprpolkitagent QML styling patch instead of more session-env tweaks.
 
 ** Commands
 :PROPERTIES:

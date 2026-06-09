@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import ".."
 import QtQuick
 import Quickshell
+import QtMultimedia
 import Quickshell.Wayland
 import "../common"
 import "../modules/wallpaper"
@@ -26,7 +27,7 @@ PanelWindow {
     color: Theme.bg
 
     Repeater {
-        model: WallpaperStore.isAnimated(WallpaperStore.currentPath) ? [] : [WallpaperStore.currentPath]
+        model: WallpaperStore.mediaKind(WallpaperStore.currentPath) === "image" ? [WallpaperStore.currentPath] : []
 
         delegate: Image {
             required property string modelData
@@ -42,7 +43,7 @@ PanelWindow {
     }
 
     Repeater {
-        model: WallpaperStore.isAnimated(WallpaperStore.currentPath) ? [WallpaperStore.currentPath] : []
+        model: WallpaperStore.mediaKind(WallpaperStore.currentPath) === "animated" ? [WallpaperStore.currentPath] : []
 
         delegate: AnimatedImage {
             required property string modelData
@@ -55,6 +56,24 @@ PanelWindow {
             paused: false
             speed: 1.0
             smooth: true
+        }
+    }
+
+    Repeater {
+        model: WallpaperStore.mediaKind(WallpaperStore.currentPath) === "video" ? [WallpaperStore.currentPath] : []
+
+        delegate: Video {
+            required property string modelData
+
+            anchors.fill: parent
+            source: WallpaperStore.fileUrl(modelData)
+            fillMode: VideoOutput.PreserveAspectCrop
+            loops: MediaPlayer.Infinite
+            muted: true
+            volume: 0
+            autoPlay: true
+
+            Component.onCompleted: play()
         }
     }
 }

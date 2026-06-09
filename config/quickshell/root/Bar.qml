@@ -52,6 +52,7 @@ PanelWindow {
         frameWidth: root.frameWidth
         frameRadius: root.frameRadius
         borderWidth: 2
+        borderColor: Theme.panel
     }
 
     RowLayout {

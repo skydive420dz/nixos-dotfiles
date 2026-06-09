@@ -15,7 +15,7 @@
 
   # Keep tmux-owned prompts and panes on a block cursor by default.
   set -g prompt-cursor-style block
-  set -gp cursor-style block
+  set -g cursor-style block
 
   # =========================================
   # TRUECOLOR
