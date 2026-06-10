@@ -71,6 +71,11 @@
   :demand t
   :after corfu)
 
+(defun sk/completion-company-owned-buffer-p ()
+  "Return non-nil when another completion UI owns this buffer."
+  (and (boundp 'sk/lsp-mode-owned-modes)
+       (memq major-mode sk/lsp-mode-owned-modes)))
+
 (defun sk/yas-snippet-candidates ()
   "Return snippet trigger/name pairs for the current major mode."
   (when (and (bound-and-true-p yas-minor-mode)
@@ -111,15 +116,16 @@
 
 (defun sk/capf-code-defaults ()
   "Add conservative fallback CAPFs for code/config buffers."
-  (when (fboundp 'cape-file)
-    (add-hook 'completion-at-point-functions #'cape-file 20 t))
-  (when (fboundp 'cape-dabbrev)
-    (add-hook 'completion-at-point-functions #'cape-dabbrev 40 t))
-  (when (fboundp 'cape-keyword)
-    (add-hook 'completion-at-point-functions #'cape-keyword 60 t))
-  (setq-local completion-at-point-functions
-              (cons #'sk/yas-capf
-                    (remq #'sk/yas-capf completion-at-point-functions))))
+  (unless (sk/completion-company-owned-buffer-p)
+    (when (fboundp 'cape-file)
+      (add-hook 'completion-at-point-functions #'cape-file 20 t))
+    (when (fboundp 'cape-dabbrev)
+      (add-hook 'completion-at-point-functions #'cape-dabbrev 40 t))
+    (when (fboundp 'cape-keyword)
+      (add-hook 'completion-at-point-functions #'cape-keyword 60 t))
+    (setq-local completion-at-point-functions
+                (cons #'sk/yas-capf
+                      (remq #'sk/yas-capf completion-at-point-functions)))))
 
 (defun sk/capf-prose-defaults ()
   "Add safe prose CAPFs."
@@ -190,45 +196,77 @@
        ((sk/completion-prose-buffer-p)
         (sk/capf-prose-defaults)))
       (when (fboundp 'corfu-mode)
-        (if (sk/completion-buffer-p)
+        (if (and (sk/completion-buffer-p)
+                 (not (sk/completion-company-owned-buffer-p)))
             (corfu-mode 1)
           (corfu-mode -1))))))
 
 (defun sk/completion-active-p ()
   "Return non-nil when in-buffer completion is active."
-  ;; Evil insert-state maps can take precedence over `corfu-map', so the
-  ;; C-h/j/k/l wrappers need to recognize Corfu's active candidate list.
+  (or (sk/corfu-completion-active-p)
+      (sk/company-completion-active-p)))
+
+(defun sk/corfu-completion-active-p ()
+  "Return non-nil when Corfu completion is active."
   (or (bound-and-true-p completion-in-region-mode)
       (and (boundp 'corfu--candidates)
            corfu--candidates)))
 
+(defun sk/company-completion-active-p ()
+  "Return non-nil when Company completion is active."
+  (and (fboundp 'company--active-p)
+       (company--active-p)))
+
 (defun sk/completion-next-or-window-down ()
   "Select the next completion candidate or move to the window below."
   (interactive)
-  (if (sk/completion-active-p)
-      (corfu-next)
-    (windmove-down)))
+  (cond
+   ((sk/company-completion-active-p)
+    (company-select-next))
+   ((sk/corfu-completion-active-p)
+    (corfu-next))
+   (t
+    (windmove-down))))
 
 (defun sk/completion-previous-or-window-up ()
   "Select the previous completion candidate or move to the window above."
   (interactive)
-  (if (sk/completion-active-p)
-      (corfu-previous)
-    (windmove-up)))
+  (cond
+   ((sk/company-completion-active-p)
+    (company-select-previous))
+   ((sk/corfu-completion-active-p)
+    (corfu-previous))
+   (t
+    (windmove-up))))
 
 (defun sk/completion-accept-or-window-right ()
   "Accept the current completion candidate or move to the right window."
   (interactive)
-  (if (sk/completion-active-p)
-      (corfu-insert)
-    (windmove-right)))
+  (cond
+   ((sk/company-completion-active-p)
+    (company-complete-selection))
+   ((sk/corfu-completion-active-p)
+    (corfu-insert))
+   (t
+    (windmove-right))))
 
 (defun sk/completion-quit-or-window-left ()
   "Quit completion or move to the left window."
   (interactive)
-  (if (sk/completion-active-p)
-      (corfu-quit)
-    (windmove-left)))
+  (cond
+   ((sk/company-completion-active-p)
+    (company-abort))
+   ((sk/corfu-completion-active-p)
+    (corfu-quit))
+   (t
+    (windmove-left))))
+
+(with-eval-after-load 'company
+  (define-key company-active-map (kbd "C-j") #'company-select-next)
+  (define-key company-active-map (kbd "C-k") #'company-select-previous)
+  (define-key company-active-map (kbd "C-l") #'company-complete-selection)
+  (define-key company-active-map (kbd "C-h") #'company-abort)
+  (define-key company-active-map (kbd "M-d") #'company-show-doc-buffer))
 
 (provide 'sk-completion)
 

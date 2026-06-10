@@ -11,6 +11,7 @@
 (require 'recentf)
 (require 'eglot)
 (require 'flymake)
+(require 'flycheck nil t)
 (require 'eldoc)
 (require 'compile)
 (require 'xref)
@@ -321,19 +322,73 @@
         (find-file (completing-read "Recent project file: " files nil t))
       (user-error "No recent files for this project"))))
 
+(defun sk/lsp-managed-p ()
+  "Return non-nil when the current buffer is managed by lsp-mode."
+  (bound-and-true-p lsp-mode))
+
 (defun sk/code-action ()
-  "Run Eglot code actions when available."
+  "Run code actions through the active language-server backend."
   (interactive)
-  (if (eglot-managed-p)
-      (call-interactively #'eglot-code-actions)
-    (user-error "Current buffer is not managed by Eglot")))
+  (cond
+   ((and (sk/lsp-managed-p)
+         (fboundp 'lsp-execute-code-action))
+    (call-interactively #'lsp-execute-code-action))
+   ((eglot-managed-p)
+    (call-interactively #'eglot-code-actions))
+   (t
+    (user-error "Current buffer is not managed by a language server"))))
 
 (defun sk/code-rename ()
-  "Rename symbol through Eglot when available."
+  "Rename symbol through the active language-server backend."
   (interactive)
-  (if (eglot-managed-p)
-      (call-interactively #'eglot-rename)
-    (user-error "Current buffer is not managed by Eglot")))
+  (cond
+   ((and (sk/lsp-managed-p)
+         (fboundp 'lsp-rename))
+    (call-interactively #'lsp-rename))
+   ((eglot-managed-p)
+    (call-interactively #'eglot-rename))
+   (t
+    (user-error "Current buffer is not managed by a language server"))))
+
+(defun sk/code-implementation ()
+  "Find implementation through the active language-server backend."
+  (interactive)
+  (cond
+   ((and (sk/lsp-managed-p)
+         (fboundp 'lsp-find-implementation))
+    (call-interactively #'lsp-find-implementation))
+   ((eglot-managed-p)
+    (call-interactively #'eglot-find-implementation))
+   (t
+    (user-error "Current buffer is not managed by a language server"))))
+
+(defun sk/code-type-definition ()
+  "Find type definition through the active language-server backend."
+  (interactive)
+  (cond
+   ((and (sk/lsp-managed-p)
+         (fboundp 'lsp-find-type-definition))
+    (call-interactively #'lsp-find-type-definition))
+   ((eglot-managed-p)
+    (call-interactively #'eglot-find-typeDefinition))
+   (t
+    (user-error "Current buffer is not managed by a language server"))))
+
+(defun sk/code-reference-identifier-at-point ()
+  "Return the Xref identifier at point, falling back to the symbol at point."
+  (or (ignore-errors
+        (xref-backend-identifier-at-point (xref-find-backend)))
+      (thing-at-point 'symbol t)))
+
+(defun sk/code-references (&optional prompt)
+  "Find references for the identifier at point.
+With PROMPT, use the normal `xref-find-references' prompt."
+  (interactive "P")
+  (if prompt
+      (call-interactively #'xref-find-references)
+    (if-let ((identifier (sk/code-reference-identifier-at-point)))
+        (xref-find-references identifier)
+      (call-interactively #'xref-find-references))))
 
 (defun sk/code-symbols ()
   "Show symbols in the current buffer."
@@ -359,9 +414,16 @@
    (current-buffer)))
 
 (defun sk/code-errors ()
-  "Show Flymake diagnostics."
+  "Show diagnostics through the active diagnostics backend."
   (interactive)
-  (call-interactively #'flymake-show-buffer-diagnostics))
+  (cond
+   ((and (bound-and-true-p flycheck-mode)
+         (fboundp 'flycheck-list-errors))
+    (call-interactively #'flycheck-list-errors))
+   ((fboundp 'flymake-show-buffer-diagnostics)
+    (call-interactively #'flymake-show-buffer-diagnostics))
+   (t
+    (user-error "No diagnostics backend is active"))))
 
 (defun sk/xref-next-and-preview ()
   "Move to the next Xref result and preview its source location."
@@ -374,6 +436,30 @@
   (interactive)
   (xref-prev-line)
   (xref-show-location-at-point))
+
+(defun sk/tabulated-list-move-to-entry (direction)
+  "Move to the next tabulated-list entry in DIRECTION."
+  (let ((step (if (< direction 0) -1 1))
+        (found nil))
+    (while (and (not found)
+                (= (forward-line step) 0)
+                (not (if (< step 0) (bobp) (eobp))))
+      (setq found (tabulated-list-get-id)))
+    found))
+
+(defun sk/flymake-diagnostics-next-and-preview ()
+  "Move to the next Flymake diagnostic and preview its source location."
+  (interactive)
+  (when (sk/tabulated-list-move-to-entry 1)
+    (save-selected-window
+      (flymake-show-diagnostic (point) t))))
+
+(defun sk/flymake-diagnostics-previous-and-preview ()
+  "Move to the previous Flymake diagnostic and preview its source location."
+  (interactive)
+  (when (sk/tabulated-list-move-to-entry -1)
+    (save-selected-window
+      (flymake-show-diagnostic (point) t))))
 
 (defun sk/save-buffer-and-quit ()
   "Save the current file buffer, then quit this Emacs client/session."
@@ -594,13 +680,13 @@
 (define-key sk/code-map (kbd "c") #'compile)
 (define-key sk/code-map (kbd "C") #'recompile)
 (define-key sk/code-map (kbd "d") #'xref-find-definitions)
-(define-key sk/code-map (kbd "D") #'xref-find-references)
+(define-key sk/code-map (kbd "D") #'sk/code-references)
 (define-key sk/code-map (kbd "f") #'sk/format-buffer-or-region)
-(define-key sk/code-map (kbd "i") #'eglot-find-implementation)
+(define-key sk/code-map (kbd "i") #'sk/code-implementation)
 (define-key sk/code-map (kbd "k") #'sk/code-docs)
 (define-key sk/code-map (kbd "r") #'sk/code-rename)
 (define-key sk/code-map (kbd "s") #'sk/code-symbols)
-(define-key sk/code-map (kbd "t") #'eglot-find-typeDefinition)
+(define-key sk/code-map (kbd "t") #'sk/code-type-definition)
 (define-key sk/code-map (kbd "w") #'ispell-word)
 (define-key sk/code-map (kbd "W") #'delete-trailing-whitespace)
 (define-key sk/code-map (kbd "x") #'sk/code-errors)
@@ -840,6 +926,24 @@
       (kbd "k") #'sk/xref-previous-and-preview
       (kbd "l") #'xref-goto-xref
       (kbd "RET") #'xref-goto-xref
+      (kbd "q") #'quit-window)))
+
+(with-eval-after-load 'flycheck
+  (with-eval-after-load 'evil
+    (evil-define-key '(normal motion) flycheck-error-list-mode-map
+      (kbd "j") #'flycheck-error-list-next-error
+      (kbd "k") #'flycheck-error-list-previous-error
+      (kbd "l") #'flycheck-error-list-goto-error
+      (kbd "RET") #'flycheck-error-list-goto-error
+      (kbd "q") #'quit-window)))
+
+(with-eval-after-load 'flymake
+  (with-eval-after-load 'evil
+    (evil-define-key '(normal motion) flymake-diagnostics-buffer-mode-map
+      (kbd "j") #'sk/flymake-diagnostics-next-and-preview
+      (kbd "k") #'sk/flymake-diagnostics-previous-and-preview
+      (kbd "l") #'flymake-goto-diagnostic
+      (kbd "RET") #'flymake-goto-diagnostic
       (kbd "q") #'quit-window)))
 
 (provide 'sk-keybindings)

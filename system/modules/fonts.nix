@@ -32,6 +32,7 @@
       # a fontconfig fallback so any icon in any range renders even if
       # your primary font is missing it.
       nerd-fonts.symbols-only
+      emacs-all-the-icons-fonts
 
       # ── Plain text fonts ────────────────────────────────────────────────
       font-awesome # explicit FontAwesome (some apps look for it by name)

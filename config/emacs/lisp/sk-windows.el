@@ -53,6 +53,7 @@ With PROMPT, ask for a directory."
          (window-parameters . ((no-delete-other-windows . t))))
         ((or (derived-mode . ibuffer-mode)
              (derived-mode . dired-mode)
+             (derived-mode . xref--xref-buffer-mode)
              (derived-mode . magit-mode)
              (derived-mode . eshell-mode)
              (derived-mode . vterm-mode)

@@ -373,6 +373,107 @@ Recommended Slice 2:
 - Compare Eglot baseline against =lsp-mode= on completion details, hover/docs,
   diagnostics, xref, and standalone/project behavior.
 
+*** Slice 2 Lua lsp-mode/company proof
+:PROPERTIES:
+:CUSTOM_ID: powerhouse-slice-2-lua-lsp-mode-company
+:END:
+Date: 2026-06-09
+
+Decision:
+
+- Lua is the first proof language because it is familiar enough to evaluate
+  completion/doc behavior quickly.
+- The proof path is =lua-ts-mode= / =lua-mode= + =lua-language-server= +
+  =lsp-mode= + =company=.
+- Other languages keep the existing Eglot/Corfu path during this slice.
+
+Implementation boundary:
+
+- =sk-lsp.el= remains the Eglot owner.
+- =sk-lsp-mode.el= owns only lsp-mode proof slices.
+- =sk/lsp-mode-owned-modes= lets Eglot skip modes intentionally handled by
+  =lsp-mode=.
+- Corfu remains global default, but Lua proof buffers disable local =corfu-mode=
+  and enable =company-mode= so there is one in-buffer completion UI.
+- Global completion refresh respects =sk/lsp-mode-owned-modes= so reloads do
+  not re-enable Corfu/Cape fallback ownership inside Lua proof buffers.
+- Lua proof buffers use a strict CAPF list: =lsp-completion-at-point= only.
+  Generic fallback sources such as =sk/yas-capf=, =cape-file=, =cape-dabbrev=,
+  and =cape-keyword= are intentionally removed from Lua buffers during this
+  proof so old-stack candidates do not contaminate the lsp-mode/company test.
+- General keymaps were not changed.
+
+LuaLS settings used by the proof:
+
+- =lsp-clients-lua-language-server-bin= and
+  =lsp-clients-lua-language-server-command= point at the Nix-provided
+  =lua-language-server=.
+- =lsp-clients-lua-language-server-main-location= points at the Nix package's
+  =share/lua-language-server/main.lua= when present.
+- =lsp-lua-runtime-version= is =LuaJIT= to match the Neovim Lua config use case.
+- =lsp-lua-diagnostics-globals= includes =vim= and =hl=.
+- =lsp-lua-workspace-library= reuses the existing Neovim runtime metadata path.
+- Lua call and keyword snippets are enabled for the proof.
+- Diagnostics use =flycheck= through =lsp-diagnostics-provider :flycheck=.
+  This avoids the older Flymake path and the extra =lua-ts-flymake-luacheck=
+  backend.
+- Existing code helpers dispatch by active backend: =lsp-mode= first, then
+  Eglot. The keymap stays stable.
+- Breadcrumbs use =lsp-headerline-breadcrumb-mode= with icons enabled and the
+  concise segment set =(project file symbols)=. Sky theme owns the breadcrumb
+  faces.
+- Breadcrumb icons use the upstream lsp-mode provider path: =lsp-treemacs= for
+  file/symbol icons and =all-the-icons= for the separator/icon font side.
+  System font coverage includes =emacs-all-the-icons-fonts= via Nix.
+- Breadcrumb provider loading is explicit in the Lua proof hook so lsp-mode does
+  not render text-only fallbacks before =lsp-treemacs= and =all-the-icons= are
+  available.
+- Breadcrumb PNG icons stay on the upstream =lsp-treemacs= / =lsp-icons= path.
+  PGTK headerline rendering did not display those PNGs while the image display
+  spec carried =:mask heuristic= and =:background unspecified=, so
+  =sk-lsp-mode.el= sanitizes that metadata after =lsp-icons= builds the icon.
+  This keeps real PNG icons instead of falling back to Nerd Font glyphs.
+- Company popup navigation mirrors the existing Corfu navigation contract:
+  =C-j= next, =C-k= previous, =C-l= accept, =C-h= abort. The shared
+  completion wrappers dispatch to Company when Company is active and to Corfu
+  when Corfu is active.
+- Company documentation is explicit, not automatic, to avoid stacked popup
+  surfaces: =M-d= opens the Company documentation buffer while the completion
+  menu is active; =SPC c k= remains the code-hover/doc command.
+- Company uses one popup surface for the Lua proof:
+  =company-frontends=(company-pseudo-tooltip-frontend)=. The default echo
+  metadata and single-candidate preview frontends are disabled to avoid stacked
+  or changing popup surfaces while typing.
+
+Validation targets:
+
+- Existing Neovim Lua config should attach to =lsp-mode=, not Eglot.
+- Standalone Lua files should still receive language-server completion.
+- Completion should expose richer candidate metadata than the Eglot baseline.
+- Hover/docs should continue working for =vim.*= APIs.
+- This slice should not change Nix, QML, Python, Shell, JSON, Elisp, Org, Rust,
+  or C ownership.
+
+Measured validation:
+
+| File context | Mode | Owner | Completion | Hover | Notes |
+|--------------+------+-------+------------+-------+-------|
+| Neovim config Lua | =lua-ts-mode= | =lsp-mode=, =company= | 166 candidates at =vim.= | yes | =eglot-managed=nil=, =corfu-mode=nil=. |
+| Standalone =/tmp= Lua | =lua-ts-mode= | =lsp-mode=, =company= | result returned | yes | Workspace root was =/tmp=, proving non-project files attach. |
+| Broken standalone Lua | =lua-ts-mode= | =lsp-mode=, =flycheck= | n/a | n/a | LuaLS diagnostic rendered through Flycheck checker =lsp=: =Missed symbol `)`. =flymake-mode=nil=. |
+| Strict Lua ownership | =lua-ts-mode= | =lsp-mode=, =company=, =flycheck= | n/a | n/a | =completion-at-point-functions=(lsp-completion-at-point)=, =company-backends=(company-capf)=, no =sk/yas-capf= or Cape fallback CAPFs. |
+| Breadcrumb polish | =lua-ts-mode= | =lsp-headerline-breadcrumb-mode= | n/a | n/a | Breadcrumb mode active, icons enabled, segments =(project file symbols)=, Sky faces applied, =lsp-treemacs= icon functions available. |
+| Breadcrumb PNG rendering | =lua-ts-mode= | =lsp-icons=, =lsp-treemacs= | n/a | n/a | Live =completion.lua= headerline window carries PNG file/symbol icons with =:mask nil= and =:background nil= after sanitizing provider output. |
+| Company navigation | =lua-ts-mode= | =company-active-map= | n/a | explicit | =C-j= =company-select-next=, =C-k= =company-select-previous=, =C-l= =company-complete-selection=, =C-h= =company-abort=, =M-d= =company-show-doc-buffer=. |
+| Company popup surface | =lua-ts-mode= | =company-frontends= | n/a | n/a | Single frontend: =company-pseudo-tooltip-frontend=. |
+
+Observed caveat:
+
+- Completion item payloads did not include documentation in the direct
+  completion response (=completion-doc-count=0=), but separate hover requests do
+  return docs. This is acceptable for the first proof, but should be compared
+  interactively before scaling the pattern to every language.
+
 Current Nix parity decision:
 
 - NVF uses =nixd= for Nix. Clean Emacs was originally using =nil=, which made

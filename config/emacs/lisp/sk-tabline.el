@@ -7,19 +7,7 @@
 (defconst sk/tabline-hidden-buffer-regexp
   (rx string-start
       (or " "
-          "*Compile-Log*"
-          "*Completions*"
-          "*EGLOT"
-          "*Help*"
-          "*Messages*"
-          "*scratch*"
-          "*Sky Home*"
-          "*Warnings*"
-          "*eldoc"
-          "*eglot"
-          "*jsonrpc"
-          "*straight-process*"
-          "*xref*"))
+          "*"))
   "Buffer names that should not appear in the tab line.")
 
 (defconst sk/tabline-hidden-modes
@@ -36,14 +24,20 @@
     vterm-mode)
   "Major modes that should not appear in the tab line.")
 
+(defun sk/tabline-hidden-buffer-p (buffer)
+  "Return non-nil when BUFFER is internal or helper-only."
+  (let ((name (buffer-name buffer)))
+    (or (minibufferp buffer)
+        (and name
+             (string-match-p sk/tabline-hidden-buffer-regexp name))
+        (with-current-buffer buffer
+          (memq major-mode sk/tabline-hidden-modes)))))
+
 (defun sk/tabline-buffer-visible-p (buffer)
   "Return non-nil when BUFFER should be shown in the tab line."
   (let ((name (buffer-name buffer)))
     (and name
-         (not (minibufferp buffer))
-         (not (string-match-p sk/tabline-hidden-buffer-regexp name))
-         (with-current-buffer buffer
-           (not (memq major-mode sk/tabline-hidden-modes))))))
+         (not (sk/tabline-hidden-buffer-p buffer)))))
 
 (defun sk/tabline-buffers ()
   "Return buffers for the tab line."
@@ -70,6 +64,11 @@
   "Disable tab line in utility/helper buffers."
   (tab-line-mode -1))
 
+(defun sk/tabline-disable-if-hidden ()
+  "Disable tab line when the current buffer is hidden from the tab list."
+  (when (sk/tabline-hidden-buffer-p (current-buffer))
+    (sk/tabline-disable)))
+
 (setq tab-line-tabs-function #'sk/tabline-buffers
       tab-line-tab-name-function #'sk/tabline-buffer-name
       tab-line-close-button-show nil
@@ -90,7 +89,13 @@
                 vterm-mode-hook))
   (add-hook hook #'sk/tabline-disable))
 
+(add-hook 'after-change-major-mode-hook #'sk/tabline-disable-if-hidden)
+
 (global-tab-line-mode 1)
+
+(dolist (buffer (buffer-list))
+  (with-current-buffer buffer
+    (sk/tabline-disable-if-hidden)))
 
 (provide 'sk-tabline)
 

@@ -115,7 +115,7 @@ SPC w H/J/K/L     resize current window
 
 SPC c a           code action
 SPC c c / C       compile / recompile
-SPC c d / D       definition / references
+SPC c d / D       definition / references at point
 SPC c f           format buffer or region explicitly
 SPC c i           implementation
 SPC c k           documentation buffer
@@ -124,6 +124,7 @@ SPC c t           type definition
 SPC c w           spell word
 SPC c W           delete trailing whitespace
 SPC c x           diagnostics
+SPC c D/x helpers j/k preview, l/RET open, q quit
 
 SPC t n           new tab
 SPC t x           close tab
@@ -599,7 +600,7 @@ SPC f u/U      sudo find/current file            sk sudo helpers                
 SPC f y/Y      yank absolute/project path        sk path helpers                   done
 SPC c a/r      code action/rename                Eglot actions                     done
 SPC c c/C      compile/recompile                 compile/recompile                 done
-SPC c d/D      definition/references             xref                              done
+SPC c d/D      definition/references at point    xref                              done
 SPC c f        format buffer/region              explicit formatter map           done
 SPC c i/t      implementation/type definition    Eglot                             done
 SPC c k        documentation                     eldoc-doc-buffer                  done

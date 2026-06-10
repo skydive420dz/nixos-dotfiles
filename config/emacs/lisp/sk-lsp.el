@@ -84,6 +84,9 @@
 (defvar sk/org-agenda-generating-p nil
   "Non-nil while Org is collecting agenda buffers.")
 
+(defvar sk/lsp-mode-owned-modes nil
+  "Major modes intentionally handled by lsp-mode instead of Eglot.")
+
 (defvar sk/lua-neovim-runtime-path
   (expand-file-name "lua/neovim-runtime" user-emacs-directory)
   "Nix-linked Neovim runtime path used by LuaLS for `vim.*' metadata.")
@@ -176,6 +179,7 @@ server config to prose servers like Harper."
 (defun sk/eglot-ensure ()
   "Start Eglot for supported buffers."
   (when (and (memq major-mode sk/eglot-managed-modes)
+             (not (memq major-mode sk/lsp-mode-owned-modes))
              (sk/eglot-buffer-eligible-p)
              (not (eglot-managed-p)))
     (condition-case err

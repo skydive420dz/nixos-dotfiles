@@ -32,6 +32,7 @@
 (require 'sk-treesit)
 (require 'sk-qml)
 (require 'sk-lsp)
+(require 'sk-lsp-mode)
 (require 'sk-json)
 (require 'sk-format)
 (require 'sk-org)
