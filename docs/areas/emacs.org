@@ -164,6 +164,98 @@ For each configured language, define and audit the full language surface:
 - Formatting behavior: =SPC c f= should be explicit and available for every
   configured language with a known formatter.
 
+** Powerhouse Editor Experiment Contract
+:PROPERTIES:
+:CUSTOM_ID: powerhouse-editor-experiment-contract
+:END:
+This branch experiments with a richer IDE/LSP-oriented clean Emacs while keeping
+=main= as the known-good functional checkpoint. The experiment must improve code
+intelligence without turning the editor into a pile of unrelated patches.
+
+Scope:
+
+- Primary focus: LSP-powered completion and Tree-sitter highlighting.
+- Secondary focus: diagnostics, hover/docs, xref/navigation, and formatting only
+  after the LSP/completion/highlighting owner model is clear.
+- Out of scope unless explicitly agreed: unrelated keymap redesign, UI churn,
+  terminal rewrites, notes workflow changes, Magit changes, dashboard changes,
+  shell changes, and unrelated package experiments.
+
+Working rules:
+
+- Do not change general key functionality unless the change is proposed and
+  agreed on first.
+- Do not manipulate keymaps as a side effect of testing LSP/completion unless
+  the key behavior is part of the current slice.
+- Do not patch incrementally around symptoms until the ownership model is known.
+- Identify candidate improvements and present them as options before making
+  assumptions.
+- Prefer one coherent owner for each capability over many small overlapping
+  packages.
+- Each slice must have a stated success condition and rollback point.
+- If a tool is removed, replaced, or made secondary, document what owns that
+  responsibility now.
+- No half-implemented helper code should stay active. Experimental code either
+  works, is disabled with a clear note, or is reverted.
+
+Operational definition of surface:
+
+- Surface is every place behavior can be configured, fail, drift, or require
+  ownership.
+- Fewer packages is not automatically less surface.
+- Many small packages glued together can be more surface than one larger mature
+  package if they add boundaries, assumptions, config files, failure points, or
+  unclear ownership.
+
+Target language set for this experiment:
+
+- Nix
+- Lua
+- QML
+- Python
+- Shell
+- JSON
+- Emacs Lisp
+- Org
+- Rust
+- C
+
+For each target language, track:
+
+- major mode and Tree-sitter mode
+- parser source and install path
+- LSP server
+- LSP client owner
+- completion owner and sources
+- snippet behavior
+- diagnostics owner
+- hover/docs behavior
+- formatter
+- standalone-file behavior
+- project-file behavior
+- known limitations
+
+Missing items to keep explicit:
+
+- Diagnostics owner: decide whether Flymake, Flycheck, or LSP UI owns error
+  display and navigation.
+- Completion UI owner: decide whether the richer stack uses Corfu, Company, or
+  a hybrid only if the boundary is defensible.
+- Formatting policy: keep manual formatting unless format-on-save is explicitly
+  agreed per language.
+- Performance budget: measure startup/reload, first LSP attach, idle CPU, and
+  obvious UI lag after major changes.
+- Test matrix: every slice should test at least one project file and one
+  standalone file outside a repo.
+
+Initial slice proposal:
+
+1. Pick the IDE owner for one language only.
+2. Prove completion, docs, diagnostics, xref, syntax highlighting, and formatting
+   on that language.
+3. Document the result.
+4. Only then scale the pattern to the next language.
+
 Current Nix parity decision:
 
 - NVF uses =nixd= for Nix. Clean Emacs was originally using =nil=, which made
@@ -187,11 +279,12 @@ Target language audit set:
 - C/C++: =clangd= behavior for standalone files versus compile database
   projects.
 - Shell: =bash-language-server= behavior and =shfmt=.
-- JSON/YAML: language-server behavior, schemas where useful, and Prettier
-  formatting.
-- TypeScript/JavaScript/CSS/HTML: language-server parity with NVF and formatter
+- JSON: language-server behavior, schemas where useful, and formatter
   availability.
-- Org/Markdown/Text: Harper diagnostics and prose completion behavior.
+- Emacs Lisp: completion, xref, eldoc, evaluation helpers, and byte-compile
+  feedback.
+- Org: Tree-sitter/classic-mode decision, source-block editing, completion, and
+  prose diagnostics where useful.
 
 *** 2026-06-07 parity audit findings
 :PROPERTIES:
