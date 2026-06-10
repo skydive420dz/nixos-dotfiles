@@ -13,8 +13,8 @@
     font-family = JetBrainsMono Nerd Font
     font-size = 12
 
-    background-opacity = 0.88
-    background-opacity-cells = true
+    background-opacity = 1
+    background-opacity-cells = false
     background-blur = false
 
     cursor-style = block
