@@ -256,6 +256,123 @@ Initial slice proposal:
 3. Document the result.
 4. Only then scale the pattern to the next language.
 
+*** Slice 1 baseline inventory
+:PROPERTIES:
+:CUSTOM_ID: powerhouse-slice-1-baseline
+:END:
+Date: 2026-06-09
+
+This slice was read-only. No Emacs behavior, keymaps, packages, or Nix modules
+were changed.
+
+Current capability owners:
+
+- LSP client: =eglot=.
+- Diagnostics UI: =flymake= through Emacs/Eglot defaults.
+- In-buffer completion UI: =corfu=.
+- Completion sources: =completion-at-point-functions=, =eglot-completion-at-point=,
+  =sk/yas-capf=, =cape-file=, =cape-dabbrev=, and =cape-keyword=.
+- Snippets: =yasnippet= from =config/emacs/snippets=.
+- Minibuffer completion: Vertico, Orderless, Marginalia, Embark, and Consult.
+- Tree-sitter parser delivery: Nix-built parser bundle exposed through
+  =SK_EMACS_TREE_SITTER_GRAMMAR_PATH=.
+- Tree-sitter mode routing: =sk-treesit.el= plus local =sk-qml-ts-mode=.
+- Formatting: manual =SPC c f= through =sk-format.el=, with no format-on-save.
+
+Installed Emacs package state:
+
+- Present and loaded: =eglot=, =corfu=, =cape=, =yasnippet=, =flymake=.
+- Present, not necessarily loaded at startup: =consult=.
+- Not installed at baseline: =lsp-mode=, =lsp-ui=, =company=, =company-box=,
+  =flycheck=, =consult-flycheck=, =treesit-auto=, =eglot-booster=.
+
+Candidate richer-IDE packages are available from package archives:
+
+- =lsp-mode=
+- =lsp-ui=
+- =company=
+- =company-box=
+- =flycheck=
+- =consult-flycheck=
+
+Nix-provided target language tools:
+
+| Language   | Server                         | Formatter           | Notes |
+|------------+--------------------------------+---------------------+-------|
+| Nix        | =nixd=                         | =nixfmt=            | Active baseline server. |
+| Lua        | =lua-language-server=          | =stylua=            | LuaLS has Neovim runtime metadata configured. |
+| QML        | =qmlls-wrapped=                | =qmlformat=         | Wrapper injects Qt/Quickshell QML import paths. |
+| Python     | =basedpyright-langserver=      | =black=             | =ruff= and =isort= are installed but not formatter owner. |
+| Shell      | =bash-language-server=         | =shfmt=             | =shellcheck= is installed. |
+| JSON       | =vscode-json-language-server=  | =prettier=          | JSON TS parser is available. |
+| Emacs Lisp | built-in Elisp completion      | none                | No external LSP owner at baseline. |
+| Org        | =harper-ls=                    | none                | Prose diagnostics, not code intelligence. |
+| Rust       | =rust-analyzer=                | =rustfmt=           | LSP starts only with =Cargo.toml= or =rust-project.json=. |
+| C          | =clangd=                       | =clang-format=      | Starts for standalone temporary files. |
+
+Tree-sitter parser availability for target languages:
+
+| Language   | Parser | Baseline mode result |
+|------------+--------+----------------------|
+| Nix        | yes    | =nix-ts-mode= |
+| Lua        | yes    | =lua-ts-mode= |
+| QML        | yes    | =sk-qml-ts-mode= with =qmljs= |
+| Python     | yes    | =python-ts-mode= |
+| Shell      | yes    | =bash-ts-mode= |
+| JSON       | yes    | =json-ts-mode= |
+| Emacs Lisp | n/a    | =emacs-lisp-mode= |
+| Org        | yes    | baseline still uses classic =org-mode= |
+| Rust       | yes    | =rust-ts-mode= |
+| C          | yes    | =c-ts-mode= |
+
+Standalone temporary-file probe:
+
+| File        | Mode             | Parser | Eglot baseline | Formatter |
+|-------------+------------------+--------+----------------+-----------|
+| =sample.nix=  | =nix-ts-mode=      | nix    | =nixd= eligible | =nixfmt= |
+| =sample.lua=  | =lua-ts-mode=      | lua    | LuaLS eligible | =stylua= |
+| =sample.qml=  | =sk-qml-ts-mode=   | qmljs  | =qmlls-wrapped= eligible | =qmlformat= |
+| =sample.py=   | =python-ts-mode=   | python | Basedpyright eligible | =black= |
+| =sample.sh=   | =bash-ts-mode=     | bash   | bash LS eligible | =shfmt= |
+| =sample.json= | =json-ts-mode=     | json   | JSON LS eligible | =prettier= |
+| =sample.el=   | =emacs-lisp-mode=  | none   | no external server | none |
+| =sample.org=  | =org-mode=         | none   | Harper eligible | none |
+| =sample.rs=   | =rust-ts-mode=     | rust   | intentionally not eligible outside Rust project | =rustfmt= |
+| =sample.c=    | =c-ts-mode=        | c      | clangd eligible | =clang-format= |
+
+Observed baseline issues and boundaries:
+
+- Current stack is an Eglot/Corfu/Cape/Yasnippet/Flymake design, not a full
+  =lsp-mode= IDE design.
+- Rust standalone behavior is deliberately conservative; it avoids starting
+  =rust-analyzer= without project metadata.
+- Org has a Tree-sitter parser installed, but the active baseline uses classic
+  =org-mode=.
+- Emacs Lisp has built-in completion/eldoc/xref but no external LSP server.
+- QML still has the largest custom surface because =sk-qml-ts-mode= owns local
+  Tree-sitter highlighting.
+- Several non-target language tools remain installed for broader config use
+  such as TypeScript, HTML, CSS, YAML, Markdown, GLSL, and Haskell. They are not
+  part of the first target-language experiment unless explicitly pulled in.
+
+Slice 2 decision options:
+
+- Option A: keep Eglot and enrich around it. This preserves the current stack
+  but risks repeating the distributed-surface problem.
+- Option B: switch globally to =lsp-mode=. This is coherent but too broad for
+  the next edit.
+- Option C: test =lsp-mode= on one language only, with Eglot disabled for that
+  language. This is the recommended next slice.
+
+Recommended Slice 2:
+
+- Pick one proof language.
+- Install/configure =lsp-mode= only for that language.
+- Do not change general keymaps.
+- Do not change completion UI yet unless required to evaluate LSP completion.
+- Compare Eglot baseline against =lsp-mode= on completion details, hover/docs,
+  diagnostics, xref, and standalone/project behavior.
+
 Current Nix parity decision:
 
 - NVF uses =nixd= for Nix. Clean Emacs was originally using =nil=, which made
