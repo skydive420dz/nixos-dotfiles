@@ -97,6 +97,7 @@
     (add-hook 'lsp-completion-mode-hook #'sk/lsp-lua-use-strict-completion nil t)
     (add-hook 'lsp-configure-hook #'sk/lsp-lua-enable-breadcrumb nil t)
     (setq-local lsp-completion-no-cache t)
+    (setq-local eldoc-display-functions '(eldoc-display-in-buffer))
     (setq-local company-minimum-prefix-length 0)
     (company-mode 1)
     (flycheck-mode 1)))
@@ -140,6 +141,7 @@
         lsp-completion-show-detail t
         lsp-completion-show-kind t
         lsp-diagnostics-provider :flycheck
+        lsp-eldoc-render-all t
         lsp-enable-snippet t
         lsp-enable-suggest-server-download nil
         lsp-headerline-breadcrumb-enable t

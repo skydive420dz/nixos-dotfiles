@@ -396,22 +396,11 @@ With PROMPT, use the normal `xref-find-references' prompt."
   (consult-imenu))
 
 (defun sk/code-docs ()
-  "Refresh and display documentation for the thing at point."
+  "Display live documentation for the thing at point."
   (interactive)
   (eldoc-mode 1)
-  (condition-case nil
-      (eldoc-print-current-symbol-info)
-    (error nil))
-  (run-at-time
-   0.15 nil
-   (lambda (buffer)
-     (when (buffer-live-p buffer)
-       (with-current-buffer buffer
-         (condition-case err
-             (eldoc-doc-buffer t)
-           (error
-            (message "%s" (error-message-string err)))))))
-   (current-buffer)))
+  (eldoc-print-current-symbol-info)
+  (eldoc-doc-buffer t))
 
 (defun sk/code-errors ()
   "Show diagnostics through the active diagnostics backend."

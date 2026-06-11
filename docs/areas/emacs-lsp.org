@@ -45,6 +45,43 @@ Rollback point:
 
 - Commit =45e3ad0=, =Build Lua lsp-mode proof slice=.
 
+** Locked Model Boundary
+:PROPERTIES:
+:CUSTOM_ID: locked-model-boundary
+:END:
+The global LSP model is locked unless an extreme language-specific constraint is
+identified, documented, and accepted before implementation. Future language
+slices should not rewrite the common editor model.
+
+Global and reusable:
+
+- Completion frontend: Company.
+- Completion backend shape: =company-capf=, =company-yasnippet=,
+  =company-files=, =company-keywords=, =company-dabbrev-code=.
+- Completion navigation: =C-j=, =C-k=, =C-l=, =C-h=.
+- Docs display policy: full LSP hover, helper-only Eldoc display.
+- Code actions: =SPC c a=.
+- Definition/references/type/implementation wrappers.
+- Diagnostics list behavior.
+- Formatting contract: use =sk-format=, not ad hoc LSP formatting, unless
+  explicitly chosen.
+- Helper window/display rules.
+- Acceptance checklist.
+
+Language-specific and mutable per slice:
+
+- Major modes owned by =lsp-mode=.
+- LSP server choice.
+- Server command/package.
+- Server settings.
+- Runtime/library paths.
+- Known globals.
+- Keyword table mapping, when needed.
+- Snippet availability.
+- Formatter command under =sk-format=.
+- Unsupported capabilities, such as missing =typeDefinition= support.
+- Acceptance probes for that language.
+
 ** Completion Ownership
 :PROPERTIES:
 :CUSTOM_ID: completion-ownership
@@ -112,6 +149,7 @@ Lua proof buffers should apply these local rules:
 #+begin_src emacs-lisp
 (setq-local company-minimum-prefix-length 0)
 (setq-local lsp-completion-no-cache t)
+(setq-local eldoc-display-functions '(eldoc-display-in-buffer))
 (setq-local company-backends sk/company-code-backends)
 (company-mode 1)
 #+end_src
@@ -122,6 +160,8 @@ Rationale:
   =vim.= to open without requiring an extra typed character.
 - =lsp-completion-no-cache= prevents stale server result pages from being
   filtered locally after the prefix changes.
+- =eldoc-display-functions= keeps full hover docs in the helper buffer instead
+  of duplicating them in the minibuffer.
 - =sk/company-code-backends= is the single shared backend definition for the
   current proof stack.
 
@@ -140,6 +180,8 @@ Lua must prove:
 - File/path completion works.
 - Local/project word completion works.
 - Hover/docs work, including explicit doc commands.
+- Hover/docs show full LSP hover content in the helper buffer without duplicate
+  minibuffer output.
 - Definition and references work where LuaLS supports them.
 - Diagnostics work through Flycheck.
 - Code actions work where LuaLS supports them.
@@ -227,3 +269,22 @@ Validation snapshot:
 - In =config/nvim/lua/sky/completion.lua=, Company/CAPF attached to LuaLS,
   used the exact backend stack, and returned 166 candidates at an existing
   =vim.= point.
+
+*** 2026-06-11 Lua Docs Display Slice
+:PROPERTIES:
+:CUSTOM_ID: lua-docs-display-slice-2026-06-11
+:END:
+Implemented:
+
+- =lsp-eldoc-render-all= is enabled so lsp-mode renders full hover contents
+  instead of only symbol signatures.
+- Lua proof buffers set =eldoc-display-functions= to
+  =(eldoc-display-in-buffer)= so docs appear in the helper buffer, not the
+  minibuffer.
+- =sk/code-docs= opens Eldoc directly without a timer wrapper.
+
+Validation snapshot:
+
+- On =print=, the docs helper shows the signature plus explanatory Lua docs.
+- Live Lua buffer value: =(t (eldoc-display-in-buffer))= for
+  =lsp-eldoc-render-all= and =eldoc-display-functions=.
