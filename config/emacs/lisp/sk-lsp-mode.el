@@ -5,6 +5,7 @@
 
 (require 'cl-lib)
 (require 'seq)
+(require 'sk-completion)
 (require 'sk-lsp)
 
 (defconst sk/lsp-mode-lua-modes '(lua-mode lua-ts-mode)
@@ -44,7 +45,7 @@
   "Let lsp-mode own completion sources in Lua proof buffers."
   (when (sk/lsp-lua-buffer-p)
     (setq-local completion-at-point-functions sk/lsp-lua-owned-capfs)
-    (setq-local company-backends '(company-capf))))
+    (setq-local company-backends sk/company-code-backends)))
 
 (defun sk/lsp-lua-enable-breadcrumb ()
   "Enable lsp-mode breadcrumbs in Lua proof buffers."
@@ -93,7 +94,10 @@
       (corfu-mode -1))
     (sk/lsp-lua-use-strict-completion)
     (add-hook 'lsp-configure-hook #'sk/lsp-lua-use-strict-completion nil t)
+    (add-hook 'lsp-completion-mode-hook #'sk/lsp-lua-use-strict-completion nil t)
     (add-hook 'lsp-configure-hook #'sk/lsp-lua-enable-breadcrumb nil t)
+    (setq-local lsp-completion-no-cache t)
+    (setq-local company-minimum-prefix-length 0)
     (company-mode 1)
     (flycheck-mode 1)))
 

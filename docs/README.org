@@ -22,6 +22,7 @@ Small maps for finding the shape of the system again after context has cooled.
 - [[file:areas/tmux.org][Tmux]]
 - [[file:areas/nvim.org][Neovim]]
 - [[file:areas/emacs.org][Emacs]]
+- [[file:areas/emacs-lsp.org][Emacs LSP and completion]]
 - [[file:areas/keyboard.org][Keyboard]]
 - [[file:areas/modules.org][Module structure]]
 - [[file:areas/git.org][Git workflow]]

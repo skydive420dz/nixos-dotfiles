@@ -256,6 +256,14 @@ Initial slice proposal:
 3. Document the result.
 4. Only then scale the pattern to the next language.
 
+** LSP And Completion Authority
+:PROPERTIES:
+:CUSTOM_ID: lsp-and-completion-authority
+:END:
+The active LSP/completion contract lives in [[file:emacs-lsp.org][Emacs LSP And Completion]].
+Treat the proof notes below as historical evidence when they conflict with that
+document.
+
 *** Slice 1 baseline inventory
 :PROPERTIES:
 :CUSTOM_ID: powerhouse-slice-1-baseline

@@ -1,0 +1,229 @@
+* Emacs LSP And Completion
+:PROPERTIES:
+:CUSTOM_ID: emacs-lsp-and-completion
+:END:
+Authoritative contract for the Powerhouse IDE completion work.
+
+This document supersedes older Lua/Nix proof-slice notes when they conflict.
+Older notes remain historical evidence; they are not implementation guidance or
+acceptance criteria.
+
+** Current Status
+:PROPERTIES:
+:CUSTOM_ID: current-status
+:END:
+- Broad language migration is paused.
+- Current slice is Lua only.
+- Lua is =PROVISIONAL=: useful lsp-mode/company proof, not accepted as the final
+  reusable model until the checklist passes.
+- Nix is =PAUSED / NOT ACCEPTED=: do not continue Nix until Lua passes or is
+  explicitly rejected.
+
+** Slice Contract
+:PROPERTIES:
+:CUSTOM_ID: slice-contract
+:END:
+The active slice is not a license to redesign Emacs.
+
+Allowed:
+
+- Adjust Lua lsp-mode/company completion ownership.
+- Restore and maintain this contract document.
+- Validate Lua completion behavior on one project Lua file and one standalone
+  Lua file.
+
+Not allowed:
+
+- Nix LSP work.
+- NVF changes.
+- General keymap changes.
+- New custom completion backends without explicit approval.
+- Hidden one-off package hacks.
+- Migration to another language before Lua passes or is rejected.
+
+Rollback point:
+
+- Commit =45e3ad0=, =Build Lua lsp-mode proof slice=.
+
+** Completion Ownership
+:PROPERTIES:
+:CUSTOM_ID: completion-ownership
+:END:
+Company is the in-buffer completion frontend for Powerhouse IDE proof buffers.
+LSP is the semantic source, not the whole completion system.
+
+For Lua proof buffers, source ownership is:
+
+- =company-capf=: semantic completion from =lsp-completion-at-point=, including
+  LuaLS-provided snippets when the server provides them.
+- =company-yasnippet=: repo/local Yasnippet templates when available.
+- =company-files=: file/path references.
+- =company-keywords=: maintained language keyword fallback.
+- =company-dabbrev-code=: local buffer/project words.
+
+Do not implement a custom syntax backend while an existing maintained backend
+or the language server can own the job. A custom backend requires an explicit
+proposal and approval before code changes.
+
+** Target Backend Shape
+:PROPERTIES:
+:CUSTOM_ID: target-backend-shape
+:END:
+Lua proof buffers should use one shared Company backend stack:
+
+#+begin_src emacs-lisp
+(setq-local company-backends
+            '((company-capf
+               company-yasnippet
+               company-files
+               company-keywords
+               company-dabbrev-code)))
+#+end_src
+
+For =lua-ts-mode=, =company-keywords= should reuse the maintained =lua-mode=
+keyword table:
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'company-keywords
+  (add-to-list 'company-keywords-alist '(lua-ts-mode . lua-mode)))
+#+end_src
+
+** CAPF Boundary
+:PROPERTIES:
+:CUSTOM_ID: capf-boundary
+:END:
+For Lua proof buffers, CAPF stays semantic:
+
+#+begin_src emacs-lisp
+(setq-local completion-at-point-functions
+            '(lsp-completion-at-point))
+#+end_src
+
+Company owns source orchestration. Do not hide snippets, keywords, paths, and
+dabbrev inside CAPF unless a measured backend limitation requires it and the
+tradeoff is documented before implementation.
+
+** Runtime Rules
+:PROPERTIES:
+:CUSTOM_ID: runtime-rules
+:END:
+Lua proof buffers should apply these local rules:
+
+#+begin_src emacs-lisp
+(setq-local company-minimum-prefix-length 0)
+(setq-local lsp-completion-no-cache t)
+(setq-local company-backends sk/company-code-backends)
+(company-mode 1)
+#+end_src
+
+Rationale:
+
+- =company-minimum-prefix-length= allows trigger-character completions such as
+  =vim.= to open without requiring an extra typed character.
+- =lsp-completion-no-cache= prevents stale server result pages from being
+  filtered locally after the prefix changes.
+- =sk/company-code-backends= is the single shared backend definition for the
+  current proof stack.
+
+** Acceptance Checklist
+:PROPERTIES:
+:CUSTOM_ID: acceptance-checklist
+:END:
+Lua is not accepted because one server starts or one completion source responds.
+Lua is accepted only when it works as part of the shared editor system.
+
+Lua must prove:
+
+- LSP semantic completion works.
+- LuaLS snippets or Yasnippet templates work.
+- Lua keyword completion works through =company-keywords=.
+- File/path completion works.
+- Local/project word completion works.
+- Hover/docs work, including explicit doc commands.
+- Definition and references work where LuaLS supports them.
+- Diagnostics work through Flycheck.
+- Code actions work where LuaLS supports them.
+- Formatting uses the =sk-format= contract.
+- Completion navigation works with =C-j=, =C-k=, =C-l=, and =C-h=.
+- No hardcoded machine paths.
+- No hidden one-off package hacks.
+- No unrelated keymap changes.
+
+** Process Rules
+:PROPERTIES:
+:CUSTOM_ID: process-rules
+:END:
+- Keep this document as the source of truth for LSP/completion work.
+- Present backend limitations as blocking facts or design choices before
+  implementation.
+- Prefer existing maintained owners before custom code.
+- Treat missing layers as failing acceptance, not as caveats.
+- Validate Lua before scaling the pattern.
+- Do not use old proof-slice text as a plan when it conflicts with this
+  document.
+
+** Active Slice
+:PROPERTIES:
+:CUSTOM_ID: active-slice
+:END:
+Goal:
+
+- Replace the Lua proof buffer's =company-capf=-only stack with the documented
+  Company backend stack using maintained sources.
+
+Implementation steps:
+
+1. Define =sk/company-code-backends= once.
+2. Alias =lua-ts-mode= to =lua-mode= for =company-keywords=.
+3. Apply =sk/company-code-backends= only to Lua lsp-mode proof buffers.
+4. Preserve =completion-at-point-functions=(lsp-completion-at-point)=.
+5. Validate Lua only.
+
+Out of scope:
+
+- Nix.
+- Additional languages.
+- Keymap changes.
+- Custom syntax backends.
+
+** Implementation Log
+:PROPERTIES:
+:CUSTOM_ID: implementation-log
+:END:
+*** 2026-06-10 Contract Restore
+:PROPERTIES:
+:CUSTOM_ID: contract-restore-2026-06-10
+:END:
+Restored the LSP/completion contract after resetting the failed custom syntax
+backend slice. The previous =sk/company-language-syntax= plan is rejected:
+Lua keyword fallback belongs to =company-keywords= unless evidence proves that
+insufficient and a custom backend is explicitly approved.
+
+*** 2026-06-10 Lua Company Source Slice
+:PROPERTIES:
+:CUSTOM_ID: lua-company-source-slice-2026-06-10
+:END:
+Implemented:
+
+- =sk/company-code-backends= uses maintained Company backends:
+  =company-capf=, =company-yasnippet=, =company-files=, =company-keywords=,
+  and =company-dabbrev-code=.
+- =lua-ts-mode= reuses the maintained =lua-mode= keyword table for
+  =company-keywords=.
+- Lua lsp-mode proof buffers apply =sk/company-code-backends= while keeping
+  =completion-at-point-functions=(lsp-completion-at-point)=.
+- Lua lsp-mode proof buffers set =company-minimum-prefix-length= to =0= and
+  =lsp-completion-no-cache= to =t=.
+- =lsp-completion-mode-hook= reapplies the strict backend stack after lsp-mode
+  autoconfig adds =company-capf=.
+
+Validation snapshot:
+
+- Fresh MSI Emacs daemon had no =sk/company-language-syntax= function.
+- =company-keywords= returned =function= in =lua-ts-mode= via the =lua-mode=
+  alias.
+- =company-files= returned 15 candidates from =config/nvim/lua/sky/=.
+- =company-dabbrev-code= returned a local symbol candidate.
+- In =config/nvim/lua/sky/completion.lua=, Company/CAPF attached to LuaLS,
+  used the exact backend stack, and returned 166 candidates at an existing
+  =vim.= point.

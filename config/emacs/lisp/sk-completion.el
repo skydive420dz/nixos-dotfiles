@@ -7,6 +7,17 @@
 
 (require 'seq)
 
+(defvar sk/company-code-backends
+  '((company-capf
+     company-yasnippet
+     company-files
+     company-keywords
+     company-dabbrev-code))
+  "Shared Company backend stack for lsp-mode proof buffers.")
+
+(with-eval-after-load 'company-keywords
+  (add-to-list 'company-keywords-alist '(lua-ts-mode . lua-mode)))
+
 (use-package vertico
   :demand t
   :config
