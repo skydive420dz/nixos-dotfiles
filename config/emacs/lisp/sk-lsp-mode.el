@@ -1,7 +1,7 @@
 ;;; sk-lsp-mode.el --- lsp-mode proof slices -*- lexical-binding: t; -*-
 
-;; This module is intentionally narrow.  It proves lsp-mode + company on Lua
-;; without changing the global Eglot/Corfu path used by other languages.
+;; This module is intentionally narrow.  It proves lsp-mode + Company on
+;; selected languages without changing the Eglot/Corfu path for other modes.
 
 (require 'cl-lib)
 (require 'seq)
@@ -11,10 +11,15 @@
 (defconst sk/lsp-mode-lua-modes '(lua-mode lua-ts-mode)
   "Lua major modes owned by lsp-mode during the proof slice.")
 
-(defconst sk/lsp-lua-owned-capfs '(lsp-completion-at-point)
-  "Completion-at-point functions allowed in Lua lsp-mode proof buffers.")
+(defconst sk/lsp-mode-nix-modes '(nix-mode nix-ts-mode)
+  "Nix major modes owned by lsp-mode during the proof slice.")
 
-(setq sk/lsp-mode-owned-modes sk/lsp-mode-lua-modes)
+(defconst sk/lsp-mode-code-capfs '(lsp-completion-at-point)
+  "Completion-at-point functions allowed in lsp-mode proof buffers.")
+
+(setq sk/lsp-mode-owned-modes
+      (append sk/lsp-mode-lua-modes
+              sk/lsp-mode-nix-modes))
 
 (defun sk/lsp-lua-language-server-root ()
   "Return the Nix package root for lua-language-server, when available."
@@ -37,23 +42,23 @@
       (puthash path t library))
     library))
 
-(defun sk/lsp-lua-buffer-p ()
-  "Return non-nil when the current buffer is part of the Lua proof slice."
-  (memq major-mode sk/lsp-mode-lua-modes))
+(defun sk/lsp-mode-code-buffer-p ()
+  "Return non-nil when the current buffer is owned by the lsp-mode proof stack."
+  (memq major-mode sk/lsp-mode-owned-modes))
 
-(defun sk/lsp-lua-use-strict-completion ()
-  "Let lsp-mode own completion sources in Lua proof buffers."
-  (when (sk/lsp-lua-buffer-p)
-    (setq-local completion-at-point-functions sk/lsp-lua-owned-capfs)
+(defun sk/lsp-mode-use-strict-completion ()
+  "Let lsp-mode own completion sources in proof buffers."
+  (when (sk/lsp-mode-code-buffer-p)
+    (setq-local completion-at-point-functions sk/lsp-mode-code-capfs)
     (setq-local company-backends sk/company-code-backends)))
 
-(defun sk/lsp-lua-enable-breadcrumb ()
-  "Enable lsp-mode breadcrumbs in Lua proof buffers."
-  (when (sk/lsp-lua-buffer-p)
+(defun sk/lsp-mode-enable-breadcrumb ()
+  "Enable lsp-mode breadcrumbs in proof buffers."
+  (when (sk/lsp-mode-code-buffer-p)
     (require 'all-the-icons nil t)
     (require 'lsp-treemacs nil t)
     (require 'lsp-headerline nil t))
-  (when (and (sk/lsp-lua-buffer-p)
+  (when (and (sk/lsp-mode-code-buffer-p)
              (fboundp 'lsp-headerline-breadcrumb-mode))
     (lsp-headerline-breadcrumb-mode 1)))
 
@@ -87,26 +92,26 @@
   (advice-add 'lsp-icons--fix-image-background
               :around #'sk/lsp-fix-breadcrumb-icon-rendering))
 
-(defun sk/lsp-lua-enable-company ()
-  "Use the Lua proof completion and diagnostics UI."
-  (when (sk/lsp-lua-buffer-p)
+(defun sk/lsp-mode-enable-code-buffer ()
+  "Use the shared lsp-mode proof completion and diagnostics UI."
+  (when (sk/lsp-mode-code-buffer-p)
     (when (fboundp 'corfu-mode)
       (corfu-mode -1))
-    (sk/lsp-lua-use-strict-completion)
-    (add-hook 'lsp-configure-hook #'sk/lsp-lua-use-strict-completion nil t)
-    (add-hook 'lsp-completion-mode-hook #'sk/lsp-lua-use-strict-completion nil t)
-    (add-hook 'lsp-configure-hook #'sk/lsp-lua-enable-breadcrumb nil t)
+    (sk/lsp-mode-use-strict-completion)
+    (add-hook 'lsp-configure-hook #'sk/lsp-mode-use-strict-completion nil t)
+    (add-hook 'lsp-completion-mode-hook #'sk/lsp-mode-use-strict-completion nil t)
+    (add-hook 'lsp-configure-hook #'sk/lsp-mode-enable-breadcrumb nil t)
     (setq-local lsp-completion-no-cache t)
     (setq-local eldoc-display-functions '(eldoc-display-in-buffer))
     (setq-local company-minimum-prefix-length 0)
     (company-mode 1)
     (flycheck-mode 1)))
 
-(defun sk/lsp-lua-start ()
-  "Start lsp-mode for Lua proof buffers."
+(defun sk/lsp-mode-start ()
+  "Start lsp-mode for proof buffers."
   (when (and buffer-file-name
-             (sk/lsp-lua-buffer-p))
-    (sk/lsp-lua-enable-company)
+             (sk/lsp-mode-code-buffer-p))
+    (sk/lsp-mode-enable-code-buffer)
     (if noninteractive
         (lsp)
       (lsp-deferred))))
@@ -156,7 +161,16 @@
         lsp-lua-diagnostics-globals ["vim" "hl"]
         lsp-lua-runtime-version "LuaJIT"
         lsp-lua-telemetry-enable nil
-        lsp-lua-workspace-library (sk/lsp-lua-workspace-library))
+        lsp-lua-workspace-library (sk/lsp-lua-workspace-library)
+        lsp-nix-nixd-server-path "nixd"
+        lsp-nix-nixd-formatting-command nil
+        lsp-nix-nixd-nixpkgs-expr nil
+        lsp-nix-nixd-nixos-options-expr nil
+        lsp-nix-nixd-home-manager-options-expr nil)
+  :config
+  (require 'lsp-nix nil t)
+  (dolist (client '(nix-nil rnix-lsp))
+    (add-to-list 'lsp-disabled-clients client))
   (when-let ((binary (executable-find "lua-language-server")))
     (setq lsp-clients-lua-language-server-bin binary
           lsp-clients-lua-language-server-command (list binary)))
@@ -165,14 +179,21 @@
 
 (remove-hook 'lua-mode-hook #'sk/lsp-lua-start)
 (remove-hook 'lua-ts-mode-hook #'sk/lsp-lua-start)
-(add-hook 'lua-mode-hook #'sk/lsp-lua-start t)
-(add-hook 'lua-ts-mode-hook #'sk/lsp-lua-start t)
+(remove-hook 'lua-mode-hook #'sk/lsp-mode-start)
+(remove-hook 'lua-ts-mode-hook #'sk/lsp-mode-start)
+(remove-hook 'nix-mode-hook #'sk/lsp-mode-start)
+(remove-hook 'nix-ts-mode-hook #'sk/lsp-mode-start)
+(add-hook 'lua-mode-hook #'sk/lsp-mode-start t)
+(add-hook 'lua-ts-mode-hook #'sk/lsp-mode-start t)
+(add-hook 'nix-mode-hook #'sk/lsp-mode-start t)
+(add-hook 'nix-ts-mode-hook #'sk/lsp-mode-start t)
 
 (dolist (buffer (buffer-list))
   (with-current-buffer buffer
-    (when (sk/lsp-lua-buffer-p)
-      (sk/lsp-lua-enable-company)
-      (sk/lsp-lua-enable-breadcrumb))))
+    (when (and (sk/lsp-mode-code-buffer-p)
+               (bound-and-true-p lsp-mode))
+      (sk/lsp-mode-enable-code-buffer)
+      (sk/lsp-mode-enable-breadcrumb))))
 
 (provide 'sk-lsp-mode)
 

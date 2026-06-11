@@ -12,12 +12,10 @@ acceptance criteria.
 :PROPERTIES:
 :CUSTOM_ID: current-status
 :END:
-- Broad language migration is paused.
-- Current slice is Lua only.
-- Lua is =PROVISIONAL=: useful lsp-mode/company proof, not accepted as the final
-  reusable model until the checklist passes.
-- Nix is =PAUSED / NOT ACCEPTED=: do not continue Nix until Lua passes or is
-  explicitly rejected.
+- Broad language migration is controlled slice-by-slice.
+- Lua is =ACCEPTED= under the locked lsp-mode/Company model.
+- Nix is =ACCEPTED= under the locked lsp-mode/Company model.
+- Next pending slice: Python.
 
 ** Slice Contract
 :PROPERTIES:
@@ -27,19 +25,19 @@ The active slice is not a license to redesign Emacs.
 
 Allowed:
 
-- Adjust Lua lsp-mode/company completion ownership.
+- Factor the locked lsp-mode/Company behavior out of Lua-specific names.
+- Add =nix-mode= and =nix-ts-mode= to lsp-mode ownership.
+- Use lsp-mode's native =nixd= client without hardcoded flake paths.
 - Restore and maintain this contract document.
-- Validate Lua completion behavior on one project Lua file and one standalone
-  Lua file.
+- Validate one language at a time on one project file and one standalone file.
 
 Not allowed:
 
-- Nix LSP work.
 - NVF changes.
 - General keymap changes.
 - New custom completion backends without explicit approval.
 - Hidden one-off package hacks.
-- Migration to another language before Lua passes or is rejected.
+- Migration to another language before the active slice passes or is rejected.
 
 Rollback point:
 
@@ -89,10 +87,10 @@ Language-specific and mutable per slice:
 Company is the in-buffer completion frontend for Powerhouse IDE proof buffers.
 LSP is the semantic source, not the whole completion system.
 
-For Lua proof buffers, source ownership is:
+For lsp-mode proof buffers, source ownership is:
 
 - =company-capf=: semantic completion from =lsp-completion-at-point=, including
-  LuaLS-provided snippets when the server provides them.
+  server-provided snippets when the server provides them.
 - =company-yasnippet=: repo/local Yasnippet templates when available.
 - =company-files=: file/path references.
 - =company-keywords=: maintained language keyword fallback.
@@ -106,7 +104,7 @@ proposal and approval before code changes.
 :PROPERTIES:
 :CUSTOM_ID: target-backend-shape
 :END:
-Lua proof buffers should use one shared Company backend stack:
+lsp-mode proof buffers should use one shared Company backend stack:
 
 #+begin_src emacs-lisp
 (setq-local company-backends
@@ -117,8 +115,9 @@ Lua proof buffers should use one shared Company backend stack:
                company-dabbrev-code)))
 #+end_src
 
-For =lua-ts-mode=, =company-keywords= should reuse the maintained =lua-mode=
-keyword table:
+Language-specific keyword table mappings are allowed only when needed. For
+=lua-ts-mode=, =company-keywords= reuses the maintained =lua-mode= keyword
+table:
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'company-keywords
@@ -129,7 +128,7 @@ keyword table:
 :PROPERTIES:
 :CUSTOM_ID: capf-boundary
 :END:
-For Lua proof buffers, CAPF stays semantic:
+For lsp-mode proof buffers, CAPF stays semantic:
 
 #+begin_src emacs-lisp
 (setq-local completion-at-point-functions
@@ -144,7 +143,7 @@ tradeoff is documented before implementation.
 :PROPERTIES:
 :CUSTOM_ID: runtime-rules
 :END:
-Lua proof buffers should apply these local rules:
+lsp-mode proof buffers should apply these local rules:
 
 #+begin_src emacs-lisp
 (setq-local company-minimum-prefix-length 0)
@@ -169,20 +168,22 @@ Rationale:
 :PROPERTIES:
 :CUSTOM_ID: acceptance-checklist
 :END:
-Lua is not accepted because one server starts or one completion source responds.
-Lua is accepted only when it works as part of the shared editor system.
+Language slices are not accepted because one server starts or one completion
+source responds. A language is accepted only when it works as part of the shared
+editor system.
 
-Lua must prove:
+Each lsp-mode language slice must prove:
 
 - LSP semantic completion works.
-- LuaLS snippets or Yasnippet templates work.
-- Lua keyword completion works through =company-keywords=.
+- Server snippets or Yasnippet templates work when available.
+- Keyword completion works through the server or =company-keywords= when
+  available.
 - File/path completion works.
 - Local/project word completion works.
 - Hover/docs work, including explicit doc commands.
 - Hover/docs show full LSP hover content in the helper buffer without duplicate
   minibuffer output.
-- Definition and references work where LuaLS supports them.
+- Definition and references work where the server supports them.
 - Diagnostics work through Flycheck.
 - Code actions work where LuaLS supports them.
 - Formatting uses the =sk-format= contract.
@@ -200,7 +201,7 @@ Lua must prove:
   implementation.
 - Prefer existing maintained owners before custom code.
 - Treat missing layers as failing acceptance, not as caveats.
-- Validate Lua before scaling the pattern.
+- Validate the active language before scaling the pattern again.
 - Do not use old proof-slice text as a plan when it conflicts with this
   document.
 
@@ -210,20 +211,19 @@ Lua must prove:
 :END:
 Goal:
 
-- Replace the Lua proof buffer's =company-capf=-only stack with the documented
-  Company backend stack using maintained sources.
+- Move Nix from the Eglot/Corfu baseline to the locked lsp-mode/Company model.
 
 Implementation steps:
 
-1. Define =sk/company-code-backends= once.
-2. Alias =lua-ts-mode= to =lua-mode= for =company-keywords=.
-3. Apply =sk/company-code-backends= only to Lua lsp-mode proof buffers.
-4. Preserve =completion-at-point-functions=(lsp-completion-at-point)=.
-5. Validate Lua only.
+1. Extract the locked lsp-mode/Company behavior into reusable helper functions.
+2. Keep Lua using those helper functions.
+3. Add =nix-mode= and =nix-ts-mode= to =sk/lsp-mode-owned-modes=.
+4. Use lsp-mode's native =nixd= client with no hardcoded flake paths.
+5. Preserve =completion-at-point-functions=(lsp-completion-at-point)=.
+6. Validate Nix only.
 
 Out of scope:
 
-- Nix.
 - Additional languages.
 - Keymap changes.
 - Custom syntax backends.
@@ -288,3 +288,40 @@ Validation snapshot:
 - On =print=, the docs helper shows the signature plus explanatory Lua docs.
 - Live Lua buffer value: =(t (eldoc-display-in-buffer))= for
   =lsp-eldoc-render-all= and =eldoc-display-functions=.
+
+*** 2026-06-11 Nix lsp-mode Ownership Slice
+:PROPERTIES:
+:CUSTOM_ID: nix-lsp-mode-ownership-slice-2026-06-11
+:END:
+Implemented:
+
+- Shared lsp-mode proof behavior was factored out of Lua-specific functions.
+- =nix-mode= and =nix-ts-mode= were added to =sk/lsp-mode-owned-modes=.
+- Nix uses lsp-mode's native =nixd= client.
+- =nix-nil= and =rnix-lsp= are disabled for the lsp-mode proof path so Nix
+  consistently selects =nixd-lsp=.
+- No hardcoded flake option expressions were added.
+- Formatting remains owned by =sk-format= through =nixfmt=.
+
+Validation snapshot:
+
+- Standalone and temporary project Nix buffers attach as =nixd-lsp=.
+- Nix buffers report =lsp-mode=t=, =eglot=nil=, =company-mode=t=,
+  =corfu=nil=.
+- Nix buffers use =completion-at-point-functions=(lsp-completion-at-point)=.
+- Nix buffers use the locked Company backend stack:
+  =company-capf=, =company-yasnippet=, =company-files=, =company-keywords=,
+  =company-dabbrev-code=.
+- Nix buffers use helper-only Eldoc display and full hover rendering.
+- =services.= completion returns NixOS service option candidates.
+- =lib.mk= completion returns =lib.mk*= candidates.
+- Hover on =lib.mkIf= returns documentation.
+- =sk/format-buffer-or-region= formats Nix through =nixfmt=.
+
+Accepted observations:
+
+- =builtins.= and =builtins.to= did not return candidates from =nixd-lsp=.
+- Flycheck is active with checker =lsp=, but syntax-error probes did not
+  produce diagnostics.
+- User manual validation accepted Nix behavior for current work. Revisit these
+  only if they block real Nix editing.
