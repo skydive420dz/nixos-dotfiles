@@ -12,6 +12,7 @@
     ./programs/bat.nix
     ./programs/nvim
     ./services/ollama.nix
+    ./services/removable-media.nix
     ./desktop/hyprland.nix
     ./audio-config.nix
     ./boot.nix
