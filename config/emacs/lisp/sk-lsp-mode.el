@@ -14,12 +14,16 @@
 (defconst sk/lsp-mode-nix-modes '(nix-mode nix-ts-mode)
   "Nix major modes owned by lsp-mode during the proof slice.")
 
+(defconst sk/lsp-mode-python-modes '(python-mode python-ts-mode)
+  "Python major modes owned by lsp-mode during the proof slice.")
+
 (defconst sk/lsp-mode-code-capfs '(lsp-completion-at-point)
   "Completion-at-point functions allowed in lsp-mode proof buffers.")
 
 (setq sk/lsp-mode-owned-modes
       (append sk/lsp-mode-lua-modes
-              sk/lsp-mode-nix-modes))
+              sk/lsp-mode-nix-modes
+              sk/lsp-mode-python-modes))
 
 (defun sk/lsp-lua-language-server-root ()
   "Return the Nix package root for lua-language-server, when available."
@@ -45,6 +49,12 @@
 (defun sk/lsp-mode-code-buffer-p ()
   "Return non-nil when the current buffer is owned by the lsp-mode proof stack."
   (memq major-mode sk/lsp-mode-owned-modes))
+
+(defun sk/lsp-mode-ensure-language-client ()
+  "Load the language client package needed by the current proof buffer."
+  (when (memq major-mode sk/lsp-mode-python-modes)
+    (unless (require 'lsp-pyright nil t)
+      (user-error "Python lsp-mode requires lsp-pyright; run SPC h r s"))))
 
 (defun sk/lsp-mode-use-strict-completion ()
   "Let lsp-mode own completion sources in proof buffers."
@@ -111,6 +121,7 @@
   "Start lsp-mode for proof buffers."
   (when (and buffer-file-name
              (sk/lsp-mode-code-buffer-p))
+    (sk/lsp-mode-ensure-language-client)
     (sk/lsp-mode-enable-code-buffer)
     (if noninteractive
         (lsp)
@@ -134,6 +145,12 @@
 
 (use-package lsp-treemacs
   :after lsp-mode)
+
+(use-package lsp-pyright
+  :after lsp-mode
+  :init
+  (setq lsp-pyright-langserver-command "basedpyright"
+        lsp-pyright-auto-import-completions t))
 
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
@@ -169,7 +186,7 @@
         lsp-nix-nixd-home-manager-options-expr nil)
   :config
   (require 'lsp-nix nil t)
-  (dolist (client '(nix-nil rnix-lsp))
+  (dolist (client '(nix-nil rnix-lsp ruff))
     (add-to-list 'lsp-disabled-clients client))
   (when-let ((binary (executable-find "lua-language-server")))
     (setq lsp-clients-lua-language-server-bin binary
@@ -183,10 +200,14 @@
 (remove-hook 'lua-ts-mode-hook #'sk/lsp-mode-start)
 (remove-hook 'nix-mode-hook #'sk/lsp-mode-start)
 (remove-hook 'nix-ts-mode-hook #'sk/lsp-mode-start)
+(remove-hook 'python-mode-hook #'sk/lsp-mode-start)
+(remove-hook 'python-ts-mode-hook #'sk/lsp-mode-start)
 (add-hook 'lua-mode-hook #'sk/lsp-mode-start t)
 (add-hook 'lua-ts-mode-hook #'sk/lsp-mode-start t)
 (add-hook 'nix-mode-hook #'sk/lsp-mode-start t)
 (add-hook 'nix-ts-mode-hook #'sk/lsp-mode-start t)
+(add-hook 'python-mode-hook #'sk/lsp-mode-start t)
+(add-hook 'python-ts-mode-hook #'sk/lsp-mode-start t)
 
 (dolist (buffer (buffer-list))
   (with-current-buffer buffer

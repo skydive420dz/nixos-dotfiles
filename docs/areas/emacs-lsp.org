@@ -15,7 +15,8 @@ acceptance criteria.
 - Broad language migration is controlled slice-by-slice.
 - Lua is =ACCEPTED= under the locked lsp-mode/Company model.
 - Nix is =ACCEPTED= under the locked lsp-mode/Company model.
-- Next pending slice: Python.
+- Python is =IN PROGRESS=: use the maintained =lsp-pyright= client with
+  =basedpyright=, keeping formatting under =sk-format=.
 
 ** Slice Contract
 :PROPERTIES:
@@ -325,3 +326,43 @@ Accepted observations:
   produce diagnostics.
 - User manual validation accepted Nix behavior for current work. Revisit these
   only if they block real Nix editing.
+
+*** 2026-06-11 Python lsp-pyright Slice
+:PROPERTIES:
+:CUSTOM_ID: python-lsp-pyright-slice-2026-06-11
+:END:
+Implemented:
+
+- =python-mode= and =python-ts-mode= were added to =sk/lsp-mode-owned-modes=.
+- Python uses the maintained =lsp-pyright= Emacs client package.
+- =lsp-pyright-langserver-command= is set to =basedpyright=, so the server
+  command is =basedpyright-langserver --stdio=.
+- =lsp-pyright-auto-import-completions= is enabled.
+- =ruff= is disabled as an lsp-mode client for this slice. It remains installed
+  as an external tool, but it is not a hidden second LSP owner.
+- Formatting remains owned by =sk-format= through =black=.
+
+Validation snapshot:
+
+- Batch probe on MSI attached a standalone Python file as =python-ts-mode=.
+- Python buffers reported =lsp-mode=t=, =eglot=nil=, =company-mode=t=,
+  =corfu=nil=.
+- The active client reported =server-id= =pyright=, which is upstream
+  =lsp-pyright= behavior even when the command is =basedpyright=.
+- Python buffers use =completion-at-point-functions=(lsp-completion-at-point)=.
+- Python buffers use the locked Company backend stack:
+  =company-capf=, =company-yasnippet=, =company-files=, =company-keywords=,
+  =company-dabbrev-code=.
+- =sk/format-buffer-or-region= formats Python through =black=.
+
+Manual acceptance probes:
+
+- Open a Python file and confirm modeline/breadcrumb show Python plus LSP.
+- Type =path.= where =path = pathlib.Path.cwd()= and confirm Company offers
+  method/property completions.
+- Use =C-j=, =C-k=, =C-l=, and =C-h= inside the completion popup.
+- Use =SPC c k= on =Path=, =sum=, or a typed function and confirm hover docs.
+- Use =SPC c d= and =SPC c D= on a local function.
+- Create an obvious type/undefined-symbol error and confirm =SPC c x= shows
+  diagnostics after the server settles.
+- Use =SPC c f= and confirm =black= formats the buffer.
