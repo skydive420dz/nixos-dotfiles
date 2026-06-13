@@ -1,5 +1,5 @@
 # ============================================
-# NVIDIA CONFIGURATION — NixOS
+# NVIDIA HYBRID CONFIGURATION — MSI NixOS
 # ============================================
 # Hardware (confirmed):
 #   GPU:  NVIDIA (NVreg, modesetting, Prime sync)

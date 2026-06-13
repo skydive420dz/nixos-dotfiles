@@ -57,7 +57,7 @@ in
     };
 
     # ── Kernel parameters ───────────────────────────────────────────────────
-    # nvidia-drm and NVreg params live in modules/nvidia.nix
+    # nvidia-drm and NVreg params live in modules/gpu/nvidia-hybrid.nix
     kernelParams = [
       "video=efifb:1920x1080"
       "quiet"

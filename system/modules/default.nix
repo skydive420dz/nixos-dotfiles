@@ -14,7 +14,6 @@
     ./services/ollama.nix
     ./desktop/hyprland.nix
     ./audio-config.nix
-    ./nvidia.nix
     ./boot.nix
     ./fonts.nix
     ./clipboard.nix

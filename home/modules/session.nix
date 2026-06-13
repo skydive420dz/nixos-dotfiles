@@ -1,12 +1,13 @@
 {
+  gpuProfile ? "nvidia-hybrid",
   homeDirectory,
   lib,
   pkgs,
   ...
 }:
 
-{
-  home.sessionVariables = {
+let
+  sharedSessionVariables = {
     SKY_THEME = "SkyDark";
     XCURSOR_THEME = "Bibata-Modern-Ice";
     XCURSOR_SIZE = "24";
@@ -27,14 +28,24 @@
       pkgs.quickshell
     ];
 
+    NIXOS_OZONE_WL = "1";
+    ELECTRON_OZONE_PLATFORM_HINT = "auto";
+  };
+
+  nvidiaSessionVariables = lib.optionalAttrs (gpuProfile == "nvidia-hybrid") {
     LIBVA_DRIVER_NAME = "nvidia";
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     AQ_DRM_DEVICES = "/dev/dri/card0:/dev/dri/card1";
     NVD_BACKEND = "direct";
-    NIXOS_OZONE_WL = "1";
-    ELECTRON_OZONE_PLATFORM_HINT = "auto";
   };
+
+  amdSessionVariables = lib.optionalAttrs (gpuProfile == "amd-rdna4") {
+    LIBVA_DRIVER_NAME = "radeonsi";
+  };
+in
+{
+  home.sessionVariables = sharedSessionVariables // nvidiaSessionVariables // amdSessionVariables;
 
   xdg.userDirs = {
     enable = true;

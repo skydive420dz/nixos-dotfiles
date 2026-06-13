@@ -32,3 +32,108 @@ Examples:
 - Prefer local helpers inside the unit directory over more flat files in =home/modules/= or =system/modules/=.
 - Respect the category tree first: programs live under =programs/=, services under =services/=, desktop/session pieces under =desktop/=, and only cross-cutting modules stay at the category root.
 - Keep shared/global concerns outside unit directories only when multiple units genuinely use them.
+
+** Host And GPU Profiles
+:PROPERTIES:
+:CUSTOM_ID: host-and-gpu-profiles
+:END:
+Goal: support the existing MSI/NVIDIA machine and a new AMD RX 9070 XT desktop
+without turning one global module tree into hardware-specific patchwork.
+
+*** Planned Shape
+:PROPERTIES:
+:CUSTOM_ID: planned-shape
+:END:
+Host separation comes before GPU separation.
+
+#+begin_src text
+hosts/
+  msi/
+    default.nix
+    # temporary: imports /etc/nixos/hardware-configuration.nix
+  desktop-amd/
+    default.nix
+    hardware-configuration.nix
+
+system/modules/
+  gpu/
+    nvidia-hybrid.nix
+    amd-rdna4.nix
+#+end_src
+
+*** Implementation Steps
+:PROPERTIES:
+:CUSTOM_ID: implementation-steps
+:END:
+- Preserve the current =#nixos= build behavior for the MSI profile until a
+  deliberate rename/cutover is chosen.
+- Keep MSI hardware configuration on the current =/etc/nixos/hardware-configuration.nix=
+  path until the MSI machine is reachable and its generated hardware file can
+  be committed under =hosts/msi/=.
+- Move current NVIDIA Prime Sync logic from =system/modules/nvidia.nix= into
+  =system/modules/gpu/nvidia-hybrid.nix=.
+- Remove the unconditional NVIDIA import from =system/modules/default.nix=.
+- Import =gpu/nvidia-hybrid.nix= from the MSI host only.
+- Add =system/modules/gpu/amd-rdna4.nix= for the AMD desktop profile.
+- Add a second flake output for the AMD desktop, for example
+  =#desktop-amd=.
+- Split Home Manager GPU session variables so NVIDIA-only variables are only
+  exported for the NVIDIA host.
+- Keep AMD session variables minimal. Prefer Mesa auto-detection unless a real
+  AMD-specific variable is proven necessary.
+- Validate by building the current MSI profile first, then the AMD profile once
+  its hardware configuration exists.
+
+*** Hardware Configuration Policy
+:PROPERTIES:
+:CUSTOM_ID: hardware-configuration-policy
+:END:
+The goal is not a generic =hardware-configuration.nix=. The goal is a smooth
+new-machine bootstrap where hardware facts are generated on the target machine
+and written directly into that host's repo path.
+
+=hardware-configuration.nix= records facts about a specific installed machine:
+root filesystem devices, swap devices, initrd modules, filesystem types, LUKS
+devices, and sometimes driver/module hints.
+
+Reproducible policy:
+
+- Commit one reviewed hardware file per host under =hosts/<host>/=.
+- Do not keep relying on =/etc/nixos/hardware-configuration.nix= for long-term
+  flake builds. That path is convenient during bootstrap, but it is outside the
+  repo and weakens reproducibility.
+- Current exception: MSI still uses the legacy =/etc/nixos= hardware file until
+  that machine can provide a reviewed copy for =hosts/msi/=.
+- Keep reusable hardware policy in normal modules, such as =gpu/amd-rdna4.nix=,
+  =gpu/nvidia-hybrid.nix=, audio, input, boot, and desktop modules.
+- Keep only irreducibly machine-specific disk/initrd facts in each host's
+  =hardware-configuration.nix=.
+
+More portable options:
+
+- Use filesystem labels such as =LABEL=nixos= instead of disk UUIDs if the
+  install process enforces those labels. This makes configs more portable
+  across reinstallations, but not universal across arbitrary machines.
+- Use =disko= later if we want the partition layout itself declared in the repo.
+  Even then, the target disk selection remains an install-time/host-specific
+  decision.
+- Use =nixos-hardware= only when a machine has a known upstream hardware profile.
+  A custom AMD desktop will still need local host facts.
+
+Bootstrap workflow target:
+
+#+begin_src sh
+nixos-generate-config --root /mnt --show-hardware-config \
+  > hosts/desktop-amd/hardware-configuration.nix
+#+end_src
+
+Then install with the host flake output:
+
+#+begin_src sh
+nixos-install --flake .#desktop-amd
+#+end_src
+
+Important flake detail: files used by a Git flake must be tracked. For a brand
+new host, keep a committed placeholder =hosts/desktop-amd/hardware-configuration.nix=
+or run =git add hosts/desktop-amd/hardware-configuration.nix= before building
+from the local checkout.

@@ -42,43 +42,65 @@
     }@inputs:
     let
       username = "skydive420dz";
-      hostname = "nixos";
       system = "x86_64-linux";
       homeDirectory = "/home/${username}";
       repoPath = "${homeDirectory}/Projects/nixos-dotfiles";
 
-      specialArgs = {
-        inherit
-          inputs
-          username
-          hostname
-          homeDirectory
-          repoPath
-          ;
-      };
+      mkNixos =
+        {
+          hostname,
+          hostPath,
+          gpuProfile,
+        }:
+        let
+          specialArgs = {
+            inherit
+              inputs
+              username
+              hostname
+              homeDirectory
+              repoPath
+              gpuProfile
+              ;
+          };
+        in
+        nixpkgs.lib.nixosSystem {
+          inherit system specialArgs;
+
+          modules = [
+            nvf.nixosModules.default
+            lanzaboote.nixosModules.lanzaboote
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                extraSpecialArgs = specialArgs;
+                backupFileExtension = "backup";
+
+                users.${username}.imports = [
+                  ./home
+                ];
+              };
+            }
+            hostPath
+          ];
+        };
     in
     {
-      nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
-        inherit system specialArgs;
+      nixosConfigurations = {
+        # Keep the existing flake target and host name for the MSI laptop.
+        nixos = mkNixos {
+          hostname = "nixos";
+          hostPath = ./hosts/msi;
+          gpuProfile = "nvidia-hybrid";
+        };
 
-        modules = [
-          nvf.nixosModules.default
-          lanzaboote.nixosModules.lanzaboote
-          home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = specialArgs;
-              backupFileExtension = "backup";
-
-              users.${username}.imports = [
-                ./home
-              ];
-            };
-          }
-          ./hosts/nixos
-        ];
+        desktop-amd = mkNixos {
+          hostname = "desktop-amd";
+          hostPath = ./hosts/desktop-amd;
+          gpuProfile = "amd-rdna4";
+        };
       };
     };
 }
