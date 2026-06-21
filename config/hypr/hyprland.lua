@@ -130,7 +130,7 @@ hl.config({
 	input = {
 		kb_layout = "us",
 		follow_mouse = 1,
-		sensitivity = 0,
+		sensitivity = 0.8,
 		repeat_rate = 67,
 		repeat_delay = 210,
 
