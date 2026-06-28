@@ -130,12 +130,14 @@ hl.config({
 	input = {
 		kb_layout = "us",
 		follow_mouse = 1,
-		sensitivity = 0.8,
+		sensitivity = 0.6,
 		repeat_rate = 67,
 		repeat_delay = 210,
 
 		touchpad = {
 			natural_scroll = true,
+			scroll_factor = 0.2,
+			disable_while_typing = true,
 		},
 	},
 
