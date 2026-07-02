@@ -5,6 +5,9 @@
   ...
 }:
 
+let
+  shellAliases = import ./shell-aliases.nix { inherit repoPath; };
+in
 {
   programs.zsh = {
     enable = true;
@@ -17,21 +20,7 @@
       path = "${config.home.homeDirectory}/.zsh_history";
     };
 
-    shellAliases = {
-      btw = "echo I use nixos, btw";
-      ncg = "sudo nix-collect-garbage -d";
-      nfu = "nix flake update --flake ${repoPath}";
-      nrb = "sudo nixos-rebuild boot --impure --flake ${repoPath}#nixos";
-      nrs = "sudo nixos-rebuild switch --impure --flake ${repoPath}#nixos";
-      vim = "nvim";
-      ls = "ls --color=auto";
-      cat = "bat";
-      btop = "uwsm app -- ghostty --title=btop_float -e btop";
-      nvtop = "uwsm app -- ghostty --title=nvtop_float -e nvtop";
-      tm = "tmux-session main";
-      tmd = "tmux-session dots";
-      discord = "uwsm app -- vesktop --use-gl=desktop --enable-features=UseOzonePlatform --ozone-platform=wayland";
-    };
+    inherit shellAliases;
 
     initContent = lib.mkBefore ''
       if [ -f "$HOME/.openai_key" ]; then

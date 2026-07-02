@@ -231,15 +231,22 @@ vterm uses zsh and keeps terminal buffers in insert state with =C-h/j/k/l=
 window movement.
 
 Eshell uses the Sky =λ= prompt, syntax highlighting, no line numbers, and no
-Corfu popup. Its live files are:
+Corfu popup. Shared shell aliases are generated from:
+
+#+begin_src text
+home/modules/programs/shell-aliases.nix
+#+end_src
+
+That same Nix attrset feeds zsh and Eshell. The Eshell profile remains
+live-editable at:
 
 #+begin_src text
 config/emacs/eshell/profile
-config/emacs/eshell/aliases
 #+end_src
 
-Keep =aliases= empty until it contains real Eshell alias lines; comment-only
-alias files fail Eshell's alias parser.
+Use =config/emacs/eshell/aliases= only for Eshell-only local aliases. Keep it
+empty until it contains real Eshell alias lines; comment-only alias files fail
+Eshell's alias parser.
 
 * Ledger
 Ledger support is for private plain-text accounting files, not dotfile-owned

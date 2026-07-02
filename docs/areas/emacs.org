@@ -636,7 +636,7 @@ Stable enough to treat as current baseline:
 - [X] Eglot server routing is validated for real files currently in the repo: Nix -> =nixd=, Lua -> =lua-language-server=, QML -> =qmlls-wrapped=, shell -> =bash-language-server=, JSON -> =vscode-json-language-server=, GLSL -> =glsl_analyzer=, Markdown/Org -> =harper-ls=.
 - [X] Completion plumbing is validated in real managed buffers: code/config buffers expose snippets first, then Eglot, then file/dabbrev/keyword fallbacks; prose buffers expose Harper/Eglot plus file/dabbrev fallbacks.
 - [X] Notes and Org localleader commands have which-key labels for the common daily-note, capture, agenda, source-block, table, subtree, clock, date, priority, link, and attachment paths.
-- [X] Eshell has a Sky prompt with =λ=, no line numbers, Corfu disabled, syntax highlighting enabled, and live-editable =profile=/=aliases= files under =config/emacs/eshell=.
+- [X] Eshell has a Sky prompt with =λ=, no line numbers, Corfu disabled, syntax highlighting enabled, a live-editable =profile=, and shared aliases generated from =home/modules/programs/shell-aliases.nix=.
 - [X] Terminal ANSI, term, and vterm faces use the Sky palette instead of Emacs' stock =red3=/=blue2=/=green3= colors.
 - [X] Language sanity probe passed for Rust, C, Python, Haskell, and YAML: each opened in the expected mode, attached to the expected Eglot server, had Corfu active, and exposed snippets before Eglot completion.
 - [X] Formatting policy is explicit/manual: =SPC c f= uses the tracked formatter map, no format-on-save hook exists, and unknown modes fall back to Eglot/indentation.

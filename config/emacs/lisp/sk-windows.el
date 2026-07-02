@@ -43,6 +43,12 @@ With PROMPT, ask for a directory."
   "Display Magit BUFFER in the utility side window."
   (sk/display-buffer-right buffer 0.48))
 
+(defun sk/normalize-full-frame-window ()
+  "Clear side-window parameters from the selected full-frame window."
+  (set-window-dedicated-p nil nil)
+  (dolist (parameter '(window-side window-slot no-delete-other-windows))
+    (set-window-parameter nil parameter nil)))
+
 (defun sk/toggle-window-full-frame ()
   "Toggle the selected window between full-frame and the previous layout."
   (interactive)
@@ -60,6 +66,7 @@ With PROMPT, ask for a directory."
             (point (point))
             (ignore-window-parameters t))
         (delete-other-windows (selected-window))
+        (sk/normalize-full-frame-window)
         (switch-to-buffer buffer)
         (goto-char (min point (point-max)))
         (message "Full-frame %s" (buffer-name buffer))))))

@@ -6,6 +6,8 @@
 (add-to-list 'default-frame-alist '(alpha . 100))
 (add-to-list 'default-frame-alist '(alpha-background . 100))
 
+(setq resize-mini-windows t)
+
 (setq display-line-numbers-type 'relative)
 
 (defun sk/enable-line-numbers ()

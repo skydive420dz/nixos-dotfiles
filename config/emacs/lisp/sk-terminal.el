@@ -54,6 +54,32 @@
 (defconst sk/eshell-prompt-symbol "λ"
   "Prompt symbol used by the Sky Eshell prompt.")
 
+(defvar sk/generated-eshell-aliases nil
+  "Generated Eshell aliases loaded from Home Manager.")
+
+(defun sk/load-generated-eshell-aliases ()
+  "Load generated Eshell aliases from `SK_EMACS_ESHELL_ALIASES_FILE'."
+  (setq sk/generated-eshell-aliases nil)
+  (when-let ((file (getenv "SK_EMACS_ESHELL_ALIASES_FILE")))
+    (when (file-readable-p file)
+      (load file nil 'nomessage)))
+  sk/generated-eshell-aliases)
+
+(defun sk/eshell-set-alias (name definition)
+  "Set Eshell alias NAME to DEFINITION without writing alias state."
+  (if-let ((entry (assoc name eshell-command-aliases-list)))
+      (setcdr entry (list definition))
+    (push (list name definition) eshell-command-aliases-list)))
+
+(defun sk/eshell-install-generated-aliases ()
+  "Install generated shell aliases into the current Eshell session."
+  (dolist (alias (sk/load-generated-eshell-aliases))
+    (sk/eshell-set-alias
+     (if (symbolp (car alias))
+         (symbol-name (car alias))
+       (car alias))
+     (cdr alias))))
+
 (defun sk/eshell-prompt ()
   "Return the Sky Eshell prompt."
   (let* ((status (if (and (boundp 'eshell-last-command-status)
@@ -89,7 +115,8 @@
         eshell-destroy-buffer-when-process-dies t
         eshell-visual-commands '("bash" "fish" "lazygit" "less" "man" "more" "nvim" "ssh" "top" "vim" "yazi" "zsh")
         eshell-prompt-function #'sk/eshell-prompt
-        eshell-prompt-regexp (concat "^" (regexp-quote sk/eshell-prompt-symbol) " ")))
+        eshell-prompt-regexp (concat "^" (regexp-quote sk/eshell-prompt-symbol) " "))
+  (add-hook 'eshell-mode-hook #'sk/eshell-install-generated-aliases))
 
 (with-eval-after-load 'corfu
   (add-hook 'eshell-mode-hook (lambda () (corfu-mode -1))))
