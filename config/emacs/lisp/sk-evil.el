@@ -7,6 +7,7 @@
         evil-want-integration t
         evil-want-C-u-scroll t
         evil-respect-visual-line-mode t)
+  (setq evil-want-clipboard t)
   :config
   (evil-mode 1)
   (define-key evil-normal-state-map (kbd "s") #'evil-substitute)

@@ -1,5 +1,8 @@
 {
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.permittedInsecurePackages = [
+    "pnpm-10.29.2"
+  ];
 
   nix.settings.experimental-features = [
     "nix-command"

@@ -43,6 +43,27 @@ With PROMPT, ask for a directory."
   "Display Magit BUFFER in the utility side window."
   (sk/display-buffer-right buffer 0.48))
 
+(defun sk/toggle-window-full-frame ()
+  "Toggle the selected window between full-frame and the previous layout."
+  (interactive)
+  (let ((configuration (frame-parameter nil 'sk/full-frame-window-configuration)))
+    (if configuration
+        (progn
+          (set-frame-parameter nil 'sk/full-frame-window-configuration nil)
+          (set-window-configuration configuration)
+          (message "Restored window layout"))
+      (when (minibufferp (current-buffer))
+        (user-error "Cannot full-frame the minibuffer"))
+      (set-frame-parameter nil 'sk/full-frame-window-configuration
+                           (current-window-configuration))
+      (let ((buffer (current-buffer))
+            (point (point))
+            (ignore-window-parameters t))
+        (delete-other-windows (selected-window))
+        (switch-to-buffer buffer)
+        (goto-char (min point (point-max)))
+        (message "Full-frame %s" (buffer-name buffer))))))
+
 (setq display-buffer-alist
       '(((or (derived-mode . help-mode)
              "\\*\\(?:Help\\|Apropos\\|eldoc\\)\\*")

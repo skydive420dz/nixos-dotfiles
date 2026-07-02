@@ -653,6 +653,7 @@ With PROMPT, use the normal `xref-find-references' prompt."
 (define-key sk/window-map (kbd "W") #'sk/previous-window)
 (define-key sk/window-map (kbd "x") #'delete-window)
 (define-key sk/window-map (kbd "o") #'delete-other-windows)
+(define-key sk/window-map (kbd "f") #'sk/toggle-window-full-frame)
 (define-key sk/window-map (kbd "=") #'balance-windows)
 (define-key sk/window-map (kbd "u") #'winner-undo)
 (define-key sk/window-map (kbd "U") #'winner-redo)
@@ -796,6 +797,7 @@ With PROMPT, use the normal `xref-find-references' prompt."
     "SPC w W" "previous window"
     "SPC w x" "close window"
     "SPC w o" "only window"
+    "SPC w f" "toggle full-frame window"
     "SPC w u" "undo window layout"
     "SPC w U" "redo window layout"
     "SPC c" "code"

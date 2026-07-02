@@ -32,6 +32,28 @@
 (make-directory (expand-file-name "backups/" user-emacs-directory) t)
 (make-directory (expand-file-name "auto-save/" user-emacs-directory) t)
 
+(defun sk/wayland-copy-text (text)
+  "Copy TEXT to the Wayland clipboard with wl-copy."
+  (when-let ((wl-copy (executable-find "wl-copy")))
+    (let ((coding-system-for-write 'utf-8))
+      (with-temp-buffer
+        (insert text)
+        (call-process-region (point-min) (point-max) wl-copy nil nil nil "--type" "text/plain")))))
+
+(defun sk/wayland-paste-text ()
+  "Return text from the Wayland clipboard with wl-paste."
+  (when-let ((wl-paste (executable-find "wl-paste")))
+    (let ((coding-system-for-read 'utf-8))
+      (with-temp-buffer
+        (when (zerop (call-process wl-paste nil t nil "--no-newline" "--type" "text"))
+          (buffer-string))))))
+
+(when (and (getenv "WAYLAND_DISPLAY")
+           (executable-find "wl-copy")
+           (executable-find "wl-paste"))
+  (setq interprogram-cut-function #'sk/wayland-copy-text
+        interprogram-paste-function #'sk/wayland-paste-text))
+
 (setq-default indent-tabs-mode nil
               tab-width 4
               fill-column 100)
