@@ -51,6 +51,14 @@ in
         tmux-session main
       fi
 
+      if [[ -o interactive ]] \
+        && [ -z "$SK_FASTFETCH_GREETER_SHOWN" ] \
+        && [ "''${SK_DISABLE_FASTFETCH_GREETER:-0}" != "1" ] \
+        && command -v fastfetch >/dev/null 2>&1; then
+        export SK_FASTFETCH_GREETER_SHOWN=1
+        fastfetch
+      fi
+
     '';
   };
 }
