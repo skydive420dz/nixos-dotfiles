@@ -75,6 +75,12 @@
 (recentf-mode 1)
 (global-auto-revert-mode 1)
 
+(when (and (fboundp 'native-comp-available-p)
+           (native-comp-available-p))
+  (setq native-comp-jit-compilation t
+        native-comp-async-report-warnings-errors 'silent
+        native-comp-speed 4))
+
 (provide 'sk-core)
 
 ;;; sk-core.el ends here
