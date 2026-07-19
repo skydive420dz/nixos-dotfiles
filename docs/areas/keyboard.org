@@ -31,8 +31,9 @@
 
 ** Vial And QMK - Accepted
 :PROPERTIES:
-:CUSTOM_ID: vial-and-qmk-incomplete
+:CUSTOM_ID: vial-and-qmk-accepted
 :END:
+*** Historical checkpoint defect
 Vial 0.7.5, QMK 1.2.0, and =qmk-udev-rules= are present in checkpoint
 generation 856, but its rules package is inert there and the device workflow is
 not accepted.
@@ -66,6 +67,7 @@ No external USB HID keyboard was connected during the candidate audit.  The
 only live hidraw node was the internal Synaptics touchpad, so the intended
 device, VID:PID, ACL, and Vial discovery remain untested.
 
+*** Accepted generation 857
 Activation and device acceptance passed in generation 857:
 
 - the keyboard is foostan Corne v4 =4653:0004=, serial
@@ -76,9 +78,9 @@ Activation and device acceptance passed in generation 857:
 - Vial 0.7.5 runs from the Nix store and the user confirmed discovery;
 - no firmware write or flash occurred.
 
-Generation 856 remains the booted fallback until reboot.  Decide separately
-whether the full QMK toolchain belongs system-wide or in an on-demand firmware
-project shell.
+Generation 856 remains the booted fallback until reboot.  QMK CLI intentionally
+remains system-wide as an accepted host capability.  Firmware configuration,
+writes, and flashing remain separate explicitly authorized work.
 
 ** NixOS Kanata Investigation
 :PROPERTIES:

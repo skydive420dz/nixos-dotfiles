@@ -116,5 +116,10 @@ The slice is accepted:
   sees the keyboard.
 - No configuration write or firmware flash was performed by this audit.
 
-The original device-discovery defect is resolved.  QMK CLI ownership and any
-firmware workflow remain separate future decisions.
+The original device-discovery defect is resolved.
+
+* Post-Acceptance Ownership Decision
+The user explicitly chose to keep QMK CLI system-wide.  Its package and closure
+cost are therefore intentional host policy, not unfinished ownership work.
+Firmware configuration, writes, and flashing remain separate actions requiring
+explicit authorization.

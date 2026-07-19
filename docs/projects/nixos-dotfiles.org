@@ -11,8 +11,8 @@ The MSI laptop is the primary live host and uses the =#nixos= flake output.
 The =#desktop-amd= output is a guarded bootstrap target whose machine-specific
 hardware acceptance is still future work.
 
-For volatile branch, generation, output, build, activation, and promotion state,
-use [[../handoffs/2026-07-18-main-checkpoint.org][the active checkpoint handoff]].
+For current branch, generation, output, build, activation, and promotion state,
+start with [[../README.org][the documentation dashboard]] and its latest handoff.
 
 Durable ownership:
 
@@ -23,8 +23,8 @@ Durable ownership:
 - NVF owns Neovim packaging, plugins, and LSP while =config/nvim/= owns live Sky
   behavior.
 - Ollama is retired from the intended system configuration.
-- Vial/QMK device integration and a Linux VS Code port are unfinished work, not
-  accepted current features.
+- Vial/QMK device integration is accepted on MSI, and the QMK CLI intentionally
+  remains system-wide.  A Linux VS Code port remains future work.
 
 * Entry Points
 :PROPERTIES:
@@ -67,13 +67,13 @@ interactive activation command.
 - Preserve the intentional live-link workflow and validate resolved live bytes.
 - Move machine facts into =hosts/<host>/= without hiding reusable mechanisms.
 - Fix confirmed defects before performance experiments.
-- Keep Vial/QMK, Emacs TLC, VS Code, Quickshell optimization, and GC as separate
-  work streams.
+- Treat Vial/QMK as an accepted system capability; keep any future firmware
+  changes separate from Emacs TLC, VS Code, Quickshell optimization, and GC.
 
 Current post-checkpoint lanes:
 
-- =work/nixos-maintenance=: system correctness, Vial/QMK permissions, security,
-  ownership, organization, and conservative GC.
+- =work/nixos-maintenance=: system correctness, security, ownership,
+  organization, and conservative GC.
 - =work/quickshell-cleanup=: deterministic shell bugs, service lifecycle,
   backend consolidation, then measured optimization.
 - Emacs: finish the active language acceptance decision, then optimize only

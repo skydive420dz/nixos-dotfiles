@@ -23,13 +23,16 @@ build, activation, runtime, and hand-test results kept distinct.
 - NVF remains the package, plugin, and LSP owner for Neovim; live Sky behavior
   stays under =config/nvim/=.
 - Ollama is retired from the intended system configuration.
-- Vial and QMK are installed, but their device workflow is unfinished: the QMK
-  udev rules are not enabled and no connected-device test has passed.
+- Vial and QMK are accepted MSI capabilities.  The QMK udev integration is
+  active, Vial discovers the Corne v4, and the QMK CLI intentionally remains
+  system-wide.
 - VS Code is not configured on NixOS.  A future Linux port should adapt the
   macOS Home Manager module rather than copy Darwin-specific pins verbatim.
 
-The exact checkpoint state and outstanding live gates are recorded in
-[[file:docs/handoffs/2026-07-18-main-checkpoint.org][the active checkpoint handoff]].
+The accepted baseline is recorded in
+[[file:docs/handoffs/2026-07-18-main-checkpoint.org][the main checkpoint handoff]];
+the latest device and activation evidence is in
+[[file:docs/handoffs/2026-07-19-vial-qmk-udev.org][the Vial/QMK handoff]].
 
 * System Shape
 | Surface | Owner | Main source |
@@ -85,12 +88,10 @@ Work stays slice-based:
 
 1. Apply confirmed NixOS maintenance, security, service, and GC corrections one
    small change at a time.
-2. Decide separately whether the now-working QMK CLI remains system-wide or
-   moves to an on-demand firmware project shell.
-3. Optimize Quickshell after deterministic correctness and lifecycle defects.
-4. Give Emacs measured, real-use-driven TLC; Lua and Nix LSP slices are accepted,
+2. Optimize Quickshell after deterministic correctness and lifecycle defects.
+3. Give Emacs measured, real-use-driven TLC; Lua and Nix LSP slices are accepted,
    while Python's manual acceptance remains in progress.
-5. Port the macOS VS Code configuration only as a Linux-specific Home Manager
+4. Port the macOS VS Code configuration only as a Linux-specific Home Manager
    slice.
 
 * Documentation

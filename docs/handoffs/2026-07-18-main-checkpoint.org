@@ -369,8 +369,8 @@ fresh-lane sequence are recorded in
 ** =work/nixos-maintenance=
 - Enable =hardware.keyboard.qmk.enable=, remove the redundant explicit rules
   package, then test Vial with the actual device.
-- Decide separately whether the full QMK firmware toolchain stays system-wide
-  or moves to an on-demand project shell.
+- Accepted 2026-07-19: the full QMK firmware toolchain intentionally stays
+  system-wide.
 - Adapt the macOS VS Code Home Manager module for Linux only as its own slice.
 - Keep later Emacs TLC tied to measured daily-use friction.
 - Commit and compare the MSI hardware configuration for pure builds.

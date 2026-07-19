@@ -51,11 +51,13 @@ remain the detailed evidence.
 - The first maintenance slice enabled MSI-scoped QMK udev ownership.  Generation
   857 granted active-seat ACLs to the connected Corne v4, and Vial discovered
   the keyboard without a firmware write.
+- The user explicitly retained QMK CLI as a system-wide host capability; its
+  package and closure cost are intentional rather than pending cleanup.
 
 * Unfinished Experiments Preserved As Direction
-- Vial and QMK packages reached the MSI system, but QMK udev integration was
-  never enabled and the device workflow was not accepted.  This becomes a
-  focused maintenance slice rather than an implied working feature.
+- Vial and QMK packages initially reached the MSI system without active QMK
+  udev integration or device acceptance.  The focused generation 857 slice
+  resolved that defect; QMK CLI remains system-wide by explicit decision.
 - The NixOS VS Code placeholder never became a configuration.  A future port
   should adapt the macOS Home Manager module for Linux.
 - Emacs optimization remains real-use-driven work, not a broad rewrite.
