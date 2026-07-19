@@ -40,8 +40,8 @@ remain the detailed evidence.
   checkpoint.  Commit =4eded33= was fast-forwarded to =main= without changing
   the live generation.  Activation and runtime evidence remain separate facts.
 - Generation 856 later activated and booted the verified output.  Ollama's unit,
-  binary, and listener are gone; privileged model-state cleanup and visual hand
-  tests remain separate completion gates.
+  binary, and listener are gone.  The user then completed privileged model-state
+  removal; visual hand tests remain a separate acceptance gate.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages reached the MSI system, but QMK udev integration was

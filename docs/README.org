@@ -17,7 +17,7 @@ commits, pushes, service changes, or branch deletion.
 | Quickshell | Service is active with the checkpoint input update and loaded its configuration | Complete visual hand tests, then use the cleanup lane |
 | Vial/QMK | Vial and QMK are installed; QMK udev integration is absent | Enable declarative udev ownership and test the connected device |
 | VS Code | NixOS has no VS Code configuration | Adapt the macOS Home Manager module in a future Linux-specific slice |
-| Doom/Ollama | Doom source is retired; Ollama unit, binary, and listener are absent from generation 856 | Remove privileged Ollama state with interactive sudo |
+| Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
 
 Volatile hashes, outputs, live services, and exact gate results belong in
 [[file:handoffs/2026-07-18-main-checkpoint.org][the active checkpoint handoff]].

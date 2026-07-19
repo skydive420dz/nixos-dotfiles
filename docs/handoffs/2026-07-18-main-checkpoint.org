@@ -299,8 +299,8 @@ silently folded into the checkpoint.
 :PROPERTIES:
 :CUSTOM_ID: recorded-activation-and-runtime-checks
 :END:
-Activation has completed, but human acceptance and privileged data cleanup
-remain open:
+Activation and the ordered Ollama cleanup have completed, but human acceptance
+remains open:
 
 - The system profile is =system-856-link=.
 - =/run/current-system= and =/run/booted-system= both resolve to the verified
@@ -319,13 +319,16 @@ remain open:
   remains a known flaky tray interaction for later cleanup.
 - QMK 1.2.0 and =/run/current-system/sw/bin/Vial= are present.  The expected
   QMK udev rule remains absent, so connected-device access is still unaccepted.
-- The already-authorized privileged Ollama state cleanup could not run through
-  the non-interactive audit connection because =sudo= requires a password.
+- The user completed the already-authorized privileged Ollama state removal.
+  Independent non-root verification finds =/var/lib/ollama= absent; the audit
+  connection cannot traverse =/var/lib/private= without interactive sudo, so
+  deletion of =/var/lib/private/ollama= remains user-attested rather than
+  independently privilege-verified.
 - Visual Quickshell checks, ordinary editor use, and the physical Vial device
   test still require human interaction.
 
 Generation 856 is therefore the active and booted checkpoint, but full runtime
-acceptance is pending the remaining human checks and Ollama data cleanup.
+acceptance is pending the remaining human checks.
 
 * Branch Archive And New Work Lanes
 :PROPERTIES:
