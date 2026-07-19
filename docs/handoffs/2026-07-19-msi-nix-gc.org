@@ -2,16 +2,17 @@
 #+startup: overview
 
 * Status And Boundary
-This records an =ACCEPTED= source, build, activation, and runtime slice and an
-=ACCEPTED= first observed maintenance run.  Generation =859= installs an
-MSI-only, age-based Nix garbage-collection timer in an explicitly unarmed state
-and removes the unsafe manual =nix-collect-garbage -d= alias.
+This records the =ACCEPTED= historical generation =859= source, build,
+activation, and runtime slice and its =ACCEPTED= first observed maintenance
+run.  Generation =859= installed an MSI-only, age-based Nix
+garbage-collection timer in an explicitly unarmed state and removed the unsafe
+manual =nix-collect-garbage -d= alias.
 
 After the complete read-only preflight, the user separately authorized and
 started exactly one =nix-gc.service= invocation.  It completed successfully
 without deleting a profile generation or changing the accepted current,
-booted, or protected rollback generations.  The timer itself has never started
-and remains inactive and unarmed.
+booted, or protected rollback generations.  Under generation =859=, the timer
+itself had never started and remained inactive and unarmed.
 
 The observed run collected unreachable store paths and performed only its
 expected stale-root bookkeeping.  It did not optimize the store, manually
@@ -19,11 +20,12 @@ delete a profile or GC root, limit or clean boot entries, activate a generation,
 or reboot.
 
 A later =ACCEPTED= source/build candidate at =e51f91a= removes only the
-completed first-run safety latch.  Its pure no-link build passed and contains
-the expected =timers.target= wiring, but it is not active.  Generation =859=
-remains current and its timer remains inactive and unarmed.  Live activation,
-runtime verification, store optimization, and boot-entry retention remain
-separate authorization gates.
+completed first-run safety latch.  The user separately authorized its exact
+built output, which is now active as generation =860=.  The timer is enabled
+and =active (waiting)= for its first trigger on =2026-07-26 04:56:30 EDT=.
+Runtime checks pass, but active-generation and timer acceptance remain pending.
+Store optimization and boot-entry retention remain separate authorization
+gates.
 
 * Verified Starting Point
 The read-only live inventory ended at =2026-07-19 12:20 EDT=:
@@ -58,7 +60,8 @@ the roles are:
 
 | Generation | Role | Release condition |
 |------------+------+-------------------|
-| =859= | accepted current system | replaced only by a separately built and accepted generation |
+| =860= | current timer-armed system, runtime verified but pending acceptance | retain while current; active acceptance is the next gate, while replacement or rollback remains separate |
+| =859= | accepted immediate pre-860 rollback with unarmed timer | retain until generation 860 and its active timer are explicitly accepted |
 | =856= | booted fallback | retain until a later accepted generation passes a real reboot test |
 | =858= | immediate pre-859 rollback | retained by the completed first run; keep pending a later explicit retention decision |
 | =857= | accepted pre-858 rollback | retained by the completed first run; future rolling-policy treatment remains a later decision |
@@ -67,7 +70,8 @@ the roles are:
 
 The 30-day window is rolling retention, not permanent pinning.  Before a
 protected generation approaches 30 days, its release condition must be met or
-the timer must remain disabled while an explicit protection decision is made.
+the active timer must be separately disarmed while an explicit protection
+decision is made.
 
 QMK remains an accepted system-wide capability and is not a GC target.
 
@@ -117,8 +121,9 @@ July 19 window.
 The =wantedBy= override is the first-run safety latch: the unit is built and can
 be inspected, but activation does not enable or start it and no calendar event
 is armed.  The prerequisite first GC has now been separately observed.
-Generation =859= still contains this override.  The later build-only candidate
-documented below removes it in source, but has not activated that change.
+Generation =859= contains this override and remains the accepted immediate
+rollback.  The later generation =860= documented below activates the source
+change that removes it.
 
 The pinned =nix-collect-garbage= manual confirms that
 =--delete-older-than 30d= first applies age-based generation deletion to
@@ -621,8 +626,9 @@ maintenance checkpoint.  At that checkpoint, the next policy decision was
 whether to remove the timer's empty =wantedBy= safety latch.  The later
 =e51f91a= candidate documented below has now passed its source, pure-evaluation,
 and build gates.  The user accepted its evidence checkpoint =9d45149=;
-activation remains separate.  Store optimization and boot-entry retention
-remain independent later decisions.
+activation remained separate at that checkpoint and was later separately
+authorized.  Store optimization and boot-entry retention remain independent
+later decisions.
 
 * Generation 859 And First-GC Verification Gates - Passed
 ** Source Gate
@@ -665,11 +671,12 @@ maintenance checkpoint after reviewing the machine-verifiable result.
 ** Automatic Timer Arming Historical Boundary
 Generation =859= did not authorize timer arming.  The later source/build
 candidate below supersedes only that source/build boundary; it does not
-authorize activation.
+authorize activation.  Activation was later separately authorized and is
+recorded below.
 
 Store optimization and boot-entry limiting remain later independent slices.
 
-* Automatic Timer Arming Candidate - Build Accepted, Activation Pending
+* Automatic Timer Arming Candidate - Activated And Runtime Verified, User Acceptance Pending
 ** Source Boundary
 Before this candidate, both clean checkouts were at accepted documentation head
 =90f64428b1b956dc749de4d3ae598823ecb743f2=.  The actual host remained:
@@ -811,21 +818,130 @@ Opening the Nix store for evaluation and building recreated the expected
 record already predicted that later store initialization could recreate it;
 this is not collection, profile mutation, or activation.
 
-** Remaining Gates
+** Source/Build Boundary Closed
+No =nrs=, =nixos-rebuild switch=, =test=, =boot=, direct
+=systemctl enable/start=, daemon reload, second GC, optimization, cleanup, or
+reboot occurred during the source/build slice.  Activation remained separately
+gated until the user accepted checkpoint =9d45149= and then explicitly
+authorized the next step.
+
+** Separately Authorized Activation - Completed
+At =2026-07-19 14:53:16 EDT= the final pre-activation snapshot proved:
+
+- the clean live checkout was at accepted head =4aa203e=;
+- pure evaluation of that exact head still returned the already built
+  =4a502xw...= output;
+- generation =859= remained current, generation =856= remained booted, and all
+  generations =848-859= were present;
+- the live generation =859= timer was still inactive and unarmed;
+- the GC service journal still contained exactly one start, the accepted manual
+  run, and the timer journal contained no entries;
+- there were no failed system or user units.
+
+The user then ran the pure =nrs= alias.  It completed without an error and
+reported:
+
+#+begin_example
+the following new units were started: NetworkManager-dispatcher.service, nix-gc.timer
+Done. The new configuration is /nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44
+#+end_example
+
+That is byte-for-byte the pure-evaluated and no-link-built candidate.  It
+created system generation =860=.  The alias's normal build phase realized no
+different output for activation.
+
+The activation output's =Collecting garbage...= line belongs to Lanzaboote's
+normal ESP reconciliation phase, not to =nix-gc.service= or Nix-store GC.  The
+exact message comes from pinned =lzbt-systemd 1.1.0=.  Its collector walks only
+Lanzaboote-managed boot paths under =/boot/EFI/nixos=, =nixos-*= files under
+=/boot/EFI/Linux=, and an optional PCR-lock directory that is not configured
+here.  It uses ordinary filesystem removal operations, not a Nix GC command.
+
+This invocation apparently found no stale managed artifact to remove.  All 12
+preexisting UKIs =848-859= reproduce their accepted manifest fingerprint, all
+eight kernel/initrd artifacts remain, and all 50 legacy loader entries remain
+unchanged.  Lanzaboote added only generation =860='s =196,784=-byte UKI.
+
+** Runtime Verification - Passed
+Read-only verification between =14:56= and =14:58 EDT= proves:
+
+| Item | Live value |
+|------+------------|
+| System profile/current system | generation =860=, exact output =4a502xw...= |
+| Booted system | generation =856=, =8q4h4b...= |
+| Immediate accepted rollback | generation =859=, =3947ayk...= |
+| Other protected rollbacks | generations =857-858= retain their original outputs |
+| System generations | =13=, generations =848-860= |
+| System state | =running= |
+| Timer unit-file state | =enabled= |
+| Timer runtime state | =active (waiting)= |
+| Timer active since | =2026-07-19 14:54:19.986363 EDT= |
+| Timer invocation ID | =8a903df8455d47889ab9728c1b3b23ba= |
+| Effective next trigger | =2026-07-26 04:56:30 EDT= |
+| Last trigger | unset |
+| Accuracy/random delay | =1min= accuracy, =45min= randomized delay, fixed delay disabled |
+| Service starts after activation | zero |
+| GC service starts in the documented July 19 window | one, the accepted =13:32= manual run |
+| Failed units | zero system, zero user |
+
+The live timer bytes are exactly the built bytes:
+
+- =OnCalendar=Sun *-*-* 04:15:00=;
+- =Persistent=false=;
+- =RandomizedDelaySec=45min=;
+- =[Install] WantedBy=timers.target=.
+
+The live link
+=/etc/systemd/system/timers.target.wants/nix-gc.timer -> ../nix-gc.timer=
+resolves to the built =s00a15w...-unit-nix-gc.timer=.  The timer is present in
+=timers.target='s dependency graph and =list-timers --all=.  Its actual
+=04:56:30= trigger is 41 minutes 30 seconds after the nominal =04:15= event,
+within the configured randomized delay; normal timer accuracy also applies.
+
+No immediate Nix GC occurred:
+
+- =nix-gc.service= remains inactive;
+- the pre-activation journal cursor has zero later service lines;
+- the documented July 19 journal window still contains exactly one collector
+  start;
+- =LastTriggerUSec= remains empty;
+- the only new timer journal line is =Started nix-gc.timer=.
+
+The =Persistent=false= no-catch-up contract therefore behaved as intended.
+The timer is now armed and is currently scheduled for its displayed future
+trigger.  That trigger can be recalculated after timer, daemon, or reboot state
+changes; disarming it requires a separate change.
+
+Boot and user-state preservation also passed:
+
+- Secure Boot remains enabled;
+- generation =860= is the configured default and generation =856= remains the
+  selected/booted entry;
+- UKIs increased only from =12= to =13= with the new generation =860= file;
+- =/boot= allocated use increased by =200,704= bytes and remains =19%= used;
+- all 50 legacy entries retain fingerprint =f2e2828...=;
+- no boot-retention cleanup occurred;
+- the Home Manager root remains =q303rn...=;
+- the user =nixos-activation.service= is successful with
+  =ExecMainStatus=0= and =NRestarts=0=;
+- =nix-optimise.timer= remains absent, with no target link, list-timer entry,
+  or service journal activity;
+- the checkout remains clean at activation head =4aa203e=.
+
+No second GC, optimization, reboot, manual profile/root deletion, or
+boot-retention slice occurred.
+
+** Current Gates
 | Gate | Status |
 |------+--------|
 | Source and pure evaluation | =PASSED= |
 | Pure no-link build | =PASSED= |
 | Candidate output inspection | =PASSED= |
-| Live non-activation proof | =PASSED= |
-| User acceptance of build candidate | =PASSED= at evidence checkpoint =9d45149= |
-| Live activation | =NOT AUTHORIZED= |
-| Runtime timer verification | =PENDING AFTER ACTIVATION= |
-| User acceptance of active timer | =PENDING AFTER RUNTIME VERIFICATION= |
+| Build-candidate user acceptance | =PASSED= at evidence checkpoint =9d45149= |
+| Separately authorized activation | =PASSED= |
+| Runtime timer verification | =PASSED= |
+| User acceptance of active generation/timer | =PENDING= |
 
-Activation would create a new system generation and is intended to target-enable
-and start the timer through =timers.target=.  The runtime gate must prove its
-actual active state and next trigger.  Because =Persistent=false=, activation
-would not catch up a missed event.  No =nrs=, =nixos-rebuild switch=, =test=,
-=boot=, =systemctl enable/start=, daemon reload, second GC, optimization,
-cleanup, or reboot occurred in this source/build slice.
+User acceptance is the remaining documentation gate, not an operational pause:
+the timer is already armed.  Rejection would require a separately authorized
+rollback or disarm decision before the displayed July 26 trigger.

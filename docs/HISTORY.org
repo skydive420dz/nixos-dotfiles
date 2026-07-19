@@ -75,9 +75,15 @@ remain the detailed evidence.
   optimization, and boot-entry retention remain separate decisions.
 - Source commit =e51f91a= later removed only the completed first-run timer
   safety latch.  Pure evaluation and a pure no-link build passed, and the user
-  accepted evidence checkpoint =9d45149=.  The built output is not active;
-  generation 859 and its unarmed timer remain live until a separate activation
-  decision.
+  accepted evidence checkpoint =9d45149=.  At that checkpoint the built output
+  was not active; generation 859 and its unarmed timer remained live pending a
+  separate activation decision.
+- The user then separately authorized activation of that exact output.
+  Generation =860= is current, and =nix-gc.timer= is enabled and waiting for
+  =2026-07-26 04:56:30 EDT=.  =Persistent=false= prevented an immediate
+  catch-up run: the GC service journal still contains only the earlier accepted
+  manual invocation.  Runtime verification passes; explicit acceptance of the
+  active generation and timer remains pending.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages initially reached the MSI system without active QMK
