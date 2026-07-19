@@ -62,13 +62,7 @@ QtObject {
     function videoThumbnailCommand(path) {
         var output = videoThumbnailPath(path);
         var filter = "scale=360:-1:flags=lanczos";
-        var command = "mkdir -p " + JSON.stringify(thumbnailDir)
-            + " && if [ ! -s " + JSON.stringify(output) + " ] || [ " + JSON.stringify(path) + " -nt " + JSON.stringify(output) + " ]; then "
-            + JSON.stringify(ffmpegBin)
-            + " -hide_banner -loglevel error -y -ss 2 -i " + JSON.stringify(path)
-            + " -frames:v 1 -vf " + JSON.stringify(filter)
-            + " -update 1 " + JSON.stringify(output)
-            + "; fi";
+        var command = "mkdir -p " + JSON.stringify(thumbnailDir) + " && if [ ! -s " + JSON.stringify(output) + " ] || [ " + JSON.stringify(path) + " -nt " + JSON.stringify(output) + " ]; then " + JSON.stringify(ffmpegBin) + " -hide_banner -loglevel error -y -ss 2 -i " + JSON.stringify(path) + " -frames:v 1 -vf " + JSON.stringify(filter) + " -update 1 " + JSON.stringify(output) + "; fi";
 
         return ["bash", "-lc", command];
     }
@@ -101,10 +95,7 @@ QtObject {
         var payload = JSON.stringify({
             currentPath: currentPath
         });
-        var command = "mkdir -p " + JSON.stringify(stateDir)
-            + " && printf %s " + JSON.stringify(payload)
-            + " > " + JSON.stringify(stateFile)
-            + " && date +%s > " + JSON.stringify(signalFile);
+        var command = "mkdir -p " + JSON.stringify(stateDir) + " && printf %s " + JSON.stringify(payload) + " > " + JSON.stringify(stateFile) + " && date +%s > " + JSON.stringify(signalFile);
 
         saveStateProc.command = ["bash", "-lc", command];
         saveStateProc.running = true;
@@ -115,10 +106,7 @@ QtObject {
     }
 
     function applyWallpaperList(data) {
-        var items = String(data || "")
-            .split("\n")
-            .map(path => path.trim())
-            .filter(path => path !== "");
+        var items = String(data || "").split("\n").map(path => path.trim()).filter(path => path !== "");
 
         items.sort();
         wallpapers = items;
@@ -154,12 +142,7 @@ QtObject {
 
     property Process listWallpapersProc: Process {
         id: listWallpapersProc
-        command: [
-            "bash",
-            "-lc",
-            "find " + JSON.stringify(root.wallpaperDir)
-                + " -maxdepth 1 -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' -o -iname '*.gif' -o -iname '*.mp4' -o -iname '*.m4v' -o -iname '*.mov' -o -iname '*.webm' -o -iname '*.mkv' \\) 2>/dev/null | sort"
-        ]
+        command: ["bash", "-lc", "find " + JSON.stringify(root.wallpaperDir) + " -maxdepth 1 -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' -o -iname '*.gif' -o -iname '*.mp4' -o -iname '*.m4v' -o -iname '*.mov' -o -iname '*.webm' -o -iname '*.mkv' \\) 2>/dev/null | sort"]
         stdout: SplitParser {
             property string buffer: ""
             onRead: data => buffer += data + "\n"

@@ -58,8 +58,7 @@ Rectangle {
             else if (key === "network_signal") {
                 var signalValue = parseInt(value);
                 root.networkSignal = Number.isFinite(signalValue) ? signalValue : -1;
-            }
-            else if (key === "rx_bytes")
+            } else if (key === "rx_bytes")
                 root.updateNetworkRate("rx", Number(value));
             else if (key === "tx_bytes")
                 root.updateNetworkRate("tx", Number(value));
@@ -160,12 +159,12 @@ Rectangle {
 
     function showOsd(icon, title, value) {
         var runtimeDir = Quickshell.env("XDG_RUNTIME_DIR") || "/run/user/" + Quickshell.env("UID");
-        var payload = JSON.stringify({ icon: icon, title: title, value: value });
-        Quickshell.execDetached([
-            "bash",
-            "-lc",
-            "printf '%s\\n' " + JSON.stringify(payload) + " > " + JSON.stringify(runtimeDir + "/qs-osd.json") + " && printf '%s\\n' \"$(date +%s%N)\" > " + JSON.stringify(runtimeDir + "/qs-osd-signal")
-        ]);
+        var payload = JSON.stringify({
+            icon: icon,
+            title: title,
+            value: value
+        });
+        Quickshell.execDetached(["bash", "-lc", "printf '%s\\n' " + JSON.stringify(payload) + " > " + JSON.stringify(runtimeDir + "/qs-osd.json") + " && printf '%s\\n' \"$(date +%s%N)\" > " + JSON.stringify(runtimeDir + "/qs-osd-signal")]);
     }
 
     Component.onCompleted: {
@@ -233,11 +232,7 @@ Rectangle {
 
     Process {
         id: volumeProc
-        command: [
-            "bash",
-            "-lc",
-            "vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true); muted=0; case \"$vol\" in *MUTED*) muted=1;; esac; level=$(awk '{ printf \"%d\", ($2+0)*100 }' <<<\"$vol\"); printf 'volume=%s\\nmuted=%s\\n' \"${level:-0}\" \"$muted\""
-        ]
+        command: ["bash", "-lc", "vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true); muted=0; case \"$vol\" in *MUTED*) muted=1;; esac; level=$(awk '{ printf \"%d\", ($2+0)*100 }' <<<\"$vol\"); printf 'volume=%s\\nmuted=%s\\n' \"${level:-0}\" \"$muted\""]
         stdout: SplitParser {
             property string buffer: ""
             onRead: data => buffer += data + "\n"
@@ -250,11 +245,7 @@ Rectangle {
 
     Process {
         id: networkInfoProc
-        command: [
-            "bash",
-            "-lc",
-            "netrow=$(nmcli -t -f DEVICE,TYPE,STATE device status 2>/dev/null | awk -F: '$3==\"connected\"{print $1\":\"$2; exit}'); netdev=${netrow%%:*}; net=${netrow#*:}; signal=-1; if [ \"$netdev\" = \"$net\" ]; then netdev=; net=; fi; if [ \"$net\" = wifi ]; then signal=$(nmcli -t -f IN-USE,SIGNAL dev wifi 2>/dev/null | awk -F: '$1==\"*\" || $1==\"yes\"{print $2; exit}'); fi; printf 'network=%s\\nnetwork_device=%s\\nnetwork_signal=%s\\n' \"${net:-}\" \"${netdev:-}\" \"${signal:--1}\""
-        ]
+        command: ["bash", "-lc", "netrow=$(nmcli -t -f DEVICE,TYPE,STATE device status 2>/dev/null | awk -F: '$3==\"connected\"{print $1\":\"$2; exit}'); netdev=${netrow%%:*}; net=${netrow#*:}; signal=-1; if [ \"$netdev\" = \"$net\" ]; then netdev=; net=; fi; if [ \"$net\" = wifi ]; then signal=$(nmcli -t -f IN-USE,SIGNAL dev wifi 2>/dev/null | awk -F: '$1==\"*\" || $1==\"yes\"{print $2; exit}'); fi; printf 'network=%s\\nnetwork_device=%s\\nnetwork_signal=%s\\n' \"${net:-}\" \"${netdev:-}\" \"${signal:--1}\""]
         stdout: SplitParser {
             property string buffer: ""
             onRead: data => buffer += data + "\n"
@@ -267,11 +258,7 @@ Rectangle {
 
     Process {
         id: trafficProc
-        command: [
-            "bash",
-            "-lc",
-            "dev=" + JSON.stringify(root.networkDevice) + "; rx=0; tx=0; if [ -n \"$dev\" ] && [ -r \"/sys/class/net/$dev/statistics/rx_bytes\" ]; then rx=$(cat \"/sys/class/net/$dev/statistics/rx_bytes\"); tx=$(cat \"/sys/class/net/$dev/statistics/tx_bytes\"); fi; printf 'rx_bytes=%s\\ntx_bytes=%s\\n' \"$rx\" \"$tx\""
-        ]
+        command: ["bash", "-lc", "dev=" + JSON.stringify(root.networkDevice) + "; rx=0; tx=0; if [ -n \"$dev\" ] && [ -r \"/sys/class/net/$dev/statistics/rx_bytes\" ]; then rx=$(cat \"/sys/class/net/$dev/statistics/rx_bytes\"); tx=$(cat \"/sys/class/net/$dev/statistics/tx_bytes\"); fi; printf 'rx_bytes=%s\\ntx_bytes=%s\\n' \"$rx\" \"$tx\""]
         stdout: SplitParser {
             property string buffer: ""
             onRead: data => buffer += data + "\n"
@@ -284,11 +271,7 @@ Rectangle {
 
     Process {
         id: bluetoothProc
-        command: [
-            "bash",
-            "-lc",
-            "bt=0; btconn=0; if command -v bluetoothctl >/dev/null 2>&1 && bluetoothctl show >/dev/null 2>&1; then bt=1; bluetoothctl devices Connected 2>/dev/null | grep -q . && btconn=1; fi; printf 'bluetooth=%s\\nbluetooth_connected=%s\\n' \"$bt\" \"$btconn\""
-        ]
+        command: ["bash", "-lc", "bt=0; btconn=0; if command -v bluetoothctl >/dev/null 2>&1 && bluetoothctl show >/dev/null 2>&1; then bt=1; bluetoothctl devices Connected 2>/dev/null | grep -q . && btconn=1; fi; printf 'bluetooth=%s\\nbluetooth_connected=%s\\n' \"$bt\" \"$btconn\""]
         stdout: SplitParser {
             property string buffer: ""
             onRead: data => buffer += data + "\n"
@@ -301,11 +284,7 @@ Rectangle {
 
     Process {
         id: batteryProc
-        command: [
-            "bash",
-            "-lc",
-            "bat=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n1); stat=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n1); charging=0; [ \"$stat\" = Charging ] && charging=1; printf 'battery=%s\\ncharging=%s\\nbattery_status=%s\\n' \"${bat:--1}\" \"$charging\" \"${stat:-}\""
-        ]
+        command: ["bash", "-lc", "bat=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n1); stat=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n1); charging=0; [ \"$stat\" = Charging ] && charging=1; printf 'battery=%s\\ncharging=%s\\nbattery_status=%s\\n' \"${bat:--1}\" \"$charging\" \"${stat:-}\""]
         stdout: SplitParser {
             property string buffer: ""
             onRead: data => buffer += data + "\n"

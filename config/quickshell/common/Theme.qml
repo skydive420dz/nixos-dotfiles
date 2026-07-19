@@ -43,12 +43,7 @@ QtObject {
         if (h.length !== 6)
             return Qt.rgba(1, 1, 1, resolvedAlpha);
 
-        return Qt.rgba(
-            parseInt(h.slice(0, 2), 16) / 255,
-            parseInt(h.slice(2, 4), 16) / 255,
-            parseInt(h.slice(4, 6), 16) / 255,
-            resolvedAlpha
-        );
+        return Qt.rgba(parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255, resolvedAlpha);
     }
 
     function applyTheme(payload) {

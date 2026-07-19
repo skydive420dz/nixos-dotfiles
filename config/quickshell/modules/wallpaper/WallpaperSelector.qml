@@ -205,7 +205,7 @@ Item {
                                     return;
 
                                 thumbnailSource = "";
-                                Qt.callLater(function() {
+                                Qt.callLater(function () {
                                     thumbnailSource = WallpaperStore.fileUrl(thumbnailPath);
                                 });
                             }

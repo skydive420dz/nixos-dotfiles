@@ -204,7 +204,7 @@ Known formatter commands:
 #+begin_src text
 Nix               nixfmt
 Lua               stylua
-QML               qmlformat --indent-width 2 --column-width -1
+QML               qmlformat --indent-width 4 --column-width -1
 Rust              rustfmt
 C / C++           clang-format
 Python            black
@@ -461,9 +461,9 @@ Indentation policy is intentionally boring:
 default           spaces, width 4
 Nix               spaces, width 2
 Lua               spaces, width 2
-QML / JS / TS     spaces, width 2
+JS / TS           spaces, width 2
 JSON / YAML       spaces, width 2
-Python / C / Rust / Haskell / GLSL
+QML / Python / C / Rust / Haskell / GLSL
                   spaces, width 4
 #+end_src
 

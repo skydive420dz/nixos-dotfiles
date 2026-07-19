@@ -251,6 +251,7 @@ This is descriptive, not a mandate to create empty folders. Split only when a mo
 - 2026-05-30: =awww= cutover validated after reboot. Wallpaper persisted through reboot, Quickshell starts cleanly, =awww-daemon.service= is gone, and no =awww= process is running.
 - 2026-05-30: Fuzzel launcher/clipboard fallback cutover removed the fallback scripts, =fuzzel= package, =config/fuzzel= live link, generated =fuzzel.ini= output, and Hyprland =fuzzel= layer rule. Native Quickshell launcher and clipboard are now the only configured picker surfaces.
 - 2026-05-30: Quickshell structure/QML metadata follow-up kept the runtime tree intact, updated the documented tree to match reality, and added =pragma ComponentBehavior: Bound= to delegate-heavy launcher, clipboard, and tray modules. =qmldir= remains the only tracked QML metadata file.
+- 2026-07-19: Cleanup Slice 0A added the exact-source validation harness. Slice 0B adopts the audit's four-space Qt formatting policy for the five previously drifting QML files and aligns both clean-Emacs QML modes and their explicit formatter with that policy; Neovim already uses the four-space Qt default. The dated audit's Doom alignment item is historical because Doom is retired. These candidate source changes remain isolated from the live checkout until separately authorized.
 
 ** Known Lesson
 :PROPERTIES:

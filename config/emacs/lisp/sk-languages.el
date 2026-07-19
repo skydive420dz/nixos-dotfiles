@@ -16,7 +16,9 @@
 
 (use-package qml-mode
   :mode "\\.qml\\'"
-  :hook (qml-mode . (lambda () (sk/set-indent-width 2))))
+  :hook (qml-mode . (lambda ()
+                      (sk/set-indent-width 4)
+                      (setq-local js-indent-level 4))))
 
 (use-package rust-mode
   :mode "\\.rs\\'"

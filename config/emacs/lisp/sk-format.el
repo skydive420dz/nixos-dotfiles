@@ -10,8 +10,10 @@
     (nix-ts-mode . ("nixfmt"))
     (lua-mode . ("stylua" "-"))
     (lua-ts-mode . ("stylua" "-"))
-    (qml-mode . ("qmlformat" "--indent-width" "2" "--column-width" "-1" :file))
-    (sk-qml-ts-mode . ("qmlformat" "--indent-width" "2" "--column-width" "-1" :file))
+    (qml-mode
+     . ("qmlformat" "--indent-width" "4" "--column-width" "-1" :file))
+    (sk-qml-ts-mode
+     . ("qmlformat" "--indent-width" "4" "--column-width" "-1" :file))
     (rust-mode . ("rustfmt"))
     (rust-ts-mode . ("rustfmt"))
     (c-mode . ("clang-format"))

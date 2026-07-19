@@ -36,11 +36,7 @@ Item {
         id: cavaProc
 
         running: root.active
-        command: [
-            "bash",
-            "-lc",
-            "command -v cava >/dev/null 2>&1 || { sleep 3600; exit 0; }; cfg=$(mktemp); trap 'rm -f \"$cfg\"' EXIT; cat >\"$cfg\" <<'EOF'\n[general]\nbars = 12\nframerate = 24\nautosens = 1\n[input]\nmethod = pulse\nsource = auto\n[output]\nmethod = raw\nraw_target = /dev/stdout\ndata_format = ascii\nascii_max_range = 100\nchannels = mono\nEOF\nexec cava -p \"$cfg\""
-        ]
+        command: ["bash", "-lc", "command -v cava >/dev/null 2>&1 || { sleep 3600; exit 0; }; cfg=$(mktemp); trap 'rm -f \"$cfg\"' EXIT; cat >\"$cfg\" <<'EOF'\n[general]\nbars = 12\nframerate = 24\nautosens = 1\n[input]\nmethod = pulse\nsource = auto\n[output]\nmethod = raw\nraw_target = /dev/stdout\ndata_format = ascii\nascii_max_range = 100\nchannels = mono\nEOF\nexec cava -p \"$cfg\""]
 
         stdout: SplitParser {
             onRead: data => {
