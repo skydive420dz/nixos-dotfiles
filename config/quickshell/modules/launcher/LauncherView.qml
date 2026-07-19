@@ -276,6 +276,8 @@ Item {
                 model: root.results
 
                 delegate: Rectangle {
+                    id: resultDelegate
+
                     required property var modelData
                     required property int index
 
@@ -300,16 +302,16 @@ Item {
                                 anchors.centerIn: parent
                                 width: root.iconSize
                                 height: root.iconSize
-                                source: Quickshell.iconPath(modelData.icon || "application-x-executable", "application-x-executable")
+                                source: Quickshell.iconPath(resultDelegate.modelData.icon || "application-x-executable", "application-x-executable")
                                 asynchronous: true
                                 mipmap: true
                             }
 
                             Text {
                                 anchors.centerIn: parent
-                                visible: modelData.icon.length === 0
+                                visible: resultDelegate.modelData.icon.length === 0
                                 text: "󰣆"
-                                color: index === root.selectedIndex ? Theme.accent : Theme.muted
+                                color: resultDelegate.index === root.selectedIndex ? Theme.accent : Theme.muted
                                 font.family: Theme.iconFont
                                 font.pixelSize: 15
                             }
@@ -321,7 +323,7 @@ Item {
 
                             Text {
                                 Layout.fillWidth: true
-                                text: modelData.name
+                                text: resultDelegate.modelData.name
                                 color: Theme.text
                                 font.family: Theme.font
                                 font.pixelSize: Theme.fontSize + 2
@@ -330,7 +332,7 @@ Item {
 
                             Text {
                                 Layout.fillWidth: true
-                                text: modelData.subtitle
+                                text: resultDelegate.modelData.subtitle
                                 color: Theme.muted
                                 font.family: Theme.font
                                 font.pixelSize: Theme.fontSizeSmall + 1
@@ -344,8 +346,8 @@ Item {
                         anchors.fill: parent
                         hoverEnabled: true
 
-                        onEntered: root.selectedIndex = index
-                        onClicked: root.activate(index)
+                        onEntered: root.selectedIndex = resultDelegate.index
+                        onClicked: root.activate(resultDelegate.index)
                     }
                 }
             }

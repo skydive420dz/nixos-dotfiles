@@ -381,6 +381,8 @@ Item {
                     model: root.results
 
                     delegate: Rectangle {
+                        id: clipboardResult
+
                         required property var modelData
                         required property int index
 
@@ -403,8 +405,8 @@ Item {
 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: modelData.isImage ? "" : ""
-                                    color: index === root.selectedIndex ? Theme.accent : Theme.muted
+                                    text: clipboardResult.modelData.isImage ? "" : ""
+                                    color: clipboardResult.index === root.selectedIndex ? Theme.accent : Theme.muted
                                     font.family: Theme.iconFont
                                     font.pixelSize: 16
                                 }
@@ -416,7 +418,7 @@ Item {
 
                                 Text {
                                     Layout.fillWidth: true
-                                    text: modelData.preview
+                                    text: clipboardResult.modelData.preview
                                     color: Theme.text
                                     font.family: Theme.font
                                     font.pixelSize: Theme.fontSize + 2
@@ -426,7 +428,7 @@ Item {
 
                                 Text {
                                     Layout.fillWidth: true
-                                    text: modelData.detail
+                                    text: clipboardResult.modelData.detail
                                     color: Theme.muted
                                     font.family: Theme.font
                                     font.pixelSize: Theme.fontSizeSmall + 1
@@ -440,8 +442,8 @@ Item {
                             anchors.fill: parent
                             hoverEnabled: true
 
-                            onEntered: root.selectedIndex = index
-                            onClicked: root.activate(index)
+                            onEntered: root.selectedIndex = clipboardResult.index
+                            onClicked: root.activate(clipboardResult.index)
                         }
                     }
                 }

@@ -51,13 +51,13 @@ RowLayout {
                 onClicked: mouse => {
                     if (mouse.button === Qt.RightButton) {
                         if (!trayIcon.showMenu())
-                            modelData.secondaryActivate();
+                            trayIcon.modelData.secondaryActivate();
                     } else if (mouse.button === Qt.MiddleButton) {
-                        modelData.secondaryActivate();
-                    } else if (modelData.onlyMenu) {
+                        trayIcon.modelData.secondaryActivate();
+                    } else if (trayIcon.modelData.onlyMenu) {
                         trayIcon.showMenu();
                     } else {
-                        modelData.activate();
+                        trayIcon.modelData.activate();
                     }
                 }
             }
