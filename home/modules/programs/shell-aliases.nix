@@ -4,8 +4,8 @@
   btw = "echo I use nixos, btw";
   ncg = "sudo nix-collect-garbage -d";
   nfu = "nix flake update --flake ${repoPath}";
-  nrb = "sudo nixos-rebuild boot --impure --flake ${repoPath}#nixos";
-  nrs = "sudo nixos-rebuild switch --impure --flake ${repoPath}#nixos";
+  nrb = "sudo nixos-rebuild boot --flake ${repoPath}#nixos";
+  nrs = "sudo nixos-rebuild switch --flake ${repoPath}#nixos";
   vim = "nvim";
   ls = "ls --color=auto";
   ll = "ls -la --color=auto";
