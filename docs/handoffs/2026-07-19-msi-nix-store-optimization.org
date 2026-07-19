@@ -1,20 +1,24 @@
-#+title: MSI Nix Store Optimization Preflight
+#+title: MSI Nix Store Optimization Preflight And Observed Run
 #+startup: overview
 
 * Status And Boundary
 
-Status: *PREFLIGHT COMPLETE; OPTIMIZATION NOT RUN; ONE SOURCE-SNAPSHOT SIDE
-EFFECT DISCLOSED; USER DECISION REQUIRED*.
+Status: *ONE-SHOT OPTIMIZATION COMPLETE; CLEAN FULL REALIZATION; RUNTIME
+EVIDENCE CHECKPOINT PENDING USER ACCEPTANCE; RECURRING POLICY NOT AUTHORIZED*.
 
-This document records the measured preflight for Nix-store hard-link
-optimization on the live MSI NixOS host.  The result is:
+This document records the measured preflight and the later explicitly
+authorized one-shot Nix-store hard-link optimization on the live MSI NixOS
+host.  The result is:
 
-- the current store has a material deduplication opportunity;
-- one separately authorized and observed optimizer run is reasonable;
-- recurring optimization is not yet justified or authorized;
-- =auto-optimise-store= should remain disabled while the first run is measured.
+- the estimator found a material deduplication opportunity;
+- the user separately authorized exactly one observed service invocation;
+- that invocation completed as a clean full realization;
+- net allocated store size fell by =14,915,272,704= bytes (=13.89 GiB=);
+- recurring optimization and =auto-optimise-store= remain disabled and
+  unauthorized.
 
-This slice did not run =nix store optimise=, =nix-store --optimise=,
+The observed run used the already-installed =nix-optimise.service=, whose
+=ExecStart= is pinned Nix =2.34.8='s =nix-store --optimise=.  It did not run
 =nix-gc.service=, any GC command, a build, activation, reboot, profile deletion,
 root cleanup, boot cleanup, or application/configuration change.
 
@@ -44,13 +48,13 @@ This preflight preserves the repository decisions documented in:
   audit]], which is a different optimization lane.
 
 Store hard-linking is not represented here as a Quickshell, Emacs, VS Code,
-Vial, QMK, or application-performance improvement.  QMK remains intentional
+Vial, QMK, or application-performance improvement.  QMK remains an intentional
 system-wide capability.  No decision in this preflight broadens or reverses
 those ownership contracts.
 
-* Live Identity And Accepted State
+* Preflight Live Identity And Accepted State
 
-Final verification at =2026-07-19T15:46:15-04:00=:
+Preflight final verification at =2026-07-19T15:46:15-04:00=:
 
 | Item | Live value |
 |------+------------|
@@ -69,7 +73,7 @@ The current and profile selectors resolve to the same generation =860=
 output.  The booted selector still resolves to generation =856=; no reboot
 occurred.
 
-* Current Optimization Configuration
+* Pre-Run Optimization Configuration
 
 The host runs Nix =2.34.8=.  Effective settings observed before the exact scan
 were:
@@ -84,8 +88,8 @@ were:
 | =min-free= | =0= |
 | =max-free= | =9,223,372,036,854,775,807= |
 
-The repository has no active =nix.optimise=, =auto-optimise-store=, or
-=configurationLimit= definition.  Therefore:
+The repository had no active =nix.optimise=, =auto-optimise-store=, or
+=configurationLimit= definition.  Therefore, at preflight:
 
 - effective =nix.optimise.automatic=false= remains the NixOS default;
 - =nix-optimise.service= is generated because Nix is enabled, but it is
@@ -96,7 +100,7 @@ The repository has no active =nix.optimise=, =auto-optimise-store=, or
 
 The generated service runs =nix-store --optimise=.  It has
 =ConditionACPower=true=, =Nice=19=, idle CPU scheduling, and idle I/O
-scheduling.  Its existence does not mean an optimizer has run.
+scheduling.  Its existence did not mean an optimizer had run at preflight.
 
 The two Nix mechanisms are distinct:
 
@@ -104,7 +108,8 @@ The two Nix mechanisms are distinct:
 - =auto-optimise-store=true= changes daemon policy for newly added paths and
   does not backfill the current store.
 
-Neither mechanism is authorized by this preflight.
+Neither recurring mechanism was authorized by this preflight, and neither is
+authorized by the later one-shot result.
 
 * Pinned Nix 2.34.8 Behavior
 
@@ -133,9 +138,9 @@ creates an index entry even for content that is unique.  Successful service
 exit can still include partial-skip warnings such as link-count or filesystem
 limit failures, so the journal and independent before/after values matter.
 
-* Final Store Baseline
+* Preflight Store Baseline
 
-The final stable baseline is:
+The preflight stable baseline was:
 
 | Item | Value |
 |------+-------|
@@ -153,7 +158,7 @@ The final stable baseline is:
 | Reserve file | =8,388,608= bytes |
 | Dead PID temp-root files | =11=; newest is =212338= |
 
-The optimizer pool remains exactly empty:
+The optimizer pool remained exactly empty before the run:
 
 | =.links= fact | Value |
 |---------------+-------|
@@ -312,12 +317,12 @@ behavior matters, avoid flake evaluation, prefer direct filesystem/systemd
 reads and SQLite read-only queries, and inventory Nix bookkeeping before and
 after any Nix client invocation.
 
-* GC, Generation, And Boot Preservation
+* Preflight GC, Generation, And Boot Preservation
 
-The accepted GC state remains:
+The accepted GC state at preflight was:
 
-| Item | Final value |
-|------+-------------|
+| Item | Preflight value |
+|------+-----------------|
 | =nix-gc.timer= | loaded, enabled, =active (waiting)= |
 | Effective next trigger | =Sun 2026-07-26 04:56:30 EDT= |
 | Last trigger | unset |
@@ -349,12 +354,14 @@ Boot evidence remains:
 
 No generation selector or boot manifest changed during the preflight.
 
-* Assessment
+* Pre-Run Assessment
 
-Verdict: *worthwhile, non-urgent, and not yet authorized for mutation*.
+Pre-run verdict: *worthwhile, non-urgent, and requiring separate authorization
+for mutation*.
 
 The =13.95 GiB= gross allocated opportunity and possible million-inode
-reduction justify one observed optimizer run.  Ample free space means there is
+reduction justified one observed optimizer run.  The user later supplied that
+authorization; its result is recorded below.  Ample free space meant there was
 no reason to combine it with another maintenance operation or rush into a
 recurring policy.
 
@@ -391,7 +398,7 @@ not a build or activation.
 
 ** Slice O2 - Runtime Verification
 
-After the service returns:
+After the service reaches =inactive (dead)= following successful completion:
 
 1. require =Result=success= and =ExecMainStatus=0=;
 2. inspect the complete service journal for warnings and partial skips;
@@ -424,6 +431,237 @@ If a timer is selected:
 - evaluate, pure-build, inspect, accept, activate, and runtime-verify as
   separate gates.
 
+* Authorized O1 And O2 Execution
+
+** User Authorization And Final Go/No-Go
+
+After reviewing evidence checkpoint =258dd32=, the user explicitly authorized
+exactly one observed optimizer run.  That authorization covered live
+hard-link/inode mutation by the existing service; it did not authorize a
+second run, GC, a timer, =auto-optimise-store=, a build, activation, cleanup,
+reboot, or boot-retention work.
+
+Two close go/no-go checks at =16:31:41= and =16:32:25 EDT= proved:
+
+| Gate | Before-state |
+|------+--------------|
+| Host/checkout | =nixos=, clean/aligned =work/nixos-maintenance= at =258dd32= |
+| AC/battery | =ADP1 online=1=, =BAT1 Full= |
+| Current/profile | generation =860=, =4a502xw...= |
+| Booted | generation =856=, =8q4h4b...= |
+| System health | =running=, zero failed system/user units |
+| Competing work | no GC, optimizer, build, activation, or systemd job |
+| GC timer | enabled, =active (waiting)=, next =2026-07-26 04:56:30 EDT= |
+| Optimizer service/timer | service inactive with zero journal lines; timer absent |
+| =.links= | zero entries, =4,096= allocated directory bytes |
+| Valid paths | =42,746=, =66,954,639,968= NAR bytes |
+| Store top-level entries | =42,747= including =.links= |
+| Temp roots | same 11 dead PID files, manifest =0c72190f...= |
+| Generations/boot | 13 generations and accepted boot fingerprints unchanged |
+
+The sealed system journal cursor was:
+
+#+begin_example
+s=eb92d84b9aef43199fbdf5e98e35242f;i=341c4c;b=2c918f35dfe54572911052a8346818af;m=5d6a0e167;t=656fcb010408e;x=9133b24eabd50d49
+#+end_example
+
+The noninteractive =sudo -n= start attempt at =16:32:52 EDT= was rejected
+before systemd received a request because a password was required.  Immediate
+verification still found zero service journal lines, zero =.links= entries,
+unchanged valid paths, and the same 11 temp-root files.  It was not an
+optimizer invocation and was not retried noninteractively.
+
+The user then ran exactly:
+
+#+begin_src sh
+sudo systemctl start nix-optimise.service
+#+end_src
+
+The command returned after systemd launched the service.  The service itself
+remained active, so monitoring continued without issuing another start.
+
+** Sealed Before-State
+
+The allocation baseline at =2026-07-19T16:32:25.886273990-04:00= was:
+
+| Measurement | Before |
+|-------------+--------|
+| Store filesystem size | =1,966,789,099,520= bytes |
+| Filesystem used | =539,543,109,632= bytes |
+| Filesystem available | =1,327,263,010,816= bytes |
+| Filesystem inodes used | =2,414,672= |
+| Allocated =/nix/store= | =72,609,529,856= bytes |
+| =.links= apparent/allocated | =4,096 / 4,096= bytes |
+| =.links= entries | =0= |
+
+The generation manifest was
+=e0bd70b5119e43f2ee3c9cd3b2cd7d463e6fedc481eda31bf0ba3b298bda3a55=.
+The current UKI and legacy-loader fingerprints remained =887058d1...= and
+=f2e2828...= respectively.
+
+The password-authorized manual start began approximately 11 minutes 36 seconds
+after this baseline.  Final valid-path/NAR/top-level counts remained exact and
+the complete =.links= algebra matched the pre-run estimator.  Store-set
+attribution is therefore clean; whole-root-filesystem byte/inode deltas are
+still reported separately and conservatively because unrelated applications
+continued running.
+
+** Single Service Invocation
+
+The only optimizer invocation had ID
+=0bd7e33e94fe465889dc88339e43e2e5=.  Its journal is exactly:
+
+#+begin_example
+2026-07-19T16:44:02.266087-04:00 Started Nix Store Optimiser.
+2026-07-19T16:48:44.730953-04:00 11.4 GiB freed by hard-linking 1062570 files
+2026-07-19T16:48:44.797957-04:00 nix-optimise.service: Deactivated successfully.
+2026-07-19T16:48:44.798558-04:00 nix-optimise.service: Consumed 2min 54.150s CPU time over 4min 42.532s wall clock time, 5.2G memory peak, 56.7G read from disk, 956.3M written to disk.
+#+end_example
+
+Terminal service evidence:
+
+| Item | Value |
+|------+-------|
+| End state | =inactive (dead)= |
+| =Result= | =success= |
+| =ExecMainCode= / =ExecMainStatus= | =0 / 0= |
+| =NRestarts= | =0= |
+| Start | =16:44:02.266087 EDT= |
+| Successful deactivation | =16:48:44.797957 EDT= |
+| Wall / CPU time | =4min 42.532s / 2min 54.150s= |
+| Memory peak | =5.2G= |
+| Service-accounted I/O | =56.7G= read, =956.3M= written |
+| Priority =err..alert= lines | =0= |
+| Warning/error/fail/cannot/link-limit/skip matches | =0= |
+
+There was one start, one optimizer summary, one successful deactivation, and
+one resource-accounting line.  No success-with-warning or partial-skip
+condition was observed.
+
+** Exact =.links= Reconciliation
+
+Post-run =.links= algebra exactly reproduces the estimator:
+
+| Measurement | Estimated | Realized |
+|-------------+-----------+----------|
+| Index entries | =705,636= | =705,636= |
+| Regular classes | =531,345= | =531,345= |
+| Symlink classes | =174,291= | =174,291= |
+| Unique classes | =281,233= | =281,233= |
+| Duplicate classes | =424,403= | =424,403= |
+| Regular duplicate classes | =300,809= | =300,809= |
+| Symlink duplicate classes | =123,594= | =123,594= |
+| Indexed store occurrences | =1,768,206= | =1,768,206= |
+| Replaced duplicate entries | =1,062,570= | =1,062,570= |
+| Regular replacements | =595,386= | =595,386= |
+| Symlink replacements | =467,184= | =467,184= |
+| Logical saving | =12,289,093,087= bytes | =12,289,093,087= bytes |
+| Regular logical saving | =12,257,904,987= bytes | =12,257,904,987= bytes |
+| Symlink logical saving | =31,188,100= bytes | =31,188,100= bytes |
+
+Every index entry has link count at least two.  Maximum link counts are =1,533=
+for regular files and =881= for symlinks, exactly one above the estimator's
+maximum store-occurrence counts because the index name adds a link.
+
+The sorted =name type size blocks nlink= manifest fingerprint is:
+
+#+begin_example
+cc9532990e141b6398acfb0d7314757e3d25ad9445e786d16acfa40dd967d125
+#+end_example
+
+The index names reference =54,252,922,349= apparent bytes and
+=56,184,291,328= allocated payload bytes.  Those are shared canonical data,
+not =.links= directory overhead and not additional store allocation.
+
+** Net Allocation Result
+
+Immediate post-run measurement at =16:49:52 EDT= and a second stable seal at
+=16:51:19 EDT= produced:
+
+| Measurement | Before | Immediate after | Difference |
+|-------------+--------+-----------------+------------|
+| Allocated =/nix/store= | =72,609,529,856= | =57,694,257,152= | *=-14,915,272,704 bytes (-13.89 GiB)=* |
+| Filesystem used | =539,543,109,632= | =524,770,123,776= | =-14,772,985,856= bytes |
+| Filesystem available | =1,327,263,010,816= | =1,342,035,996,672= | =+14,772,985,856= bytes |
+| Filesystem inodes used | =2,414,672= | =1,352,371= | =-1,062,301= |
+| =.links= directory allocated | =4,096= | =61,255,680= | =+61,251,584= bytes |
+
+The exact store allocation reduction is =20.541756%= of the sealed before
+store.  Whole-filesystem used/available bytes moved by slightly less because
+the root filesystem also serves live journals and applications.  The second
+seal showed only =16,384= bytes of unrelated filesystem-use movement while
+=du -sxB1 /nix/store= remained exactly =57,694,257,152=.
+
+The filesystem's net used-inode reduction is 269 less than the optimizer's
+exact =1,062,570= replacements.  Concurrent root-filesystem activity therefore
+created a net 269 other inodes during the measurement window; this does not
+contradict the =.links= replacement count.
+
+The estimator's gross allocated range was
+=14,976,507,904-14,976,532,480= bytes.  The measured net result is
+=99.591043%= of that range's midpoint.  Its
+=61,235,200-61,259,776=-byte gross-to-net gap brackets the measured
+=61,251,584=-byte =.links= directory-allocation growth.  The estimator and
+filesystem result therefore reconcile within their predicted block-allocation
+uncertainty.
+
+** Bookkeeping And Preservation
+
+The optimizer opened the Nix database and checkpointed its WAL:
+
+- =db.sqlite= stayed =108,834,816= bytes but received the completion mtime;
+- =db.sqlite-wal= changed from =12,392= bytes to an empty =0=-byte WAL;
+- =db.sqlite-shm= remained =32,768= bytes and received a runtime mtime;
+- the =8,388,608=-byte reserve file retained its exact inode and mtime.
+
+Database content did not drift:
+
+| Item | Before | After |
+|------+--------+-------|
+| Valid paths | =42,746= | =42,746= |
+| Valid-path NAR bytes | =66,954,639,968= | =66,954,639,968= |
+| Maximum registration time | =1784488941= | =1784488941= |
+| Store top-level entries including =.links= | =42,747= | =42,747= |
+
+The optimizer's transient roots were gone at completion.  The same 11
+pre-existing dead PID temp-root files retained manifest
+=0c72190f46ebd873de407c64ed70b96bc5a7d4b0f8b4adff15b97c5304c83eb7=.
+No manual bookkeeping cleanup occurred.
+
+System preservation passed twice:
+
+| Surface | Post-run result |
+|---------+-----------------|
+| Checkout | clean/aligned =work/nixos-maintenance= at =258dd32= |
+| Current/profile | unchanged generation =860=, =4a502xw...= |
+| Booted | unchanged generation =856=, =8q4h4b...= |
+| System generations | 13, manifest =e0bd70b5...= unchanged |
+| System/user health | =running=, zero failed units |
+| GC service | inactive; July 19 start count still exactly one |
+| GC timer | enabled, =active (waiting)=, next =2026-07-26 04:56:30 EDT=, last trigger unset |
+| Optimizer timer | absent |
+| =/boot= | =19%= used, no change |
+| UKIs | 13, manifest =887058d1...= unchanged |
+| Legacy entries | 50, manifest =f2e2828...= unchanged |
+
+No GC, build, activation, reboot, profile/root deletion, boot cleanup, second
+optimizer, or recurring-timer change occurred.
+
+** O1/O2 Verdict
+
+Classification: *CLEAN FULL REALIZATION*.
+
+The service completed successfully with no warning or skip, every estimator
+class/count/logical byte was realized exactly, net store allocation fell by
+=13.89 GiB=, and all protected system, generation, GC, and boot state remained
+unchanged.
+
+This result does not authorize recurrence.  The first run cleared accumulated
+historical duplicates; it does not yet measure how quickly new unoptimized
+content accumulates.  Keep =auto-optimise-store=false= and
+=nix.optimise.automatic=false= until the user accepts this runtime checkpoint
+and separately chooses O3.
+
 * Current Gates
 
 | Gate | Status |
@@ -434,10 +672,13 @@ If a timer is selected:
 | Metadata-only bound | =PASSED= |
 | Exact external equivalence scan | =PASSED= |
 | No-write/no-drift proof for completed scan | =PASSED= |
-| Preflight documentation | =PASSED= at this evidence checkpoint |
-| User authorization for one observed run | *NOT REQUESTED YET* |
-| Actual store optimization | *NOT RUN* |
+| Preflight documentation | =PASSED= at evidence checkpoint =258dd32= |
+| User authorization for one observed run | =PASSED= |
+| O1 one-shot invocation | =PASSED=, exactly one invocation |
+| O2 journal/runtime verification | =PASSED=, clean full realization |
+| Protected generation/GC/boot preservation | =PASSED= |
+| User acceptance of observed-run checkpoint | *PENDING* |
 | Recurring optimizer decision | *NOT ACCEPTED* |
 
-The next decision is whether to authorize Slice O1: exactly one observed
-=nix-optimise.service= run with the before/after gates above.
+The next decision is whether to accept this observed one-shot result as the
+current runtime checkpoint.  Recurrence remains a later separate O3 decision.
