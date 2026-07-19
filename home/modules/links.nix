@@ -22,7 +22,6 @@ let
 
   liveDirs = {
     ".config/aerc" = "config/aerc";
-    ".config/doom" = "config/doom";
     ".config/emacs" = "config/emacs";
     ".config/ghostty/shaders" = "config/ghostty/shaders";
     ".config/quickshell" = "config/quickshell";

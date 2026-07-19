@@ -7,7 +7,8 @@
 :CUSTOM_ID: current
 :END:
 - Managed separately in =../nixos-macos=.
-- VS Code packages live on macOS, not NixOS.
+- The working VS Code Home Manager configuration currently lives on macOS;
+  NixOS has no VS Code editor configuration.
 - macOS keyboard repeat is the reference feel for NixOS.
 
 ** Commands
@@ -29,7 +30,11 @@
 :PROPERTIES:
 :CUSTOM_ID: decisions
 :END:
-- Do not add VS Code-specific setup to NixOS unless explicitly needed.
+- Use the macOS VS Code module as the reference for a future NixOS port, but
+  adapt it for Linux.  The current file contains =darwin-arm64= extension pins
+  and cannot be imported verbatim.
+- Keep the future NixOS VS Code module under Home Manager and select Linux
+  package/extension owners explicitly.
 - Keep Mac and NixOS keyboard repeat feeling aligned.
 
 ** Next
@@ -37,3 +42,5 @@
 :CUSTOM_ID: next
 :END:
 - Keep upstream-sourced VS Code extensions current.
+- After the NixOS checkpoint, decide the minimum Linux VS Code profile and port
+  it as its own tested slice.

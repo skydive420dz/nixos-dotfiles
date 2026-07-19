@@ -33,11 +33,7 @@ The Sky theme selector is system-wide state. Quickshell exposes a button for it,
 - =theme/lib.nix=: shared Nix helper for deriving Sky semantic palette aliases from any style in =theme/styles.json=.
 - =theme/plymouth.nix=: rebuild-time Sky Plymouth theme package.
 - =config/quickshell/common/Theme.qml=: runtime reader for Quickshell tokens.
-- =config/emacs/lisp/sk-theme.el=: active clean Emacs =sky-night= face definitions. Clean Emacs currently uses this local palette directly.
-- =config/doom/theme.el=: frozen/reference Doom theme loader.
-- =config/doom/themes/sky-theme-common.el=: frozen/reference Doom face definitions.
-- =config/doom/themes/sky-dark-theme.el=: frozen/reference Doom =SkyDark= theme wrapper.
-- =config/doom/themes/sky-light-theme.el=: frozen/reference Doom =SkyLight= theme wrapper.
+- =config/emacs/lisp/sk-theme.el=: active clean Emacs =sky-night= face definitions and runtime-token loader.
 - =config/nvim/colors/sky.lua=: live Neovim colorscheme entrypoint.
 - =config/nvim/lua/sky/theme.lua=: live Neovim Sky highlight definitions.
 - Home Manager modules install packages, link scripts, and set fallback session variables. They should not become per-project or per-machine theme patches.
@@ -59,7 +55,7 @@ Generated under =~/.config/theme/current/=:
 - =starship.toml=
 - =tmux.conf=
 - =nvim.lua=
-- =emacs-theme.el=, generated token file kept for the old Doom/reference theme path. Clean Emacs does not currently consume this file.
+- =emacs-theme.el=, generated runtime tokens consumed by clean Emacs.
 - =yazi.toml=
 - =aerc/stylesets/sky=
 - =env=
@@ -100,7 +96,11 @@ These can change without =nrs=, usually after =theme-select toggle= or =theme-se
 - aerc loads the generated styleset first through =stylesets-dirs=. Existing sessions need =:reload-config=; new sessions pick it up on launch.
 - Neovim prepends =~/.config/sky-nvim= to runtimepath and loads the live =sky= colorscheme. After changing the global style, restart Neovim or run =:colorscheme sky=/=:SkyThemeReload=.
 - GTK and Qt apps get generated settings/palettes. Existing GUI apps usually need restart; new processes should pick up the active style.
-- Clean Emacs uses the local =sky-night= theme in =config/emacs/lisp/sk-theme.el=. Use =SPC h r t= to reload those active faces in a running Emacs session. It does not currently consume the generated =emacs-theme.el= runtime token file.
+- Clean Emacs uses the local =sky-night= theme in
+  =config/emacs/lisp/sk-theme.el=, loads the generated =emacs-theme.el= tokens
+  when available, and falls back to its tracked local tokens during startup.
+  Use =SPC h r t= to reload the runtime tokens and active faces in a running
+  Emacs session.
 
 ** Rebuild-Themed Apps
 :PROPERTIES:
@@ -121,7 +121,7 @@ These are still owned by Nix/Home Manager and need =nrs= or a rebuild when the d
 :END:
 Covered by runtime generation:
 
-- Quickshell launcher/clipboard/wallpaper/bar modules, Mako, Ghostty, tmux, Starship, btop, bat, Yazi, GTK, Qt, KDE-style globals, zsh/fzf env, and the generated Emacs token file for the old Doom/reference theme path.
+- Quickshell launcher/clipboard/wallpaper/bar modules, Mako, Ghostty, tmux, Starship, btop, bat, Yazi, GTK, Qt, KDE-style globals, zsh/fzf env, and clean Emacs.
 
 Fixed in this pass:
 
@@ -132,7 +132,7 @@ Fixed in this pass:
 - Nix fallback theming for Mako now reads semantic Sky tokens instead of inherited palette names.
 - =theme/yazi.nix= now uses semantic Sky aliases from =theme/tokens.nix=.
 - Old Catppuccin-style palette aliases were removed from =theme/styles.json=.
-- Doom native theme wrappers now read generated runtime tokens instead of duplicating the dark and light color tables.
+- The now-retired Doom theme wrappers read generated runtime tokens instead of duplicating the dark and light color tables.
 - The stale Catppuccin shadow color in =config/hypr/hyprland.lua= was renamed and replaced with a Sky value.
 - Yazi now reads the generated runtime =yazi.toml= instead of a static Home Manager theme symlink.
 

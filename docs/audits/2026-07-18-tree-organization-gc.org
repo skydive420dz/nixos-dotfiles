@@ -1,0 +1,1223 @@
+#+title: NixOS Tree, Configuration, and Maintenance Audit - 2026-07-18
+
+* Purpose And Safety Boundary
+:PROPERTIES:
+:CUSTOM_ID: purpose-and-safety-boundary
+:END:
+This is a read-mostly audit of the current MSI NixOS machine, the live checkout
+that configures it, and the matching local checkout.  It focuses on:
+
+- repository and module ownership;
+- code and package organization;
+- the current Quickshell source and service lifecycle;
+- closure growth, generations, caches, logs, and a conservative GC policy;
+- a slice-based implementation order.
+
+It complements the broader
+[[file:2026-07-14-nixos-system.org][2026-07-14 NixOS system audit]] and the measured
+[[file:2026-07-14-quickshell-optimization.org][2026-07-14 Quickshell optimization audit]].
+The Quickshell source has not changed since those measurements, so this report
+does not duplicate the earlier component-by-component analysis.
+
+No flake update, package edit, garbage collection, cache deletion, build,
+activation, service restart, compositor restart, profile change, or reboot was
+performed.  Evaluation and =nix flake check --no-build= were kept separate from
+live-state inspection.
+
+One nominally read-only command had a small side effect.  While printing GC
+roots, =nix-store --gc --print-roots= removed one stale indirect-root link and
+five stale temporary-root bookkeeping files.  It did not delete a store path,
+profile, generation, or cache, and no garbage collection ran.  Further
+dead-path/GC queries were stopped rather than risk more implicit housekeeping.
+The Nix reclaim estimate is therefore deliberately non-exact.
+
+Evidence labels:
+
+- =SOURCE=: tracked or dirty checkout bytes.
+- =EVAL=: Nix evaluation only; not a build and not activation.
+- =ACTIVE=: observed on the running machine.
+- =HISTORY=: generation, journal, or coredump history.
+- =CONFIRMED=: directly demonstrated defect or ownership mismatch.
+- =HYPOTHESIS=: an optimization candidate that still needs comparative
+  measurement.
+
+* Executive Verdict
+:PROPERTIES:
+:CUSTOM_ID: executive-verdict
+:END:
+The repository does not need a wholesale rewrite.  Its strongest internal
+trees, particularly =config/quickshell=, already have understandable
+responsibilities and no orphaned QML components.  The highest-value polish is at
+the boundaries:
+
+1. Reconcile the live, uncommitted QMK/Vial configuration before doing unrelated
+   system work.
+2. Move MSI-only facts out of shared modules and bring the MSI hardware file
+   into Git.
+3. Make package ownership explicit: base runtime, per-user application, optional
+   feature, or project development shell.
+4. Give theme generation and QML tooling one owner each.
+5. Separate stable store-backed configuration from an explicit live-development
+   profile.
+6. Introduce age-based Nix maintenance only after generation/rollback policy is
+   written down.
+
+The machine is not under disk pressure: root is 29% used and inode use is about
+2%.  GC is maintenance hygiene, not an emergency.  The largest storage choices
+are Steam content, shader caches, ISO downloads, Ollama models, and application
+caches; they are not interchangeable with Nix garbage.
+
+The live Quickshell process is currently stable and quiet.  A ten-second sample
+used about 1.49% of one CPU core for the complete cgroup, with about 348 MiB
+current cgroup memory.  The important new Quickshell reliability finding is not
+an independent QML crash: one July 17 Hyprland renderer crash removed the
+Wayland display, then Quickshell and hyprpolkit repeatedly restarted too early
+and produced dependent coredumps.  Their session ordering/backoff needs a
+bounded Wayland-ready gate.
+
+* Verified Target And Provenance
+:PROPERTIES:
+:CUSTOM_ID: verified-target-and-provenance
+:END:
+** Machine and checkout identity
+:PROPERTIES:
+:CUSTOM_ID: machine-and-checkout-identity
+:END:
+| Item | Verified value |
+|------+----------------|
+| SSH target | =skydive420dz@192.168.1.175= |
+| Hostname | =nixos= |
+| NixOS | =26.11.20260705.d407951 (Zokor)= |
+| Kernel | =7.1.3= |
+| Remote repository | =/home/skydive420dz/Projects/nixos-dotfiles= |
+| Local repository | =/Users/skydive420dz/Projects/nixos-dotfiles= |
+| Branch | =work/emacs-lsp-mode-experiment= |
+| HEAD | =8bd891b8dc926af0670e002de264122b206d156d= |
+| Flake lock SHA-256 | =4a67dc462e30cc8c43659cc71ea5fd65f8153ea4874e8b6533db8032ee2b5851= |
+| Active generation | =855= |
+| Active output | =/nix/store/px0spfwgd632lf9nybcb1ygarz7zg9b6-nixos-system-nixos-26.11.20260705.d407951= |
+
+The local and remote checkouts agree on HEAD and =flake.lock=.  No fetch was
+performed.  The local remote-tracking reference is stale, so its “ahead 1”
+status is not evidence of a new local-only commit.
+
+** Current dirty-state split
+:PROPERTIES:
+:CUSTOM_ID: current-dirty-state-split
+:END:
+Both checkouts contain the documentation work from the July 14 audits.  The live
+host additionally contains user-owned system changes absent from the local
+checkout:
+
+#+begin_src diff
+ system/modules/packages.nix
+   + vial
+   + qmk
+   + qmk-udev-rules
+
+ system/modules/programs/vscode.nix
+   untracked, zero bytes, not imported
+#+end_src
+
+Those package lines are not merely staged.  Generations 854 and 855 were created
+on July 18; generation 855 is the active, booted, and current profile output.
+=system.configurationRevision= is =null=, which is consistent with a
+dirty-source build.  Generation 854 introduced Vial; generation 855 introduced
+the QMK toolchain.
+
+=EVAL=: evaluating the dirty remote checkout impurely returns the exact active
+output above.  This proves that the current checkout plus the external hardware
+file describes the active output.  It does not make the state reproducible from
+commit =8bd891b=, because the package additions are uncommitted.
+
+** Generation history
+:PROPERTIES:
+:CUSTOM_ID: generation-history
+:END:
+Eight system generations are retained:
+
+| Generation | Date | Role |
+|------------+------+------|
+| 848-852 | July 1-10 | earlier retained rollback points |
+| 853 | July 10 | July 14 audit baseline, 27.0 GiB closure |
+| 854 | July 18 00:17 | Vial addition |
+| 855 | July 18 00:34 | Vial plus QMK; active/booted, 28.9 GiB closure |
+
+All eight are less than 30 days old.  A proposed 30-day GC policy would not
+immediately remove these system rollback points, but profiles and roots must
+still be reviewed before enabling it.
+
+* Current Repository And Configuration Map
+:PROPERTIES:
+:CUSTOM_ID: current-repository-and-configuration-map
+:END:
+** Tree scale
+:PROPERTIES:
+:CUSTOM_ID: tree-scale
+:END:
+There are 255 tracked files.  Top-level tracked ownership is:
+
+| Top-level path | Tracked files | Current role |
+|----------------+---------------+--------------|
+| =config/= | 131 | Live application configuration and editor sources |
+| =home/= | 30 | Home Manager packages, services, session, and links |
+| =system/= | 28 | NixOS modules, packages, programs, and services |
+| =wallpapers/= | 17 | Versioned visual assets; videos are ignored |
+| =scripts/= | 17 | Runtime helpers and theme generators |
+| =docs/= | 15 | Project/area notes before the new audit artifacts |
+| =theme/= | 5 | Palette data and Nix-generated app themes |
+| =hosts/= | 5 | MSI and deferred AMD host entry points |
+| =pkgs/= | 1 | Local =wlctl= package |
+| root files | 5 | Flake, lock, ignore file, and compatibility wrappers |
+
+Source scale observed during this audit:
+
+| Language/data | Files | Lines |
+|---------------+-------+-------|
+| Nix | 71 | 7,420 |
+| Emacs Lisp | 36 | 5,665 |
+| Org | 23 | 3,973 |
+| QML | 31 | 3,570 |
+| Lua | 18 | 1,579 |
+| Shell | 9 | 897 |
+| JSON | 3 | 192 |
+
+Line count alone is not a reason to split a file.  The largest files deserve a
+review because they mix generated data or multiple responsibilities:
+
+| Source | Lines | Finding |
+|--------+-------+---------|
+| =theme/yazi.nix= | 3,463 | mostly icon/schema data; review and formatting are expensive |
+| =config/emacs/lisp/sk-keybindings.el= | 942 | one broad keybinding surface |
+| =config/quickshell/modules/clipboard/ClipboardView.qml= | 479 | data loading, filtering, actions, image preview, and view |
+| =config/quickshell/modules/wallpaper/WallpaperSelector.qml= | 373 | selection state and nonvirtual visual grid |
+| =config/quickshell/modules/status/StatusCluster.qml= | 357 | five pollers, rate state, OSD logic, and view |
+| =config/quickshell/modules/launcher/LauncherView.qml= | 354 | loading, parsing, scoring, execution, and view |
+| =home/modules/programs/yazi.nix= | 300 | Nix wiring plus two embedded Lua plugins |
+| =home/modules/programs/emacs.nix= | 238 | service/package wiring plus many language toolchains |
+
+The Yazi Nix file is a maintainability/evaluation-hygiene candidate, not a live
+runtime bottleneck.  Splitting QML files also does not inherently reduce CPU or
+memory; behavior and object count matter.
+
+** Active import graph
+:PROPERTIES:
+:CUSTOM_ID: active-import-graph
+:END:
+#+begin_src text
+flake.nix
+├── nixosConfigurations.nixos
+│   └── hosts/msi
+│       ├── /etc/nixos/hardware-configuration.nix
+│       ├── hosts/msi/kernel.nix
+│       ├── system/modules/default.nix
+│       └── system/modules/gpu/nvidia-hybrid.nix
+├── nixosConfigurations.desktop-amd
+│   └── hosts/desktop-amd
+│       ├── assertion-failing hardware placeholder
+│       ├── system/modules/default.nix
+│       └── system/modules/gpu/amd-rdna4.nix
+└── Home Manager user
+    └── home/default.nix
+        ├── home/home.nix
+        ├── home/modules/default.nix
+        └── btop, git, zsh, Quickshell, and session imported separately
+#+end_src
+
+=system/modules/default.nix= is not a neutral module library; it is a complete
+workstation profile.  It pulls MSI-specific audio, input, power, boot, and Razer
+facts, plus Ollama, into both exported hosts.
+
+=home/default.nix= has two module ownership lists: the aggregate
+=home/modules/default.nix= plus a second arbitrary list.  New modules therefore
+have no obvious single index.
+
+The root =configuration.nix=, root =home.nix=, and
+=hosts/nixos/default.nix= are compatibility/legacy wrappers.  They are not
+reachable from flake outputs, and the live machine's =/etc/nixos= files do not
+import them.  Label or retire them deliberately; do not silently delete them.
+
+** Stable versus live user configuration
+:PROPERTIES:
+:CUSTOM_ID: stable-versus-live-user-configuration
+:END:
+=home/modules/links.nix= declares nine healthy out-of-store links into the live
+remote checkout:
+
+- aerc;
+- frozen/reference Doom;
+- active clean Emacs;
+- Ghostty shaders;
+- Quickshell;
+- runtime scripts;
+- the Neovim config overlay;
+- WezTerm;
+- Hyprland Lua.
+
+This is an effective development workflow, and every live link resolved
+correctly.  It is also a validation and rollback boundary: changing those source
+bytes can change the active desktop without a Nix build, and a Home Manager
+generation does not freeze them.
+
+The correct polish is classification, not blanket conversion:
+
+| Class | Recommended ownership |
+|-------+-----------------------|
+| stable and rollback-sensitive | store-backed =xdg.configFile= or packaged source |
+| actively developed | explicit live-development profile using out-of-store links |
+| frozen reference | =archive/= or documentation; no live link |
+| runtime state/cache | XDG state/cache paths, never Git source |
+
+** Quickshell tree
+:PROPERTIES:
+:CUSTOM_ID: quickshell-tree
+:END:
+=config/quickshell= remains a coherent component tree:
+
+#+begin_src text
+shell.qml
+├── common/       theme and bar frame
+├── root/         bar, launcher, clipboard, OSD, wallpaper surfaces
+└── modules/
+    ├── clipboard/
+    ├── launcher/
+    ├── media/
+    ├── osd/
+    ├── status/
+    ├── theme/
+    ├── tray/
+    ├── wallpaper/
+    ├── window/
+    └── workspaces/
+#+end_src
+
+All 31 QML files are reachable by type reference; no orphaned QML component was
+found.  The remote Quickshell tree is clean, has 3,570 QML lines, and is the
+actual =~/.config/quickshell= target.
+
+Do not lead with directory churn.  The current =root/= versus =modules/=
+boundary is understandable.  A later =services/=, =surfaces/=, and
+=components/= naming pass is useful only after the behavior/validation slices
+in the Quickshell audit are complete.
+
+* Strengths
+:PROPERTIES:
+:CUSTOM_ID: strengths
+:END:
+- Host construction in =flake.nix= is compact, inputs are lock-pinned, and the
+  GPU profiles are already separated.
+- NixOS and Home Manager sources are distinct and mostly category-aware.
+- The live-link map is centralized and documented instead of being scattered
+  through unrelated modules.
+- Theme palette data is centralized in =theme/styles.json=, and the generator
+  has already been split into small helpers.
+- Quickshell has a coherent object graph, uses native Quickshell services in
+  several places, debounces workspace/app searches, refuses overlapping status
+  probes, and virtualizes launcher/clipboard results.
+- The active Quickshell service has run for about 20.5 hours with
+  =NRestarts=0= on the current boot.
+- The active system output matches evaluation of the actual dirty live
+  checkout, so the current drift is understood rather than mysterious.
+- All 71 tracked Nix files parse.  Correctly classified shell files pass
+  =bash -n=, =scripts/launcher-apps= compiles as Python, and tracked JSON parses.
+- No committed private key, password, or obvious API token was found.  Public
+  SSH keys and account identities are expected configuration data.
+- Root storage and inode headroom are ample; maintenance can be conservative
+  and rollback-friendly.
+- Existing area notes and the two July 14 audits provide an unusually useful
+  architecture/history trail.
+
+* Confirmed Bugs And Ownership Defects
+:PROPERTIES:
+:CUSTOM_ID: confirmed-bugs-and-ownership-defects
+:END:
+** P0 - live source provenance is not committed
+:PROPERTIES:
+:CUSTOM_ID: p0-live-source-provenance-is-not-committed
+:END:
+Generation 855 boots configuration bytes that do not exist in local HEAD or the
+shared commit.  A future checkout, rebuild, or recovery from commit =8bd891b=
+will not reproduce the current Vial/QMK package state.
+
+Before organization work, choose one of two source outcomes:
+
+1. preserve the intended device feature declaratively, but with corrected
+   ownership and udev wiring; or
+2. remove it deliberately and retain generation 855 until the replacement is
+   proven.
+
+No audit action selected either outcome.
+
+** P0 - QMK rules are installed but inert
+:PROPERTIES:
+:CUSTOM_ID: p0-qmk-rules-are-installed-but-inert
+:END:
+The dirty system package list contains =qmk-udev-rules=, but package presence in
+=environment.systemPackages= does not activate its udev integration.
+
+=CONFIRMED=:
+
+- =hardware.keyboard.qmk.enable=false=;
+- =services.udev.packages= omits QMK rules;
+- =/etc/udev/rules.d/50-qmk.rules= is absent;
+- no =plugdev= group exists;
+- the package's rule file is merely exposed under
+  =/run/current-system/sw/lib/udev/rules.d/=.
+
+The locked NixOS module's intended interface is
+=hardware.keyboard.qmk.enable=true=.  That belongs in the MSI/device-specific
+boundary, not the shared global package bucket.
+
+The cost is also disproportionate:
+
+| Addition | Incremental realized closure |
+|----------+------------------------------|
+| Vial relative to generation 853 | 157,087,776 bytes, about 149.8 MiB |
+| QMK CLI/toolchains relative to generation 854 | 1,861,400,008 bytes, about 1.73 GiB |
+| Rules package itself | 4,824 bytes |
+| All three relative to generation 853 | 2,018,492,608 bytes, about 1.88 GiB |
+
+Least-bloated ownership:
+
+- enable QMK device rules through the NixOS option on the MSI host;
+- keep Vial as a user application if it is regularly used;
+- place the full =qmk= compiler/flasher stack in a project dev shell or invoke
+  it on demand unless it truly belongs on every system generation;
+- remove the explicit =qmk-udev-rules= package once the module owns it.
+
+Moving Vial from NixOS to Home Manager clarifies ownership but may not reduce the
+integrated NixOS closure by itself; measure rather than assume.
+
+** P1 - MSI and shared-host boundaries are inverted
+:PROPERTIES:
+:CUSTOM_ID: p1-msi-and-shared-host-boundaries-are-inverted
+:END:
+=system/modules/default.nix= imports MSI PCI/card/node audio identifiers, fixed
+keyboard paths, MSI battery names, NVIDIA-related power policy, laptop
+framebuffer/ACPI quirks, TTY autologin, and OpenRazer policy.  The future AMD
+desktop would inherit them all.
+
+The live Hyprland Lua similarly contains MSI monitor and touchpad facts while
+being shared through one global link.
+
+Move hardware facts behind =hosts/msi= first.  Shared modules should express
+portable features or typed options, not values that only make sense on one
+laptop.
+
+** P1 - MSI evaluation is impure and whole-flake QA is permanently red
+:PROPERTIES:
+:CUSTOM_ID: p1-msi-evaluation-is-impure-and-whole-flake-qa-is-permanently-red
+:END:
+=hosts/msi/default.nix= imports
+=/etc/nixos/hardware-configuration.nix=.  Pure evaluation therefore fails and
+hardware facts are not reviewable from Git.
+
+Separately, =desktop-amd= is exported as a normal NixOS configuration while its
+tracked hardware file deliberately asserts false and lacks a root filesystem.
+
+The current no-build check demonstrates the boundary:
+
+#+begin_src text
+nix flake check --impure --no-build --no-write-lock-file
+  nixosConfigurations.nixos       checked
+  nixosConfigurations.desktop-amd failed:
+    bootstrap placeholder assertion
+    root filesystem unspecified
+#+end_src
+
+Keep the AMD safety assertion, but stop exporting the unfinished host as a
+normal checkable configuration until real hardware facts exist.
+
+** P1 - compositor recovery amplifies into dependent desktop crashes
+:PROPERTIES:
+:CUSTOM_ID: p1-compositor-recovery-amplifies-into-dependent-desktop-crashes
+:END:
+The recent coredump population is not nineteen independent current regressions.
+
+On July 17, Hyprland hit one renderer assertion and lost the Wayland display.
+The portal then segfaulted; Quickshell and hyprpolkit restarted while the display
+still refused connections.  Quickshell produced nine coredumps and hyprpolkit
+five before session shutdown/start limits intervened.
+
+On July 18, the second Hyprland coredump occurred during an intentional
+compositor/session stop.  Quickshell, polkit, and the portal stopped normally
+and restarted successfully.  Brave and Electron =SIGTRAP= dumps are in that same
+maintenance window and should not be mislabeled as current independent loops.
+
+=ACTIVE=: on the current boot Quickshell, Hyprland, portal-hyprland, and
+hyprpolkit are running with no new restart.  The separate
+=xdg-document-portal.service= remains failed for the older missing-fusermount
+bug.
+
+The repository-owned Quickshell improvement is a bounded Wayland-ready
+=ExecStartPre= or equivalent dependency, plus deliberate restart delay/backoff.
+=After=graphical-session.target= alone did not protect an in-place compositor
+restart.  Apply the same lifecycle reasoning to hyprpolkit through an override
+or upstream/NixOS ownership.  Preserve the recent core files until the primary
+Hyprland crash is understood.
+
+** P1 - the document portal is still broken
+:PROPERTIES:
+:CUSTOM_ID: p1-the-document-portal-is-still-broken
+:END:
+On the current boot =xdg-document-portal.service= exits
+=6/NOTCONFIGURED=.  Neither =fusermount= nor =fusermount3= is on its executable
+path, so it cannot mount =/run/user/1000/doc=.  This confirms that the July 14
+bug remains active; it is independent of the working Hyprland portal backend.
+
+** P1 - one secret reaches the graphical session too broadly
+:PROPERTIES:
+:CUSTOM_ID: p1-one-secret-reaches-the-graphical-session-too-broadly
+:END:
+=home/modules/programs/zsh.nix= sources =~/.openai_key= near the start of every
+interactive zsh.  UWSM loads the shell profile and recorded
+=OPENAI_API_KEY= among variables exported to the user manager.  The value was
+not printed or inspected.
+
+This means the key can propagate to unrelated graphical descendants rather than
+only the client that needs it.  Replace global shell sourcing with a scoped
+wrapper, credential store, or client-specific environment.  Purging the running
+user-manager environment is a separate live action after the source fix and a
+new login/session.
+
+** P2 - theme generation has three owners
+:PROPERTIES:
+:CUSTOM_ID: p2-theme-generation-has-three-owners
+:END:
+=theme-select apply= runs from:
+
+- Home Manager activation;
+- Mako =ExecStartPre=;
+- Quickshell =ExecStartPre=.
+
+That permits duplicate or concurrent writes to one global generated theme
+tree.  Normal theme toggling also restarts Quickshell even though =Theme.qml=
+watches its signal file and can reload.
+
+One ordered =sky-theme-apply.service= should own generation.  Mako and
+Quickshell should depend on its result, and normal toggling should use the
+existing in-process signal path.
+
+** P2 - package ownership is duplicated or too broad
+:PROPERTIES:
+:CUSTOM_ID: p2-package-ownership-is-duplicated-or-too-broad
+:END:
+Confirmed merged-profile duplicates include:
+
+- =btop=: explicit Home package plus =programs.btop.enable=;
+- =git=: Home module, Emacs runtime list, and system package list;
+- =tmux= and =fzf=: system and Home ownership.
+
+Nix store deduplication limits literal byte duplication, but profile contents,
+closure references, update surface, and ownership remain unclear.
+
+=system/modules/packages.nix= mixes diagnostic tools, compositor/QML support,
+global utilities, language/build tools, media tools, Bluetooth tools, gaming
+helpers, and now keyboard firmware development.  It should become a thin
+workstation-runtime profile plus opt-in features/dev shells.
+
+The active Emacs Home module installs complete C/C++, Rust, Haskell, Python,
+Node, TeX, QML, and Nix stacks.  NVF duplicates parts of them.  The July 14
+measurements found Haskell tooling and NVF to be the dominant closure areas.
+Choose the primary editor and actual language workflow before removing
+toolchains; do not optimize closure by breaking editor capability.
+
+** P2 - QML tooling has three drifting implementations
+:PROPERTIES:
+:CUSTOM_ID: p2-qml-tooling-has-three-drifting-implementations
+:END:
+The =qmlls= wrapper/import paths are independently constructed in:
+
+- =home/home.nix=;
+- =home/modules/programs/emacs.nix=;
+- =system/modules/programs/nvim/lsp.nix=.
+
+They already differ: the general wrapper includes a per-user QML path while the
+editor wrappers do not.  Package one wrapper under =pkgs/= or a small shared
+Nix library and point all consumers at it.
+
+** P2 - Home module indexing has no single rule
+:PROPERTIES:
+:CUSTOM_ID: p2-home-module-indexing-has-no-single-rule
+:END:
+=home/default.nix= imports =home/modules/default.nix= and then separately imports
+btop, git, zsh, Quickshell, and session.  Move all normal module imports to one
+index.  Keep =home/default.nix= as the Home Manager entry point and profile
+selection boundary.
+
+Flat names also obscure domain ownership:
+
+| Current source | Clearer destination |
+|----------------+---------------------|
+| =home/modules/email.nix= | =home/modules/programs/aerc.nix= |
+| =home/modules/notifications.nix= | =home/modules/services/mako.nix= |
+| =home/modules/services/removable-media.nix= | =home/modules/services/udiskie.nix= |
+| =system/modules/services/removable-media.nix= | =system/modules/services/udisks2.nix= |
+| =system/modules/audio-config.nix= | MSI host hardware unless generalized |
+
+** P2 - QA and formatting ownership are undefined
+:PROPERTIES:
+:CUSTOM_ID: p2-qa-and-formatting-ownership-are-undefined
+:END:
+The flake exports no =formatter=, =checks=, or CI contract.  The two installed
+formatters disagree.
+
+Fresh non-building validation produced:
+
+| Surface | Result |
+|---------+--------|
+| tracked Nix | 71/71 parse |
+| remote untracked =vscode.nix= | fails at byte 1 because it is empty |
+| JSON | 3/3 parse with =jq= |
+| Lua | 18/18 parse with =luac= |
+| shell | all nine =*.sh= helpers and seven shell executables pass =bash -n= |
+| Python launcher helper | compiles without execution |
+| QML | 31/31 parse through =qmlformat= with the active import paths |
+
+=qmllint= exits successfully on all 31 QML files, but reports 62 diagnostics
+across 16 files.  The July 14 Quickshell audit classifies the known tooling
+metadata noise separately from actionable layout diagnostics; a future check
+must filter named false-positive categories rather than ignoring all warnings.
+
+Default formatting is also not an agreed policy:
+
+- StyLua would change 16 of 18 Lua files;
+- =qmlformat= would change five QML files;
+- =shfmt= would change the six primary Bash entry points;
+- ShellCheck reports four warnings in =scripts/theme-select=:
+  =SC1007= twice, =SC2034=, and dynamic-source =SC1090=.
+
+=nixfmt 1.3.1 --check= flags six tracked files:
+
+- =home/modules/programs/tmux/tmux.nix=;
+- =home/modules/services/quickshell.nix=;
+- =system/modules/packages.nix=;
+- =system/modules/programs/brave.nix=;
+- =theme/plymouth.nix=;
+- =theme/yazi.nix=.
+
+=nixpkgs-fmt 1.3.0 --check= flags twelve:
+
+- =flake.nix=;
+- =home/home.nix=;
+- =home/modules/programs/emacs.nix=;
+- =home/modules/programs/tmux/extra-config.nix=;
+- =home/modules/programs/zsh.nix=;
+- =home/modules/session.nix=;
+- =pkgs/wlctl-bin.nix=;
+- =system/modules/boot.nix=;
+- =system/modules/packages.nix=;
+- =system/modules/programs/nvim/lsp.nix=;
+- =theme/plymouth.nix=;
+- =theme/yazi.nix=.
+
+The empty untracked =vscode.nix= also makes naive “parse every =*.nix=” scripts
+fail.  The remote package diff also contains one whitespace-only line, so
+=git diff --check= is currently red on =system/modules/packages.nix:43=.
+Choose one formatter, validate tracked inputs explicitly, and add target-aware
+checks before a mechanical formatting pass.
+
+* Dead, Stale, And Ambiguous Material
+:PROPERTIES:
+:CUSTOM_ID: dead-stale-and-ambiguous-material
+:END:
+** Confirmed unused or unreachable
+:PROPERTIES:
+:CUSTOM_ID: confirmed-unused-or-unreachable
+:END:
+- The upstream Quickshell flake input is unused; runtime and tooling use
+  =pkgs.quickshell= from the primary Nixpkgs pin.
+- =scripts/weather= has no caller and starts with a blank line before its
+  shebang.
+- The remote zero-byte =system/modules/programs/vscode.nix= is untracked and
+  unimported.
+- =home/default.nix= binds unused =inputs=.
+- Ten QML Yasnippet files are byte-identical under frozen Doom and active clean
+  Emacs.
+- Two Doom logo assets have no source reference.
+- =nil= remains globally installed while active Emacs and NVF use =nixd=.
+- =nixpkgs-fmt= remains globally installed while current editor policy uses
+  =nixfmt=.
+
+The last two are strong removal candidates, not proof that the user never
+invokes them manually.
+
+** Deliberate references that should be labeled
+:PROPERTIES:
+:CUSTOM_ID: deliberate-references-that-should-be-labeled
+:END:
+- Doom is documented as frozen reference material but is still published live
+  at =~/.config/doom=.  Move it under =archive/= or keep it in Git without a
+  runtime link.
+- =config/brave/extensions= and =config/brave/policies= contain documentation
+  and scaffolding.  Their READMEs correctly point to actual system/Home
+  ownership; they are not active configuration and should be named accordingly,
+  not called dead.
+- Ghostty, Kitty, and WezTerm can be intentional primary/fallback experiments.
+  Classify them before deduplicating terminal packages or themes.
+- Root compatibility wrappers may still help non-flake muscle memory.  Label
+  them “legacy compatibility” before deciding whether to remove them.
+
+** Documentation mismatch
+:PROPERTIES:
+:CUSTOM_ID: documentation-mismatch
+:END:
+=docs/areas/theme.org= says clean Emacs does not consume generated
+=emacs-theme.el=.  Active =config/emacs/lisp/sk-theme.el= explicitly loads it,
+and the Emacs area note describes the current behavior correctly.  The theme
+area note should be corrected during the documentation slice.
+
+* Quickshell Optimization Update
+:PROPERTIES:
+:CUSTOM_ID: quickshell-optimization-update
+:END:
+** Current passive snapshot
+:PROPERTIES:
+:CUSTOM_ID: current-passive-snapshot
+:END:
+| Item | Current observation |
+|------+---------------------|
+| Active output | one =eDP-1= monitor |
+| Service | active/running, about 20.5 hours, =NRestarts=0= |
+| Main PID | 4391 |
+| QML source | 31 files, 3,570 lines, clean |
+| Cgroup current memory | 365,342,720 bytes, about 348 MiB |
+| Cgroup peak this boot | 375,767,040 bytes, about 358 MiB |
+| Ten-second cgroup CPU | 149,265 µs, about 1.49% of one core |
+| Snapshot activity | one network status shell probe was in flight |
+
+This is a quiet-state sample, not a benchmark.  It does not replace the July 14
+scenario measurements for launcher, clipboard, wallpaper picker, media/CAVA,
+and theme toggles.
+
+** Confirmed structure versus performance hypotheses
+:PROPERTIES:
+:CUSTOM_ID: confirmed-structure-versus-performance-hypotheses
+:END:
+| Observation | Status | Correct response |
+|-------------+--------+------------------|
+| Five status =Timer=/=Process= pairs are instantiated by each =Bar= | confirmed structure | centralize once before replacing implementations |
+| Current host has one bar/output | active fact | multi-monitor amplification remains a design issue |
+| Quickshell repeatedly failed when Wayland was absent after a Hyprland crash | confirmed reliability bug | add a bounded Wayland-ready lifecycle gate |
+| Mako and Quickshell both regenerate the global theme | confirmed duplicate work | one ordered theme owner |
+| Full-height bar/frame Canvas plus blur is expensive | measured hypothesis from July 14 | compare narrow versus full-height render slice |
+| Wallpaper picker uses =Flickable + Grid + Repeater= | confirmed structure | virtualize only after identical-workload measurement |
+| Splitting large QML files will reduce CPU/memory | unsupported | split for responsibility/testability, then measure behavior separately |
+| GC will make Quickshell faster | unsupported | GC is disk/build hygiene, not a shell optimization |
+
+** Recommended Quickshell order
+:PROPERTIES:
+:CUSTOM_ID: recommended-quickshell-order
+:END:
+Keep the detailed eight-slice plan in the July 14 Quickshell audit.  Incorporate
+today's evidence in this order:
+
+1. Add the source-validation harness and fix deterministic safety/layout bugs.
+2. Add bounded Wayland readiness/restart behavior and one theme-generation
+   owner.
+3. Move existing per-bar pollers into one shared root backend without changing
+   commands or intervals.
+4. Replace those probes one domain at a time with the installed native
+   Quickshell services.
+5. Re-measure media/CAVA, bar rendering, and wallpaper scenarios separately.
+6. Only then consider =services/=, =surfaces/=, and =components/= renames or
+   splitting the four largest view files.
+
+This order gets correctness and measured runtime wins without turning a healthy
+component tree into a rename project.
+
+* Storage, Generations, Logs, And GC
+:PROPERTIES:
+:CUSTOM_ID: storage-generations-logs-and-gc
+:END:
+** Current storage snapshot
+:PROPERTIES:
+:CUSTOM_ID: current-storage-snapshot
+:END:
+| Area | Current | Interpretation |
+|------+---------+----------------|
+| Root filesystem | about 497 GiB used, 29%; about 2% inodes | no pressure |
+| Nix store | 52,235,759,616 bytes, =du -sh= 49 GiB | about 3 GiB larger than July 14 |
+| Store entries | 25,444 top-level paths | population, not dead-path count |
+| Current system closure | 28.9 GiB | 1.9 GiB above generation 853 |
+| Home Manager closure | 17.6 GiB | approximately unchanged from July 14 |
+| Retained system generations | 8 | all July 1-18 |
+| Nix database | 270 MiB | expected daemon metadata |
+| Nix build logs | 65 MiB, 14,869 files | modest |
+| Store =.links= pool | effectively empty, 4 KiB | no meaningful optimized hardlink pool |
+| Persistent journal | 1.6 GiB | effectively unchanged |
+| Coredump metadata | 1,839 records | 1,820 historical/missing plus 19 present |
+| Present compressed cores | about 179.7 MB | retain recent crash evidence for now |
+
+=auto-optimise-store=false=.  =nix.gc.automatic=false=,
+=nix.optimise.automatic=false=, and
+=boot.loader.systemd-boot.configurationLimit=null=.  No GC/optimise timer
+invocations appear in the journal.
+
+One broken direct GC-root link remains:
+
+#+begin_src text
+/nix/var/nix/gcroots/profiles -> /mnt/nix/var/nix/profiles
+#+end_src
+
+=/mnt/nix= does not exist.  Treat removal of that exact stale root as its own
+reviewed maintenance action; it was not changed during this audit.
+
+The store minus the current runtime closure is about 20.1 GiB, but that is only
+a hard upper bound before accounting for seven older generations, user
+profiles, channels, development roots, derivations, and other live references.
+It is not a reclaim estimate.
+
+The July 14 audit saw 1,712 dead paths.  No GC has run since, and the store grew,
+so a candidate population likely remains.  Liveness has changed; that old count
+must not be presented as today's exact result.
+
+** Current non-Nix storage choices
+:PROPERTIES:
+:CUSTOM_ID: current-non-nix-storage-choices
+:END:
+| Area | Size | Classification |
+|------+------|----------------|
+| Steam total | 429.4 GB | user content and caches |
+| Steam installed games | 394.4 GB | content, not cleanup |
+| Steam shader cache | 25.83 GB | regenerable; may cause downloads/compilation/stutter |
+| Enshrouded shader-cache share | 19.006 GB | largest explicit Steam cleanup candidate |
+| Steam compatdata | 5.84 GB | game prefixes/state; not blind cache deletion |
+| Downloads | 25.26 GB | user content |
+| Downloads =iso/= | 19.67 GB | review before deletion |
+| Ollama models | 13,045,167,444 bytes | model data, not cache |
+| Unmanaged =deepseek-r1:8b= | 5.225 GB | semantic/user-choice removal candidate |
+| =~/.config/emacs.backup= | 719.1 MB | old Home Manager backup; confirm before deletion |
+| Trash | 305.4 MB | low-risk only after review |
+
+Two Windows download artifacts are each 8.4716 GB.  Equal size is not proof of
+duplicate content.  Hash and identify both before deleting one.
+
+Observed application-cache candidates include Brave 1.739 GB, Firefox 1.844 GB,
+Vesktop Cache 500.5 MB plus Code Cache 289.4 MB, Nix download/eval cache
+365.5 MB, NVIDIA GL cache 64.8 MB, and Kitty cache 42.6 MB.  Clear application
+caches only with the owning application stopped and after accepting cold-start
+or recompilation cost.
+
+** Log and coredump hygiene
+:PROPERTIES:
+:CUSTOM_ID: log-and-coredump-hygiene
+:END:
+The nineteen present coredumps are useful current evidence and should not be
+deleted merely to improve a dashboard.  After the Hyprland/restart lifecycle is
+triaged, set explicit coredump retention.
+
+Current user warning volume is still dominated by PipeWire-Pulse:
+
+- 146 of 192 sampled user warnings;
+- 73 =SO_PRIORITY= bad-file-descriptor warnings;
+- 73 peer-credential bad-file-descriptor warnings.
+
+D-Bus broker and WirePlumber are the next smaller groups.  Fix or understand the
+source before applying a journal size cap; retention does not solve a warning
+loop.
+
+** Conservative Nix maintenance policy
+:PROPERTIES:
+:CUSTOM_ID: conservative-nix-maintenance-policy
+:END:
+The currently available NixOS options support an age-based policy:
+
+#+begin_src text
+nix.gc = {
+  automatic = true;
+  dates = "weekly";
+  options = "--delete-older-than 30d";
+  randomizedDelaySec = "45min";
+};
+
+nix.optimise = {
+  automatic = true;
+  dates = "weekly";
+};
+
+boot.loader.systemd-boot.configurationLimit = 10;
+#+end_src
+
+This is a proposal, not an applied patch.  Treat the three concerns separately:
+
+1. *Generation policy*: retain a known-good boot generation and document why
+   each exceptional generation is protected.
+2. *GC policy*: delete only roots older than the chosen age, then collect
+   unreachable paths.
+3. *Store optimization*: deduplicate identical files; measure duration and I/O
+   independently from GC.
+
+For the first activation, prevent an immediately caught-up maintenance timer or
+schedule it explicitly in the future.  Inspect generated units and timers before
+the first run.  The first actual collection is a separately authorized,
+observed maintenance event with before/after store, free-space, generation, and
+boot-entry evidence.
+
+* Security, Portability, And Hygiene
+:PROPERTIES:
+:CUSTOM_ID: security-portability-and-hygiene
+:END:
+Current tree-level concerns that remain relevant:
+
+- Ollama is a universal shared module, binds =0.0.0.0=, and opens TCP 11434.
+  Make the AI/LAN service an explicit host profile.
+- TTY1 autologin and immediate Hyprland startup are hardcoded in a shared boot
+  module.  They are MSI/user policy, not generic workstation defaults.
+- The OpenAI key is injected too broadly as described above.
+- =repoPath= fixes the live checkout to
+  =/home/skydive420dz/Projects/nixos-dotfiles=.  This is intentional for live
+  links but reduces portability.
+- =AQ_DRM_DEVICES=/dev/dri/card0:/dev/dri/card1= relies on unstable enumeration;
+  prefer =/dev/dri/by-path= identifiers.
+- Rebuild aliases hardcode =#nixos=; they would select the MSI output on the AMD
+  host.  Derive the target from =hostname=.
+- Kitty enables remote control.  No listening socket is declared, so this is a
+  threat-model review item rather than a confirmed exposed service.
+- The stale global insecure =pnpm-10.29.2= exception and unused Quickshell input
+  should be removed one at a time with output comparison.
+- =allowUnfree=true= is broader than necessary; an allow predicate would record
+  accepted proprietary packages.
+
+The earlier system audit contains the full active security baseline, including
+the open physical session, world-readable ESP random seed, Ollama network
+boundary, SSH hardening, Secure Boot, and missing disk encryption.  This report
+does not relabel those findings without a full new live retest.
+
+* Minimum-Change Target Tree
+:PROPERTIES:
+:CUSTOM_ID: minimum-change-target-tree
+:END:
+This is a destination map, not a one-commit move:
+
+#+begin_src text
+hosts/
+  msi/
+    default.nix
+    hardware-configuration.nix
+    kernel.nix
+    hardware/
+      audio.nix
+      boot.nix
+      input.nix
+      power.nix
+      razer.nix
+    session.nix
+  desktop-amd/
+    default.nix
+    hardware-configuration.nix
+    session.nix
+
+system/
+  profiles/
+    workstation.nix
+    ai.nix
+  modules/
+    core/
+    desktop/
+    programs/
+    services/
+    gpu/
+
+home/
+  profiles/
+    default.nix
+    dev-live-config.nix
+  modules/
+    core/
+    programs/
+    services/
+      theme-apply.nix
+
+pkgs/
+  wlctl-bin.nix
+  qmlls-wrapper.nix
+  hyr.nix
+
+config/
+  quickshell/
+  hypr/
+    common.lua
+    hosts/
+      msi.lua
+      desktop-amd.lua
+  nvim-overlay/
+  emacs/
+
+archive/
+  doom/
+
+devshells/
+  qmk.nix
+
+scripts/
+theme/
+docs/
+#+end_src
+
+Keep the existing top-level =system/= and =home/= names to minimize churn.
+Create category indexes as each subsystem moves.  Do not move all files in one
+slice, and do not combine path moves with behavioral changes.
+
+* Slice-Based Implementation Roadmap
+:PROPERTIES:
+:CUSTOM_ID: slice-based-implementation-roadmap
+:END:
+** Slice 0 - freeze and reconcile the live baseline
+:PROPERTIES:
+:CUSTOM_ID: slice-0-freeze-and-reconcile-the-live-baseline
+:END:
+- Preserve the exact generation 855 output, current dirty diff, and generation
+  list.
+- Decide whether Vial/QMK are intended permanent features.
+- Either commit a corrected feature slice or deliberately prepare a build
+  without it; do not silently copy the remote catch-all package list.
+
+Source gate: local and remote intended source bytes match and =git diff= is
+reviewed.
+
+Build gate: evaluation and no-link build only.
+
+Activation gate: separately authorized; retain generation 855 until device hand
+tests pass.
+
+** Slice 1 - correct QMK/Vial ownership
+:PROPERTIES:
+:CUSTOM_ID: slice-1-correct-qmk-vial-ownership
+:END:
+- Enable =hardware.keyboard.qmk= from an MSI device module.
+- Remove explicit =qmk-udev-rules= from the package list.
+- Put Vial in user application ownership if retained.
+- Move =qmk= to =devShells.x86_64-linux.qmk= or an on-demand shell unless
+  always-on compiler access is intentional.
+
+Build gate: compare closure delta to generation 855 and inspect generated udev
+packages/rules.
+
+Activation gate: after switch, verify =plugdev=, the generated rule, device
+permissions, Vial, and one non-destructive QMK discovery command.  Firmware
+flashing is a separate hand action.
+
+** Slice 2 - make the MSI source hermetic
+:PROPERTIES:
+:CUSTOM_ID: slice-2-make-the-msi-source-hermetic
+:END:
+- Copy and review the current external hardware file into =hosts/msi=.
+- Switch the host to the relative import.
+- Compare the impure and pure derivation/output identities.
+
+Source gate: UUIDs, filesystems, initrd modules, microcode, and platform facts
+match the verified live file.
+
+Build gate: pure eval and no-link build.
+
+Activation gate: only after equality/review; verify mounts and devices, with a
+separately scheduled reboot if boot facts change.
+
+** Slice 3 - restore whole-flake QA
+:PROPERTIES:
+:CUSTOM_ID: slice-3-restore-whole-flake-qa
+:END:
+- Stop exporting the invalid AMD placeholder as a normal NixOS configuration,
+  while retaining its deployment safety guard.
+- Choose =nixfmt= or its intended successor and export =formatter=.
+- Add tracked-file Nix parse, shell, Python, JSON, Lua, and Quickshell checks.
+- Add an MSI pure evaluation/build check after Slice 2.
+
+Success gate: =nix flake check --no-build= is green for exported outputs.
+
+Build gate: full no-link MSI build recorded separately.
+
+There is no activation in this repository-only slice.
+
+** Slice 4 - establish host boundaries
+:PROPERTIES:
+:CUSTOM_ID: slice-4-establish-host-boundaries
+:END:
+- Move MSI audio, input, power, boot quirks, Razer, display, and touchpad facts
+  behind =hosts/msi=.
+- Make Ollama an explicit opt-in profile rather than universal shared policy.
+- Derive rebuild aliases from the selected hostname.
+- Keep generic desktop/program modules behaviorally unchanged.
+
+Move one subsystem per commit.  A path move and a behavior change do not share a
+slice.
+
+Build gate: MSI output builds after every move; AMD bootstrap remains safely
+nondeployable.
+
+Activation gate: separate by hardware domain, with cold-boot/hotplug/suspend/GPU
+hand tests where relevant.
+
+** Slice 5 - make package ownership explicit
+:PROPERTIES:
+:CUSTOM_ID: slice-5-make-package-ownership-explicit
+:END:
+- Turn =system/modules/packages.nix= into a small workstation-runtime profile.
+- Deduplicate btop, git, tmux, and fzf ownership.
+- Remove unused Quickshell input, stale =nil=/=nixpkgs-fmt= candidates, and stale
+  insecure pnpm exception one at a time.
+- Group Emacs tools by capability and move occasional language stacks to project
+  shells only after confirming active editor use.
+- Decide NVF versus Emacs ownership before removing duplicated compiler/LSP
+  stacks.
+
+Build gate: record current and candidate system/Home closure sizes and
+=why-depends= evidence.
+
+Activation gate: verify commands, editor LSPs, and terminal sessions separately.
+
+** Slice 6 - add conservative Nix maintenance
+:PROPERTIES:
+:CUSTOM_ID: slice-6-add-conservative-nix-maintenance
+:END:
+- Document the rollback generations to preserve.
+- Add a 30-day weekly GC schedule with an explicit first future window.
+- Add store optimization as a separate timer.
+- Set a reviewed boot-entry limit, initially ten.
+
+Build gate: inspect generated =nix-gc=, =nix-optimise=, and bootloader
+configuration without collecting.
+
+Activation gate: verify timer schedules only.  Prevent immediate catch-up.
+
+Maintenance gate: the first actual GC/optimization is separately authorized and
+observed.  Record paths/generations retained, duration, bytes reclaimed, and
+post-run boot entries.
+
+** Slice 7 - clean non-Nix storage by owner
+:PROPERTIES:
+:CUSTOM_ID: slice-7-clean-non-nix-storage-by-owner
+:END:
+- Clear stopped-application caches in small batches if desired.
+- Review Trash and the old Emacs backup.
+- Hash/identify the equal-size Windows artifacts before deleting either.
+- Use Steam's own UI for selected shader-cache cleanup and accept regeneration
+  stutter.
+- Remove an Ollama model only after confirming it is no longer wanted.
+
+There is no Nix build or activation in this slice.  Each data owner gets its own
+before/after measurement and rollback expectation.
+
+** Slice 8 - harden Quickshell and graphical service lifecycle
+:PROPERTIES:
+:CUSTOM_ID: slice-8-harden-quickshell-and-graphical-service-lifecycle
+:END:
+- Implement the validation and deterministic safety fixes from Quickshell
+  Slices 0-1.
+- Add bounded Wayland readiness and restart delay/backoff.
+- Preserve crash evidence until the Hyprland renderer assertion is triaged.
+- Apply an equivalent lifecycle fix/override for hyprpolkit.
+
+Build gate: inspect user-unit ordering and service scripts.
+
+Activation gate: restart only the affected user service first.
+
+Runtime gate: normal start, controlled Quickshell restart, compositor
+stop/start, and one induced unavailable-display test without a coredump storm.
+
+** Slice 9 - give theme and QML tooling one owner
+:PROPERTIES:
+:CUSTOM_ID: slice-9-give-theme-and-qml-tooling-one-owner
+:END:
+- Create one ordered theme-apply oneshot service.
+- Order Mako and Quickshell after it and remove duplicate =ExecStartPre= calls.
+- Stop restarting Quickshell for normal theme toggles.
+- Package one shared =qmlls= wrapper/import-path source for shell, Emacs, and
+  NVF.
+
+Build gate: inspect generated units and wrapper command lines.
+
+Activation gate: restart one service at a time.
+
+Hand tests: login, dark/light toggle, Mako notification, Quickshell reload, and
+QML language-server startup in both editors.
+
+** Slice 10 - classify configuration provenance
+:PROPERTIES:
+:CUSTOM_ID: slice-10-classify-configuration-provenance
+:END:
+- Move settled configs to store-backed sources.
+- Keep a named =dev-live-config= profile for Quickshell/editor iteration.
+- Remove frozen Doom from the live runtime path and consolidate its duplicate
+  snippets only after deciding archive policy.
+- Make theme generation atomic and fix its Home Manager DAG ordering.
+
+Build gate: a generation contains the exact stable config bytes.
+
+Activation gate: branch switches and Home Manager rollbacks have documented,
+predictable effects.
+
+** Slice 11 - tree and large-file hygiene
+:PROPERTIES:
+:CUSTOM_ID: slice-11-tree-and-large-file-hygiene
+:END:
+- Consolidate the Home import index and rename ambiguous aerc/Mako/udisks2/
+  udiskie modules.
+- Move embedded Yazi Lua plugins to normal source files or packaged plugins.
+- Replace the giant Yazi schema/icon attrset with a reviewed generated/data
+  source where practical.
+- Remove or label =scripts/weather=, the empty VS Code placeholder, legacy
+  wrappers, and unused Doom assets.
+- Correct the theme/Emacs documentation mismatch.
+- Split large QML/Elisp files only by responsibility and without changing
+  behavior.
+
+Source gate: reference checks and byte-for-byte generated-output comparisons.
+
+Build gate: Nix evaluation/build for Nix-owned moves; QML/Elisp validation for
+live-source moves.
+
+Activation is separate and only needed for paths that participate in the active
+profile.
+
+** Slice 12 - narrow security scope
+:PROPERTIES:
+:CUSTOM_ID: slice-12-narrow-security-scope
+:END:
+- Scope the OpenAI key to the clients that need it.
+- Make Ollama LAN exposure a deliberate host/profile option.
+- Revisit autologin/lock policy, =AQ_DRM_DEVICES= stability, unfree policy, and
+  Kitty remote control as independent changes.
+
+Build gate: inspect environment, unit, firewall, and package-policy outputs.
+
+Activation gate: separate per concern.  For the secret slice, start a fresh
+user session and verify that unrelated graphical processes and the user manager
+do not inherit =OPENAI_API_KEY=.
+
+* Verification Contract
+:PROPERTIES:
+:CUSTOM_ID: verification-contract
+:END:
+Every implementation slice should record five distinct gates:
+
+1. *Source validation*: exact dirty diff, parsers/linters, reference checks, and
+   generated-output comparison.
+2. *Evaluation*: target-specific =nix eval=; not a build.
+3. *Build verification*: no-link build and closure comparison; not activation.
+4. *Live activation*: separately authorized =test=, =switch=, =boot=, or user
+   service restart.
+5. *Runtime and hand tests*: active store path, units, logs, hardware/app
+   behavior, and rollback.
+
+A green build never proves that the machine is running it.  An out-of-store
+Quickshell/Emacs/Hyprland link also means a green Nix build does not prove the
+active source bytes unless that slice adds its own source validation.
+
+* Recommended Starting Point
+:PROPERTIES:
+:CUSTOM_ID: recommended-starting-point
+:END:
+Start with Slices 0 and 1 only:
+
+- reconcile the dirty live package source;
+- make QMK rules functional;
+- remove the 1.73 GiB always-on QMK toolchain from the system closure if
+  on-demand use matches the workflow;
+- preserve generation 855 as rollback;
+- compare builds without activating.
+
+Then do the hermetic-host and QA slices.  GC should follow source/rollback
+clarity, not precede it.  Quickshell's next change should be validation plus the
+Wayland-ready lifecycle fix, not a folder rename.

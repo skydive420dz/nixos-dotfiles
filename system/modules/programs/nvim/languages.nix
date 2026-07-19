@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 {
   programs.nvf.settings.vim.languages = {
     enableFormat = true;
@@ -40,7 +40,6 @@
       extensions.crates-nvim.enable = true;
       lsp = {
         enable = true;
-        package = pkgs.rust-analyzer;
       };
     };
 

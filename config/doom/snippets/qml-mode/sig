@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: signal
-# key: sig
-# --
-signal ${1:name}(${2})
-$0

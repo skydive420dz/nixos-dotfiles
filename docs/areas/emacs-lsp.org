@@ -26,10 +26,10 @@ The active slice is not a license to redesign Emacs.
 
 Allowed:
 
-- Factor the locked lsp-mode/Company behavior out of Lua-specific names.
-- Add =nix-mode= and =nix-ts-mode= to lsp-mode ownership.
-- Use lsp-mode's native =nixd= client without hardcoded flake paths.
-- Restore and maintain this contract document.
+- Keep the accepted shared lsp-mode/Company behavior centralized.
+- Finish the existing Python =lsp-pyright=/=basedpyright= acceptance probes.
+- Keep Python formatting under the existing =sk-format=/=black= owner.
+- Update this contract with observed results.
 - Validate one language at a time on one project file and one standalone file.
 
 Not allowed:
@@ -40,7 +40,7 @@ Not allowed:
 - Hidden one-off package hacks.
 - Migration to another language before the active slice passes or is rejected.
 
-Rollback point:
+Historical proof-slice rollback point:
 
 - Commit =45e3ad0=, =Build Lua lsp-mode proof slice=.
 
@@ -186,7 +186,7 @@ Each lsp-mode language slice must prove:
   minibuffer output.
 - Definition and references work where the server supports them.
 - Diagnostics work through Flycheck.
-- Code actions work where LuaLS supports them.
+- Code actions work where the active server supports them.
 - Formatting uses the =sk-format= contract.
 - Completion navigation works with =C-j=, =C-k=, =C-l=, and =C-h=.
 - No hardcoded machine paths.
@@ -212,22 +212,27 @@ Each lsp-mode language slice must prove:
 :END:
 Goal:
 
-- Move Nix from the Eglot/Corfu baseline to the locked lsp-mode/Company model.
+- Finish manual acceptance of the implemented Python =lsp-pyright=/Company
+  slice.
 
-Implementation steps:
+Implemented:
 
-1. Extract the locked lsp-mode/Company behavior into reusable helper functions.
-2. Keep Lua using those helper functions.
-3. Add =nix-mode= and =nix-ts-mode= to =sk/lsp-mode-owned-modes=.
-4. Use lsp-mode's native =nixd= client with no hardcoded flake paths.
-5. Preserve =completion-at-point-functions=(lsp-completion-at-point)=.
-6. Validate Nix only.
+- =python-mode= and =python-ts-mode= use the shared lsp-mode/Company owner.
+- The maintained =lsp-pyright= client launches =basedpyright=.
+- Formatting remains explicitly owned by =sk-format= through =black=.
+- The batch wiring probe passed.
+
+Remaining acceptance:
+
+- Complete the manual popup, navigation, hover, definition, diagnostics, and
+  formatting probes in the Python implementation log below.
+- Accept the slice or revert it before choosing another language.
 
 Out of scope:
 
-- Additional languages.
-- Keymap changes.
-- Custom syntax backends.
+- Migrating another language.
+- General completion, keymap, or editor redesign.
+- NVF changes.
 
 ** Implementation Log
 :PROPERTIES:

@@ -2,10 +2,7 @@
 #+startup: overview
 
 * Purpose
-This is the clean personal Emacs configuration experiment.
-
-This is the active clean Emacs config. Doom is frozen as reference material
-under =~/.config/doom=.
+This is the active personal Emacs configuration.
 
 * Ownership
 #+begin_src text
@@ -21,8 +18,6 @@ After Home Manager links this directory to =~/.config/emacs=:
 emacs-sync
 emacs
 #+end_src
-
-Doom is frozen as reference material under =~/.config/doom=.
 
 * Runtime State
 Runtime/package state belongs outside the repo:
@@ -45,6 +40,7 @@ lisp/
   sk-evil.el
   sk-completion.el
   sk-lsp.el
+  sk-lsp-mode.el
   sk-format.el
   sk-org.el
   sk-notes.el
@@ -428,18 +424,20 @@ warnings / compile output    bottom panel
 #+end_src
 
 * Completion
-Completion is layered deliberately:
+Completion is layered deliberately.  Lua, Nix, and Python use the
+=lsp-mode=/Company proof stack; other code and prose buffers keep the
+Eglot/Corfu path.
 
 #+begin_src text
 minibuffer        Vertico + Orderless + Marginalia + Consult + Embark
-buffer popup      Corfu
-code sources      snippet triggers first, then mode/LSP CAPFs and Cape fallbacks
+default popup     Corfu
+Lua/Nix/Python    Company backed by lsp-mode CAPF, snippets, files, keywords, dabbrev
+other code        Eglot/mode CAPFs plus snippets and conservative Cape fallbacks
 prose sources     Org/text CAPFs first, then Cape file and dabbrev
 snippets          Yasnippet is active globally; repo snippets live in config/emacs/snippets
-snippet source    snippet triggers appear in Corfu for code buffers
+snippet source    snippet triggers appear in the active Corfu or Company popup
 snippet fields    TAB / S-TAB move next / previous while a snippet is active
-history           savehist persists Corfu selection history
-docs              Corfu popupinfo shows candidate documentation when the source provides it
+docs              M-d shows source/server documentation when available
 #+end_src
 
 Completion keys:
@@ -448,14 +446,13 @@ Completion keys:
 C-j / C-k         next / previous completion candidate
 C-l               accept completion candidate
 C-h               quit completion popup
-M-/               start completion at point; Corfu displays the popup
-M-d               toggle Corfu documentation popup while completion is open
+M-/               start completion at point
+M-d               show/toggle documentation for the active popup
 #+end_src
 
 Documentation availability depends on the completion source. LSP candidates may
 provide docs. File names, keywords, dabbrev, snippets, and many local symbols
-usually do not. Snippet triggers are offered in Corfu for code buffers and
-expand when accepted. Current tracked snippets cover QML/Quickshell.
+usually do not. Current tracked snippets cover QML/Quickshell.
 
 * Editing Defaults
 Indentation policy is intentionally boring:
@@ -558,9 +555,17 @@ NVF is not edited by this policy. It remains a reference and already owns its
 own Tree-sitter setup through NVF.
 
 * LSP Policy
-Eglot is the clean Emacs LSP client. Servers are started for real file buffers
-only, and =eglot-autoshutdown= stays disabled so project language servers are
-not repeatedly started and killed during normal buffer churn.
+Client ownership is intentionally hybrid and language-scoped:
+
+#+begin_src text
+Lua / Nix          accepted lsp-mode + Company slices
+Python             implemented lsp-mode + Company slice; manual acceptance in progress
+other languages    Eglot + Corfu baseline until deliberately migrated
+#+end_src
+
+Servers start only for real file buffers.  The authoritative status, acceptance
+criteria, and next language decision live in
+[[../../docs/areas/emacs-lsp.org][the Emacs LSP contract]].
 
 * Binding Migration
 This table tracks Doom key behavior as it moves into the clean config.
@@ -672,36 +677,16 @@ org SPC m B    source-block localleader          sk/org-babel-map               
 org SPC m a    attachment localleader            same built-in Org commands       done
 #+end_src
 
-* TODO Next Emacs Passes
-#+begin_src text
-DONE Finish Doom muscle-memory key audit for core file/project/search/help/buffer/mode keys.
-TODO Watch for real-use key edge cases and add them deliberately as they come up.
-TODO Make insert-state physical =<tab>= indent like =TAB= without changing Org, Magit, or active snippet field behavior.
-TODO Add a macOS LaunchAgent-backed Emacs daemon and make =emacsclient --create-frame= the normal GUI entrypoint.
-TODO Tune completion across minibuffer, Corfu, snippets, LSP, and prose.
-DONE Polish Doom modeline and Sky theme faces until the UI looks intentional.
-TODO Make Org first-class: notes, agenda, capture templates, source blocks, navigation.
-DONE Sanity-check LSP per language: Nix, Lua, QML, Rust, C/C++, Python, Haskell, shell, Markdown/Org prose, YAML/JSON, web basics.
-TODO Decide formatting policy and keep it explicit instead of surprise autoformat.
-DONE Decide Emacs tree-sitter grammar ownership before enabling tsx-ts/js-ts modes.
-TODO Choose an extra TS major-mode package for Org if it beats the classic mode. QML is handled by local sk-qml-ts-mode.
-TODO Keep documenting the clean Emacs layout and user-facing key surface as it changes.
-TODO Reference audit: gopar/.emacs.d. Treat it as source material only, not structure to copy.
-TODO Revisit optional symbol-at-point DevDocs lookup later. DevDocs is active as a Magit/Dired-style helper panel only; it does not own LSP, completion, or code documentation at point.
-TODO Evaluate Popper for transient help/warnings/terminal/compilation buffer control.
-TODO Adapt Org TODO/agenda/review ideas slowly: NEXT, IN-PROGRESS, WAITING, log drawers, review views.
-TODO Compare completion layering with gopar's Corfu/Cape/dabbrev/yasnippet-capf setup before changing ours.
-TODO Consider smarter keyboard-quit behavior for minibuffer/completion/region escape.
-TODO Consider keycast for learning/debugging key usage.
-TODO Consider envrc/direnv only if project environments become a real Emacs pain point.
-#+end_src
+* Future TLC
+- Finish or explicitly defer the Python =lsp-mode=/Company manual acceptance
+  probes before selecting another language.
+- Tie completion, terminal, Harper, Tree-sitter, HTML/CSS diagnostics, key, and
+  SkyLight changes to observed daily-use friction.
+- Keep formatting manual and ownership explicit.
+- Borrow reference-config ideas one small, tested behavior at a time.
 
-Reference:
-- https://github.com/gopar/.emacs.d
-- Popper: README.org section "Popper"
-- Org workflow: README.org sections "Org", "Org Agenda", and "Org Capture"
-- Completion: README.org section "Code Completion"
-- Smart quit: README.org function =gopar/er-keyboard-quit-dwim=
+The longer backlog and historical checkpoints live in
+[[../../docs/areas/emacs.org][the Emacs area note]].
 
 * Rule
 Keep every module small enough to understand.

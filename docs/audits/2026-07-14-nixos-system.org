@@ -1,0 +1,928 @@
+#+title: NixOS System Audit - 2026-07-14
+
+* Purpose
+:PROPERTIES:
+:CUSTOM_ID: purpose
+:END:
+This is the evidence-backed baseline for the MSI laptop currently reachable at
+=192.168.1.175=.  It audits both the live machine and the dotfiles checkout that
+produces it, without treating a successful build as proof that a change was
+activated.
+
+The audit began read-only.  It did not update the flake lock, edit configuration,
+restart services, run =nixos-rebuild test/switch/boot=, change the system profile,
+or reboot the machine.  A no-link Nix build realized an already-present output in
+the Nix store; that result is recorded separately from active-state evidence.
+
+Evidence labels used below:
+
+- =CONFIG=: declared in the tracked repository or the imported hardware file.
+- =BUILD=: Nix evaluation or realization result; not proof of activation.
+- =ACTIVE=: observed on the running machine.
+- =HISTORY=: journal/profile evidence from an earlier boot or shutdown.
+- =INFERENCE=: a conclusion from the preceding evidence, called out explicitly.
+
+* Verified Target And Provenance
+:PROPERTIES:
+:CUSTOM_ID: verified-target-and-provenance
+:END:
+** Machine identity
+:PROPERTIES:
+:CUSTOM_ID: machine-identity
+:END:
+| Item | Verified value |
+|-------------------+------------------------------------------------------------|
+| SSH target | =skydive420dz@192.168.1.175= |
+| Hostname | =nixos= |
+| Hardware | MSI Bravo 15 C7VE, AMD Ryzen 5 7535HS, 30 GiB RAM |
+| Graphics | AMD integrated GPU plus NVIDIA RTX 4050 Laptop GPU |
+| NixOS | =26.11.20260705.d407951 (Zokor)= |
+| Kernel | =7.1.3= |
+| Remote checkout | =/home/skydive420dz/Projects/nixos-dotfiles= |
+| Branch | =work/emacs-lsp-mode-experiment= |
+| Commit | =8bd891b8dc926af0670e002de264122b206d156d= |
+| Active generation | =853= |
+
+The SSH name =nixos= was not resolvable from the audit machine.  The literal IP
+was therefore verified directly: it reports hostname =nixos= and owns address
+=192.168.1.175=.
+
+** Checkout relationship
+:PROPERTIES:
+:CUSTOM_ID: checkout-relationship
+:END:
+- The local and remote checkouts have the same tracked HEAD, =flake.nix=, and
+  =flake.lock=.
+- The remote checkout's fetched =origin/work/emacs-lsp-mode-experiment= is at
+  HEAD.  The local remote-tracking ref is stale at =45cca46= and therefore says
+  the local branch is one commit ahead.  No fetch was performed during this
+  audit.
+- The local tracked tree was clean before this audit document was added.
+- The remote tree has one pre-existing untracked file:
+  =system/modules/programs/vscode.nix=.  It is zero bytes, is not imported, and
+  is ignored by the Git-backed flake.  It was preserved as user-owned state.
+- The active checkout is an experimental editor branch rather than =main=.
+  Together with the current external hardware file it evaluates to the active
+  output, but store-path equality does not prove the branch name that originally
+  created generation 853.  Rebuilding from this checkout still couples future OS
+  work to in-progress editor work and mutable live-linked configs.
+
+** Build versus active state
+:PROPERTIES:
+:CUSTOM_ID: build-versus-active-state
+:END:
+The current tracked checkout together with the imported live
+=/etc/nixos/hardware-configuration.nix= evaluates impurely to:
+
+#+begin_src text
+/nix/store/m0935nawz2snmwq04fw6lx8z6sjs1g8f-nixos-system-nixos-26.11.20260705.d407951.drv
+/nix/store/270apsrfarbxf8c3jyya65gmr1vdhvvy-nixos-system-nixos-26.11.20260705.d407951
+#+end_src
+
+=nix build --impure --no-link --no-write-lock-file= completed successfully and
+returned the second path.  It was an already-present realization, not a
+clean-store rebuild.
+
+Separately, the three active pointers and the profile generation identity resolve
+to that exact same output:
+
+- =/run/current-system=
+- =/run/booted-system=
+- =/nix/var/nix/profiles/system=
+- generation =853=
+
+Therefore the current tracked checkout plus the current external hardware file
+evaluates to the active and booted system output.  This equality does not prove
+which branch name or working-tree state originally created generation 853.  No
+activation was performed by the audit.
+
+Six system profile links, generations 848 through 853, are retained.
+
+** Evaluation and QA boundary
+:PROPERTIES:
+:CUSTOM_ID: evaluation-and-qa-boundary
+:END:
+- All 71 tracked Nix files parse.
+- All tracked shell files pass =bash -n=.
+- The Hyprland Lua file compiles, the checked JSON files parse, and the active
+  Quickshell journal contains =Configuration Loaded=.
+- Pure MSI evaluation fails because [[../../hosts/msi/default.nix][hosts/msi/default.nix]] imports
+  =/etc/nixos/hardware-configuration.nix=.
+- =nix flake check --impure --no-build= gets past MSI, then fails because
+  [[../../hosts/desktop-amd/hardware-configuration.nix][desktop-amd/hardware-configuration.nix]] deliberately asserts false and has no
+  root filesystem.  The AMD safety placeholder is useful, but exporting it as a
+  normal configuration keeps whole-flake checks red.
+- The flake exports neither =formatter= nor =checks= and has no CI.
+- =nixfmt 1.3.1 --check= flags six tracked files; =nixpkgs-fmt 1.3.0 --check=
+  flags eleven.  The formatters disagree, so one must be chosen before a
+  mechanical format pass.
+
+The =nixfmt= set is:
+
+- =home/modules/programs/tmux/tmux.nix=
+- =home/modules/services/quickshell.nix=
+- =system/modules/packages.nix=
+- =system/modules/programs/brave.nix=
+- =theme/plymouth.nix=
+- =theme/yazi.nix=
+
+The =nixpkgs-fmt= set is:
+
+- =flake.nix=
+- =home/home.nix=
+- =home/modules/programs/emacs.nix=
+- =home/modules/programs/tmux/extra-config.nix=
+- =home/modules/programs/zsh.nix=
+- =home/modules/session.nix=
+- =pkgs/wlctl-bin.nix=
+- =system/modules/boot.nix=
+- =system/modules/programs/nvim/lsp.nix=
+- =theme/plymouth.nix=
+- =theme/yazi.nix=
+
+* Effective Configuration Inventory
+:PROPERTIES:
+:CUSTOM_ID: effective-configuration-inventory
+:END:
+** Flake and host graph
+:PROPERTIES:
+:CUSTOM_ID: flake-and-host-graph
+:END:
+[[../../flake.nix][flake.nix]] pins Nixpkgs unstable, Home Manager, Hyprland, Lanzaboote,
+Quickshell, NVF, and the Firefox add-on set.  =mkNixos= fixes the user to
+=skydive420dz= and the platform to =x86_64-linux=, then applies NVF, Lanzaboote,
+Home Manager, and the selected host module.
+
+| Output | Host composition | Current status |
+|---------------+-------------------------------------------------------------+----------------------------------------------|
+| =nixos= | [[../../hosts/msi/default.nix][hosts/msi]], shared system modules, NVIDIA hybrid profile | Builds and matches the active MSI machine |
+| =desktop-amd= | [[../../hosts/desktop-amd/default.nix][hosts/desktop-amd]], shared modules, AMD RDNA4 profile | Deliberately non-buildable placeholder |
+
+The top-level [[../../configuration.nix][configuration.nix]], [[../../home.nix][home.nix]], and
+[[../../hosts/nixos/default.nix][hosts/nixos/default.nix]] are compatibility wrappers.  The flake selects
+=hosts/msi= directly.
+
+The MSI hardware facts currently live outside Git.  The imported file declares:
+
+- NVMe, XHCI, USB-storage, and SD initrd modules;
+- =kvm-amd=;
+- an unencrypted ext4 root by UUID;
+- a VFAT =/boot= by UUID with =fmask=0022,dmask=0022=;
+- no swap devices;
+- x86_64 platform and AMD microcode policy.
+
+** Shared NixOS modules
+:PROPERTIES:
+:CUSTOM_ID: shared-nixos-modules
+:END:
+| Source | Effective ownership |
+|-------------------------------------------------------+--------------------------------------------------------------------------------------|
+| [[../../system/modules/base.nix][base.nix]] | Unfree policy, one insecure-package exception, flakes, timezone, state version 25.05 |
+| [[../../system/modules/networking.nix][networking.nix]] | NetworkManager, firewall-backed OpenSSH, key-only login, no root login |
+| [[../../system/modules/power.nix][power.nix]] | UPower, TLP AC/battery policy, charge thresholds, weekly trim |
+| [[../../system/modules/input.nix][input.nix]] | Libinput and Kanata mappings for the internal and DrunkDeer keyboards |
+| [[../../system/modules/users.nix][users.nix]] | One normal zsh user, wheel/network/video/input groups, two SSH public keys |
+| [[../../system/modules/gaming.nix][gaming.nix]] | Steam, Gamescope session, GameMode, compatibility-tools path |
+| [[../../system/modules/razer.nix][razer.nix]] | Patched OpenRazer kernel package, Polychromatic, ratbagd, input-remapper |
+| [[../../system/modules/packages.nix][packages.nix]] | CLI/dev/QML/media/Bluetooth packages and fixed-output =wlctl= |
+| [[../../system/modules/programs/brave.nix][programs/brave.nix]] | Global Brave policy and extension allow/install policy |
+| [[../../system/modules/programs/bat.nix][programs/bat.nix]] | System-wide bat configuration and shell-facing defaults |
+| [[../../system/modules/programs/nvim/default.nix][programs/nvim]] | NVF Neovim, languages, LSP, completion, UI, and development tools |
+| =services/ollama.nix= (retired after this audit) | Ollama server, three declarative model pulls, open TCP 11434 |
+| [[../../system/modules/services/removable-media.nix][services/removable-media.nix]] | UDisks2 removable-media support |
+| [[../../system/modules/desktop/hyprland.nix][desktop/hyprland.nix]] | Upstream Hyprland package, UWSM, Xwayland, portals, polkit agent |
+| [[../../system/modules/audio-config.nix][audio-config.nix]] | PipeWire/Pulse/ALSA, WirePlumber hardware rules, Bluetooth, RTKit |
+| [[../../system/modules/boot.nix][boot.nix]] | Lanzaboote, Plymouth, silent boot, kernel quirks, TTY1 autologin |
+| [[../../system/modules/fonts.nix][fonts.nix]] | Nerd, icon, emoji, CJK, Unicode, UI, serif, and fallback fonts |
+| [[../../system/modules/clipboard.nix][clipboard.nix]] | Cliphist, clipboard persistence, image previews, wipe helper |
+
+The MSI host adds [[../../hosts/msi/kernel.nix][linuxPackages_latest]] and
+[[../../system/modules/gpu/nvidia-hybrid.nix][NVIDIA Prime Sync]].  Both GPUs remain on; NVIDIA drives the rendered desktop
+while the internal panel is physically attached to AMD.
+
+** Home Manager and graphical session
+:PROPERTIES:
+:CUSTOM_ID: home-manager-and-graphical-session
+:END:
+[[../../home/default.nix][home/default.nix]] and [[../../home/modules/default.nix][home/modules/default.nix]] compose:
+
+- Python, screenshot, JSON, audio, monitoring, notification, and power tools;
+- aerc plus pass/GPG/notmuch/abook;
+- Mako, udiskie, Quickshell, and the Emacs daemon;
+- Brave and Firefox;
+- Ghostty, Kitty, and WezTerm;
+- zsh, Starship, fzf, tmux, btop, Git, Yazi, Vesktop, and fastfetch;
+- runtime theme generation and pointer/cursor integration.
+
+The graphical path is:
+
+1. TTY1 auto-logs in as =skydive420dz=.
+2. Login zsh asks UWSM to launch =hyprland-uwsm.desktop= on TTY1.
+3. Hyprland finalizes the UWSM graphical session.
+4. The graphical-session target starts Quickshell, Mako, Emacs, udiskie, and the
+   polkit agent.  PipeWire/WirePlumber are separate user/socket-activated
+   services rather than children of that target.
+5. Hyprland starts Vesktop, two Cliphist watchers, and =wl-clip-persist=.
+
+The active user manager confirms that the core desktop services are running.
+It is degraded only because =xdg-document-portal.service= is failed.
+
+** Declarative versus mutable user state
+:PROPERTIES:
+:CUSTOM_ID: declarative-versus-mutable-user-state
+:END:
+[[../../home/modules/links.nix][home/modules/links.nix]] intentionally makes most frequently edited configs out-of-store
+symlinks into =/home/skydive420dz/Projects/nixos-dotfiles=.  Live targets for
+aerc, Doom, Emacs, Quickshell, scripts, Neovim, WezTerm, Ghostty shaders, and
+Hyprland all currently resolve to that checkout.
+
+Consequences:
+
+- edits and branch switches take effect outside a Nix generation;
+- a NixOS/Home Manager rollback does not roll those files back;
+- moving or deleting the checkout breaks them;
+- activation and several user services execute mutable scripts from the repo.
+
+Other intentionally external state includes NetworkManager connections, the
+user password, GPG keys, =pass= data, Emacs package/cache state, browser profiles,
+Cliphist history, wallpaper state, Ollama models, and Secure Boot keys.
+
+One live setting is known configuration drift: =mpris-proxy.service= is enabled
+per-user, but the repo only documents a manual =systemctl --user enable= command.
+
+** Live hardware and resource snapshot
+:PROPERTIES:
+:CUSTOM_ID: live-hardware-and-resource-snapshot
+:END:
+| Area | Active observation |
+|----------------+---------------------------------------------------------------------------------------------|
+| CPU | 6-core/12-thread AMD Ryzen 5 7535HS, =amd-pstate-epp= |
+| GPU | AMD integrated display path plus RTX 4050 Laptop GPU, NVIDIA driver 610.43.02 |
+| Memory | 30 GiB RAM, no swap, no zram, systemd-oomd active |
+| Root | 1.8 TiB Samsung 990 Pro ext4, about 493 GiB used, no LUKS mapping |
+| ESP | 1 GiB VFAT at =/boot=, about 141 MiB used |
+| Battery | Fully charged sample at about 95.4% of design capacity; later sample discharging |
+| Network | NetworkManager on Wi-Fi; IPv4 LAN plus global IPv6; firewall active |
+| Listeners | SSH on TCP 22 and Ollama on TCP 11434; transient app-local listeners are not configuration claims |
+| Desktop | Hyprland/UWSM, Quickshell, Mako, PipeWire/WirePlumber, Emacs daemon |
+| Service health | System state =running= with zero failed system units; user state degraded by document portal |
+
+* Strengths
+:PROPERTIES:
+:CUSTOM_ID: strengths
+:END:
+- The checked-out tracked configuration plus the current external hardware file
+  builds to the exact active/booted system path.
+- The host constructor and GPU profiles are small and understandable.
+- NixOS and Home Manager state versions are pinned at 25.05.
+- Inputs are lock-pinned; the direct pins were five to nine days old at audit
+  time.  No upstream freshness check or update was attempted.
+- Secure Boot is genuinely enabled.  Lanzaboote is the active stub, the TPM2 is
+  present, the UKI is measured, and boot-entry editing is disabled.  This does
+  not provide a complete runtime kernel-module boundary: the active kernel lacks
+  module-signature and lockdown-LSM support, AppArmor/SELinux are inactive, and
+  taint 4097 reflects the expected proprietary/out-of-tree NVIDIA stack.
+- The firewall is active.  SSH is key-only, disables keyboard-interactive and
+  password login, disables root login and X11 forwarding, and sudo still needs a
+  password.
+- Nix sandboxing and signature requirements are enabled; only root is trusted
+  and only the official cache is configured.
+- There are zero failed system services, no current kernel/storage/OOM errors,
+  and the desktop, audio, network, SSH, firewall, and Nix daemon are live.
+- The active generation's earlier Home Manager activation completed
+  successfully, and core user services start normally.  This audit did not run
+  activation.
+- The root filesystem has ample space (29% used), the ESP is 14% used, weekly
+  trim is active, and the battery reports about 95.4% of design capacity.
+- CPU vulnerability files report either not-affected or mitigated states.
+  =dmesg_restrict=, =kptr_restrict=, Yama ptrace restrictions, ASLR, protected
+  link/file sysctls, and unprivileged-BPF restrictions are active.
+- Ollama's systemd sandbox is strong even though its network boundary is not:
+  dynamic user, strict filesystem protection, no-new-privileges, private temp,
+  and constrained devices/capabilities.
+- The OpenRazer compatibility patch uses =--replace-fail=, so upstream drift
+  fails visibly.
+- No private-key or obvious committed-token signature was found.  The live
+  =~/.openai_key= is mode 0600, =~/.gnupg= and =~/.password-store= are mode 0700,
+  and aerc obtains credentials through =pass=.
+- The repository's architecture and ownership notes are unusually useful and
+  already call out the external MSI hardware file as temporary.
+
+* Findings
+:PROPERTIES:
+:CUSTOM_ID: findings
+:END:
+Severity means priority for this machine, not a claim of exploitation.
+
+** High - network, physical, and boot access
+:PROPERTIES:
+:CUSTOM_ID: high-network-physical-and-boot-access
+:END:
+*** Ollama is exposed on every interface
+=CONFIG=: Ollama binds =0.0.0.0:11434= and the firewall opens TCP 11434.
+
+=ACTIVE=: =ss= shows =*:11434= and an IPv4 LAN request returned Ollama version
+=0.31.1=.  The laptop also has a global IPv6 address and the listener is
+dual-stack, but upstream IPv6 reachability was not tested.
+
+=CONFIG/EXECUTED=: the generated firewall start script contains IPv4 and IPv6
+accept rules for TCP 11434 and its systemd unit completed successfully.  The
+live nftables/iptables ruleset could not be dumped without privilege, so the
+rule text is not mislabeled as an independently inspected active ruleset.
+
+There is no authenticated proxy, TLS boundary, or source-subnet restriction in
+the repo.  Ollama's local API does not require authentication.  Default to
+loopback and close the firewall port unless LAN service is an explicit decision.
+If LAN access is required, put it behind a scoped firewall plus an authenticated
+proxy or VPN.  See the upstream [[https://docs.ollama.com/api/authentication][authentication documentation]] and
+[[https://github.com/ollama/ollama/blob/main/docs/faq.mdx][FAQ]].
+
+Ollama also starts with =OLLAMA_NO_CLOUD=false= and attempted outbound model
+cache/recommendation requests to =ollama.com=.  That proves metadata/recommendation
+egress attempts, not prompt upload.  If local-only operation is the intent,
+decide explicitly whether to set =OLLAMA_NO_CLOUD=true=.
+
+*** The physical session is effectively open
+=CONFIG=: TTY1 silently auto-logs into the wheel user and zsh immediately starts
+Hyprland.  No idle/lock daemon or locker is declared.  GPG agent credentials may
+remain cached for up to eight hours.
+
+=ACTIVE=: no Hyprlock, swaylock, gtklock, Hypridle, or equivalent process/unit is
+present; =LockedHint=no=.  Root is a direct ext4 partition with no dm-crypt/LUKS
+layer.
+
+Secure Boot protects boot integrity, not stored-data confidentiality or an
+already unlocked session.  Add and test lock-on-idle, pre-suspend lock, and
+resume behavior; then decide whether autologin still matches the threat model.
+Disk encryption is a separate invasive migration/reinstall decision.
+
+*** The ESP random seed is world-readable
+=CONFIG/ACTIVE=: =/boot= uses =fmask=0022,dmask=0022=, so
+=/boot/loader/random-seed= and its directories are mode 0755.  =bootctl= has
+reported this as a security hole on nine observed boots since July 1.
+
+Use a restrictive ESP mount mask such as =umask=0077= (or equivalent file and
+directory masks), then separately verify boot entry updates, Secure Boot, and a
+real reboot.
+
+** High - confirmed functional and reliability bugs
+:PROPERTIES:
+:CUSTOM_ID: high-confirmed-functional-and-reliability-bugs
+:END:
+*** The document portal fails every login
+=ACTIVE/HISTORY=: =xdg-document-portal.service= exits with status
+=6/NOTCONFIGURED= because neither =fusermount= nor =fusermount3= is on its
+execution path.  It cannot mount =/run/user/1000/doc=.  This has recurred across
+nine boots since July 2.
+
+The main Hyprland and GTK portals run, but sandbox/document sharing and portal
+file integration are incomplete.  Wire =fuse3/fusermount3= through the correct
+NixOS/user-unit path, then verify the unit and mount point after activation.
+
+*** Emacs can add 90 seconds to shutdown
+=HISTORY=: on the July 14 reboot, =emacs.service= ignored SIGTERM for its default
+90-second =TimeoutStopSec=, was SIGKILLed, and left the user session waiting.
+Earlier shutdowns also recorded status 15; fourteen Emacs failed-result events
+exist since July 1.
+
+=CONFIG=: the unit has =Restart=on-failure= but no =ExecStop= or bounded custom
+shutdown policy.
+
+Design a deterministic Emacs shutdown that accounts for unsaved buffers,
+processes, and save hooks before shortening the timeout.  A build cannot prove
+this fix; it requires a separately planned stop/reboot test.
+
+*** The configured battery governor cannot be selected
+=CONFIG=: TLP requests =schedutil= and EPP =power= on battery.
+
+=ACTIVE=: the driver is =amd-pstate-epp=, its available governors are only
+=performance powersave=, and its available EPP list currently contains only
+=performance=.  While unplugged and discharging, every CPU policy remained
+=performance/performance= even though TLP reported successful application.
+
+=schedutil= is invalid for the active driver.  Change only the battery governor
+to an available value first, then investigate why the EPP list is restricted
+(firmware, ACPI quirks, latest-kernel behavior, or another owner).  Measure
+frequency, heat, responsiveness, and battery drain after a separate activation.
+
+** Medium - reproducibility and validation
+:PROPERTIES:
+:CUSTOM_ID: medium-reproducibility-and-validation
+:END:
+*** MSI hardware facts are outside the repository
+The absolute =/etc/nixos/hardware-configuration.nix= import forces =--impure=,
+prevents pure review/builds, and leaves disk/initrd facts outside the checkout.
+Copy the verified file to =hosts/msi/hardware-configuration.nix=, review it,
+switch to a relative import, and prove that the output path is unchanged before
+any activation.
+
+*** Whole-flake checks are red while the invalid host is exported
+=desktop-amd= is exported even though its tracked hardware placeholder asserts
+false and lacks a root filesystem.  A custom =checks= set cannot make standard
+=nix flake check= ignore an invalid =nixosConfigurations.desktop-amd=.  Keep a
+deployment guard, but stop exporting the unfinished host as a normal
+configuration or redesign its bootstrap representation until it has real
+hardware facts.
+
+*** QA ownership is undefined
+No formatter, checks, or CI are exported.  Two installed formatters disagree and
+currently flag different file sets.  Choose one formatter, add a target-specific
+MSI evaluation/build check, shell/JSON/Lua checks, and a deliberate policy for
+the deferred AMD host.
+
+*** Home Manager generations do not own most live configs
+The live-link model is an intentional fast-edit workflow, but it weakens rollback,
+portability, and generation provenance.  Classify each linked surface as stable
+or experimental.  Move settled configs to store-backed sources and retain live
+links only where immediate edits are worth the tradeoff.
+
+*** The update stack has several simultaneous moving parts
+The active host combines NixOS unstable, upstream Hyprland, latest kernel, latest
+proprietary NVIDIA, an out-of-tree OpenRazer patch, runtime Emacs packages from
+moving archives, and mutable dotfile links.  A single lock update can break boot,
+graphics, peripherals, editor startup, or user services together.
+
+Stage lock updates behind parse/eval/build gates, keep a discoverable rollback
+generation, and decide whether =linuxPackages_latest= is necessary.  The current
+bootloader timeout of zero makes recovery less discoverable even though older
+generations exist.
+
+** Medium - performance and resilience
+:PROPERTIES:
+:CUSTOM_ID: medium-performance-and-resilience
+:END:
+*** Boot waits on model provisioning
+The measured boot is 39.547 seconds: 8.611 firmware, 0.927 loader, 0.632 kernel,
+2.201 initrd, and 27.173 userspace.  Graphical target arrives at 26.678 seconds.
+
+=NetworkManager-wait-online= consumes 16.598 seconds.  The critical chain is:
+
+#+begin_src text
+graphical -> multi-user -> ollama-model-loader -> network-online
+          -> NetworkManager-wait-online
+#+end_src
+
+The model loader itself took only milliseconds once online, but its dependency
+makes graphical boot wait.  Decouple model hydration from the boot-critical
+target before disabling or tightening wait-online.
+
+*** GPU/module initialization is expensive but succeeds
+=systemd-modules-load= takes 7.637 seconds and about 982 MiB peak while loading
+Razer, AMDGPU, and NVIDIA modules.  It succeeds, so optimize this only after the
+network critical path and only with cold-boot/peripheral/GPU evidence.
+
+*** Ollama is CPU-only despite the RTX 4050
+Ollama startup reports =compute=cpu= and =total_vram=0 B=; no Ollama process
+appears in =nvidia-smi=.  The service has device allowances but the configured
+package/runtime does not discover usable GPU acceleration.  Treat CUDA/Vulkan
+acceleration as its own slice after closing the network boundary.
+
+*** There is no swap or zram
+The machine has 30 GiB RAM and no current OOM incident, but systemd-oomd warns on
+every boot that no swap degrades memory-pressure handling.  Compilers, Electron,
+two editor stacks, browsers, and LLMs can create sharp peaks.  Add measured zram
+first; real hibernation requires a separate correctly sized disk-swap design.
+
+*** The closure is large
+The current system closure is 27.0 GiB; Home Manager accounts for an 18 GiB
+closure.  Haskell language tooling alone reaches about 7.5 GiB cumulatively and
+NVF about 6.5 GiB.  Emacs installs full C/C++, Rust, Haskell, Python, Node, TeX,
+QML, and Nix stacks while NVF duplicates part of that toolchain.
+
+This is mostly update/build/store cost rather than idle runtime cost.  Decide the
+active editor/toolchain ownership before removing anything; move occasional
+language stacks to project dev shells where that improves the workflow.
+
+*** Desktop performance policy favors effects and the discrete GPU
+Prime Sync, NVIDIA persistence, blur, VRR/HDR/10-bit display policy, animated
+wallpaper support, three Ghostty shaders, large terminal scrollback, and frequent
+Quickshell polling all favor responsiveness/appearance over battery life.
+
+The RTX used about 4 W at idle during one sample and owned Hyprland/Xwayland and
+desktop clients even while unplugged.  This may be deliberate for a
+desktop-replacement workflow.  If mobile use matters, design a separate
+AMD-primary/NVIDIA-offload slice with console rollback because compositor GPU
+changes can black-screen.
+
+** Medium/low - maintenance and log hygiene
+:PROPERTIES:
+:CUSTOM_ID: medium-low-maintenance-and-log-hygiene
+:END:
+- No automatic Nix GC or store optimization is declared.  The store was about
+  46 GiB and =nix-store --gc --print-dead= found 1,712 dead paths.  Root has
+  plenty of free space; use conservative age-based cleanup, not emergency
+  deletion.  Auto-upgrade is off, which is reasonable for this moving stack;
+  document a staged update cadence instead.
+- Persistent journals use about 1.5-1.6 GiB.  Since July 1 they contain over two
+  thousand repeated PipeWire bad-file-descriptor warnings plus recurring rfkill,
+  Bluetooth, D-Bus duplicate-name, dispatcher, and resolver noise.  Audio and
+  Bluetooth currently work, so fix sources by symptom/volume, then set explicit
+  retention.
+- =coredumpctl= has 1,820 historical crash-event records from May 2 through June
+  21, including past Hyprland, Harper, Electron, and Brave events.  All retained
+  core files are missing and there are no coredumps since July 1.  This is a
+  large historical crash population, but not evidence of a current crash loop.
+- The Cliphist wipe helper exists but has no key binding, despite the module's
+  warning that not every password manager marks copied data secret.  Add a panic
+  binding and decide an expiry/size policy.
+- The Quickshell flake input is unused; all actual references use
+  =pkgs.quickshell=.  Remove it or wire it intentionally.  NVF also carries a
+  second Nixpkgs pin rather than following the primary input.
+- The global =permittedInsecurePackages = [ "pnpm-10.29.2" ]= exception is stale.
+  Forcing the list empty produces the exact same system derivation, and the
+  current build graph uses pnpm 10.34.4 instead.
+- =allowUnfree = true= is broad.  A predicate would document which proprietary
+  packages are actually accepted, although NVIDIA/Steam/Brave make some unfree
+  policy necessary.
+- =~/.openai_key= is sourced into every interactive zsh shell.  Its live mode is
+  correctly 0600, but scoped injection would reduce how widely the secret enters
+  process environments.
+- The user is in the broad =input= group for Kanata.  Keep only if direct raw
+  input access is required beyond the service.
+- Two SSH public keys are declared.  Confirm both are current and intentional as
+  ordinary key inventory hygiene.
+- IPv4 and IPv6 redirect acceptance are enabled; disable unless this LAN setup
+  needs router redirects.  AppArmor, audit, kernel lockdown, kexec restrictions,
+  and narrower user namespaces are optional defense-in-depth slices that require
+  compatibility testing, especially with proprietary/out-of-tree modules.
+
+** Application and wiring defects to triage
+:PROPERTIES:
+:CUSTOM_ID: application-and-wiring-defects-to-triage
+:END:
+- The boot parameters include =acpi=ht=, =acpi_enforce_resources=lax=,
+  =acpi_os=linux=, fixed EFIFB geometry, framebuffer reservation, and heavy log
+  suppression.  These are high-risk laptop-specific quirks and plausible
+  contributors to limited power-policy behavior.  Remove only one at a time,
+  with reboot, suspend, battery, audio, keyboard, and GPU checks.
+- MSI-specific audio PCI paths, keyboard device paths, TLP battery names,
+  NVIDIA bus IDs, Razer devices, boot geometry, monitor layout, and touchpad name
+  live in modules inherited by =desktop-amd=.  Move them behind host imports or
+  options before the AMD output becomes real.
+- =AQ_DRM_DEVICES=/dev/dri/card0:/dev/dri/card1= assumes unstable enumeration.
+  Prefer =/dev/dri/by-path= identifiers.
+- Kanata exact device paths can fail when the external keyboard is absent or
+  renamed.  Current services are running; test cold boot and hotplug separately.
+- The fixed Home Manager =.backup= suffix can collide with an older backup on a
+  later activation.
+- Theme activation runs after =writeBoundary= rather than =linkGeneration=;
+  first activation can skip the not-yet-created live script.  The generator also
+  updates many files in place, so a mid-run failure can leave mixed theme state.
+- Emacs packages come from moving runtime archives without a lockfile, and
+  =emacs-sync= compiles vterm inside mutable cache state.  Nix generation rollback
+  cannot reproduce that package/cache state.
+- =mpris-proxy= is enabled live but not declared.
+- Ghostty retains up to ten million scrollback lines and always enables three
+  animated shaders.  Firefox permits a 1 GiB memory cache and disables disk
+  cache.  Quickshell launches short-lived status commands every two seconds.
+  Tune only after profiling real symptoms.
+- aerc references =chafa= and =pdftotext= but neither package is declared, and
+  its config has two =[ui]= sections.  Its iCloud submission URL uses implicit
+  TLS on port 587; no live mail error was found, but account connectivity was not
+  tested.  Validate without exposing credentials before changing it.
+- NVIDIA VA-API is asserted through session variables and Firefox preferences,
+  but =vainfo= is absent, so hardware decoding was not validated.
+- =scripts/weather= is executable, starts with a blank line before its shebang,
+  and is not referenced by the active configuration.
+
+* Slice-Based Implementation Roadmap
+:PROPERTIES:
+:CUSTOM_ID: slice-based-implementation-roadmap
+:END:
+Each slice is intentionally small.  Do not combine a build result with live
+activation evidence.
+
+** Slice 0 - preserve the baseline
+:PROPERTIES:
+:CUSTOM_ID: slice-0-preserve-the-baseline
+:END:
+- Commit or otherwise preserve this audit on the intended branch.
+- Decide whether the zero-byte remote =vscode.nix= is a placeholder to keep or
+  remove.
+- Refresh the local remote-tracking ref before making branch/upstream claims.
+- Record the current output path and generation 853 as the rollback baseline.
+
+Success gate: tracked-tree ownership is explicit; no system change.
+
+** Slice 1 - contain Ollama's network boundary
+:PROPERTIES:
+:CUSTOM_ID: slice-1-contain-ollamas-network-boundary
+:END:
+- Bind Ollama to loopback and close TCP 11434, unless a scoped authenticated LAN
+  design is chosen explicitly.
+- Decide separately whether local-only mode should set =OLLAMA_NO_CLOUD=true=.
+
+Build gate: inspect the generated Ollama environment and firewall script; run a
+no-link build.
+
+Activation gate: preserve SSH access, activate explicitly, then verify from the
+laptop and a second LAN host that the intended listener/egress boundary is real.
+
+** Slice 2 - add session and clipboard containment
+:PROPERTIES:
+:CUSTOM_ID: slice-2-add-session-and-clipboard-containment
+:END:
+- Add a lock/idle service with pre-suspend and resume-lock behavior.
+- Add the existing Cliphist wipe helper to an explicit panic binding.
+- Confirm both authorized SSH keys.
+- Decide, as a separate policy toggle, whether TTY autologin remains desirable.
+
+Build gate: render and inspect the new user units/bindings without activation.
+
+Activation gate: exercise manual lock, idle lock, suspend/resume, wipe, and SSH
+recovery.  Disk encryption is not part of this slice.
+
+** Slice 3 - protect the ESP random seed
+:PROPERTIES:
+:CUSTOM_ID: slice-3-protect-the-esp-random-seed
+:END:
+- Change only the =/boot= mount mask to a restrictive value such as
+  =umask=0077=.
+- Confirm the generated mount and Lanzaboote configuration before activation.
+
+Build gate: no-link build and generated mount-option review.
+
+Activation gate: activate explicitly, verify permissions, create/update a boot
+entry, and schedule a separate Secure Boot reboot test with rollback available.
+
+** Slice 4 - repair the document portal
+:PROPERTIES:
+:CUSTOM_ID: slice-4-repair-the-document-portal
+:END:
+- Put =fusermount3= on the document portal's declared execution path through the
+  narrowest NixOS/user-unit mechanism.
+
+Build gate: the rendered unit has the intended executable path.
+
+Activation gate: use a fresh user login to verify the unit,
+=/run/user/1000/doc=, and a portal-backed file chooser.
+
+** Slice 5 - make Emacs shutdown deterministic
+:PROPERTIES:
+:CUSTOM_ID: slice-5-make-emacs-shutdown-deterministic
+:END:
+- Decide how unsaved buffers, save hooks, and long-running processes should
+  behave.
+- Add a safe stop command and only then set a shorter bounded timeout.
+
+Build gate: inspect the rendered unit; a build cannot prove shutdown behavior.
+
+Activation gate: test controlled modified buffers and processes, stop the unit,
+then schedule a real reboot and measure shutdown separately.
+
+** Slice 6 - repair battery governor selection
+:PROPERTIES:
+:CUSTOM_ID: slice-6-repair-battery-governor-selection
+:END:
+- Replace the impossible battery governor with =powersave= for the active
+  =amd-pstate-epp= driver.
+- Leave GPU topology and broad ACPI changes untouched.
+- Investigate the one-value EPP list and measure unplugged frequency,
+  temperature, responsiveness, and drain.
+
+Build gate: no-link system build plus generated TLP review.
+
+Activation gate: unplugged runtime measurements prove whether the governor
+actually changed.  Any EPP follow-up is a later one-variable slice.
+
+** Slice 7 - make MSI hardware self-contained
+:PROPERTIES:
+:CUSTOM_ID: slice-7-make-msi-hardware-self-contained
+:END:
+- Copy and review the exact active MSI hardware file under =hosts/msi/=.
+- Change only the MSI import to the relative file.
+- Prove the pure output matches the current baseline before touching aliases.
+- Remove =--impure= from rebuild aliases only after that proof.
+
+Build gate: pure eval and pure no-link MSI build return the expected derivation
+and output.  No activation is required if the output is unchanged.
+
+** Slice 8 - restore whole-flake QA
+:PROPERTIES:
+:CUSTOM_ID: slice-8-restore-whole-flake-qa
+:END:
+- Stop exporting the assertion-failing AMD placeholder as an ordinary
+  =nixosConfigurations= output, or redesign its bootstrap representation while
+  retaining a deployment guard.
+- Choose and export one formatter.
+- Add MSI eval/build and shell/JSON/Lua checks, then wire CI if desired.
+
+Success gate: pure =nix flake check=, including the new checks, is green.  This is
+repository QA and does not need live activation.
+
+** Slice 9 - clean dependency policy one input at a time
+:PROPERTIES:
+:CUSTOM_ID: slice-9-clean-dependency-policy-one-input-at-a-time
+:END:
+Treat each item as its own commit/build comparison:
+
+- remove the proven-stale pnpm 10.29.2 exception;
+- remove or intentionally wire the unused Quickshell input and update only the
+  corresponding lock graph;
+- separately test making NVF follow the primary Nixpkgs input.
+
+Success gate: every sub-slice has an explained lock/output/closure diff.  Do not
+combine all three into one ambiguous lock update.
+
+** Slice 10 - remove model hydration from the boot critical path
+:PROPERTIES:
+:CUSTOM_ID: slice-10-remove-model-hydration-from-the-boot-critical-path
+:END:
+- Move declarative Ollama model hydration to a non-critical
+  timer/manual/background unit.
+- Do not change NetworkManager wait-online until the dependency is removed and
+  the critical chain is re-measured.
+
+Build gate: generated dependencies no longer pull =network-online= into the
+graphical critical chain.
+
+Activation gate: reboot separately and compare =systemd-analyze= with the
+recorded baseline.
+
+** Slice 11 - enable and prove Ollama GPU acceleration
+:PROPERTIES:
+:CUSTOM_ID: slice-11-enable-and-prove-ollama-gpu-acceleration
+:END:
+- After Slice 1, select the correct CUDA/Vulkan-enabled package and device
+  policy for the RTX 4050.
+- Keep network binding and model hydration unchanged in this slice.
+
+Build gate: inspect the package and unit diff.
+
+Activation gate: run a small local inference while checking Ollama discovery
+logs, =ollama ps=, VRAM, GPU utilization, and CPU fallback.
+
+** Slice 12 - add zram memory resilience
+:PROPERTIES:
+:CUSTOM_ID: slice-12-add-zram-memory-resilience
+:END:
+- Add measured zram and document its algorithm/size policy.
+- Keep disk swap and hibernation as a separate design.
+
+Build gate: generated zram/oomd configuration and no-link build.
+
+Activation gate: verify the zram device, oomd warning removal, and behavior under
+a controlled memory-pressure test.
+
+** Slice 13 - establish conservative Nix maintenance
+:PROPERTIES:
+:CUSTOM_ID: slice-13-establish-conservative-nix-maintenance
+:END:
+- Define an age-based GC policy, generation retention rule, store optimization,
+  and a staged lock-update cadence.
+- Review =--print-dead=, free space, roots, and rollback needs before the first
+  collection.
+- Choose and document the first automatic maintenance window explicitly.
+
+Build gate: evaluate generated timers and policy without collecting anything.
+
+Activation gate: verify timer schedules.  The first actual GC is a separately
+observed maintenance event, never part of build verification.
+
+** Slice 14 - reduce log noise before capping retention
+:PROPERTIES:
+:CUSTOM_ID: slice-14-reduce-log-noise-before-capping-retention
+:END:
+- Triage the dominant PipeWire, rfkill, Bluetooth, D-Bus, dispatcher, and
+  resolver warnings by current symptom and volume.
+- Set explicit journal/coredump retention only after source fixes are measured.
+
+Success gate: compare grouped warning counts and disk use across equivalent
+uptime; do not erase history merely to make the audit look clean.
+
+** Slice 15 - make boot recovery discoverable
+:PROPERTIES:
+:CUSTOM_ID: slice-15-make-boot-recovery-discoverable
+:END:
+- Add a small visible boot-menu window and document the recovery key/path.
+- Decide stable-versus-latest kernel policy while preserving a known-good
+  generation.
+
+Build gate: inspect boot entries and no-link build.
+
+Activation gate: use =boot= rather than =switch= where appropriate, then verify
+the menu and selected generation during an explicitly scheduled reboot.
+
+** Slice 16 - remove one boot quirk per reboot-tested change
+:PROPERTIES:
+:CUSTOM_ID: slice-16-remove-one-boot-quirk-per-reboot-tested-change
+:END:
+Test =acpi=ht=, lax resource enforcement, =acpi_os=linux=, fixed EFIFB geometry,
+framebuffer reservation, and log suppression independently.  Each one gets its
+own build, cold boot, battery, suspend, audio, keyboard, and GPU evidence.  Do
+not batch these parameters.
+
+** Slice 17 - tighten host and Home Manager ownership
+:PROPERTIES:
+:CUSTOM_ID: slice-17-tighten-host-and-home-manager-ownership
+:END:
+- Move MSI-only audio/input/power/Razer/boot/display facts behind MSI imports or
+  typed options.
+- Keep =desktop-amd= deferred until real hardware exists.
+- Classify every live link; convert settled configs to store-backed files.
+- Fix theme DAG ordering and generate theme bundles atomically.
+- Declare =mpris-proxy= and other intended persistent user state.
+
+Success gate: branch switches and generation rollbacks have documented,
+predictable effects.  Split these ownership moves by subsystem when implemented.
+
+** Slice 18 - trim closure and application defects by ownership decision
+:PROPERTIES:
+:CUSTOM_ID: slice-18-trim-closure-and-application-defects-by-ownership-decision
+:END:
+- Decide which editor and terminal stacks are primary, fallback, reference, or
+  removable before deduplicating packages.
+- Move occasional language toolchains to dev shells where appropriate.
+- Fix aerc filters/sections and validate SMTP without printing credentials.
+- Validate NVIDIA VA-API, then align Firefox/session claims with evidence.
+- Profile Ghostty shaders/scrollback, Quickshell polling, wallpaper decode, and
+  browser cache one variable at a time.
+
+Success gate: smaller closure or lower measured resource use without weakening
+the chosen workflow.  Each application is a separate implementation slice.
+
+** Deferred security projects - do not fold into routine rebuilds
+:PROPERTIES:
+:CUSTOM_ID: deferred-security-projects
+:END:
+- Test redirect policy, AppArmor, kexec restrictions, user-namespace narrowing,
+  and kernel lockdown as separate compatibility projects, especially with the
+  proprietary/out-of-tree GPU and Razer modules.
+- Plan full-disk encryption as a migration/reinstall project with verified
+  backups and recovery media.  It is not an ordinary NixOS activation.
+
+* Verification Contract For Every Future Slice
+:PROPERTIES:
+:CUSTOM_ID: verification-contract-for-every-future-slice
+:END:
+** Configuration and build phase
+:PROPERTIES:
+:CUSTOM_ID: configuration-and-build-phase
+:END:
+Current impure baseline commands:
+
+#+begin_src sh
+nix eval --impure --raw \
+  --no-write-lock-file \
+  .#nixosConfigurations.nixos.config.system.build.toplevel.drvPath
+nix build --impure --no-link --no-write-lock-file --print-out-paths \
+  .#nixosConfigurations.nixos.config.system.build.toplevel
+#+end_src
+
+Target pure MSI commands after Slice 7:
+
+#+begin_src sh
+nix eval --raw --no-write-lock-file \
+  .#nixosConfigurations.nixos.config.system.build.toplevel.drvPath
+out="$(nix build --no-link --no-write-lock-file --print-out-paths \
+  .#nixosConfigurations.nixos.config.system.build.toplevel)"
+nix path-info -Sh "$out"
+#+end_src
+
+Whole-flake commands after Slice 8:
+
+#+begin_src sh
+nix flake check --no-build --no-write-lock-file
+nix flake check --no-write-lock-file
+#+end_src
+
+Record the derivation, output path, warnings, and closure change.  A successful
+command here means only that the configuration evaluates/builds.
+
+** Separately authorized live phase
+:PROPERTIES:
+:CUSTOM_ID: separately-authorized-live-phase
+:END:
+- =nixos-rebuild test= changes the running system temporarily.
+- =nixos-rebuild switch= changes the running system and default profile.
+- =nixos-rebuild boot= changes the next boot but not the current runtime.
+- A reboot proves the boot path only after it actually occurs.
+
+For an approved live test, preserve SSH/console rollback first, activate the
+smallest slice, and collect feature-specific evidence plus:
+
+#+begin_src sh
+readlink -f /run/current-system
+readlink -f /run/booted-system
+systemctl --failed
+systemctl --user --failed
+journalctl -b -p warning
+#+end_src
+
+Do not label a built output active until =/run/current-system= points to it.  Do
+not label a switched output boot-verified until =/run/booted-system= points to it
+after a reboot.
+
+* Audit Evidence Summary
+:PROPERTIES:
+:CUSTOM_ID: audit-evidence-summary
+:END:
+The audit used read-only identity, Git, Nix eval/build, systemd, journal, boot,
+resource, block-device, network-listener, firewall-script, GPU, power, portal,
+login-session, and package/config probes.  No privileged command succeeded.
+
+Several live-audit diagnostics briefly wrote capture files under remote =/tmp=;
+all were removed.  No persistent configuration, repository, service, Nix
+profile, or live system state was changed.  The only lasting work from this audit
+is documentation in the verified local and remote dotfiles checkouts and ordinary Nix
+evaluation/store bookkeeping from the no-link build.

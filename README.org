@@ -1,0 +1,105 @@
+#+title: NixOS Dotfiles
+#+startup: overview
+
+* What This Is
+This repository is the declarative NixOS and Home Manager configuration for
+Skydive's machines.  The MSI laptop is the primary, daily-used system; the AMD
+desktop output is a guarded bootstrap target, not yet a second fully accepted
+installation.
+
+The goal is a system that is understandable, recoverable, and pleasant to use.
+=main= is the checkpoint lane.  New work belongs in small branches with source,
+build, activation, runtime, and hand-test results kept distinct.
+
+* Current Direction
+- =nixosConfigurations.nixos= owns the MSI/NVIDIA laptop.
+- =nixosConfigurations.desktop-amd= is the AMD desktop bootstrap output.
+- Hyprland is configured in Lua.
+- Quickshell owns the bar, launcher, clipboard, wallpaper, OSD, tray, media, and
+  status surfaces.
+- =scripts/theme-select= and =theme/styles.json= own global theme state;
+  Quickshell is a consumer, not the palette authority.
+- Clean Emacs is the active personal Emacs configuration.  Doom is retired.
+- NVF remains the package, plugin, and LSP owner for Neovim; live Sky behavior
+  stays under =config/nvim/=.
+- Ollama is retired from the intended system configuration.
+- Vial and QMK are installed, but their device workflow is unfinished: the QMK
+  udev rules are not enabled and no connected-device test has passed.
+- VS Code is not configured on NixOS.  A future Linux port should adapt the
+  macOS Home Manager module rather than copy Darwin-specific pins verbatim.
+
+The exact checkpoint state and outstanding live gates are recorded in
+[[file:docs/handoffs/2026-07-18-main-checkpoint.org][the active checkpoint handoff]].
+
+* System Shape
+| Surface | Owner | Main source |
+|---------+-------+-------------|
+| Hosts and hardware | NixOS | =hosts/= and =system/modules/gpu/= |
+| System packages/services | NixOS | =system/modules/= |
+| User packages/services | Home Manager | =home/modules/= |
+| Hyprland | live Lua config | =config/hypr/hyprland.lua= |
+| Desktop shell | Quickshell | =config/quickshell/= |
+| Global theme | selector scripts and registry | =scripts/theme-select*=, =theme/= |
+| Emacs | clean live config plus Nix tools | =config/emacs/=, =home/modules/programs/emacs.nix= |
+| Neovim | NVF plus live Sky Lua | =system/modules/programs/nvim/=, =config/nvim/= |
+
+Several high-churn configs are intentional out-of-store links into this
+checkout.  Editing them can change the running applications without changing a
+Nix generation.  Always validate the actual linked bytes as well as the Nix
+build.
+
+* Repository Map
+#+begin_src text
+flake.nix          flake inputs and host outputs
+hosts/             machine-specific entrypoints and hardware facts
+system/modules/    reusable NixOS policy
+home/modules/      Home Manager policy and live links
+config/            application-native configuration
+scripts/           user commands and theme orchestration
+theme/             shared style registry and Nix tokens
+docs/              current contracts, handoffs, audits, and history
+#+end_src
+
+* Build And Activation
+Run the build gate from the repository:
+
+#+begin_src sh
+nix --extra-experimental-features 'nix-command flakes' \
+  build --print-out-paths \
+  '.#nixosConfigurations."nixos".config.system.build.toplevel' \
+  --no-link --impure --no-write-lock-file --show-trace
+#+end_src
+
+That command does not activate anything.  Live activation is separate:
+
+#+begin_src sh
+nrs
+#+end_src
+
+After activation, record the new generation and test the affected runtime
+surfaces before calling the live result accepted.  Preserve a known rollback
+generation until those checks pass.
+
+* Next Work
+Work stays slice-based:
+
+1. Finish the source/build checkpoint and =main= promotion, then activate and
+   record the live result separately.
+2. Repair QMK/Vial udev ownership and test with the actual device.
+3. Apply confirmed NixOS maintenance, security, service, and GC corrections one
+   small change at a time.
+4. Optimize Quickshell after deterministic correctness and lifecycle defects.
+5. Give Emacs measured, real-use-driven TLC; Lua and Nix LSP slices are accepted,
+   while Python's manual acceptance remains in progress.
+6. Port the macOS VS Code configuration only as a Linux-specific Home Manager
+   slice.
+
+* Documentation
+- [[file:docs/README.org][Documentation dashboard]]
+- [[file:docs/projects/nixos-dotfiles.org][Current NixOS system map]]
+- [[file:docs/HISTORY.org][Project history and decision log]]
+- [[file:docs/areas/git.org][Git and checkpoint workflow]]
+
+Project and area documents describe durable ownership.  Handoffs record active
+execution state.  Audits are dated evidence, not standing authorization to
+change the machine.

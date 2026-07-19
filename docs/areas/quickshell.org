@@ -4,6 +4,12 @@
 :END:
 This is the desktop shell layer: bar, OSD, launcher, clipboard, tray, media, and small status surfaces.
 
+The measured architecture and candidate optimization slices are recorded in
+[[../audits/2026-07-14-quickshell-optimization.org][the 2026-07-14 Quickshell optimization audit]].
+That audit is an evidence baseline, not permission to override the ownership,
+branch, or live-test contracts in this file.  The active checkpoint sequence is
+recorded in [[../handoffs/2026-07-18-main-checkpoint.org][the 2026-07-18 runway]].
+
 The current =main= branch is the sober working shell. The old modular shell lives on =prototype/quickshell-legacy= and the archived quickshell branches. Treat those branches as reference material only: port useful ideas back deliberately, one module at a time.
 
 ** Branch Workflow
@@ -11,7 +17,8 @@ The current =main= branch is the sober working shell. The old modular shell live
 :CUSTOM_ID: branch-workflow
 :END:
 - =main= is the stable checkpoint for the known-good shell.
-- =work/quickshell-cleanup= is the active refactor and polish lane.
+- =work/quickshell-cleanup= is the designated post-checkpoint refactor and
+  polish lane; create or refresh it from the accepted =main= checkpoint.
 - Promote the cleanup branch to =main= only by fast-forwarding a clean, documented, live-tested state.
 - After promoting a stable state, switch back to =work/quickshell-cleanup= and continue the next small slice there.
 

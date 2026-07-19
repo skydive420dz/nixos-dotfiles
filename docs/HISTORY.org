@@ -1,0 +1,58 @@
+#+title: NixOS Dotfiles History And Decision Log
+#+startup: overview
+
+* Purpose
+This is the short human memory log for major direction changes.  It preserves
+context without turning the root README into a changelog.  Current instructions
+live in the root README, area contracts, and the active handoff; dated audits
+remain the detailed evidence.
+
+* 2026-05 - Desktop Ownership Settles
+- Hyprland moved to a Lua-first configuration.
+- Quickshell became the native owner of the bar, launcher, clipboard, wallpaper,
+  OSD, tray, media, and status surfaces.
+- The native launcher and clipboard replaced their Fuzzel fallbacks.
+- Quickshell replaced =awww= as wallpaper owner.
+- The Sky theme registry and =scripts/theme-select= became the global theme
+  authority.
+
+* 2026-06 - Clean Emacs Becomes Primary
+- Clean Emacs replaced Doom as the active editor configuration.
+- Useful behavior, bindings, theme faces, Org, terminal, and language tooling
+  were migrated deliberately.
+- Doom remained briefly as frozen reference material while parity was checked.
+- Emacs language work later moved to a hybrid model: accepted Lua and Nix
+  =lsp-mode=/Company slices, an in-progress Python slice, and Eglot/Corfu for
+  languages not yet migrated.
+
+* 2026-07 - Audit And Checkpoint
+- The live MSI system and Quickshell runtime were audited against the actual
+  machine and linked configuration.
+- The audits identified confirmed correctness, lifecycle, security, ownership,
+  and hygiene issues and separated them from performance hypotheses.
+- A Nixpkgs/NVF/Hyprland/Quickshell input update exposed the removed NVF
+  =vim.languages.rust.lsp.package= option.  The checkpoint candidate removes
+  only that obsolete override.
+- Doom was explicitly retired rather than kept as a second configuration.
+- Ollama was explicitly retired; model-state deletion remains ordered after the
+  running service is removed.
+- The user designated the successful full no-link build as the source/build
+  checkpoint to promote to =main=.  Activation and live runtime evidence remain
+  separate facts.
+
+* Unfinished Experiments Preserved As Direction
+- Vial and QMK packages reached the MSI system, but QMK udev integration was
+  never enabled and the device workflow was not accepted.  This becomes a
+  focused maintenance slice rather than an implied working feature.
+- The NixOS VS Code placeholder never became a configuration.  A future port
+  should adapt the macOS Home Manager module for Linux.
+- Emacs optimization remains real-use-driven work, not a broad rewrite.
+- Quickshell optimization follows correctness and service lifecycle repairs.
+
+* Detailed Evidence
+- [[file:handoffs/2026-07-18-main-checkpoint.org][2026-07 checkpoint runway and execution ledger]]
+- [[file:audits/2026-07-14-nixos-system.org][MSI NixOS system audit]]
+- [[file:audits/2026-07-14-quickshell-optimization.org][Quickshell optimization audit]]
+- [[file:audits/2026-07-18-tree-organization-gc.org][Tree, organization, and GC audit]]
+- [[file:areas/emacs.org][Emacs area history]]
+- [[file:areas/quickshell.org][Quickshell area history]]

@@ -2,8 +2,12 @@
 :PROPERTIES:
 :CUSTOM_ID: emacs
 :END:
-Clean Emacs is the active MSI Emacs configuration. Doom remains in the repo as
-frozen reference material while the clean config absorbs the useful behavior.
+Clean Emacs is the sole active MSI Emacs configuration.  The checkpoint
+candidate retires the frozen Doom source tree while leaving it recoverable from
+Git history.  On 2026-07-19 the separately verified user-owned Doom clone,
+cache, and dangling =~/.config/doom= link were also removed with explicit user
+authorization.  Those source and user-state cleanups are not claims that the
+candidate NixOS system has been activated.
 
 ** Shape
 :PROPERTIES:
@@ -11,7 +15,6 @@ frozen reference material while the clean config absorbs the useful behavior.
 :END:
 - Nix installs Emacs and external support tools.
 - Clean Emacs lives in [[../../config/emacs][config/emacs]] and is linked to =~/.config/emacs=.
-- Doom lives in [[../../config/doom][config/doom]] and is linked to =~/.config/doom= for reference.
 - Emacs owns Emacs packages, editor behavior, keymaps, completion, LSP client behavior, Org, Dired, terminal integration, and theme faces.
 - Nix owns external tools, language servers, formatters, fonts, services, wrappers, and links.
 - Projects own project-local metadata such as =.dir-locals.el= and language-server hints.
@@ -618,13 +621,17 @@ emacsclient --create-frame --alternate-editor=emacs
 Stable enough to treat as current baseline:
 
 - [X] Clean Emacs is the default MSI Emacs config.
-- [X] Doom remains in the repo as frozen/reference material.
+- [X] Retire the frozen Doom source tree in the checkpoint candidate; its
+  history remains available through Git.  Promotion and activation are still
+  separate gates.
 - [X] =M-/= starts completion and survives =SPC h r r=.
 - [X] =C-h/j/k/l= switch between completion navigation and window navigation.
 - [X] =SPC h r r= reloads clean Emacs modules without breaking completion.
 - [X] Doom modeline-style UI and Sky theme faces are active.
 - [X] vterm builds through =emacs-sync=.
-- [X] Current state is checkpointed in Git.
+- [X] The accepted pre-retirement clean Emacs baseline is checkpointed in Git;
+  the retirement candidate remains uncommitted pending source/build checkpoint
+  promotion.  Activation follows separately.
 - [X] Org notes root, capture templates, daily/topic/project helpers, and recursive agenda file discovery are active.
 - [X] Org agenda refresh, refile targets, and daily review helper are active.
 - [X] Org source-block insertion, editing, tangling, and source-block navigation helpers are active.
@@ -633,6 +640,14 @@ Stable enough to treat as current baseline:
 - [X] Doom muscle-memory key audit is complete for the core file, project, search, help, buffer, mode, window, notes, Org, Dired, Magit, vterm, and eshell surfaces currently in daily use.
 - [X] Daily notes workflow is active: inbox, daily/topic/project notes, capture templates, agenda refresh, and daily review are wired.
 - [X] Kill-oriented bindings are audited: =SPC b k/K= and =SPC p k= use =k= for kill actions, while =x= remains close/scratch/tab behavior where already established.
+
+The detailed parity entries below preserve the accepted pre-experiment
+Eglot/Corfu evidence.  Where they name Lua, Nix, or Python ownership, current
+reality is the hybrid model in [[file:emacs-lsp.org][the Emacs LSP contract]]:
+Lua and Nix use accepted =lsp-mode=/Company slices, and Python uses the
+implemented but still manually unaccepted slice.  Other languages remain on
+the Eglot/Corfu baseline until deliberately migrated.
+
 - [X] Eglot server routing is validated for real files currently in the repo: Nix -> =nixd=, Lua -> =lua-language-server=, QML -> =qmlls-wrapped=, shell -> =bash-language-server=, JSON -> =vscode-json-language-server=, GLSL -> =glsl_analyzer=, Markdown/Org -> =harper-ls=.
 - [X] Completion plumbing is validated in real managed buffers: code/config buffers expose snippets first, then Eglot, then file/dabbrev/keyword fallbacks; prose buffers expose Harper/Eglot plus file/dabbrev fallbacks.
 - [X] Notes and Org localleader commands have which-key labels for the common daily-note, capture, agenda, source-block, table, subtree, clock, date, priority, link, and attachment paths.

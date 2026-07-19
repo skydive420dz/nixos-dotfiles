@@ -1,37 +1,64 @@
-* Notes
-:PROPERTIES:
-:CUSTOM_ID: notes
-:END:
-Small maps for finding the shape of the system again after context has cooled.
+#+title: NixOS Dotfiles Documentation
+#+startup: overview
 
-** Projects
-:PROPERTIES:
-:CUSTOM_ID: projects
-:END:
-- [[file:projects/nixos-dotfiles.org][NixOS dotfiles]]
-- [[file:projects/nixos-macos.org][macOS dotfiles]]
-- [[file:projects/clipboard-launcher.org][Clipboard and launcher]]
+* How The Documentation Works
+Start with [[../README.org][the repository README]].  Project and area notes
+describe durable ownership and direction.  Handoffs record current execution
+state.  Audits are dated evidence, not implementation authority.
 
-** Areas
-:PROPERTIES:
-:CUSTOM_ID: areas
-:END:
+Documentation does not turn a build into activation and does not authorize
+commits, pushes, service changes, or branch deletion.
+
+* Status At A Glance - 2026-07-19
+| Surface | Confirmed current state | Next accepted step |
+|---------+-------------------------+--------------------|
+| System | Generation 855 is live; the updated candidate evaluates and builds | Promote the build/source checkpoint, then activate and test separately |
+| Emacs | Clean Emacs is active; Lua and Nix =lsp-mode=/Company slices are accepted | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
+| Quickshell | The existing shell remains live | Hand-test the dependency update, then use the post-checkpoint cleanup lane |
+| Vial/QMK | Vial and QMK are installed; QMK udev integration is absent | Enable declarative udev ownership and test the connected device |
+| VS Code | NixOS has no VS Code configuration | Adapt the macOS Home Manager module in a future Linux-specific slice |
+| Doom/Ollama | Both are retired from the candidate source | Activation removes live ownership; Ollama model cleanup follows service removal |
+
+Volatile hashes, outputs, live services, and exact gate results belong in
+[[file:handoffs/2026-07-18-main-checkpoint.org][the active checkpoint handoff]].
+
+* Current Work Lanes
+- =main=: checkpoint lane.
+- =work/nixos-maintenance=: designated post-checkpoint system, Vial/QMK, and
+  hygiene work.
+- =work/quickshell-cleanup=: designated post-checkpoint correctness and
+  optimization work.
+- Emacs: complete the current Python acceptance decision before selecting
+  another language or optimization slice.
+
+* Ownership Contracts
+- [[file:projects/nixos-dotfiles.org][NixOS system map]]
+- [[file:areas/modules.org][Modules and hosts]]
 - [[file:areas/hyprland.org][Hyprland]]
 - [[file:areas/quickshell.org][Quickshell]]
 - [[file:areas/theme.org][Global theme]]
-- [[file:areas/tmux.org][Tmux]]
-- [[file:areas/nvim.org][Neovim]]
 - [[file:areas/emacs.org][Emacs]]
 - [[file:areas/emacs-lsp.org][Emacs LSP and completion]]
-- [[file:areas/keyboard.org][Keyboard]]
-- [[file:areas/modules.org][Module structure]]
-- [[file:areas/git.org][Git workflow]]
+- [[file:areas/nvim.org][Neovim and NVF]]
+- [[file:areas/keyboard.org][Keyboard and input]]
+- [[file:areas/git.org][Git and verification workflow]]
 
-** How to Use This
-:PROPERTIES:
-:CUSTOM_ID: how-to-use-this
-:END:
-- Keep project notes focused on current state, commands, important files, decisions, and next actions.
-- Put reusable knowledge in area notes.
-- When a project changes, update the project note before or after the commit.
-- Prefer links to files over long explanations.
+* Other Project Notes
+- [[file:projects/nixos-macos.org][macOS dotfiles]]
+- [[file:projects/clipboard-launcher.org][Completed clipboard and launcher work]]
+
+* Evidence And History
+- [[file:HISTORY.org][Human-readable history and decision log]]
+- [[file:audits/2026-07-18-tree-organization-gc.org][2026-07-18 tree, organization, and GC audit]]
+- [[file:audits/2026-07-14-nixos-system.org][2026-07-14 NixOS system audit]]
+- [[file:audits/2026-07-14-quickshell-optimization.org][2026-07-14 Quickshell optimization audit]]
+
+* Writing Rules
+- Use =LIVE=, =CANDIDATE=, =IN PROGRESS=, =ACCEPTED=, and =HISTORICAL=
+  deliberately.
+- Keep volatile state in the active handoff instead of copying it into every
+  area note.
+- Keep current ownership near the top and detailed history below it.
+- Prefer links and concise decision records over repeated roadmaps.
+- Keep build, activation, runtime acceptance, promotion, and cleanup as separate
+  facts.

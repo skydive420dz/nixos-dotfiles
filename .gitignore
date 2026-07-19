@@ -44,9 +44,6 @@ config/aerc/state
 nvim.log
 *.log
 
-# Doom runtime/cache state belongs outside git.
-config/doom/.local/
-
 # Clean Emacs experiment runtime/cache state belongs outside git.
 config/emacs/**/*.elc
 config/emacs/auto-save/

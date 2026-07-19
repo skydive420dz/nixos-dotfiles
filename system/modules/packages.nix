@@ -36,6 +36,10 @@
       mpv
       cava
 
+      vial
+      qmk
+      qmk-udev-rules
+
       bluez
       bluez-tools
       brightnessctl

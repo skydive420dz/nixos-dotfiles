@@ -1,64 +1,91 @@
-* NixOS Dotfiles
+* NixOS System Map
 :PROPERTIES:
 :CUSTOM_ID: nixos-dotfiles
 :END:
-** Current
-:PROPERTIES:
-:CUSTOM_ID: current
-:END:
-- Hyprland config is Lua-only.
-- Quickshell owns bar, launcher, clipboard, OSD, and popovers.
-- Sky theme selection is global runtime state owned by =scripts/theme-select= and helpers under =scripts/theme-select.d/=.
-- Keep git clean between jobs.
 
-** Commands
+* Current System
 :PROPERTIES:
-:CUSTOM_ID: commands
+:CUSTOM_ID: current-system
 :END:
-- =nrs=
-- =hyr reload=
-- =systemctl --user restart quickshell=
-- =git status --short --branch=
+The MSI laptop is the primary live host and uses the =#nixos= flake output.
+The =#desktop-amd= output is a guarded bootstrap target whose machine-specific
+hardware acceptance is still future work.
 
-** Important Files
-:PROPERTIES:
-:CUSTOM_ID: important-files
-:END:
-- [[../../config/hypr/hyprland.lua][Hyprland Lua]]
-- [[../../config/quickshell/][Quickshell]]
-- [[../../home/home.nix][Home entry]]
-- [[../../home/modules/links.nix][Live links]]
-- [[../../system/modules/][System modules]]
-- [[../areas/modules.org][Module structure]]
+For volatile branch, generation, output, build, activation, and promotion state,
+use [[../handoffs/2026-07-18-main-checkpoint.org][the active checkpoint handoff]].
 
-** Decisions
-:PROPERTIES:
-:CUSTOM_ID: decisions
-:END:
-- Hyprland is configured through =config/hypr/hyprland.lua=.
-- =hyprland.conf=, =mocha.conf=, and =uwsm-at-cursor= were removed.
-- Quickshell layer windows choose their screen when opened.
-- Bar applets launch plainly through =uwsm app=; Hyprland rules place them near the cursor.
-- Key repeat in Hyprland matches macOS feel.
-- Sky theme source data lives in =theme/styles.json=; generated runtime files live under =~/.config/theme/current/=.
-- Units that grow past one small file move into category-aware module directories with a local =default.nix=; current examples are tmux and Neovim.
+Durable ownership:
 
-** Next
+- Hyprland behavior lives in =config/hypr/hyprland.lua=.
+- Quickshell owns the desktop shell surfaces under =config/quickshell/=.
+- =scripts/theme-select= and =theme/styles.json= own global theme state.
+- Clean Emacs is the active Emacs configuration; Doom is retired.
+- NVF owns Neovim packaging, plugins, and LSP while =config/nvim/= owns live Sky
+  behavior.
+- Ollama is retired from the intended system configuration.
+- Vial/QMK device integration and a Linux VS Code port are unfinished work, not
+  accepted current features.
+
+* Entry Points
 :PROPERTIES:
-:CUSTOM_ID: next
+:CUSTOM_ID: entry-points
 :END:
-- [X] Document the global Sky theme ownership model.
-- [X] List generated files vs source files.
-- [X] Map which apps are runtime-themed vs rebuild-themed.
-- [X] Clean up =scripts/theme-select= so it stops feeling like one giant generator carpet.
-- [X] Continue global theme coverage audit.
-- [X] Convert docs from Markdown to Org.
-- [X] Resurrect native Quickshell launcher and clipboard surfaces before removing fuzzel fallbacks.
-- [X] Remove =awww= package/startup/service wiring.
-- [X] Validate native wallpaper after =nrs= and reboot with =awww= removed.
-- [X] Cut over from fuzzel launcher/clipboard fallbacks after the native tools stay boring.
-- [ ] Polish wallpaper manager with a clearer current marker plus optional history/favorites.
-- [ ] Add per-monitor wallpaper state if the workflow needs it.
-- [ ] Split native wallpaper into its own Quickshell process/service so bar restarts do not reveal stale compositor or old =awww= background state.
-- [X] Quickshell project structure/QML metadata follow-up.
-- [X] NVF reassessment or replacement path.
+- =flake.nix=: host outputs and shared special arguments.
+- =hosts/msi/=: current MSI host entrypoint.
+- =hosts/desktop-amd/=: AMD bootstrap entrypoint.
+- =system/modules/=: reusable NixOS modules.
+- =home/modules/=: Home Manager modules and live-link ownership.
+- =config/=: application-native configuration.
+- [[../areas/modules.org][Module and host structure]]
+
+* Normal Commands
+:PROPERTIES:
+:CUSTOM_ID: normal-commands
+:END:
+#+begin_src sh
+git status --short --branch
+
+nix --extra-experimental-features 'nix-command flakes' \
+  build --print-out-paths \
+  '.#nixosConfigurations."nixos".config.system.build.toplevel' \
+  --no-link --impure --no-write-lock-file --show-trace
+
+nrs
+hyr reload
+systemctl --user restart quickshell
+#+end_src
+
+The standalone build does not activate the machine.  =nrs= is the separate
+interactive activation command.
+
+* Direction
+:PROPERTIES:
+:CUSTOM_ID: direction
+:END:
+- Keep =main= as the checkpoint lane.
+- Work in small, measurable slices with rollback.
+- Preserve the intentional live-link workflow and validate resolved live bytes.
+- Move machine facts into =hosts/<host>/= without hiding reusable mechanisms.
+- Fix confirmed defects before performance experiments.
+- Keep Vial/QMK, Emacs TLC, VS Code, Quickshell optimization, and GC as separate
+  work streams.
+
+Current post-checkpoint lanes:
+
+- =work/nixos-maintenance=: system correctness, Vial/QMK permissions, security,
+  ownership, organization, and conservative GC.
+- =work/quickshell-cleanup=: deterministic shell bugs, service lifecycle,
+  backend consolidation, then measured optimization.
+- Emacs: finish the active language acceptance decision, then optimize only
+  observed daily-use friction.
+- VS Code: adapt the macOS Home Manager configuration for Linux rather than
+  importing Darwin-specific extension pins.
+
+* History And Evidence
+:PROPERTIES:
+:CUSTOM_ID: history-and-evidence
+:END:
+- [[../HISTORY.org][Project history and decision log]]
+- [[../audits/2026-07-14-nixos-system.org][MSI system audit]]
+- [[../audits/2026-07-14-quickshell-optimization.org][Quickshell audit]]
+- [[../audits/2026-07-18-tree-organization-gc.org][Tree, organization, and GC audit]]

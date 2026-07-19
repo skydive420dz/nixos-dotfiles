@@ -29,6 +29,36 @@
 - keyd is disabled. Keep it disabled while Kanata owns keyboards.
 - Keep app-native navigation simple until a real layer system is worth the setup cost.
 
+** Vial And QMK - Incomplete
+:PROPERTIES:
+:CUSTOM_ID: vial-and-qmk-incomplete
+:END:
+Vial 0.7.5, QMK 1.2.0, and =qmk-udev-rules= are present in generation 855,
+but this is not an accepted device workflow.
+
+Confirmed defect:
+
+- =qmk-udev-rules= is only listed in =environment.systemPackages=.
+- =hardware.keyboard.qmk.enable= evaluates to false.
+- =services.udev.packages= does not contain the rules package.
+- =/etc/udev/rules.d/50-qmk.rules= is absent, and =udevadm test= confirms that
+  systemd-udevd does not load the package's rules from the system profile.
+
+This explains why merely installing Vial/QMK did not grant non-root device
+access.  No compatible external device was connected during the audit, so the
+hardware path remains untested.
+
+First maintenance slice:
+
+1. Enable =hardware.keyboard.qmk.enable=.
+2. Remove the redundant explicit =qmk-udev-rules= system package.
+3. Build and activate separately.
+4. Reconnect the real device and verify its hidraw ACL, Vial discovery, and the
+   intended configuration flow.
+5. Decide separately whether the full QMK toolchain belongs system-wide or in
+   an on-demand firmware project shell.  Firmware flashing is a distinct,
+   explicitly authorized action.
+
 ** NixOS Kanata Investigation
 :PROPERTIES:
 :CUSTOM_ID: nixos-kanata-investigation

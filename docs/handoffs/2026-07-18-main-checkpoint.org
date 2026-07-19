@@ -1,0 +1,348 @@
+#+title: Main Checkpoint And Reorganization Runway - 2026-07-18
+
+* Purpose
+:PROPERTIES:
+:CUSTOM_ID: purpose
+:END:
+This records the user's 2026-07-18 checkpoint decisions and the gated runway
+from the current live MSI checkout to one accepted =main= checkpoint and the
+next system-maintenance and Quickshell work lanes.  Where July audit suggestions
+conflict with the direct decisions recorded below, the audits remain evidence
+rather than implementation authority for this run.
+
+No build result counts as activation.  On 2026-07-19 the user explicitly
+designated the exact successful no-link result as the source/build checkpoint
+to promote to =main= before activation.  That is a deliberate ordering
+exception: it authorizes the checkpoint commit and fast-forward, but it does not
+turn the output into a live generation or authorize activation, tags, branch
+deletion, GC, or model-state deletion underneath a running service.
+
+* Verified Starting Point
+:PROPERTIES:
+:CUSTOM_ID: verified-starting-point
+:END:
+| Item | Verified value |
+|------+----------------|
+| Host | =skydive420dz@192.168.1.175=, hostname =nixos= |
+| Live checkout | =/home/skydive420dz/Projects/nixos-dotfiles= |
+| Current branch | =work/emacs-lsp-mode-experiment= |
+| Current HEAD | =8bd891b8dc926af0670e002de264122b206d156d= |
+| Active generation | =855= |
+| Active output | =/nix/store/px0spfwgd632lf9nybcb1ygarz7zg9b6-nixos-system-nixos-26.11.20260705.d407951= |
+| Live-host local =main= | =d6cc8ca42ae8ee85b7e00eaafdae3846c31c85cc= |
+| Verified =origin/main= | =97a70765eda96eac3c79f09652c2b99df8b22395= |
+| Branch relationship | both are ancestors; the work branch is 30 commits ahead of local =main= and 19 ahead of =origin/main= |
+
+The live worktree is dirty.  In addition to the audit documentation, it contains
+an updated =flake.lock=, Vial/QMK package additions, trailing whitespace in
+=system/modules/packages.nix=, and an untracked empty
+=system/modules/programs/vscode.nix=.  The active generation predates the current
+lock update but already contains the uncommitted Vial/QMK package additions.
+
+The first rebuild attempt against the updated lock fails during evaluation
+because the new NVF revision removed
+=vim.languages.rust.lsp.package=.  The new NVF Rust preset already owns the
+=rust-analyzer= command, so the behavior-preserving migration is to remove only
+the obsolete override and its now-unused =pkgs= argument.
+
+* Revised Decisions
+:PROPERTIES:
+:CUSTOM_ID: revised-decisions
+:END:
+These are direct user decisions for this checkpoint.  In particular, they are
+the explicit exception to the older frozen-Doom reference decision and to the
+Emacs experiment branch's normal prohibition on NVF changes.
+
+- Clean Emacs is accepted as the sole Emacs configuration.
+- Remove the frozen =config/doom= tree and its =~/.config/doom= live link before
+  the checkpoint.  Preserve clean-Emacs behavior and packages whose names or
+  history contain “Doom,” such as =doom-modeline=; they are not the Doom
+  configuration.
+- Leave the retired Doom personal spelling dictionary recoverable from Git
+  history rather than adding new clean-Emacs behavior during this checkpoint.
+- Remove declarative Ollama service, firewall, and model-hydration ownership
+  before the checkpoint.  The user also authorized data removal; delete model
+  state only after activation has removed the running service.
+- Keep =config/nvim= as the live Neovim root and keep NVF as its current
+  package/plugin/LSP owner.
+- Apply only the lock-required NVF compatibility migration in this checkpoint;
+  do not use that exception for unrelated NVF redesign.
+- Treat clean Emacs' current hybrid editor behavior as the checkpoint baseline.
+  Python's unfinished manual acceptance and broader Emacs TLC move to later
+  slices rather than blocking this source/build checkpoint.
+- Keep the existing Vial/QMK packages in the exact checkpoint, but do not call
+  device access accepted.  The missing QMK udev ownership is a confirmed first
+  maintenance slice.
+- Keep NixOS VS Code absent at this checkpoint.  A future Linux-specific Home
+  Manager module may adapt the macOS configuration.
+- Keep the guarded =desktop-amd= bootstrap output.  Do not remove it merely to
+  make whole-flake QA green.
+- Keep the intentional live-link development workflow.  Any store-backed
+  conversion remains an explicit per-path decision.
+- The exact source that passed evaluation and the full no-link build becomes
+  this =main= source/build checkpoint by fast-forward only.  Activation and
+  runtime acceptance remain separately recorded facts.
+- Old branches are archived by preserving exact tips before deletion.  Branch
+  deletion is not implied by documentation and requires a reviewed keep/archive
+  list.
+
+* Immediate Checkpoint Sequence
+:PROPERTIES:
+:CUSTOM_ID: immediate-checkpoint-sequence
+:END:
+** Gate 0 - preserve and reconcile the source
+:PROPERTIES:
+:CUSTOM_ID: gate-0-preserve-and-reconcile-the-source
+:END:
+1. Record branch, HEAD, dirty diff, active generation/output, and branch graph.
+2. Preserve the remote-only =flake.lock= and Vial/QMK changes.
+3. Remove the empty, untracked VS Code placeholder.
+4. Fix whitespace and review every intended checkpoint file.
+
+Success: the candidate source is explicit and no user-owned diff is silently
+discarded.
+
+** Gate 1 - repair the NVF update
+:PROPERTIES:
+:CUSTOM_ID: gate-1-repair-the-nvf-update
+:END:
+1. Remove =vim.languages.rust.lsp.package = pkgs.rust-analyzer=.
+2. Remove the unused =pkgs= module argument.
+3. Do not add a new command override: NVF's enabled Rust preset already sets
+   =vim.lsp.servers.rust-analyzer.cmd= to its pinned =rust-analyzer=.
+
+Success: target evaluation no longer raises the removed-option assertion and the
+generated Neovim configuration still contains a Rust analyzer command.
+
+** Gate 2 - remove retired Doom and Ollama ownership
+:PROPERTIES:
+:CUSTOM_ID: gate-2-remove-retired-doom-and-ollama-ownership
+:END:
+1. Remove the =config/doom= source tree.
+2. Remove the =~/.config/doom= Home Manager live link.
+3. Update current-state documentation so it says clean Emacs is authoritative;
+   retain clearly historical Doom references where they explain provenance.
+4. Remove the Ollama module import and module file from the candidate.
+   Activation—not source editing or building—will close TCP 11434 and remove
+   declarative model hydration from the running system.
+5. Do not delete Ollama model/state data while the old service is running;
+   perform that cleanup after activation removes live ownership.
+
+Success: no declarative Doom runtime path or Ollama unit/firewall/model-hydration
+owner remains, while clean Emacs and unrelated data are preserved.
+
+The retired tree's 24-word personal spelling dictionary remains recoverable
+from Git history.  At the time this gate was drafted, the unmanaged
+=~/.local/share/doom= and =~/.config/emacs.backup= paths were outside its
+declarative removal scope.  They were later provenance-checked and deleted
+under the user's explicit 2026-07-19 authorization, as recorded below.
+
+** Gate 3 - source validation, evaluation, and build
+:PROPERTIES:
+:CUSTOM_ID: gate-3-source-validation-evaluation-and-build
+:END:
+Record these separately:
+
+1. *Source validation*: =git diff --check=, Nix parsing/format review, exact dirty
+   diff, and reference scans.
+2. *Evaluation*: target-specific impure MSI evaluation with full assertion trace;
+   this is not a build.
+3. *Build verification*: run the standalone =nix build ... --no-link --impure=
+   command against the remote candidate; record the resulting output and
+   closure delta.  Do not call this an =nrs= invocation: =nrs= continues into
+   activation after its build phase.
+
+Success: all three gates pass without changing the running generation or
+services.
+
+** Recorded pre-activation results - 2026-07-18
+:PROPERTIES:
+:CUSTOM_ID: recorded-pre-activation-results
+:END:
+The technical pre-activation work in Gates 0 through 3 is complete:
+
+- The empty, untracked =system/modules/programs/vscode.nix= placeholder was
+  removed.  The remote lock update and intended Vial/QMK package additions were
+  preserved; trailing whitespace was fixed.
+- =git diff --check= and parsing of the changed Nix sources pass.  The tracked
+  binary diff against =8bd891b= hashes to
+  =16f9b96e3ebe51abd4fdf6dc6fbd5b1d4a63dbd38e28d269f57c9d0297b01f52=.
+  Current declarative scans find no Doom link, Ollama module/import, model
+  loader, or TCP 11434 owner.
+- Target evaluation reports:
+  - =services.ollama.enable = false=;
+  - no =ollama.service= or =ollama-model-loader.service=;
+  - no TCP 11434 firewall opening;
+  - no =~/.config/doom= Home Manager file;
+  - Rust Analyzer command
+    =/nix/store/5x0z7lf4wmnjwkfk6n19cp804l0f76fg-rust-analyzer-2026-06-15/bin/rust-analyzer=.
+- The NVF package builds independently to
+  =/nix/store/j22l6jr7bvbjcx396cg8hbzcsrprg8k0-nvf-with-helpers=.
+- The full target-specific no-link command passes:
+
+  #+begin_src sh
+  nix --extra-experimental-features 'nix-command flakes' \
+    build --print-out-paths \
+    '.#nixosConfigurations."nixos".config.system.build.toplevel' \
+    --no-link --impure --no-write-lock-file --show-trace
+  #+end_src
+
+  Candidate output:
+  =/nix/store/8q4h4bp340ikcp5wzflpsswia7p12x0s-nixos-system-nixos-26.11.20260718.61b7c44=.
+
+- Candidate-output inspection finds no Ollama binary, unit, model-loader unit,
+  or systemd reference to Ollama/TCP 11434.  Its Home Manager generation has no
+  Doom link; the clean Emacs and Neovim live links still resolve to this
+  checkout.
+- The old and candidate closures contain 3,542 and 3,553 paths and report
+  30,995,152,992 and 31,186,123,680 bytes respectively: a candidate increase of
+  190,970,688 bytes (displayed by =nix path-info -Sh= as 28.9 GiB and 29.0 GiB).
+  This is not a narrow NVF-only closure: the preserved lock update also advances
+  Nixpkgs, Hyprland, Home Manager, NVF, Quickshell inputs, systemd, Python, and
+  many desktop packages, while the candidate preserves the already-live
+  Vial/QMK packages and removes Ollama.
+  Runtime acceptance must therefore cover the combined update.
+
+No activation has occurred.  Generation 855 remains both current and booted at
+=/nix/store/px0spfwgd632lf9nybcb1ygarz7zg9b6-nixos-system-nixos-26.11.20260705.d407951=.
+The old =ollama.service=, Quickshell, and Emacs services remain active, and the
+old Ollama listener remains on TCP 11434.  These live facts confirm the
+build/activation boundary; they are not candidate failures.
+
+A read-mostly audit query using =nix-store -q --roots= pruned only stale
+temporary-root bookkeeping.  It did not delete store paths, profiles,
+generations, configuration, services, caches, or Ollama model data.  Generation
+855 and approximately 13.0 GB of Ollama model state remain preserved.
+
+On 2026-07-19, after confirming provenance, the user-owned
+=~/.config/emacs.backup= clean upstream Doom clone, =~/.local/share/doom=,
+=~/.config/doom= dangling link, and =~/.ollama= CLI history were deleted.
+Clean Emacs' independently used =doom-modeline= package and cache were
+preserved.  The privileged Ollama model store remains until the active service
+is removed.
+
+** Gate 4 - checkpoint and promote the build-verified source
+:PROPERTIES:
+:CUSTOM_ID: gate-4-checkpoint-and-promote
+:END:
+1. Commit only the exact accepted source.
+2. Treat the commit containing this ledger as the checkpoint identity.  Keep
+   the candidate output and build result recorded here without claiming
+   activation; obtain the immutable commit ID from Git rather than embedding a
+   self-referential hash in the file.
+3. Reverify that current =origin/main= is an ancestor of the accepted
+   checkpoint.
+4. Fast-forward =main= in a separate worktree so the live checkout never
+   temporarily switches to the older =main= bytes.
+5. Push and verify the remote =main= tip.
+6. Switch the live checkout to =main= only after both branch names resolve to the
+   same commit; that switch must not change live-linked bytes.
+
+Success: =main= names the exact build-verified source and the working tree is
+clean.  This gate does not create a new live NixOS generation.
+
+** Gate 5 - explicit activation, runtime acceptance, and data cleanup
+:PROPERTIES:
+:CUSTOM_ID: gate-5-explicit-activation-runtime-and-cleanup
+:END:
+Activation remains separate and interactive because =nrs= requires =sudo=.
+After explicit activation:
+
+1. Record the new generation and =/run/current-system= output.
+2. Confirm the booted output remains separately identified until a reboot.
+3. Verify Neovim starts, Rust LSP resolves to =rust-analyzer=, and ordinary
+   editor behavior remains intact.
+4. Verify clean Emacs starts and =! -L ~/.config/doom=.  Python manual
+   acceptance and broader Emacs TLC are explicitly deferred from this
+   checkpoint.
+5. Verify =ollama.service= is absent/inactive, no listener remains on TCP 11434,
+   the firewall no longer declares the port, and =ollama= is absent from the new
+   system path.
+6. Delete the four Ollama models and privileged state only after step 5, then
+   verify =/var/lib/private/ollama= and =/var/lib/ollama= are gone or empty.
+7. On both monitors, verify Quickshell bar/status/media, launcher, clipboard,
+   wallpaper picker, OSD, tray, theme toggle, focus, click masks, and logs.
+   Verify Hyprland, portals, networking, audio, and input separately.
+8. Confirm Vial and QMK commands still launch, but keep non-root device access
+   explicitly unaccepted until the dedicated udev/device slice.
+9. Preserve generation 855 as rollback until the new live system is accepted.
+
+Success: live behavior is recorded accurately, retired Ollama data is removed
+in safe order, and unresolved Vial/Emacs work remains labeled rather than
+silently folded into the checkpoint.
+
+* Branch Archive And New Work Lanes
+:PROPERTIES:
+:CUSTOM_ID: branch-archive-and-new-work-lanes
+:END:
+After the =main= checkpoint:
+
+1. Produce a reviewed list of every local and remote branch and its tip.
+2. Keep =main= plus the newly created active work lanes.
+3. Before removing an old branch, create and verify a durable archive tag under
+   =archive/2026-07-18/<branch-name>= and push that tag.
+4. Delete no branch whose tip is not reachable from either =main= or its verified
+   archive tag.
+5. Recreate/refresh =work/quickshell-cleanup= from accepted =main= only after its
+   old tip is archived.
+6. Create =work/nixos-maintenance= from accepted =main=.
+7. Archive the completed Emacs experiment branch only after its accepted commits
+   are on =main=.
+
+Exact branch deletion and remote pruning are a later reviewed mutation, not part
+of the initial checkpoint fix.
+
+* Post-Checkpoint Roadmap
+:PROPERTIES:
+:CUSTOM_ID: post-checkpoint-roadmap
+:END:
+** =work/nixos-maintenance=
+- Enable =hardware.keyboard.qmk.enable=, remove the redundant explicit rules
+  package, then test Vial with the actual device.
+- Decide separately whether the full QMK firmware toolchain stays system-wide
+  or moves to an on-demand project shell.
+- Adapt the macOS VS Code Home Manager module for Linux only as its own slice.
+- Keep later Emacs TLC tied to measured daily-use friction.
+- Commit and compare the MSI hardware configuration for pure builds.
+- Repair confirmed portal, secret-environment, battery-governor, service
+  lifecycle, and selected security defects as separate slices.
+- Move only MSI facts behind host boundaries; keep reusable mechanisms shared.
+- Deduplicate package ownership one item at a time.
+- Add target-specific QA while preserving the guarded AMD bootstrap output.
+- Add conservative GC only after source and rollback ownership are clear.
+
+** =work/quickshell-cleanup=
+- Add exact-source validation and repeatable performance measurements.
+- Fix deterministic safety, layout, timer, title, network, CAVA, and clipboard
+  bugs before performance experiments.
+- Add bounded Wayland readiness and restart backoff.
+- Keep =scripts/theme-select= as owner; use systemd only to order one invocation
+  before Mako and Quickshell, and stop restarting Quickshell on normal toggles.
+- Centralize duplicated backends before replacing pollers one domain per commit.
+- Treat media/frame and wallpaper work as controlled A/B slices, not assumed
+  wins.
+
+** Maintenance
+- Preserve explicit rollback generations.
+- Evaluate a weekly 30-day GC timer without collecting.
+- Keep store optimization on a separate timer.
+- Prevent immediate timer catch-up.
+- Make the first real GC an explicitly authorized and observed maintenance event.
+- Clean non-Nix caches and model data only by owner and in independent batches.
+
+* Universal Verification Contract
+:PROPERTIES:
+:CUSTOM_ID: universal-verification-contract
+:END:
+Every slice records:
+
+1. exact source validation;
+2. target evaluation;
+3. no-link build verification;
+4. separately authorized activation;
+5. runtime and human hand tests;
+6. rollback and acceptance evidence.
+
+Quickshell, Emacs, Neovim, Hyprland, and scripts may be live-linked.  A Nix build
+does not validate those active bytes unless the slice explicitly checks the
+resolved live source.

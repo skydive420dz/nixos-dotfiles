@@ -1,9 +1,0 @@
-# -*- mode: snippet -*-
-# name: Item
-# key: item
-# --
-Item {
-  id: ${1:root}
-
-  $0
-}

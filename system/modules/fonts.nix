@@ -39,7 +39,7 @@
       noto-fonts # broad Unicode coverage
       noto-fonts-cjk-sans # CJK sans
       noto-fonts-color-emoji
-      symbola # Doom Emacs fallback font for broad Unicode symbols
+      symbola # Fallback font for broad Unicode symbols
       liberation_ttf # MS-compatible (Arial/Times/Courier replacements)
       dejavu_fonts # widely-used, good fallback
       inter # the Inter UI font

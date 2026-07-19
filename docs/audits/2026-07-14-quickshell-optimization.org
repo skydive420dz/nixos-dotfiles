@@ -1,0 +1,856 @@
+#+title: Quickshell Optimization Audit - 2026-07-14
+
+* Purpose And Verdict
+:PROPERTIES:
+:CUSTOM_ID: purpose-and-verdict
+:END:
+This is the focused companion to [[file:2026-07-14-nixos-system.org][the 2026-07-14 NixOS system audit]].  It
+maps the complete active Quickshell configuration, measures the running shell,
+separates confirmed defects from performance hypotheses, and defines small
+implementation slices with measurable acceptance gates.
+
+The audit began read-only.  It did not edit QML, open a picker, change media
+playback, restart Quickshell, rebuild or switch NixOS, change the system profile,
+or reboot the machine.  The only writes made after the evidence pass are this
+documentation and its index links.
+
+Evidence labels used below:
+
+- =CONFIG=: declared by the repository or installed QML type metadata.
+- =ACTIVE=: observed on the running machine.
+- =HISTORY=: journal, coredump, or completed-unit accounting from an older run.
+- =VALIDATION=: read-only parser, linter, or syntax-check result.
+- =INFERENCE=: a likely cost or cause that still requires an A/B test.
+
+** Executive verdict
+:PROPERTIES:
+:CUSTOM_ID: executive-verdict
+:END:
+The current shell is stable and thoughtfully modular, but it is not yet lean.
+The highest-value work is architectural rather than cosmetic:
+
+1. Make the dynamic bar a small render surface instead of sharing a blurred,
+   full-output window with the static screen frame.
+2. Replace per-bar shell polling with one shared, mostly event-driven state
+   backend using the native Quickshell services already installed.
+3. Share or reduce the 24 fps media analyzer and measure it independently.
+4. Virtualize and pre-thumbnail the 514 MiB live wallpaper collection.
+5. Put safety and validation ahead of those changes: fix shell quoting, the CAVA
+   temporary-file leak, the three layout defects, and the live-link/restart
+   failure boundary first.
+
+The live media-playing baseline is about =7.7-8.1%= of one CPU core, roughly
+=177-185 MiB= of cgroup memory, about =205 MiB= process PSS, and =92 MiB= of
+NVIDIA framebuffer allocation.  Those figures are not an idle baseline: Brave
+was playing media and one CAVA analyzer was active.  No playback state was
+changed merely to manufacture a second result.
+
+* Verified Target And Provenance
+:PROPERTIES:
+:CUSTOM_ID: verified-target-and-provenance
+:END:
+| Item | Verified value |
+|----------------------+-----------------------------------------------------------------------|
+| SSH target | =skydive420dz@192.168.1.175= |
+| Hostname | =nixos= |
+| Remote checkout | =/home/skydive420dz/Projects/nixos-dotfiles= |
+| Branch | =work/emacs-lsp-mode-experiment= |
+| Commit | =8bd891b8dc926af0670e002de264122b206d156d= |
+| Local/remote lock hash | =4a67dc462e30cc8c43659cc71ea5fd65f8153ea4874e8b6533db8032ee2b5851= |
+| Active NixOS output | =/nix/store/270apsrfarbxf8c3jyya65gmr1vdhvvy-nixos-system-nixos-26.11.20260705.d407951= |
+| Quickshell executable | =/nix/store/nm6wrf4gprrxlri8nr16kcmixpkk8hrf-quickshell-0.3.0/bin/quickshell= |
+| Qt / qmllint | =6.11.1= |
+| Active service PID | =4452= |
+| Service start | =2026-07-14 22:37:07 EDT= |
+| Current restarts | =0= |
+
+The local and remote tracked checkouts have the same commit and lock file.  The
+active configuration is not store-frozen, however.  The effective link chain is:
+
+#+begin_src text
+~/.config/quickshell
+  -> Home Manager link farm
+  -> hm_quickshell
+  -> /home/skydive420dz/Projects/nixos-dotfiles/config/quickshell
+#+end_src
+
+An exact directory comparison found no difference between the resolved live
+path and the remote repository directory.  Quickshell currently holds 54 file
+watches and reports QML tooling support enabled.  Editing or switching the
+repository can therefore change or reload the live shell without a Nix build,
+Home Manager activation, or NixOS generation change.  This is convenient for
+development and is also the most important build-versus-live caveat in this
+audit.
+
+The flake declares a Quickshell upstream input at revision
+=25eb04fb06c09bbdef91664f044ad22195862700=, but no output references it.
+The actual service, import path, editor tooling, and system package all use
+=pkgs.quickshell= from pinned Nixpkgs, currently version =0.3.0=.
+
+** Current output and wallpaper state
+:PROPERTIES:
+:CUSTOM_ID: current-output-and-wallpaper-state
+:END:
+Only the internal =eDP-1= output was connected during measurement:
+
+| Output | Active geometry | Refresh | State |
+|--------+-----------------+---------+-------|
+| =eDP-1= | =1920x1080= | =144.003 Hz= | active, focused, VRR enabled |
+| =HDMI-A-1= | configured for =3440x1440@100= | - | disconnected |
+
+The live wallpaper state points to
+=wp3915756-city-girls-wallpapers.png=.  It is a static =3440x1440= PNG, 1.61 MB
+compressed, rendered onto the internal panel.  Therefore no animated or video
+wallpaper decoder was responsible for the continuous live measurements.
+
+The repository tracks 17 wallpaper files totaling about 34 MiB.  The remote
+runtime directory also has five intentionally ignored MP4 files and one ignored
+GIF, for a live total of 23 files and 514 MiB.  The largest assets include a
+203.7 MB MP4 and a 143.9 MB, 563-frame GIF.  The five cached video thumbnails
+currently occupy only 80 KiB.
+
+* Complete Configuration Map
+:PROPERTIES:
+:CUSTOM_ID: complete-configuration-map
+:END:
+The Quickshell source is 31 QML files and 3,570 lines, plus =qmldir= and launcher
+JSON.  [[file:../areas/quickshell.org][The Quickshell area note]] retains the chronological design and hand-test
+history; this section describes the configuration that is active now.
+
+** Runtime object graph
+:PROPERTIES:
+:CUSTOM_ID: runtime-object-graph
+:END:
+#+begin_src text
+ShellRoot
+  MediaController                         one global MPRIS selector + IPC target
+  Variants(Quickshell.screens)
+    Wallpaper                            one background layer per output
+  Variants(Quickshell.screens)
+    Bar                                  one bar/frame layer per output
+      LauncherButton
+      Workspaces
+      WindowTitle
+      Media -> MediaAnalyzer
+      ThemeToggle
+      WallpaperButton
+      Tray
+      StatusCluster
+        Network -> NetworkGraph
+        Bluetooth
+        Volume
+        Battery
+        Clock
+  WallpaperPicker                        one screen-targetable overlay
+  Launcher                               one screen-targetable overlay
+  Clipboard                              one screen-targetable overlay
+  Osd                                    one overlay
+
+Singletons from qmldir
+  Theme                                  theme JSON watcher and tokens
+  StatusMetrics                          status geometry
+  WallpaperStore                         list, selection, state, thumbnails
+#+end_src
+
+** Source ownership
+:PROPERTIES:
+:CUSTOM_ID: source-ownership
+:END:
+| Source | Active ownership |
+|--------+------------------|
+| [[../../config/quickshell/shell.qml][shell.qml]] | Creates global objects, per-screen variants, and overlay roots |
+| [[../../config/quickshell/qmldir][qmldir]] | Exports =Theme=, =StatusMetrics=, and =WallpaperStore= singletons |
+| [[../../config/quickshell/common/Theme.qml][common/Theme.qml]] | Theme defaults, JSON parsing, signal watch, and reload process |
+| [[../../config/quickshell/common/BarFrame.qml][common/BarFrame.qml]] | Full-output Canvas that paints the bar and three-pixel screen frame |
+| [[../../config/quickshell/root/Bar.qml][root/Bar.qml]] | Top layer, exclusive zone, mask, frame, and complete per-output bar row |
+| [[../../config/quickshell/root/Wallpaper.qml][root/Wallpaper.qml]] | Per-output static, GIF, or video background renderer |
+| [[../../config/quickshell/root/WallpaperPicker.qml][root/WallpaperPicker.qml]] | Full-output picker layer and focus/mask policy |
+| [[../../config/quickshell/root/Launcher.qml][root/Launcher.qml]] | Full-output launcher layer, screen selection, toggle-file watcher |
+| [[../../config/quickshell/root/Clipboard.qml][root/Clipboard.qml]] | Full-output clipboard layer, screen selection, toggle-file watcher |
+| [[../../config/quickshell/root/Osd.qml][root/Osd.qml]] | Full-output OSD layer and mask |
+| [[../../config/quickshell/modules/media/MediaController.qml][media/MediaController.qml]] | Global player selection and =media.playPause= IPC |
+| [[../../config/quickshell/modules/media/Media.qml][media/Media.qml]] | Controls, metadata, art, and analyzer placement |
+| [[../../config/quickshell/modules/media/MediaAnalyzer.qml][media/MediaAnalyzer.qml]] | Per-bar CAVA process, fallback timer, level parsing, Canvas |
+| [[../../config/quickshell/modules/status/StatusCluster.qml][status/StatusCluster.qml]] | Five status pollers, network rate state, battery OSD, view composition |
+| [[../../config/quickshell/modules/status/Network.qml][status/Network.qml]] / [[../../config/quickshell/modules/status/NetworkGraph.qml][NetworkGraph.qml]] | Network icon, launcher, samples, and Canvas graph |
+| [[../../config/quickshell/modules/status/Bluetooth.qml][status/Bluetooth.qml]] | Bluetooth state view and BlueTUI launcher |
+| [[../../config/quickshell/modules/status/Volume.qml][status/Volume.qml]] | Volume state view and WireMix launcher |
+| [[../../config/quickshell/modules/status/Battery.qml][status/Battery.qml]] | Battery icon, level, and charge-state view |
+| [[../../config/quickshell/modules/status/Clock.qml][status/Clock.qml]] | Time/date state, one-second timer, and view |
+| [[../../config/quickshell/modules/status/StatusMetrics.qml][status/StatusMetrics.qml]] | Status and graph geometry constants |
+| [[../../config/quickshell/modules/workspaces/Workspaces.qml][workspaces/Workspaces.qml]] | Hyprland events, occupancy query, buttons, dispatch |
+| [[../../config/quickshell/modules/window/WindowTitle.qml][window/WindowTitle.qml]] | Hyprland events, initial query, title normalization |
+| [[../../config/quickshell/modules/tray/Tray.qml][tray/Tray.qml]] | Native StatusNotifier model, icons, activation, native menus |
+| [[../../config/quickshell/modules/launcher/LauncherButton.qml][launcher/LauncherButton.qml]] | Left/right launcher and clipboard actions |
+| [[../../config/quickshell/modules/launcher/LauncherView.qml][launcher/LauncherView.qml]] | App loading, fuzzy scoring, keyboard handling, virtualized results |
+| [[../../config/quickshell/modules/launcher/apps.json][launcher/apps.json]] | Three terminal-first custom application entries |
+| [[../../config/quickshell/modules/clipboard/ClipboardView.qml][clipboard/ClipboardView.qml]] | Cliphist loading, filtering, deletion, restore, image preview |
+| [[../../config/quickshell/modules/osd/OsdView.qml][osd/OsdView.qml]] | OSD file signal, payload load, timeout, and card |
+| [[../../config/quickshell/modules/wallpaper/WallpaperStore.qml][wallpaper/WallpaperStore.qml]] | Wallpaper list/state, media classification, thumbnail commands |
+| [[../../config/quickshell/modules/wallpaper/WallpaperSelector.qml][wallpaper/WallpaperSelector.qml]] | Search and nonvirtual card grid |
+| [[../../config/quickshell/modules/wallpaper/WallpaperButton.qml][wallpaper/WallpaperButton.qml]] | Picker toggle |
+| [[../../config/quickshell/modules/theme/ThemeToggle.qml][theme/ThemeToggle.qml]] | Global theme toggle command |
+
+** Service and desktop integration
+:PROPERTIES:
+:CUSTOM_ID: service-and-desktop-integration
+:END:
+| Source | Integration |
+|--------+-------------|
+| [[../../home/modules/services/quickshell.nix][home/modules/services/quickshell.nix]] | Graphical-session user service, Qt paths, FFmpeg path, restart policy |
+| [[../../home/modules/links.nix][home/modules/links.nix]] | Out-of-store live link to the repository QML |
+| [[../../config/hypr/hyprland.lua][config/hypr/hyprland.lua]] | Monitors, binds, startup clipboard processes, layer blur/fade rules |
+| [[../../scripts/launcher-apps][scripts/launcher-apps]] | Python desktop-file discovery and JSON serialization |
+| [[../../scripts/launcher-toggle][scripts/launcher-toggle]] / [[../../scripts/clipboard-toggle][clipboard-toggle]] | Target/signal-file overlay controls |
+| [[../../scripts/osd-volume][scripts/osd-volume]] / [[../../scripts/osd-brightness][osd-brightness]] | Hardware action plus JSON/signal-file OSD transport |
+| [[../../scripts/theme-select][scripts/theme-select]] | Generates the global runtime theme and reloads consumers |
+| [[../../system/modules/clipboard.nix][system/modules/clipboard.nix]] | Cliphist, ImageMagick, clipboard persistence, and wipe command |
+
+The primary runtime transports are native MPRIS, SystemTray, and Hyprland
+models/events; five status shell probes; CAVA/Pulse; and FileView-backed theme,
+wallpaper, launcher, clipboard, and OSD signals.  Typed Quickshell IPC is used
+only for =media.playPause=.
+
+* Surface And Resource Baseline
+:PROPERTIES:
+:CUSTOM_ID: surface-and-resource-baseline
+:END:
+** Layer geometry
+:PROPERTIES:
+:CUSTOM_ID: layer-geometry
+:END:
+With all pickers closed, the live layer tree contains only:
+
+| Namespace | Layer | Geometry | Expected visible role |
+|-----------+-------+----------+-----------------------|
+| =qs-wallpaper= | background | =1920x1080= | full-output wallpaper |
+| =qs-bar= | top | =1920x1080= | 34 px bar plus thin frame around the output |
+
+The bar reserves 36 px at the top, and its input mask is correctly limited to
+the visible =barRow=.  The launcher, clipboard, OSD, and wallpaper picker are
+not mapped while hidden, which is a strong result.  The performance concern is
+the render surface, not a phantom input surface.
+
+The configured two-output layout would give the two bar Canvases a combined
+7.03 million pixels.  One RGBA8 backing extent is about 26.8 MiB before scene
+graph and compositor buffering.  This calculation is =CONFIG=; the actual
+continuous composition and blur cost is still an =INFERENCE= requiring the
+frame/bar A/B slice.
+
+** Controlled live sample
+:PROPERTIES:
+:CUSTOM_ID: controlled-live-sample
+:END:
+Measurement condition: one internal output, picker closed, static PNG wallpaper,
+Brave MPRIS state =Playing=, one CAVA process at 24 fps.  A 20-second cgroup and
+process sample found:
+
+| Metric | Observation |
+|--------+-------------|
+| Entire Quickshell cgroup CPU | =7.66%= of one core |
+| Quickshell main CPU | =5.20%= of one core |
+| CAVA and transient children | about =2.46%= of one core |
+| Main character reads | about 179 KiB/s |
+| Main read/write syscalls | about 375/s and 357/s |
+| Main voluntary context switches | about 181/s |
+| Main process RSS / PSS | about 295 MiB / 205 MiB |
+| Main private dirty memory | about 149 MiB |
+| Service cgroup current / peak | roughly 177-185 MiB / 187 MiB |
+| Main threads / CAVA threads | 7 / 3 |
+| Steady file descriptors | 64, briefly 67 around child launches |
+| Swap, pressure, OOM | none observed |
+
+RSS/PSS and cgroup figures use different shared-page accounting and should not be
+subtracted from each other.
+
+NVIDIA =pmon= reported 92 MiB of Quickshell framebuffer allocation.  Across
+twenty one-second samples, Quickshell had nonzero rendering activity in six,
+with =8-18%= SM bursts and a =3.25%= mean when idle samples are counted as zero.
+This coarse sampler proves bursty GPU work, not which QML object caused it.
+
+The active =3440x1440= wallpaper has an approximately 18.9 MiB RGBA texture and
+roughly 25.2 MiB with a complete mip chain.  A display-sized =1920x1080= variant
+would be about 7.9 MiB, or 10.5 MiB with mipmaps.  A generated per-output cache
+could therefore save roughly 14-15 MiB per screen, subject to a before/after GPU
+measurement.
+
+** Process budget
+:PROPERTIES:
+:CUSTOM_ID: process-budget
+:END:
+The steady status schedule in [[../../config/quickshell/modules/status/StatusCluster.qml][StatusCluster.qml]] creates this theoretical
+Wi-Fi-path budget per monitor:
+
+| Probe | Cadence | Bash/QProcess per minute | Visible helper execs per minute | Approximate total |
+|-------+---------+--------------------------+---------------------------------+-------------------|
+| Volume | 2 s | 30 | 60 (=wpctl= + =awk=) | 90 |
+| Traffic | 2 s | 30 | 60 (two =cat=) | 90 |
+| Network identity/signal | 15 s | 4 | 16 (two =nmcli= + two =awk=) | 20 |
+| Battery | 10 s | 6 | 24 (two =cat/head= pairs) | 30 |
+| Bluetooth | 30 s | 2 | 6 (two =bluetoothctl= + =grep=) | 8 |
+| Total per monitor | - | 72 | 166 | 238/minute |
+
+That is about 14,280 process executions per hour for one bar and about 28,560
+for the configured two-output layout.  A 21.3-second 20 Hz sampler caught 18
+unique Bash children, or 50.7/minute, while predictably missing shorter jobs.
+A separate 15-second decomposition attributed about =1.66%= of one CPU core to
+transient children.  The source-derived budget and sampled churn agree on the
+order of magnitude.
+
+The one-second clock adds 60 timer callbacks per minute per bar despite showing
+only minutes.  Active media adds one long-lived CAVA child and up to 24 new JS
+arrays/Canvas paints per second per bar.
+
+** Stability and historical peaks
+:PROPERTIES:
+:CUSTOM_ID: stability-and-historical-peaks
+:END:
+The current run is healthy: =NRestarts=0=, =Result=success=, no growth in file
+descriptors during sampling, and no current binding-loop or runtime error.  Over
+the last 14 days, twelve starts all reached =Configuration Loaded=; the journal
+contains 22 warnings, zero errors, and zero failed main processes.  The warnings
+are recurring Vesktop tray =IconName= getter failures plus two earlier Brave
+MPRIS peers disconnecting during a property read.
+
+Completed cgroup accounting shows peaks worth regression testing:
+
+| Completed run | Duration | CPU consumed | Cgroup memory peak |
+|---------------+----------+--------------+--------------------|
+| 2026-06-09 through 2026-06-17 | 5 d 12 h | 9 h 33 m, about 7.2% of one core average | 3.2 GiB |
+| 2026-07-11 through 2026-07-14 | 2 d 19 h | 1 h 59 m, about 3.0% average | 783 MiB |
+| Current run at audit time | about 1.5 h | workload-dependent | about 187 MiB |
+
+A cgroup peak includes transient CAVA, FFmpeg, ImageMagick, and shell children;
+it is not proof that the Quickshell process leaks.  The picker can legitimately
+create large concurrent decoder peaks, and retained Qt allocator pages can keep
+the high-water mark elevated.  The correct next step is an action-labeled soak
+test, not a leak claim.
+
+The current binary =qslog= was 68 KiB and did not grow during a quiet ten-second
+interval.  It contains window-title and media event metadata.  Its mode is 0644,
+but it is enclosed by =/run/user/1000= mode 0700 and disappears with the runtime
+directory, so this is a low-severity privacy/hygiene note rather than a cross-user
+exposure.
+
+* Validation Results
+:PROPERTIES:
+:CUSTOM_ID: validation-results
+:END:
+No second Quickshell instance was started.  The active service was not restarted.
+
+** QML validation
+:PROPERTIES:
+:CUSTOM_ID: qml-validation
+:END:
+The live import path was taken from the active process and used for all 31 files:
+
+#+begin_src sh
+QML_IMPORT_PATH="$import_path" qmllint \
+  --json - -E -I config/quickshell \
+  $(find config/quickshell -name '*.qml' -type f -print)
+#+end_src
+
+The parser returned no fatal parse error, but warning-level diagnostics do not
+make the default command fail.  It produced 62 diagnostics:
+
+| Category | Count | Interpretation |
+|----------+-------+----------------|
+| =Quick.layout-positioning= | 3 | definite layout defects |
+| =unqualified= | 17 | real cleanup work |
+| =unused-imports= | 4 | real cleanup work |
+| =missing-property= | 15 | =SplitParser.stdout.buffer= metadata/tooling gap |
+| =signal-handler-parameters= | 17 | Quickshell/QProcess metadata mismatch |
+| =uncreatable-type= | 6 | =PanelWindow= tooling metadata mismatch |
+
+The three definite defects assign =height= to children managed by
+=ColumnLayout= instead of using =implicitHeight= or =Layout.preferredHeight=:
+
+- [[../../config/quickshell/modules/launcher/LauncherView.qml][LauncherView.qml]] line 201;
+- [[../../config/quickshell/modules/clipboard/ClipboardView.qml][ClipboardView.qml]] lines 269 and 342.
+
+All files parse through =qmlformat=.  Default four-space formatting would change
+only =Theme.qml=, =MediaAnalyzer.qml=, =StatusCluster.qml=,
+=WallpaperSelector.qml=, and =WallpaperStore.qml=.  Editor policy currently
+conflicts: Neovim/default Qt formatting uses four spaces, the clean Emacs helper
+forces two, and the legacy Doom command includes a =-w -1= typo that flattens
+indentation while exiting successfully.  Choose four spaces for the least churn,
+align every editor, and add a compare gate.
+
+** Native replacement capability
+:PROPERTIES:
+:CUSTOM_ID: native-replacement-capability
+:END:
+A synthetic read-only lint input successfully imported and referenced the native
+modules installed with this exact Quickshell build:
+
+- =Quickshell.Services.Pipewire=: default sink, volume/mute, and peak monitor;
+- =Quickshell.Services.UPower=: display battery, percentage, state, on-battery;
+- =Quickshell.Bluetooth=: adapters, enabled state, connected devices;
+- =Quickshell.Networking=: NetworkManager devices, networks, signal, connectivity;
+- =Quickshell.Hyprland=: workspaces, workspace toplevels, active toplevel/title;
+- =Quickshell.DesktopEntries=: applications and desktop-entry execution data.
+
+These are available now; replacing status shell probes does not require upgrading
+Quickshell first.
+
+** Other source checks
+:PROPERTIES:
+:CUSTOM_ID: other-source-checks
+:END:
+- The relevant shell scripts pass =bash -n=.
+- =launcher/apps.json= parses with =jq=.
+- =scripts/launcher-apps= parses as Python.
+- Launcher discovery took 60-74 ms across five runs for 36 applications and a
+  7.9 KiB JSON result.
+
+* Strengths To Preserve
+:PROPERTIES:
+:CUSTOM_ID: strengths-to-preserve
+:END:
+- Root surfaces, visible modules, and shared tokens are separated cleanly.
+- =MediaController= is correctly single-instance, avoiding duplicate MPRIS IPC
+  registration across outputs.
+- Per-screen =Variants= handle output hotplug without hard-coded QML monitor
+  names.
+- Native MPRIS and SystemTray models are already preferred where they exist.
+- Hidden overlays are genuinely unmapped, and focus becomes exclusive only while
+  an interactive overlay is open.
+- The bar input mask stays on the 34 px row even though the decorative surface is
+  full-height.
+- Workspace refresh is debounced, pollers refuse overlap, and image loads are
+  asynchronous.
+- Launcher and clipboard results use virtualized =ListView= delegates.
+- Raw clipboard values are passed as shell positional parameters rather than
+  interpolated into command text.
+- Wallpaper state and thumbnails live outside the source tree, and the video
+  thumbnails are reused when fresh.
+- Polling was already split by cost: fast visible state at two seconds and slow
+  service probes at 10-30 seconds.
+- Current and recent service starts are boring: clean load, no restart loop, and
+  only attributable client-side D-Bus warning noise.
+
+* Ranked Findings
+:PROPERTIES:
+:CUSTOM_ID: ranked-findings
+:END:
+| ID | Priority | Class | Confirmed finding |
+|----+----------+-------+-------------------|
+| QS-01 | P0 | security/correctness | Wallpaper paths use JSON quoting as Bash quoting; crafted names can execute shell expansions |
+| QS-02 | P0 | correctness/hygiene | CAVA's successful =exec= bypasses its EXIT trap; 254 orphan configs exist |
+| QS-03 | P0 | performance | The live dynamic bar is a blurred =1920x1080= surface and full-output Canvas |
+| QS-04 | P0 | performance | Active CAVA/JS/Canvas rendering is a measured continuous CPU/GPU load and duplicates per output |
+| QS-05 | P0 | performance/architecture | Status, workspace, title, clock, and analyzer backends are instantiated once per bar |
+| QS-06 | P0 | performance/memory | The wallpaper picker creates every delegate, loads original assets, and fans out video jobs |
+| QS-07 | P1 | reliability/build | Live-linked QML bypasses Nix build verification; restart backoff is only 100 ms |
+| QS-08 | P1 | correctness | Multi-output workspace/status state and several event handlers are globally wrong or duplicated |
+| QS-09 | P1 | reliability/latency | File-based IPC can coalesce events and overlay close timers race reopen |
+| QS-10 | P1 | correctness/tooling | Three definite layout defects plus unenforced lint/formatter policy |
+| QS-11 | P1 | startup/lifecycle | Quickshell and Mako concurrently regenerate the full theme; theme toggle then restarts Quickshell |
+| QS-12 | P1 | privacy/robustness | Clipboard previews lack success, cancellation, cleanup, and resource bounds |
+| QS-13 | P2 | latency/spec | Launcher rescans desktop files on every open and executes reconstructed shell text |
+| QS-14 | P2 | power/hygiene | One-second minute clock, unused rate work, swallowed process errors, stale properties |
+| QS-15 | P2 | Nix/media hygiene | Unused flake input, two FFmpeg variants, and disabled GPU texture conversion need resolution |
+
+** QS-01: wallpaper shell boundary
+:PROPERTIES:
+:CUSTOM_ID: qs-01-wallpaper-shell-boundary
+:END:
+[[../../config/quickshell/modules/wallpaper/WallpaperStore.qml][WallpaperStore.qml]] uses =JSON.stringify= as if it were a shell escaping
+function in the video thumbnail command, state save/load, and directory list.
+JSON produces double-quoted strings; Bash still expands =$variables=, backticks,
+and =$(commands)= inside double quotes.  A downloaded wallpaper with a crafted
+filename can execute code as the logged-in user when its thumbnail runs or state
+is saved.  The current 23 filenames inspected are benign, so no current trigger
+was observed.
+
+Use argv-based processes or pass paths as positional parameters to a fixed helper.
+Write state and thumbnails to a temporary file followed by an atomic rename.
+
+** QS-02: CAVA temporary files
+:PROPERTIES:
+:CUSTOM_ID: qs-02-cava-temporary-files
+:END:
+[[../../config/quickshell/modules/media/MediaAnalyzer.qml][MediaAnalyzer.qml]] creates a temporary config, installs an EXIT trap, and then
+runs =exec cava=.  A successful =exec= replaces Bash, so Bash never executes its
+trap.  The active machine has 254 matching mode-0600 configs in =/tmp=, 190 bytes
+each; four were created during the current service run.
+
+Use one declarative/store-backed CAVA config or a stable file under the private
+runtime directory.  This is a small, behavior-preserving first fix.
+
+** QS-03 and QS-04: render topology and analyzer
+:PROPERTIES:
+:CUSTOM_ID: qs-03-and-qs-04-render-topology-and-analyzer
+:END:
+[[../../config/quickshell/root/Bar.qml][Bar.qml]] sets its implicit height to the output height, and
+[[../../config/quickshell/common/BarFrame.qml][BarFrame.qml]] paints/clears that full Canvas.  Hyprland then applies blur to
+the =qs-bar= namespace.  The analyzer updates inside the same QQuickWindow up to
+24 times per second.  Geometry and update rate are definite; how much damage and
+blur work propagates is not yet proven.
+
+First share one analyzer backend and reduce or make its cadence configurable.
+Then A/B the existing unified surface against a 34 px dynamic bar plus a separate
+static, input-transparent frame.  Preserve the approved unified visual and mask
+invariants; do not blindly remove the frame.
+
+The installed =PwNodePeakMonitor= is an event-driven alternative if aggregate
+level animation is visually acceptable.  If CAVA stays, run it once, add sample
+freshness/restart handling, lower the frame rate to 12-15 fps, and expose the
+same levels to every bar.  Today a stalled CAVA can leave old levels nonempty and
+prevent the fallback from resuming.
+
+** QS-05: per-output backend duplication
+:PROPERTIES:
+:CUSTOM_ID: qs-05-per-output-backend-duplication
+:END:
+Every connected output adds a complete =Bar=, including five poll loops,
+=Workspaces=, =WindowTitle=, =Tray=, =Clock=, and =MediaAnalyzer=.  With HDMI
+connected, the current code doubles status process churn to about 28,560 process
+executions/hour, opens two Pulse/CAVA captures during playback, and gives both
+status instances permission to emit the same battery OSD transition.
+
+Move stateful backends to =ShellRoot= or true singletons and keep only cheap view
+delegates per output.  As a low-risk first step, centralize the existing pollers
+unchanged; replace each source with a native model in later commits.
+
+** QS-06: wallpaper lifecycle and picker
+:PROPERTIES:
+:CUSTOM_ID: qs-06-wallpaper-lifecycle-and-picker
+:END:
+[[../../config/quickshell/modules/wallpaper/WallpaperSelector.qml][WallpaperSelector.qml]] uses =Flickable + Grid + Repeater=.  Opening it creates
+all 23 cards.  Eighteen non-video cards load original sources without
+=sourceSize= and with =cache: false=.  Their one-frame raw RGBA dimensions total
+about 359.7 MiB before textures; animated frames can cost more.  Five video cards
+each start a Bash freshness check and can launch five FFmpeg decoders concurrently
+when thumbnails are missing or stale.
+
+The store also refreshes the list immediately before opening, assigns a new
+array even when unchanged, and can rebuild the delegates twice.  Startup begins
+with =wallpaper-003.gif= while the persisted state is loaded asynchronously, so
+every restart can briefly create GIF decoders before switching to the current
+PNG.  Static wallpapers disable the shared image cache and enable mipmaps per
+output.  Animated/video outputs never pause for battery state or DPMS.
+
+Use a virtualized =GridView=, display-sized thumbnails for every format, one
+bounded thumbnail worker, content/mtime cache keys, and cache pruning.  Load
+state before constructing a decoder.  Then add an explicit animated-wallpaper
+power policy and convert the 143.9 MB GIF to MP4/WebM for an A/B test.
+
+** QS-07: production versus development mode
+:PROPERTIES:
+:CUSTOM_ID: qs-07-production-versus-development-mode
+:END:
+A Nix build verifies the user-unit and package closure but not the bytes under the
+out-of-store QML link.  Historical development evidence shows why the distinction
+matters: on 2026-06-09 invalid configurations exited 255, restarted at the
+effective 100 ms =RestartUSec=, and hit the five-start limit twice.  Forty-one
+older May Quickshell coredump records are retained.  None of these failures is
+current: the last 30 days and current run have no crash, OOM, or restart loop.
+
+Provide an explicit stable/store-backed mode and a separate opt-in live-link
+development mode.  If live mode remains the default, require lint before manual
+restart, set a one- or two-second restart delay, and make failure state obvious.
+
+** QS-08 through QS-10: correctness and races
+:PROPERTIES:
+:CUSTOM_ID: qs-08-through-qs-10-correctness-and-races
+:END:
+- Each =Workspaces= reads global =Hyprland.focusedMonitor=, so two bars show the
+  focused output's active workspace rather than their own; each also repeats the
+  same =hyprctl workspaces -j= query.
+- =WindowTitle= clears the active title on every =closewindow= event, including
+  an unrelated background window.
+- Network interface changes do not reset prior byte counters/timestamps, so a
+  handoff can graph a false spike.  The first connected =nmcli= row is selected,
+  not necessarily the default-route interface, and identity can lag 15 seconds.
+- Dual status instances race duplicate battery OSD writes.
+- Launcher, clipboard, and OSD write target/payload and signal as separate files.
+  A FileView event that arrives while the reader =Process= is already running can
+  coalesce.  Repeating volume/brightness binds make this a real hot path.
+- Launcher and clipboard do not stop a pending 150 ms close timer when reopened;
+  the old timer can clear a newly typed query.
+- Clipboard delete clamps against =results.length - 2= after changing the model
+  and can jump an extra row.
+- The linter-confirmed layout defects leave three child heights undefined under
+  =ColumnLayout= ownership.
+
+Native Hyprland workspaces/active-toplevel state fixes the first two without
+shell queries.  Typed Quickshell IPC can carry overlay target and OSD payload
+atomically.  Keeping the external hardware scripts still lets volume keys work
+when Quickshell is down; only the UI notification transport needs to become IPC.
+
+** QS-11: duplicate theme lifecycle
+:PROPERTIES:
+:CUSTOM_ID: qs-11-duplicate-theme-lifecycle
+:END:
+Both Quickshell and Mako run =theme-select apply= as concurrent =ExecStartPre=
+jobs.  Each invocation regenerates every consumer theme, repeatedly forks =jq=,
+writes the same mutable files, and updates the same user-manager environment.
+For the current Quickshell start, the journal span was about 0.58 seconds from
+=Starting= to its main process and about 0.86 seconds to =Configuration Loaded=.
+Systemd's monotonic unit accounting put both Mako and Quickshell at about 1.11
+seconds from inactive transition to main-process start.  The exact duration is
+small; the duplicate work and concurrent write ownership are the real defects.
+
+=Theme.qml= already watches =quickshell-signal= and reloads in place.  Despite
+that, =theme-select toggle= also restarts Quickshell; the restart then regenerates
+the global theme a second time and recreates pollers/CAVA.
+
+Create one ordered =theme-select-apply.service= or generate the initial theme at
+Home Manager activation.  Make Quickshell and Mako depend on that result, and
+remove the Quickshell restart from normal theme toggles.
+
+** QS-12 and QS-13: clipboard and launcher
+:PROPERTIES:
+:CUSTOM_ID: qs-12-and-qs-13-clipboard-and-launcher
+:END:
+Clipboard preview conversion has no time/memory limit, cannot cancel a stale
+ImageMagick job, never deletes preview PNGs during a session, and keys them only
+by Cliphist ID.  After a wipe/ID reuse it can show stale content.  A failed
+conversion publishes a =file://= URL without checking output existence or exit
+status, silently producing a broken preview.  Entries remain in QML memory after
+close.  The broader Cliphist service persists about 750 entries and already
+documents that 1Password Linux may not mark secrets.
+
+Use content-addressed runtime previews, atomic writes, success-aware publication,
+bounded ImageMagick resources, cancellation/coalescing, and cleanup.  Preserve
+the existing positional-argument handling for raw clipboard data.
+
+Launcher discovery reparses desktop files and returns JSON on every open even
+when its in-memory app list is populated.  The measured 60-74 ms is acceptable
+today but unnecessary.  The helper also incompletely implements desktop-entry
+masking, =OnlyShowIn=, =TryExec=, working directories, and D-Bus activation;
+malformed =Exec= parsing falls back to raw shell text.  Adopt the installed
+=DesktopEntries.applications= model or cache a spec-correct helper.  Preserve
+UWSM scoping explicitly when launching.
+
+** QS-14 and QS-15: power and hygiene
+:PROPERTIES:
+:CUSTOM_ID: qs-14-and-qs-15-power-and-hygiene
+:END:
+- The clock wakes every second for =HH:mm= and date, and runs once both from
+  =Component.onCompleted= and =triggeredOnStart=.  Align one shared timer to the
+  next minute, then use a 60-second interval.
+- Numeric network rates and raw byte properties are still calculated/passed even
+  though the current UI renders only graph samples.
+- Most process parse/exit errors are swallowed and blocking CLIs have no timeout;
+  a feature can silently freeze while the unit remains healthy.
+- =WallpaperStore.configHome= is unused; OSD =kind= is emitted but unread.
+- The user PATH points to =ffmpeg-full= while the service separately retains the
+  standard =ffmpeg= output for =SKY_FFMPEG=.
+- The Quickshell flake input is unused and misleading.
+- The service description says "Quickshell bar" although it owns the wallpaper,
+  launcher, clipboard, OSD, tray, and status system.
+- =QT_DISABLE_HW_TEXTURES_CONVERSION=1= disables GPU texture conversion for Qt
+  video.  Qt documents that GPU conversion can significantly reduce CPU, but the
+  variable may be a valid rendering workaround on this AMD/NVIDIA hybrid host.
+  Treat removal as a controlled video-wallpaper A/B, not a blind cleanup.  See
+  [[https://doc.qt.io/qt-6/advanced-ffmpeg-configuration.html][Qt 6.11 Advanced FFmpeg Configuration]].
+
+* Slice-Based Implementation Roadmap
+:PROPERTIES:
+:CUSTOM_ID: slice-based-implementation-roadmap
+:END:
+Each slice should be reviewable, buildable where Nix is involved, and reversible
+without bundling unrelated visual changes.
+
+** Slice 0 - reproducible checks and measurements
+:PROPERTIES:
+:CUSTOM_ID: slice-0-reproducible-checks-and-measurements
+:END:
+- Add =scripts/check-quickshell= for QML parsing/lint, Bash syntax, JSON, and
+  Python parsing against the actual source directory.
+- Filter only the three known Quickshell metadata/tooling categories, then make
+  layout, unqualified, and unused-import warnings fatal with =qmllint -W 0=.
+- Choose four-space =qmlformat= and align Neovim, clean Emacs, and Doom commands.
+- Add a read-only profiling helper that records cgroup CPU/memory, PSS, child
+  launches, CAVA temps, NVIDIA samples when present, layer geometry, and journal
+  warnings with workload labels.
+
+Acceptance: the current source produces a repeatable baseline; checks do not
+start or restart a shell; known false positives are named rather than ignored
+wholesale.
+
+** Slice 1 - safety and deterministic small bugs
+:PROPERTIES:
+:CUSTOM_ID: slice-1-safety-and-deterministic-small-bugs
+:END:
+- Remove =JSON.stringify=-as-shell-quote and make wallpaper writes atomic.
+- Replace temporary CAVA configs with one stable declarative config.
+- Fix the three layout properties, close/reopen timers, background-window title
+  clearing, network handoff reset, and CAVA stale-sample behavior.
+- Make preview publication conditional on success; fix delete selection.
+
+Acceptance: crafted wallpaper filename fixtures are inert; media start/stop adds
+zero new temp configs; reduced lint gate is clean; focused title survives closing
+a background window; no visual redesign.
+
+** Slice 2 - service and theme lifecycle
+:PROPERTIES:
+:CUSTOM_ID: slice-2-service-and-theme-lifecycle
+:END:
+- Create one ordered theme initialization owner for Quickshell and Mako.
+- Rely on =Theme.qml='s signal reload instead of restarting Quickshell on toggle.
+- Set deliberate restart backoff and improve unit description/result visibility.
+- Add a stable store-backed mode and explicit development live-link mode.
+
+Acceptance: one theme generator runs at login, a theme toggle does not change the
+Quickshell PID, stable mode's QML bytes participate in a Nix build, and dev mode
+remains convenient.
+
+** Slice 3 - one shared backend without behavior changes
+:PROPERTIES:
+:CUSTOM_ID: slice-3-one-shared-backend-without-behavior-changes
+:END:
+- Move existing status pollers and battery transition detection to one root
+  controller before changing their data source.
+- Move workspace and active-title state to shared controllers while exposing the
+  correct active workspace for each output.
+- Run one CAVA backend and pass levels to all bar views.
+- Share a minute-aligned clock.
+
+Acceptance with both outputs: one status backend, one analyzer, one battery OSD,
+correct per-output workspaces, no duplicate IPC target, and polling executions
+no higher than the current one-monitor budget.
+
+** Slice 4 - event-driven system state
+:PROPERTIES:
+:CUSTOM_ID: slice-4-event-driven-system-state
+:END:
+Replace one source per commit:
+
+1. PipeWire volume/mute;
+2. UPower battery/charge transitions;
+3. Bluetooth adapter/connected device state;
+4. Networking device/default connection/Wi-Fi signal;
+5. native Hyprland workspaces/toplevel/title.
+
+Keep one shared traffic sampler only if the native networking model lacks byte
+counters.  Prefer an in-process/FileView reload or one persistent helper over a
+new Bash plus two =cat= processes every two seconds.
+
+Acceptance: routine status helper launches approach zero, transient-child CPU is
+below 0.25% of one core, unplug/network/Bluetooth changes appear promptly, and
+click launchers retain current behavior.
+
+** Slice 5 - media and dynamic bar rendering
+:PROPERTIES:
+:CUSTOM_ID: slice-5-media-and-dynamic-bar-rendering
+:END:
+- A/B =PwNodePeakMonitor= versus shared CAVA.
+- If CAVA wins visually, test 12, 15, and 24 fps and repaint only on material
+  sample changes.
+- Separate the 34 px dynamic bar from the static output frame, or otherwise
+  isolate high-frequency damage from the full-output Canvas.
+- A/B blur and Canvas/primitive alternatives while preserving the current look.
+
+Acceptance under the same playing-media workload: total cgroup CPU at or below
+4% of one core, lower GPU burst duty, one analyzer process, and no control/art
+regression.  Record whether =qs-bar= remains full-output deliberately.
+
+** Slice 6 - wallpaper memory and power
+:PROPERTIES:
+:CUSTOM_ID: slice-6-wallpaper-memory-and-power
+:END:
+- Load persisted state before constructing a wallpaper decoder.
+- Replace the picker Repeater with =GridView= virtualization.
+- Pre-generate bounded, display-independent thumbnails for all formats; run one
+  worker and prune its cache.
+- Generate output-sized static caches and A/B mipmaps/cache sharing.
+- Add DPMS/session/battery pause policy for animated and video wallpaper.
+- Convert the 143.9 MB GIF and compare decode cost and visual quality.
+
+Acceptance: picker cold/open peak is bounded, close returns near baseline, no
+five-way FFmpeg fan-out, no startup GIF decoder when a PNG is saved, and video
+CPU is measured with and without GPU texture conversion.
+
+** Slice 7 - typed overlay IPC and application surfaces
+:PROPERTIES:
+:CUSTOM_ID: slice-7-typed-overlay-ipc-and-application-surfaces
+:END:
+- Replace launcher, clipboard, and OSD target/signal pairs with typed Quickshell
+  IPC carrying target screen and payload atomically.
+- Preserve external hardware commands so volume/brightness still work when the
+  shell is unavailable.
+- Add explicit OSD/picker monitor targeting and latest-value coalescing.
+- Move launcher to the native DesktopEntries model or a cached spec-correct
+  helper.
+- Bound, cancel, key, and clean clipboard preview work.
+
+Acceptance: repeated hardware keys show the latest value without dropped hide
+timer refresh; rapid open/close/reopen preserves input; all overlays appear on
+the intended output; clipboard secrets and files obey the chosen lifecycle.
+
+** Slice 8 - Nix and dead-code cleanup
+:PROPERTIES:
+:CUSTOM_ID: slice-8-nix-and-dead-code-cleanup
+:END:
+- Remove or intentionally wire the upstream Quickshell flake input.
+- Converge the standard and full FFmpeg variants based on actual consumers.
+- Remove dead network rate/state properties, unused imports, and unused fields.
+- Make process failures/timeouts observable without filling the journal.
+- Add the focused source check to the flake/CI only after the stable/dev source
+  ownership decision is made.
+
+Acceptance: one intentional Quickshell source, one intentional FFmpeg choice,
+clean reduced lint/format gates, and no dead state in the hot path.
+
+* Performance Acceptance Matrix
+:PROPERTIES:
+:CUSTOM_ID: performance-acceptance-matrix
+:END:
+Use the same output topology, wallpaper, media state, sampling interval, and
+power profile before comparing a slice.
+
+| Workload | Primary target | Secondary guardrail |
+|----------+----------------+---------------------|
+| One-output, no media | establish first; target <=1% one core | no steady helper churn |
+| One-output, media playing | <=4% one core | one analyzer, lower GPU burst duty |
+| Two-output, media playing | close to one-output backend cost | correct per-output workspace/state |
+| Picker cold open | one bounded thumbnail worker | no multi-FFmpeg fan-out |
+| Picker warm open/close | small peak; return near pre-open current memory | no stale or blank thumbnails |
+| Eight-hour normal use | cgroup peak <=250 MiB excluding deliberate conversion jobs | stable FD/temp-file counts |
+| Theme toggle | no Quickshell restart | one generator invocation |
+| Rapid OSD keys | latest value wins, timer extends | external hardware action still works without QS |
+
+The exact idle target is provisional because idle playback was not forced during
+this audit.  Capture it before using the table as a pass/fail gate.
+
+* Build, Activation, And Hand-Test Boundary
+:PROPERTIES:
+:CUSTOM_ID: build-activation-and-hand-test-boundary
+:END:
+Keep these gates distinct for every implementation slice:
+
+1. *Source validation*: run QML, shell, JSON, and Python checks against the exact
+   source path that would become live.  This is the only gate that sees the
+   current out-of-store QML bytes.
+2. *Build verification*: for Nix/service changes, evaluate and run
+   =nix build --impure --no-link --no-write-lock-file= for the candidate toplevel.
+   A successful build is not activation, and in current live-link mode it still
+   does not validate QML content.
+3. *Explicit activation*: only after review, apply the Nix/Home Manager change or
+   deliberately restart the user service.  Record the new generation and PID.
+4. *Runtime verification*: inspect =Configuration Loaded=, new warnings, layer
+   geometry, restart count, resource delta, and interaction behavior.
+5. *Human hand test*: launcher search/launch, clipboard search/delete/preview,
+   tray menus, wallpaper selection, media controls, OSD repeat, theme toggle,
+   output hotplug, and per-output workspace correctness.
+
+The same tracked checkout already passed the no-link system build recorded in
+the parent system audit and evaluates to the active system output.  This focused
+audit performed no additional build because it made no Nix or QML candidate
+change.  No activation or live service restart was performed.
+
+* Recommended First Implementation Branch
+:PROPERTIES:
+:CUSTOM_ID: recommended-first-implementation-branch
+:END:
+Start with Slice 0 and Slice 1 only.  They provide the validation harness, close
+the shell-injection boundary, stop the proven temp leak, and fix deterministic
+layout/event bugs without changing the approved design.  Re-measure before
+centralizing state so every later optimization has a trustworthy comparison.
+
+Do not combine the frame experiment, native status migration, and wallpaper
+picker rewrite in one change.  Each touches a different failure domain and has a
+different visual/interaction acceptance test.
