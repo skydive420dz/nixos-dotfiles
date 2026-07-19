@@ -266,7 +266,7 @@ Item {
                 id: searchBox
 
                 Layout.fillWidth: true
-                height: root.controlHeight
+                Layout.preferredHeight: root.controlHeight
                 radius: Theme.radius
                 color: root.controlColor
                 clip: true
@@ -339,7 +339,7 @@ Item {
                 id: emptyState
 
                 Layout.fillWidth: true
-                height: 92
+                Layout.preferredHeight: 92
                 visible: root.visibleRows === 0
                 color: "transparent"
 

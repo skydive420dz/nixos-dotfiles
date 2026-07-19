@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import "../.."
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 

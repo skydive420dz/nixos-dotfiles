@@ -198,7 +198,7 @@ Item {
                 id: searchBox
 
                 Layout.fillWidth: true
-                height: root.controlHeight
+                Layout.preferredHeight: root.controlHeight
                 radius: Theme.radius
                 color: root.controlColor
                 clip: true
