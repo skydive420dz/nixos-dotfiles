@@ -241,6 +241,30 @@ is removed.
 Success: =main= names the exact build-verified source and the working tree is
 clean.  This gate does not create a new live NixOS generation.
 
+** Recorded checkpoint promotion - 2026-07-19
+:PROPERTIES:
+:CUSTOM_ID: recorded-checkpoint-promotion
+:END:
+Gate 4 is complete:
+
+- Commit =4eded3350b1b861ac11b40627a2fa0160c801269= contains the accepted
+  configuration, documentation, audits, and this execution ledger.
+- A clean-source no-link build of that commit produced
+  =/nix/store/8q4h4bp340ikcp5wzflpsswia7p12x0s-nixos-system-nixos-26.11.20260718.61b7c44=.
+- =origin/main= and =origin/work/emacs-lsp-mode-experiment= were both verified
+  at =4eded3350b1b861ac11b40627a2fa0160c801269=.
+- =main= was fast-forwarded in a temporary worktree.  The live checkout was
+  switched to =main= only after both names matched; its Git tree remained
+  =35ce008cdaabb9c6435588f2046d81110d932a15= before and after the switch.
+- The live checkout and local review checkout are clean and track
+  =origin/main=.
+- No activation occurred.  Generation 855 remains current and booted at
+  =/nix/store/px0spfwgd632lf9nybcb1ygarz7zg9b6-nixos-system-nixos-26.11.20260705.d407951=.
+
+The documentation-only ledger update containing this completion record must
+reproduce the same system output before it is pushed.  It does not replace the
+configuration checkpoint identity above.
+
 ** Gate 5 - explicit activation, runtime acceptance, and data cleanup
 :PROPERTIES:
 :CUSTOM_ID: gate-5-explicit-activation-runtime-and-cleanup

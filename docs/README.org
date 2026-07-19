@@ -12,12 +12,12 @@ commits, pushes, service changes, or branch deletion.
 * Status At A Glance - 2026-07-19
 | Surface | Confirmed current state | Next accepted step |
 |---------+-------------------------+--------------------|
-| System | Generation 855 is live; the updated candidate evaluates and builds | Promote the build/source checkpoint, then activate and test separately |
+| System | Generation 855 is live; commit =4eded33= is the build-verified =main= checkpoint | Activate and test separately |
 | Emacs | Clean Emacs is active; Lua and Nix =lsp-mode=/Company slices are accepted | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
 | Quickshell | The existing shell remains live | Hand-test the dependency update, then use the post-checkpoint cleanup lane |
 | Vial/QMK | Vial and QMK are installed; QMK udev integration is absent | Enable declarative udev ownership and test the connected device |
 | VS Code | NixOS has no VS Code configuration | Adapt the macOS Home Manager module in a future Linux-specific slice |
-| Doom/Ollama | Both are retired from the candidate source | Activation removes live ownership; Ollama model cleanup follows service removal |
+| Doom/Ollama | Both are retired from =main= source | Activation removes live ownership; Ollama model cleanup follows service removal |
 
 Volatile hashes, outputs, live services, and exact gate results belong in
 [[file:handoffs/2026-07-18-main-checkpoint.org][the active checkpoint handoff]].

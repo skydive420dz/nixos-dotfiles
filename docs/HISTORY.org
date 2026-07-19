@@ -37,8 +37,8 @@ remain the detailed evidence.
 - Ollama was explicitly retired; model-state deletion remains ordered after the
   running service is removed.
 - The user designated the successful full no-link build as the source/build
-  checkpoint to promote to =main=.  Activation and live runtime evidence remain
-  separate facts.
+  checkpoint.  Commit =4eded33= was fast-forwarded to =main= without changing
+  the live generation.  Activation and runtime evidence remain separate facts.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages reached the MSI system, but QMK udev integration was
