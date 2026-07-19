@@ -83,15 +83,14 @@ generation until those checks pass.
 * Next Work
 Work stays slice-based:
 
-1. Archive legacy branch tips with verified tags, then create the fresh
-   maintenance and Quickshell work lanes from accepted =main=.
-2. Repair QMK/Vial udev ownership and test with the actual device.
-3. Apply confirmed NixOS maintenance, security, service, and GC corrections one
+1. Begin =work/nixos-maintenance= with the QMK/Vial udev ownership fix and test
+   it with the actual device.
+2. Apply confirmed NixOS maintenance, security, service, and GC corrections one
    small change at a time.
-4. Optimize Quickshell after deterministic correctness and lifecycle defects.
-5. Give Emacs measured, real-use-driven TLC; Lua and Nix LSP slices are accepted,
+3. Optimize Quickshell after deterministic correctness and lifecycle defects.
+4. Give Emacs measured, real-use-driven TLC; Lua and Nix LSP slices are accepted,
    while Python's manual acceptance remains in progress.
-6. Port the macOS VS Code configuration only as a Linux-specific Home Manager
+5. Port the macOS VS Code configuration only as a Linux-specific Home Manager
    slice.
 
 * Documentation

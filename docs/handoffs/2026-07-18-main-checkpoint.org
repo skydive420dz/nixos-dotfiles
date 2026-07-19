@@ -357,11 +357,9 @@ After the =main= checkpoint:
 7. Archive the completed Emacs experiment branch only after its accepted commits
    are on =main=.
 
-Exact branch deletion and remote pruning are a later reviewed mutation, not part
-of the initial checkpoint fix.
-
-The exact branch tips, merge status, proposed archive tags, and fresh-lane
-sequence are recorded in
+The branch mutation was separately reviewed and completed after checkpoint
+acceptance.  Its exact tips, merge status, verified archive tags, deletions, and
+fresh-lane sequence are recorded in
 [[file:2026-07-19-branch-archive.org][the branch archive manifest]].
 
 * Post-Checkpoint Roadmap

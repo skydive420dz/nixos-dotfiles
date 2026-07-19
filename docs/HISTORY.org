@@ -45,6 +45,9 @@ remain the detailed evidence.
 - The user accepted generation 856 after the remaining hand tests.  That closes
   the checkpoint gate and permits tag-first legacy branch archival and fresh
   post-checkpoint work lanes.
+- Eleven legacy branch tips were preserved as verified remote annotated tags,
+  then their local and remote branch names were retired.  Fresh maintenance and
+  Quickshell lanes were created from accepted =main=.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages reached the MSI system, but QMK udev integration was

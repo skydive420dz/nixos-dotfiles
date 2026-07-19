@@ -44,19 +44,25 @@ The three unmerged historical lines contain:
 
 All other branch tips are already reachable from accepted =main=.
 
-* Proposed Mutation Sequence
-1. Create one annotated tag for every mapping above at its recorded exact tip.
-2. Verify every tag dereferences to that tip locally.
-3. Push all archive tags.
-4. Verify every remote tag dereferences to the recorded tip.
-5. Delete the ten legacy remote branches; the Doom backup is local-only.
-6. Delete all eleven legacy local branch names.
-7. Fetch with prune and prove that only =main= remains.
-8. Create =work/nixos-maintenance= from the final accepted =main= and push it.
-9. Recreate =work/quickshell-cleanup= from that same =main= and push it.
-10. Keep the live checkout on =work/nixos-maintenance= for the first Vial/QMK
-    slice.  Create Emacs and VS Code branches only when those slices begin, so
-    empty long-lived branches do not drift.
+* Completion Record
+The reviewed sequence completed without moving any archived commit:
+
+1. Eleven annotated tags were created at the exact tips above.
+2. Every local tag was dereferenced and matched its recorded commit.
+3. All eleven tags were pushed.
+4. Every remote tag was independently dereferenced and matched.
+5. The ten legacy remote branches were deleted; the Doom backup had no remote
+   branch.
+6. All eleven legacy local branch names were deleted.
+7. A pruned remote-head query showed only =main=.
+8. Fresh =work/nixos-maintenance= and =work/quickshell-cleanup= branches were
+   created from the final =main= commit containing this completion record and
+   pushed.
+9. The live checkout moved to =work/nixos-maintenance= without changing its
+   tree.
+
+Emacs and VS Code branches remain intentionally uncreated until their slices
+begin, so empty long-lived branches do not drift.
 
 * Safety Contract
 - Never delete a branch before its exact tag is present and verified remotely.
