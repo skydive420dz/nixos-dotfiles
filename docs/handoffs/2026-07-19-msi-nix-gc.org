@@ -192,7 +192,7 @@ At =2026-07-19 12:40 EDT=:
 - the checkout is clean at =2b3c7f4=.
 
 The build increased allocated store size from =96,616,161,280= to
-=96,725,708,800= bytes and top-level store paths from =45,191= to =45,232=.
+=96,725,708,800= bytes and top-level store entries from =45,191= to =45,232=.
 That =109,547,520=-byte increase is expected build material, not a collection.
 This work ran no removal command; generation, profile, boot-entry, and visible
 GC-root inventories remained unchanged.
