@@ -946,3 +946,8 @@ The user explicitly accepted evidence checkpoint =f10e1ef=.  This closes the
 automatic timer-arming slice.  The timer remains armed and currently scheduled
 for the displayed July 26 trigger.  Store optimization and boot-entry retention
 remain independent, not-yet-authorized maintenance slices.
+
+A later measured store-optimization preflight is recorded separately in
+[[file:2026-07-19-msi-nix-store-optimization.org][the MSI Nix store
+optimization handoff]].  It does not reopen or change this accepted GC
+checkpoint.
