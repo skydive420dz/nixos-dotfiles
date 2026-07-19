@@ -48,6 +48,9 @@ remain the detailed evidence.
 - Eleven legacy branch tips were preserved as verified remote annotated tags,
   then their local and remote branch names were retired.  Fresh maintenance and
   Quickshell lanes were created from accepted =main=.
+- The first maintenance slice enabled MSI-scoped QMK udev ownership.  Generation
+  857 granted active-seat ACLs to the connected Corne v4, and Vial discovered
+  the keyboard without a firmware write.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages reached the MSI system, but QMK udev integration was

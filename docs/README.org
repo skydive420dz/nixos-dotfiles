@@ -12,10 +12,10 @@ commits, pushes, service changes, or branch deletion.
 * Status At A Glance - 2026-07-19
 | Surface | Confirmed current state | Next accepted step |
 |---------+-------------------------+--------------------|
-| System | Generation 856 is current, booted, and user-accepted from the verified checkpoint; generation 855 remains rollback | Begin post-checkpoint work in fresh branches |
+| System | Generation 857 is current with the accepted QMK/Vial slice; generation 856 remains booted fallback until reboot | Continue post-checkpoint maintenance in measured slices |
 | Emacs | Clean Emacs is active in generation 856; Lua and Nix =lsp-mode=/Company slices are accepted | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
 | Quickshell | The generation 856 shell is accepted | Use the cleanup lane for deterministic fixes and measured optimization |
-| Vial/QMK | The MSI-only udev correction builds successfully; generation 856 remains live without it | Activate separately, reconnect the device, and test its ACL and Vial discovery |
+| Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs and Vial discovers it | Decide QMK CLI system-wide versus an on-demand firmware shell separately |
 | VS Code | NixOS has no VS Code configuration | Adapt the macOS Home Manager module in a future Linux-specific slice |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
 

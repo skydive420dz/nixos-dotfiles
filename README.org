@@ -83,10 +83,10 @@ generation until those checks pass.
 * Next Work
 Work stays slice-based:
 
-1. Begin =work/nixos-maintenance= with the QMK/Vial udev ownership fix and test
-   it with the actual device.
-2. Apply confirmed NixOS maintenance, security, service, and GC corrections one
+1. Apply confirmed NixOS maintenance, security, service, and GC corrections one
    small change at a time.
+2. Decide separately whether the now-working QMK CLI remains system-wide or
+   moves to an on-demand firmware project shell.
 3. Optimize Quickshell after deterministic correctness and lifecycle defects.
 4. Give Emacs measured, real-use-driven TLC; Lua and Nix LSP slices are accepted,
    while Python's manual acceptance remains in progress.

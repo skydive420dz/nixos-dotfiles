@@ -29,7 +29,7 @@
 - keyd is disabled. Keep it disabled while Kanata owns keyboards.
 - Keep app-native navigation simple until a real layer system is worth the setup cost.
 
-** Vial And QMK - Build Verified, Device Test Pending
+** Vial And QMK - Accepted
 :PROPERTIES:
 :CUSTOM_ID: vial-and-qmk-incomplete
 :END:
@@ -66,14 +66,19 @@ No external USB HID keyboard was connected during the candidate audit.  The
 only live hidraw node was the internal Synaptics touchpad, so the intended
 device, VID:PID, ACL, and Vial discovery remain untested.
 
-Next:
+Activation and device acceptance passed in generation 857:
 
-1. Activate the build-verified slice separately.
-2. Reconnect the real device and identify its USB and hidraw nodes.
-3. Verify applied rules, active-seat ACL, and Vial discovery.
-4. Decide separately whether the full QMK toolchain belongs system-wide or in
-   an on-demand firmware project shell.  Firmware flashing remains a distinct,
-   explicitly authorized action.
+- the keyboard is foostan Corne v4 =4653:0004=, serial
+  =vial:f64c2b3c=;
+- its two interfaces use =/dev/hidraw1= and =/dev/hidraw2=;
+- both nodes are =0660 root:plugdev= with explicit =rw= ACLs for
+  =skydive420dz= and =uaccess=/=udev-acl= tags;
+- Vial 0.7.5 runs from the Nix store and the user confirmed discovery;
+- no firmware write or flash occurred.
+
+Generation 856 remains the booted fallback until reboot.  Decide separately
+whether the full QMK toolchain belongs system-wide or in an on-demand firmware
+project shell.
 
 ** NixOS Kanata Investigation
 :PROPERTIES:

@@ -96,3 +96,25 @@ The device test cannot pass until the keyboard is physically connected.
 6. Launch =Vial= from the local graphical session and verify discovery and
    non-destructive configuration reads.
 7. Keep firmware flashing outside this slice.
+
+* Activation And Device Acceptance
+The slice is accepted:
+
+- Commit =8024e562b8ab147cd9f815a6be4dfdc1fdcfd6d2= was built and pushed
+  before activation.
+- The current profile is =system-857-link= and =/run/current-system= resolves
+  to the build-verified candidate output.
+- =/run/booted-system= remains accepted generation 856 until reboot.
+- =/etc/udev/rules.d/50-qmk.rules= is active, =plugdev= exists, and
+  =systemd-udevd= is running.
+- The connected keyboard identifies as foostan Corne v4, USB =4653:0004=,
+  serial =vial:f64c2b3c=.
+- Its two HID interfaces are =/dev/hidraw1= and =/dev/hidraw2=.
+- Both nodes are =0660 root:plugdev= and carry explicit =rw= ACLs for
+  =skydive420dz= plus =uaccess=/=udev-acl= tags.
+- Vial 0.7.5 is running from the Nix store, and the user confirmed that Vial
+  sees the keyboard.
+- No configuration write or firmware flash was performed by this audit.
+
+The original device-discovery defect is resolved.  QMK CLI ownership and any
+firmware workflow remain separate future decisions.
