@@ -1,0 +1,400 @@
+#!/usr/bin/env bash
+set -euo pipefail
+export LC_ALL=C
+
+usage() {
+  printf 'usage: %s [REPO_ROOT]\n' "${0##*/}"
+}
+
+die() {
+  printf 'check-quickshell: %s\n' "$*" >&2
+  exit 2
+}
+
+relative_path() {
+  printf '%s\n' "${1#"$repo_root"/}"
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+esac
+
+if (( $# > 1 )); then
+  usage >&2
+  exit 2
+fi
+
+if (( $# == 1 )); then
+  requested_root=$1
+else
+  script_path=$0
+  if [[ $script_path != */* ]]; then
+    script_path="$(command -v -- "$script_path")" ||
+      die "cannot resolve the script path; pass REPO_ROOT explicitly"
+  fi
+  script_dir="$(CDPATH='' cd -- "$(dirname -- "$script_path")" && pwd -P)"
+  requested_root="$script_dir/.."
+fi
+
+repo_root="$(CDPATH='' cd -- "$requested_root" && pwd -P)" ||
+  die "repository root does not exist: $requested_root"
+qml_root="$repo_root/config/quickshell"
+scripts_root="$repo_root/scripts"
+styles_json="$repo_root/theme/styles.json"
+launcher_apps_json="$qml_root/modules/launcher/apps.json"
+
+[[ -d $qml_root ]] || die "missing Quickshell source directory: $qml_root"
+[[ -d $scripts_root ]] || die "missing scripts directory: $scripts_root"
+[[ -d $scripts_root/theme-select.d ]] ||
+  die "missing theme helper directory: $scripts_root/theme-select.d"
+[[ -f $qml_root/qmldir ]] || die "missing QML module metadata: $qml_root/qmldir"
+[[ -f $launcher_apps_json ]] ||
+  die "missing launcher registry: $launcher_apps_json"
+[[ -f $styles_json ]] || die "missing theme registry: $styles_json"
+
+required_theme_helpers=(
+  "$scripts_root/theme-select.d/consumers.sh"
+  "$scripts_root/theme-select.d/core.sh"
+  "$scripts_root/theme-select.d/generators/cli.sh"
+  "$scripts_root/theme-select.d/generators/desktop.sh"
+  "$scripts_root/theme-select.d/generators/emacs.sh"
+  "$scripts_root/theme-select.d/generators/nvim.sh"
+  "$scripts_root/theme-select.d/generators/quickshell.sh"
+  "$scripts_root/theme-select.d/generators/terminal.sh"
+  "$scripts_root/theme-select.d/state.sh"
+)
+for file in "${required_theme_helpers[@]}"; do
+  [[ -f $file ]] || die "missing required theme helper: $file"
+done
+
+missing_tools=()
+for tool in bash find jq nix python3 qmlformat qmllint sort; do
+  if ! command -v "$tool" >/dev/null 2>&1; then
+    missing_tools[${#missing_tools[@]}]=$tool
+  fi
+done
+if (( ${#missing_tools[@]} > 0 )); then
+  die "missing required tools: ${missing_tools[*]}"
+fi
+
+# This is a pure, offline evaluation of import metadata, not a Nix build.
+if qml_import_path="$(
+  nix eval \
+    --raw \
+    --no-write-lock-file \
+    --no-eval-cache \
+    --offline \
+    --option allow-import-from-derivation false \
+    "$repo_root#nixosConfigurations.nixos.config.home-manager.users.skydive420dz.home.sessionVariables.QML2_IMPORT_PATH"
+)"; then
+  :
+else
+  die "could not evaluate the candidate QML import path"
+fi
+[[ -n $qml_import_path ]] || die "candidate QML import path is empty"
+
+qml_files=()
+while IFS= read -r -d '' file; do
+  qml_files[${#qml_files[@]}]=$file
+done < <(find "$qml_root" -type f -name '*.qml' -print0 | sort -z)
+(( ${#qml_files[@]} > 0 )) || die "no QML files found under $qml_root"
+
+bash_files=(
+  "$scripts_root/clipboard-toggle"
+  "$scripts_root/launcher-toggle"
+  "$scripts_root/osd-brightness"
+  "$scripts_root/osd-mic"
+  "$scripts_root/osd-volume"
+  "$scripts_root/theme-select"
+  "$scripts_root/weather"
+)
+while IFS= read -r -d '' file; do
+  bash_files[${#bash_files[@]}]=$file
+done < <(find "$scripts_root/theme-select.d" -type f -name '*.sh' -print0 | sort -z)
+
+python_files=("$scripts_root/launcher-apps")
+
+json_files=()
+while IFS= read -r -d '' file; do
+  json_files[${#json_files[@]}]=$file
+done < <(find "$qml_root" -type f -name '*.json' -print0 | sort -z)
+json_files[${#json_files[@]}]=$styles_json
+
+printf 'Quickshell source validation\n'
+printf '  repository: %s\n' "$repo_root"
+printf '  QML imports: pure candidate-flake evaluation\n'
+printf '  source set: %d QML, %d Bash, %d JSON, %d Python\n' \
+  "${#qml_files[@]}" "${#bash_files[@]}" "${#json_files[@]}" "${#python_files[@]}"
+
+failed=0
+
+printf '\nQML parse and four-space format\n'
+qml_parse_failures=0
+qml_format_drifts=0
+for file in "${qml_files[@]}"; do
+  set +e
+  qmlformat \
+    --ignore-settings \
+    --indent-width 4 \
+    --column-width -1 \
+    --newline unix \
+    "$file" |
+    PYTHONDONTWRITEBYTECODE=1 python3 -B -c '
+import pathlib
+import sys
+
+source = pathlib.Path(sys.argv[1]).read_bytes()
+formatted = sys.stdin.buffer.read()
+raise SystemExit(0 if source == formatted else 1)
+' "$file"
+  pipeline_status=("${PIPESTATUS[@]}")
+  set -e
+
+  if (( pipeline_status[0] != 0 )); then
+    printf '  parse failure: %s\n' "$(relative_path "$file")"
+    qml_parse_failures=$((qml_parse_failures + 1))
+  elif (( pipeline_status[1] != 0 )); then
+    printf '  format drift: %s\n' "$(relative_path "$file")"
+    qml_format_drifts=$((qml_format_drifts + 1))
+  fi
+done
+if (( qml_parse_failures == 0 && qml_format_drifts == 0 )); then
+  printf '  pass: all %d files parse and match four-space qmlformat output\n' \
+    "${#qml_files[@]}"
+else
+  printf '  fail: %d parse failure(s), %d format drift(s)\n' \
+    "$qml_parse_failures" "$qml_format_drifts"
+  failed=1
+fi
+
+printf '\nQML lint\n'
+lint_json=
+if lint_json="$(
+  QML_IMPORT_PATH="$qml_import_path" \
+    qmllint \
+      --ignore-settings \
+      --bare \
+      --json - \
+      -E \
+      -I "$qml_root" \
+      "${qml_files[@]}"
+)"; then
+  raw_lint_status=0
+else
+  raw_lint_status=$?
+fi
+
+set +e
+printf '%s\n' "$lint_json" |
+  PYTHONDONTWRITEBYTECODE=1 python3 -B -c '
+import json
+import os
+import sys
+
+repo_root = os.path.realpath(sys.argv[1])
+
+known_shapes = {
+    (
+        "missing-property",
+        "warning",
+        6,
+        "Member \"buffer\" not found on type \"DataStreamParser\"",
+    ): "DataStreamParser.buffer metadata",
+    (
+        "signal-handler-parameters",
+        "warning",
+        8,
+        "Type QProcess::ExitStatus of parameter exitStatus in signal called "
+        "exited was not found, but is required to compile onExited. Did you "
+        "add all imports and dependencies?",
+    ): "QProcess::ExitStatus metadata",
+    (
+        "uncreatable-type",
+        "warning",
+        11,
+        "Type PanelWindow is not creatable.",
+    ): "PanelWindow metadata",
+}
+
+try:
+    report = json.load(sys.stdin)
+except (OSError, json.JSONDecodeError) as error:
+    print(f"  invalid qmllint JSON: {error}")
+    raise SystemExit(2)
+
+if (
+    not isinstance(report, dict)
+    or report.get("revision") != 4
+    or not isinstance(report.get("files"), list)
+):
+    print("  unsupported qmllint JSON schema")
+    raise SystemExit(2)
+
+known_counts = {label: 0 for label in known_shapes.values()}
+actionable = []
+
+for file_report in report["files"]:
+    if not isinstance(file_report, dict):
+        print("  malformed qmllint file record")
+        raise SystemExit(2)
+    filename = file_report.get("filename")
+    warnings = file_report.get("warnings")
+    if not isinstance(filename, str) or not isinstance(warnings, list):
+        print("  malformed qmllint file record")
+        raise SystemExit(2)
+
+    for diagnostic in warnings:
+        if not isinstance(diagnostic, dict):
+            print("  malformed qmllint diagnostic")
+            raise SystemExit(2)
+
+        shape = (
+            diagnostic.get("id"),
+            diagnostic.get("type"),
+            diagnostic.get("length"),
+            diagnostic.get("message"),
+        )
+        suggestions = diagnostic.get("suggestions")
+        if shape in known_shapes and suggestions == []:
+            known_counts[known_shapes[shape]] += 1
+            continue
+
+        actionable.append(
+            (
+                filename,
+                diagnostic.get("line", 0),
+                diagnostic.get("column", 0),
+                str(diagnostic.get("type", "unknown")),
+                str(diagnostic.get("id", "unknown")),
+                str(diagnostic.get("message", "missing message")),
+            )
+        )
+
+print("  named tooling diagnostics:")
+for label in sorted(known_counts):
+    print(f"    {label}: {known_counts[label]}")
+
+if actionable:
+    print(f"  actionable diagnostics: {len(actionable)}")
+    for filename, line, column, level, diagnostic_id, message in sorted(actionable):
+        absolute = os.path.realpath(filename)
+        try:
+            display = os.path.relpath(absolute, repo_root)
+        except ValueError:
+            display = filename
+        first_line = message.splitlines()[0]
+        print(
+            f"    {display}:{line}:{column}: {level}: "
+            f"{diagnostic_id}: {first_line}"
+        )
+    raise SystemExit(1)
+
+print("  pass: no actionable diagnostics")
+' "$repo_root"
+lint_report_status=${PIPESTATUS[1]}
+set -e
+
+if (( raw_lint_status != 0 )); then
+  printf '  qmllint raw pass exited %d\n' "$raw_lint_status"
+  failed=1
+fi
+if (( lint_report_status != 0 )); then
+  failed=1
+fi
+
+if QML_IMPORT_PATH="$qml_import_path" \
+  qmllint \
+    --ignore-settings \
+    --bare \
+    --missing-property disable \
+    --signal-handler-parameters disable \
+    --uncreatable-type disable \
+    --unused-imports warning \
+    -W 0 \
+    -E \
+    -I "$qml_root" \
+    "${qml_files[@]}" >/dev/null 2>&1; then
+  strict_lint_status=0
+else
+  strict_lint_status=$?
+fi
+if (( strict_lint_status != 0 )); then
+  printf '  strict gate: fail (qmllint exit %d)\n' "$strict_lint_status"
+  failed=1
+else
+  printf '  strict gate: pass\n'
+fi
+
+printf '\nBash syntax\n'
+bash_failures=0
+for file in "${bash_files[@]}"; do
+  if [[ ! -f $file ]]; then
+    printf '  missing: %s\n' "$(relative_path "$file")"
+    bash_failures=$((bash_failures + 1))
+  elif ! bash -n -- "$file"; then
+    printf '  syntax failure: %s\n' "$(relative_path "$file")"
+    bash_failures=$((bash_failures + 1))
+  fi
+done
+if (( bash_failures == 0 )); then
+  printf '  pass: %d files\n' "${#bash_files[@]}"
+else
+  printf '  fail: %d file(s)\n' "$bash_failures"
+  failed=1
+fi
+
+printf '\nJSON syntax\n'
+json_failures=0
+for file in "${json_files[@]}"; do
+  if [[ ! -f $file ]]; then
+    printf '  missing: %s\n' "$(relative_path "$file")"
+    json_failures=$((json_failures + 1))
+  elif ! jq empty "$file"; then
+    printf '  syntax failure: %s\n' "$(relative_path "$file")"
+    json_failures=$((json_failures + 1))
+  fi
+done
+if (( json_failures == 0 )); then
+  printf '  pass: %d files\n' "${#json_files[@]}"
+else
+  printf '  fail: %d file(s)\n' "$json_failures"
+  failed=1
+fi
+
+printf '\nPython syntax\n'
+python_failures=0
+for file in "${python_files[@]}"; do
+  if [[ ! -f $file ]]; then
+    printf '  missing: %s\n' "$(relative_path "$file")"
+    python_failures=$((python_failures + 1))
+  elif ! PYTHONDONTWRITEBYTECODE=1 python3 -B -c '
+import ast
+import sys
+import tokenize
+
+path = sys.argv[1]
+with tokenize.open(path) as source_file:
+    ast.parse(source_file.read(), filename=path)
+' "$file"; then
+    printf '  syntax failure: %s\n' "$(relative_path "$file")"
+    python_failures=$((python_failures + 1))
+  fi
+done
+if (( python_failures == 0 )); then
+  printf '  pass: %d file(s), parsed without execution\n' "${#python_files[@]}"
+else
+  printf '  fail: %d file(s)\n' "$python_failures"
+  failed=1
+fi
+
+printf '\n'
+if (( failed == 0 )); then
+  printf 'Quickshell source validation passed.\n'
+  exit 0
+fi
+
+printf 'Quickshell source validation failed.\n'
+exit 1
