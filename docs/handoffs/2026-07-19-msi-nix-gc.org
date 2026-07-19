@@ -2,7 +2,7 @@
 #+startup: overview
 
 * Status And Boundary
-This is an =ACTIVATED / RUNTIME VERIFIED= source-and-build slice.  Generation
+This is an =ACCEPTED= source, build, activation, and runtime slice.  Generation
 =859= installs an MSI-only, age-based Nix garbage-collection timer in an
 explicitly unarmed state and removes the unsafe manual
 =nix-collect-garbage -d= alias.
@@ -45,7 +45,7 @@ the roles are:
 
 | Generation | Role | Release condition |
 |------------+------+-------------------|
-| =859= | current activated system, pending explicit user acceptance | replaced only by a separately built and accepted generation |
+| =859= | accepted current system | replaced only by a separately built and accepted generation |
 | =856= | booted fallback | retain until a later accepted generation passes a real reboot test |
 | =858= | immediate pre-859 rollback | retain through this timer slice and its separately observed first GC |
 | =857= | accepted pre-858 rollback | retain through the separately observed first GC under the earlier contract |
@@ -257,6 +257,22 @@ At =12:55 EDT=, allocated store size was =96,763,015,168= bytes with =45,233=
 top-level entries.  Root usage remains =31%= and =/boot= remains =19%= used.
 These are post-activation baselines, not reclaimed-space results.
 
+* User Acceptance
+The user explicitly accepted generation =859= as the current known-good
+activation checkpoint.  A final read-only check at =2026-07-19 13:01 EDT=
+confirmed:
+
+- generation =859= still matches the build-verified output;
+- generation =856= remains booted fallback;
+- the timer is linked but not target-enabled, inactive, and has no next or last
+  trigger;
+- the service remains inactive, has no activation timestamp, and has no journal
+  entries;
+- no failed system or user units were reported;
+- the checkout was clean at =76b7268=.
+
+Acceptance does not authorize a GC run or automatic timer arming.
+
 * Verification Gates
 ** Source Gate
 1. Confirm the diff contains only this handoff, the MSI import and policy, and
@@ -281,10 +297,9 @@ The separately approved activation and runtime checks passed.  The timer is
 linked into the active generation but not target-enabled, remains inactive, has
 no next trigger, and has never run.
 
-** User Acceptance Gate - Pending
-Machine-verifiable activation checks passed.  Explicit user acceptance of
-generation =859= as the current checkpoint remains separate and precedes any
-first maintenance run.
+** User Acceptance Gate - Passed
+The user explicitly accepted generation =859= as the current known-good
+checkpoint after machine-verifiable activation checks passed.
 
 ** First Maintenance Gate - Not Authorized Here
 The first actual GC requires another explicit approval and an observed manual
