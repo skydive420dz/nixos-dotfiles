@@ -2,9 +2,9 @@
 #+startup: overview
 
 * Status And Boundary
-This is a =CANDIDATE= source-and-build slice.  It installs an MSI-only,
-age-based Nix garbage-collection timer in an explicitly unarmed state and
-removes the unsafe manual =nix-collect-garbage -d= alias.
+This is a =SOURCE/BUILD VERIFIED= candidate.  It installs an MSI-only, age-based
+Nix garbage-collection timer in an explicitly unarmed state and removes the
+unsafe manual =nix-collect-garbage -d= alias.
 
 This slice does not activate the candidate, create a system generation, start a
 timer or service, collect or optimize the store, delete a profile or GC root,
@@ -128,6 +128,74 @@ This candidate intentionally excludes:
 - cleanup of dangling GC roots or temporary roots;
 - cleanup of legacy boot entries, channels, caches, journals, or coredumps;
 - automatic flake or system upgrades.
+
+* Source, Evaluation, And Build Results
+The source candidate is the clean commit:
+
+=2b3c7f4ff1192dd2946a611326ecaefd3d47399b=
+
+Commit =24f64fe= introduced the MSI policy, alias removal, and this handoff.
+Review then caught that a normal =WantedBy= would arm the next scheduled GC
+during activation.  Commit =2b3c7f4= adds the empty =wantedBy= safety latch
+before the first build.  No unsafe candidate was built or activated.
+
+Source validation passed on the MSI:
+
+- =git diff --check=;
+- =nixfmt --check= for all changed Nix files;
+- parse checks for the changed modules;
+- MSI =nix.gc.automatic = true= with the documented calendar, age, persistence,
+  and delay values;
+- MSI =systemd.timers.nix-gc.wantedBy = []=;
+- AMD =nix.gc.automatic = false=;
+- MSI =nix.optimise.automatic = false=;
+- generated Zsh and Emacs Eshell aliases omit =ncg= while retaining pure =nrs=
+  and =nrb=.
+
+The pure no-link build passed:
+
+| Item | Value |
+|------+-------|
+| Candidate derivation | =/nix/store/z5a8n504nxz3ca7lhrvdylg7q51q5rn1-nixos-system-nixos-26.11.20260718.61b7c44.drv= |
+| Candidate output | =/nix/store/3947ayk07qq4bfs948yrxk15spbgdidx-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Active closure | =31,186,122,768= bytes |
+| Candidate closure | =31,186,123,360= bytes |
+| Closure delta | =+592= bytes |
+
+Direct inspection of the output proves:
+
+- =nix-gc.service= is a one-shot unit whose script executes
+  =nix-collect-garbage --delete-older-than 30d=;
+- =nix-gc.timer= contains the intended =OnCalendar=, =Persistent=false=, and
+  =RandomizedDelaySec=45min= values;
+- the timer has no =[Install]= section and the candidate contains no
+  =timers.target.wants/nix-gc.timer= link;
+- =systemd-analyze calendar= reports the next nominal event as July 26 at 04:15
+  EDT, but it is not armed;
+- unit verification reports only the pre-existing NVIDIA
+  =/var/run/nvidia-persistenced= PID-file warning, unrelated to this slice.
+
+* Post-Build Live Proof
+At =2026-07-19 12:40 EDT=:
+
+- =/run/current-system= and the system profile still resolve to generation
+  =858=;
+- =/run/booted-system= still resolves to generation =856=;
+- the current Home Manager root is unchanged;
+- system profile links remain exactly generations =848-858=;
+- the live system has no =nix-gc.timer= unit, the service is inactive, and its
+  journal has no entries;
+- the active Zsh still exposes the old =ncg= alias, independently proving that
+  the candidate Home Manager output is not active;
+- the ESP still contains 11 current UKIs and the same 50 stale legacy loader
+  entries;
+- the checkout is clean at =2b3c7f4=.
+
+The build increased allocated store size from =96,616,161,280= to
+=96,725,708,800= bytes and top-level store paths from =45,191= to =45,232=.
+That =109,547,520=-byte increase is expected build material, not a collection.
+This work ran no removal command; generation, profile, boot-entry, and visible
+GC-root inventories remained unchanged.
 
 * Verification Gates
 ** Source Gate
