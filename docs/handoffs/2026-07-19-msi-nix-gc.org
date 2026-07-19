@@ -18,12 +18,12 @@ expected stale-root bookkeeping.  It did not optimize the store, manually
 delete a profile or GC root, limit or clean boot entries, activate a generation,
 or reboot.
 
-A later =CANDIDATE= source/build slice at =e51f91a= removes only the completed
-first-run safety latch.  Its pure no-link build passed and contains the expected
-=timers.target= wiring, but it is not active.  Generation =859= remains current
-and its timer remains inactive and unarmed.  Candidate acceptance, live
-activation, runtime verification, store optimization, and boot-entry retention
-remain separate authorization gates.
+A later =ACCEPTED= source/build candidate at =e51f91a= removes only the
+completed first-run safety latch.  Its pure no-link build passed and contains
+the expected =timers.target= wiring, but it is not active.  Generation =859=
+remains current and its timer remains inactive and unarmed.  Live activation,
+runtime verification, store optimization, and boot-entry retention remain
+separate authorization gates.
 
 * Verified Starting Point
 The read-only live inventory ended at =2026-07-19 12:20 EDT=:
@@ -620,8 +620,9 @@ The user explicitly accepted evidence checkpoint =cccf57a= as the first-GC
 maintenance checkpoint.  At that checkpoint, the next policy decision was
 whether to remove the timer's empty =wantedBy= safety latch.  The later
 =e51f91a= candidate documented below has now passed its source, pure-evaluation,
-and build gates; candidate acceptance and activation remain separate.  Store
-optimization and boot-entry retention remain independent later decisions.
+and build gates.  The user accepted its evidence checkpoint =9d45149=;
+activation remains separate.  Store optimization and boot-entry retention
+remain independent later decisions.
 
 * Generation 859 And First-GC Verification Gates - Passed
 ** Source Gate
@@ -668,7 +669,7 @@ authorize activation.
 
 Store optimization and boot-entry limiting remain later independent slices.
 
-* Automatic Timer Arming Candidate - Build Passed, Pending User Acceptance
+* Automatic Timer Arming Candidate - Build Accepted, Activation Pending
 ** Source Boundary
 Before this candidate, both clean checkouts were at accepted documentation head
 =90f64428b1b956dc749de4d3ae598823ecb743f2=.  The actual host remained:
@@ -817,7 +818,7 @@ this is not collection, profile mutation, or activation.
 | Pure no-link build | =PASSED= |
 | Candidate output inspection | =PASSED= |
 | Live non-activation proof | =PASSED= |
-| User acceptance of build candidate | =PENDING= |
+| User acceptance of build candidate | =PASSED= at evidence checkpoint =9d45149= |
 | Live activation | =NOT AUTHORIZED= |
 | Runtime timer verification | =PENDING AFTER ACTIVATION= |
 | User acceptance of active timer | =PENDING AFTER RUNTIME VERIFICATION= |

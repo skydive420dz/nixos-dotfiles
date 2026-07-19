@@ -73,6 +73,11 @@ remain the detailed evidence.
   remained inactive and unarmed.  The user accepted evidence checkpoint
   =cccf57a= as the first-GC maintenance checkpoint; automatic arming,
   optimization, and boot-entry retention remain separate decisions.
+- Source commit =e51f91a= later removed only the completed first-run timer
+  safety latch.  Pure evaluation and a pure no-link build passed, and the user
+  accepted evidence checkpoint =9d45149=.  The built output is not active;
+  generation 859 and its unarmed timer remain live until a separate activation
+  decision.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages initially reached the MSI system without active QMK
