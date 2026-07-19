@@ -70,8 +70,9 @@ remain the detailed evidence.
   It deleted no profile generations, preserved current generation 859, booted
   fallback 856, and rollback generations 857-858, and removed 3,117 unreachable
   store paths.  Allocated store usage fell by about 23.25 GiB.  The timer
-  remained inactive and unarmed; automatic arming, optimization, and boot-entry
-  retention remain separate decisions.
+  remained inactive and unarmed.  The user accepted evidence checkpoint
+  =cccf57a= as the first-GC maintenance checkpoint; automatic arming,
+  optimization, and boot-entry retention remain separate decisions.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages initially reached the MSI system without active QMK

@@ -2,11 +2,10 @@
 #+startup: overview
 
 * Status And Boundary
-This is an =ACCEPTED= source, build, activation, and runtime slice and a
-=COMPLETED= first observed maintenance run pending explicit user acceptance.
-Generation =859= installs an MSI-only, age-based Nix garbage-collection timer
-in an explicitly unarmed state and removes the unsafe manual
-=nix-collect-garbage -d= alias.
+This records an =ACCEPTED= source, build, activation, and runtime slice and an
+=ACCEPTED= first observed maintenance run.  Generation =859= installs an
+MSI-only, age-based Nix garbage-collection timer in an explicitly unarmed state
+and removes the unsafe manual =nix-collect-garbage -d= alias.
 
 After the complete read-only preflight, the user separately authorized and
 started exactly one =nix-gc.service= invocation.  It completed successfully
@@ -480,7 +479,7 @@ run, the final cutoff, before-state, privileged root-selector snapshot, and
 journal cursor were captured.  The user then started only =nix-gc.service=
 once.
 
-* First Observed Manual GC - Completed, Pending User Acceptance
+* First Observed Manual GC - Accepted
 ** Authorization And Execution Boundary
 The final before-state was sealed at =2026-07-19 13:28:46 EDT=.  The user then
 explicitly authorized and personally ran:
@@ -612,9 +611,9 @@ After the run:
   manual profile/root deletion occurred;
 - the live checkout remained clean at pre-run documentation head =19fb371=.
 
-The immediate next gate is explicit user review and acceptance of this observed
-run.  Only after that acceptance should the project decide whether to remove
-the timer's empty =wantedBy= safety latch.  If later authorized, that is a new
+The user explicitly accepted evidence checkpoint =cccf57a= as the first-GC
+maintenance checkpoint.  The next policy decision is whether to remove the
+timer's empty =wantedBy= safety latch.  If later authorized, that is a new
 source, pure-evaluation, build, activation, runtime-verification, and acceptance
 slice.  Store optimization and boot-entry retention remain independent later
 decisions.
@@ -653,9 +652,9 @@ The full read-only preflight passed, the user separately authorized exactly one
 manual start of the generated service, and the complete before/after contract
 passed.  The timer remained unarmed throughout.
 
-** First Maintenance User Acceptance Gate - Pending
-The machine-verifiable run passed, but the user has not yet explicitly accepted
-it as the maintenance checkpoint.
+** First Maintenance User Acceptance Gate - Passed
+The user explicitly accepted evidence checkpoint =cccf57a= as the first-GC
+maintenance checkpoint after reviewing the machine-verifiable result.
 
 ** Automatic Timer Arming Gate - Not Authorized Here
 Removing the empty =wantedBy= latch remains a later source, pure-evaluation,
