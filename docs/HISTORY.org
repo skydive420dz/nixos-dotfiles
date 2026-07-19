@@ -42,6 +42,9 @@ remain the detailed evidence.
 - Generation 856 later activated and booted the verified output.  Ollama's unit,
   binary, and listener are gone.  The user then completed privileged model-state
   removal; visual hand tests remain a separate acceptance gate.
+- The user accepted generation 856 after the remaining hand tests.  That closes
+  the checkpoint gate and permits tag-first legacy branch archival and fresh
+  post-checkpoint work lanes.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages reached the MSI system, but QMK udev integration was

@@ -12,7 +12,7 @@ commits, pushes, service changes, or branch deletion.
 * Status At A Glance - 2026-07-19
 | Surface | Confirmed current state | Next accepted step |
 |---------+-------------------------+--------------------|
-| System | Generation 856 is current and booted from the verified checkpoint; generation 855 remains rollback | Finish runtime hand tests before acceptance |
+| System | Generation 856 is current, booted, and user-accepted from the verified checkpoint; generation 855 remains rollback | Begin post-checkpoint work in fresh branches |
 | Emacs | Clean Emacs is active in generation 856; Lua and Nix =lsp-mode=/Company slices are accepted | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
 | Quickshell | Service is active with the checkpoint input update and loaded its configuration | Complete visual hand tests, then use the cleanup lane |
 | Vial/QMK | Vial and QMK are installed; QMK udev integration is absent | Enable declarative udev ownership and test the connected device |
@@ -21,6 +21,8 @@ commits, pushes, service changes, or branch deletion.
 
 Volatile hashes, outputs, live services, and exact gate results belong in
 [[file:handoffs/2026-07-18-main-checkpoint.org][the active checkpoint handoff]].
+The reviewed tag/delete mapping for legacy branches is in
+[[file:handoffs/2026-07-19-branch-archive.org][the branch archive manifest]].
 
 * Current Work Lanes
 - =main=: checkpoint lane.

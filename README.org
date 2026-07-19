@@ -83,8 +83,8 @@ generation until those checks pass.
 * Next Work
 Work stays slice-based:
 
-1. Finish the generation 856 visual/runtime hand tests; preserve generation 855
-   as rollback until acceptance.
+1. Archive legacy branch tips with verified tags, then create the fresh
+   maintenance and Quickshell work lanes from accepted =main=.
 2. Repair QMK/Vial udev ownership and test with the actual device.
 3. Apply confirmed NixOS maintenance, security, service, and GC corrections one
    small change at a time.

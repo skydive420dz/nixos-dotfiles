@@ -1,0 +1,68 @@
+#+title: Legacy Branch Archive Manifest - 2026-07-19
+#+startup: overview
+
+* Purpose
+This is the pre-mutation manifest for retiring every legacy branch after
+generation 856 was accepted.  It preserves exact tips before deletion and keeps
+=main= as the checkpoint lane.
+
+No branch or tag had been changed when this inventory was recorded.
+
+* Accepted Baseline
+| Item | Value |
+|------+-------|
+| Host | =nixos= at =192.168.1.175= |
+| Checkout | =/home/skydive420dz/Projects/nixos-dotfiles= |
+| Accepted generation | =856= |
+| Accepted output | =/nix/store/8q4h4bp340ikcp5wzflpsswia7p12x0s-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Inventory-time =main= | =c7d4fd035b33ecb393606e1f21251508aca404a6= |
+| Existing tags | none |
+
+* Exact Archive Mapping
+The =main-only= count is informational.  The =branch-only= count determines
+whether a tip contains commits not reachable from =main=.
+
+| Source branch | Remote branch | Exact tip | Main-only | Branch-only | Proposed archive tag |
+|---------------+---------------+-----------+-----------+-------------+----------------------|
+| =archive/quickshell-hdr-layer-experiment= | yes | =829900b63e11ad98f62897f39445d5f27e73286c= | 322 | 2 | =archive/2026-07-19/archive/quickshell-hdr-layer-experiment= |
+| =archive/quickshell-split-shells= | yes | =f9f724d22e8a8c1ce25fc6b42b0f41a4322024f4= | 322 | 1 | =archive/2026-07-19/archive/quickshell-split-shells= |
+| =archive/refactor-module-layout= | yes | =f80a7429cbeeeaf44c0ab2c2f4224f2293ffdf84= | 421 | 0 | =archive/2026-07-19/archive/refactor-module-layout= |
+| =archive/rolling= | yes | =e56980b14aae89f672677bebbd040590ed227943= | 518 | 0 | =archive/2026-07-19/archive/rolling= |
+| =backup/nixos-local-doom-5e1e57c= | no | =5e1e57c3376e59e606e3a475944d71b664cea0e5= | 194 | 1 | =archive/2026-07-19/backup/nixos-local-doom-5e1e57c= |
+| =prototype/quickshell-legacy= | yes | =11c6e1394354fcf3cf2e9db99641c1a6b2d889b6= | 322 | 0 | =archive/2026-07-19/prototype/quickshell-legacy= |
+| =work/emacs-lsp-mode-experiment= | yes | =4eded3350b1b861ac11b40627a2fa0160c801269= | 3 | 0 | =archive/2026-07-19/work/emacs-lsp-mode-experiment= |
+| =work/nvim-live-config= | yes | =97a70765eda96eac3c79f09652c2b99df8b22395= | 23 | 0 | =archive/2026-07-19/work/nvim-live-config= |
+| =work/quickshell-cleanup= | yes | =c7e0000e4d876b37c6d0ead69bb1d80963509af8= | 161 | 0 | =archive/2026-07-19/work/quickshell-cleanup= |
+| =work/quickshell-cutover-cleanup= | yes | =c93301ee34df7585f91e98af6d3d62df945fb3f6= | 128 | 0 | =archive/2026-07-19/work/quickshell-cutover-cleanup= |
+| =work/quickshell-wallpaper-manager= | yes | =2c255930f0eabbcfae220beb8ecfd5230db45da1= | 134 | 0 | =archive/2026-07-19/work/quickshell-wallpaper-manager= |
+
+The three unmerged historical lines contain:
+
+- =archive/quickshell-hdr-layer-experiment=: commits =5694011= and =829900b=.
+- =archive/quickshell-split-shells=: commit =f9f724d=.
+- =backup/nixos-local-doom-5e1e57c=: commit =5e1e57c=.
+
+All other branch tips are already reachable from accepted =main=.
+
+* Proposed Mutation Sequence
+1. Create one annotated tag for every mapping above at its recorded exact tip.
+2. Verify every tag dereferences to that tip locally.
+3. Push all archive tags.
+4. Verify every remote tag dereferences to the recorded tip.
+5. Delete the ten legacy remote branches; the Doom backup is local-only.
+6. Delete all eleven legacy local branch names.
+7. Fetch with prune and prove that only =main= remains.
+8. Create =work/nixos-maintenance= from the final accepted =main= and push it.
+9. Recreate =work/quickshell-cleanup= from that same =main= and push it.
+10. Keep the live checkout on =work/nixos-maintenance= for the first Vial/QMK
+    slice.  Create Emacs and VS Code branches only when those slices begin, so
+    empty long-lived branches do not drift.
+
+* Safety Contract
+- Never delete a branch before its exact tag is present and verified remotely.
+- Use the recorded commit IDs, not moving branch names, when creating tags.
+- Do not rewrite =main=.
+- Do not activate, collect garbage, or modify the running configuration during
+  branch archival.
+- If any branch tip changes after this manifest, stop and regenerate the
+  mapping before mutation.

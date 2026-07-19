@@ -330,6 +330,15 @@ remains open:
 Generation 856 is therefore the active and booted checkpoint, but full runtime
 acceptance is pending the remaining human checks.
 
+** Recorded checkpoint acceptance - 2026-07-19
+:PROPERTIES:
+:CUSTOM_ID: recorded-checkpoint-acceptance
+:END:
+The user reported =checkpoint accepted= after completing the remaining hand
+tests.  Gate 5 is complete: generation 856 is the accepted current and booted
+checkpoint.  Generation 855 remains available as rollback, but it no longer
+blocks post-checkpoint work.
+
 * Branch Archive And New Work Lanes
 :PROPERTIES:
 :CUSTOM_ID: branch-archive-and-new-work-lanes
@@ -350,6 +359,10 @@ After the =main= checkpoint:
 
 Exact branch deletion and remote pruning are a later reviewed mutation, not part
 of the initial checkpoint fix.
+
+The exact branch tips, merge status, proposed archive tags, and fresh-lane
+sequence are recorded in
+[[file:2026-07-19-branch-archive.org][the branch archive manifest]].
 
 * Post-Checkpoint Roadmap
 :PROPERTIES:
