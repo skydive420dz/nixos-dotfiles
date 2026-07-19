@@ -1,0 +1,98 @@
+#+title: Vial And QMK Udev Slice - 2026-07-19
+#+startup: overview
+
+* Purpose
+Correct the confirmed package-versus-udev ownership defect without redesigning
+input configuration, changing firmware, or claiming device acceptance before
+the physical keyboard is present.
+
+* Verified Baseline
+| Item | Value |
+|------+-------|
+| Host | =nixos= at =192.168.1.175= |
+| Checkout | =/home/skydive420dz/Projects/nixos-dotfiles= |
+| Branch | =work/nixos-maintenance= |
+| Starting commit | =a24a5f5349886276a21c299ad5317a91bbba93ba= |
+| Live generation | accepted =856= |
+| Live output | =/nix/store/8q4h4bp340ikcp5wzflpsswia7p12x0s-nixos-system-nixos-26.11.20260718.61b7c44= |
+
+Generation 856 exposes =qmk-udev-rules= only through the system profile.  Udev
+does not load rules from that package location:
+
+- =hardware.keyboard.qmk.enable = false=;
+- =services.udev.packages= omits QMK rules;
+- =/etc/udev/rules.d/50-qmk.rules= is absent;
+- =plugdev= is absent;
+- the live hidraw node has no active-seat ACL.
+
+* Source Decision
+The narrow correction is:
+
+1. Set =hardware.keyboard.qmk.enable = true= in =hosts/msi/default.nix=.
+2. Remove =qmk-udev-rules= from =environment.systemPackages=.
+3. Keep Vial 0.7.5 and QMK CLI 1.2.0 installed.
+4. Keep =hardware.keyboard.qmk.keychronSupport = false= unless the physical
+   device proves that Keychron-specific rules are required.
+
+MSI owns the enable because the AMD bootstrap imports the shared
+=system/modules= tree and must remain unchanged.  A new keyboard module and
+movement of existing Kanata paths are separate organization work.
+
+* NixOS Behavior And Security Boundary
+The pinned NixOS QMK module:
+
+- adds =qmk-udev-rules-0.27.13= to =services.udev.packages=;
+- creates =plugdev=;
+- does not install Vial or the QMK CLI;
+- does not add the user permanently to =plugdev=.
+
+The official generic hidraw rule is:
+
+#+begin_example
+KERNEL=="hidraw*", MODE="0660", GROUP="plugdev", TAG+="uaccess", TAG+="udev-acl"
+#+end_example
+
+Local graphical access relies on logind's active-seat =uaccess= ACL.  The
+generic rule affects all hidraw devices at the active seat, not only one
+keyboard; that is the upstream QMK policy and an explicit security tradeoff.
+
+* Source, Evaluation, And Build Results
+- =git diff --check= passes.
+- Both changed Nix files parse.
+- MSI evaluates =hardware.keyboard.qmk.enable = true=.
+- AMD evaluates =hardware.keyboard.qmk.enable = false=.
+- MSI =services.udev.packages= contains =qmk-udev-rules-0.27.13=.
+- MSI system packages contain =Vial-0.7.5= and =qmk-1.2.0=, not an explicit
+  =qmk-udev-rules= entry.
+- The no-link target build passes at:
+
+  =/nix/store/drvm5368y01v57hj32pqn4y660ka0za0-nixos-system-nixos-26.11.20260718.61b7c44=
+
+- The candidate contains readable =etc/udev/rules.d/50-qmk.rules=, the generic
+  hidraw rule, =sw/bin/Vial=, and =sw/bin/qmk=.
+- Reported closure size remains 29.0 GiB; the exact byte count changes from
+  =31,186,123,680= to =31,186,122,808=, a reduction of 872 bytes.
+
+No activation occurred during these checks.  Generation 856 and its absent
+active QMK rule remain unchanged.
+
+* Live Device Inventory
+No intended Vial keyboard was connected:
+
+- the only external-looking USB function was the internal MediaTek Bluetooth
+  device =0e8d:0608=;
+- the only hidraw node was the internal I2C Synaptics touchpad =06cb:7e7e=;
+- no external USB HID keyboard, applicable VID:PID, or candidate hidraw node
+  could be identified.
+
+The device test cannot pass until the keyboard is physically connected.
+
+* Remaining Gates
+1. Commit and push the exact build-verified source.
+2. Activate separately.
+3. Confirm =/etc/udev/rules.d/50-qmk.rules= and =plugdev= exist.
+4. Reconnect the keyboard and identify its VID:PID and hidraw node.
+5. Inspect =udevadm test=, file mode, ownership, and =getfacl= for that node.
+6. Launch =Vial= from the local graphical session and verify discovery and
+   non-destructive configuration reads.
+7. Keep firmware flashing outside this slice.

@@ -29,12 +29,13 @@
 - keyd is disabled. Keep it disabled while Kanata owns keyboards.
 - Keep app-native navigation simple until a real layer system is worth the setup cost.
 
-** Vial And QMK - Incomplete
+** Vial And QMK - Build Verified, Device Test Pending
 :PROPERTIES:
 :CUSTOM_ID: vial-and-qmk-incomplete
 :END:
 Vial 0.7.5, QMK 1.2.0, and =qmk-udev-rules= are present in checkpoint
-generation 856, but this is not an accepted device workflow.
+generation 856, but its rules package is inert there and the device workflow is
+not accepted.
 
 Confirmed defect:
 
@@ -48,15 +49,30 @@ This explains why merely installing Vial/QMK did not grant non-root device
 access.  No compatible external device was connected during the audit, so the
 hardware path remains untested.
 
-First maintenance slice:
+The first maintenance slice on =work/nixos-maintenance= now:
 
-1. Enable =hardware.keyboard.qmk.enable=.
-2. Remove the redundant explicit =qmk-udev-rules= system package.
-3. Build and activate separately.
-4. Reconnect the real device and verify its hidraw ACL, Vial discovery, and the
-   intended configuration flow.
-5. Decide separately whether the full QMK toolchain belongs system-wide or in
-   an on-demand firmware project shell.  Firmware flashing is a distinct,
+- enables =hardware.keyboard.qmk.enable= only in =hosts/msi/default.nix=;
+- removes explicit =qmk-udev-rules= package ownership while retaining Vial and
+  the QMK CLI;
+- evaluates with QMK enabled for MSI and disabled for the AMD bootstrap;
+- generates =/etc/udev/rules.d/50-qmk.rules= and the =plugdev= group;
+- builds successfully without activating generation 856.
+
+The official rule grants active-seat =uaccess= to =hidraw*= and does not add the
+user permanently to =plugdev=.  This is broader than a device-specific VID:PID
+rule, so keep that security boundary explicit.
+
+No external USB HID keyboard was connected during the candidate audit.  The
+only live hidraw node was the internal Synaptics touchpad, so the intended
+device, VID:PID, ACL, and Vial discovery remain untested.
+
+Next:
+
+1. Activate the build-verified slice separately.
+2. Reconnect the real device and identify its USB and hidraw nodes.
+3. Verify applied rules, active-seat ACL, and Vial discovery.
+4. Decide separately whether the full QMK toolchain belongs system-wide or in
+   an on-demand firmware project shell.  Firmware flashing remains a distinct,
    explicitly authorized action.
 
 ** NixOS Kanata Investigation

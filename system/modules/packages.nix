@@ -38,7 +38,6 @@
 
       vial
       qmk
-      qmk-udev-rules
 
       bluez
       bluez-tools

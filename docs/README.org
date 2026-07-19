@@ -14,13 +14,16 @@ commits, pushes, service changes, or branch deletion.
 |---------+-------------------------+--------------------|
 | System | Generation 856 is current, booted, and user-accepted from the verified checkpoint; generation 855 remains rollback | Begin post-checkpoint work in fresh branches |
 | Emacs | Clean Emacs is active in generation 856; Lua and Nix =lsp-mode=/Company slices are accepted | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | Service is active with the checkpoint input update and loaded its configuration | Complete visual hand tests, then use the cleanup lane |
-| Vial/QMK | Vial and QMK are installed; QMK udev integration is absent | Enable declarative udev ownership and test the connected device |
+| Quickshell | The generation 856 shell is accepted | Use the cleanup lane for deterministic fixes and measured optimization |
+| Vial/QMK | The MSI-only udev correction builds successfully; generation 856 remains live without it | Activate separately, reconnect the device, and test its ACL and Vial discovery |
 | VS Code | NixOS has no VS Code configuration | Adapt the macOS Home Manager module in a future Linux-specific slice |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
 
-Volatile hashes, outputs, live services, and exact gate results belong in
-[[file:handoffs/2026-07-18-main-checkpoint.org][the active checkpoint handoff]].
+Volatile hashes, outputs, live services, and exact gate results for the current
+slice belong in
+[[file:handoffs/2026-07-19-vial-qmk-udev.org][the Vial/QMK handoff]].
+The accepted system baseline remains recorded in
+[[file:handoffs/2026-07-18-main-checkpoint.org][the checkpoint handoff]].
 The reviewed tag/delete mapping for legacy branches is in
 [[file:handoffs/2026-07-19-branch-archive.org][the branch archive manifest]].
 
