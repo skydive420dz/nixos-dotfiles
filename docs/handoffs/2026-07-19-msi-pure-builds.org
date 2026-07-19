@@ -81,17 +81,25 @@ The candidate Zsh and Eshell outputs contain the pure =nrb=/=nrs= commands and
 zero =--impure= occurrences.  Closure changes are the expected Home Manager
 alias propagation; package versions did not change.
 
-* Live State And Remaining Gate
-=/run/current-system= and the system profile still resolve to the generation
-857 baseline output.  =/run/booted-system= remains generation 856.  No =result=
-link was created.
+* Activation And Runtime Acceptance
+The user completed the separately authorized activation successfully.
+Generation 858 is current:
 
-The candidate is build-verified, not active.  A separately approved =nrs=
-activation would create a new generation and should be followed by:
+=/nix/store/1ba341k08ccy8mz2a6dq1p6af0j0xc53-nixos-system-nixos-26.11.20260718.61b7c44=
 
-1. confirm =/run/current-system= is the candidate output;
-2. start a fresh Zsh and verify =alias nrs= and =alias nrb= omit =--impure=;
-3. verify the clean-Emacs Eshell aliases expose the same pure commands;
-4. run a non-activating pure evaluation or no-link build through the normal
-   repository path;
-5. retain generation 857 as rollback until those checks pass.
+Runtime verification passed:
+
+- =/run/current-system= and the system profile resolve to the build-verified
+  candidate;
+- =/run/booted-system= remains generation 856 because no reboot occurred;
+- generation 857 remains available as the immediate pre-activation rollback;
+- a fresh Zsh reports pure =nrs= and =nrb= aliases with no =--impure= flag;
+- the Emacs daemon restarted on the new Home Manager generation, is active with
+  =NRestarts=0=, and loads the candidate generated alias file;
+- clean-Emacs Eshell resolves both aliases to the same pure commands;
+- a post-activation pure evaluation returns the active candidate output;
+- no failed system or user units were reported.
+
+The pure rebuild workflow is accepted.  No reboot test is required for this
+alias/source change; generation 856 remains the booted fallback until the next
+separately chosen reboot.

@@ -58,7 +58,9 @@ remain the detailed evidence.
   derivation and output, so no activation or reboot was needed.
 - The =nrs= and =nrb= aliases then moved to pure flake syntax.  Their separate
   pure candidate build passed and changed only alias-derived Home Manager and
-  system paths; activation remains a separate gate.
+  system paths.  Generation 858 activated that candidate; fresh Zsh and
+  clean-Emacs Eshell both expose the pure aliases, while generations 856 and
+  857 remain available as booted fallback and rollback respectively.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages initially reached the MSI system without active QMK
