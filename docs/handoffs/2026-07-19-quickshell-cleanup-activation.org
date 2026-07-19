@@ -1,0 +1,1405 @@
+#+title: Quickshell Cleanup Activation Handoff - 2026-07-19
+#+startup: overview
+
+* Status And Authority
+This handoff is =CANDIDATE=.  It records the completed read-only preflight and
+the exact remaining gates for cleanup Slices 0A, 0B, 1A, and 1B.
+
+This document does not authorize a fetch, branch update, build, checkout
+switch, service stop/start/restart, hand-test mutation, mutable-state
+restoration, Emacs reload, promotion, or rollback.  Those remain separate
+decisions.  At the time of this record:
+
+- the four-commit payload source is committed and pushed; this handoff and its
+  index updates are not yet committed or pushed;
+- exact isolated MSI source validation passes;
+- the live MSI checkout and Quickshell process are unchanged;
+- build verification, live activation, runtime verification, human hand tests,
+  and promotion remain unperformed.
+
+* Verified Read-Only Baseline
+The final containment snapshot was taken on =2026-07-19T19:21:14-04:00=.
+
+| Item | Value |
+|------+-------|
+| Host | =nixos= at =192.168.1.175= |
+| Checkout | =/home/skydive420dz/Projects/nixos-dotfiles= |
+| Live branch | =work/nixos-maintenance= |
+| Source rollback commit | =73e2bd82003e21c7955a9c9d12c4b80ab86eb634= |
+| Live Git state | clean and equal to =origin/work/nixos-maintenance= |
+| Current system profile | =system-860-link= |
+| Current system output | =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Booted system output | =/nix/store/8q4h4bp340ikcp5wzflpsswia7p12x0s-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Quickshell state | =active/running=, =MainPID=4132=, =NRestarts=0= |
+| Quickshell start | =2026-07-19 09:34:48 EDT= |
+| Accepted tracked QML tree | =ca54f21a7c683541dacbbd6e0fe04cb556e78c21= |
+| Accepted tracked Emacs tree | =90ef5ffd3d31ba76b5b01a9bd902e9a5ef6d5ecb= |
+| Accepted tracked scripts tree | =861ee507f99e2b05057e43611fac0af878dd8e24= |
+| Candidate payload commit | =0db9953a6a312fcb40ddde396667b41f2ac0696c= |
+| Candidate tracked QML tree | =2f9d5a4f3ccdf6bed1635d8ff5bb4668be741c98= |
+| Candidate tracked Emacs tree | =a3fe7cb4b9cf99b99b9901c08e8d98716cd89686= |
+| Candidate tracked scripts tree | =047ddc3eb0298786fbb4d434416f0da2901e26b5= |
+| Candidate relationship | strict four-commit descendant of the rollback commit |
+| Branch divergence | maintenance =0=, cleanup =4= |
+| Connected outputs | only =eDP-1=, =1920x1080@1.0=, reserved =0,36,0,0= |
+
+The live MSI's local =work/quickshell-cleanup= branch and matching
+=origin/work/quickshell-cleanup= tracking ref are stale at
+=4756f02dc08575b938b32991501b394d49ce77e2=.  The candidate object is not yet
+present in that checkout.  GitHub resolves the remote branch to the payload
+commit above before this handoff/index documentation is added.
+
+Do not switch to the stale local branch.  That would temporarily expose older
+=main= bytes through every out-of-store link.
+
+* Candidate History And Scope
+The cleanup payload is four narrow commits on top of the accepted maintenance
+commit:
+
+| Commit | Scope |
+|--------+-------|
+| =088db85= | Add the exact-source Quickshell validation harness |
+| =7b28066= | Adopt four-space QML formatting and align clean Emacs QML formatting |
+| =337ae08= | Fix three layout constraints and remove four unused imports |
+| =0db9953= | Qualify all 17 parent-delegate property accesses |
+
+The aggregate payload changes 19 paths:
+
+- 12 files under =config/quickshell/=;
+- four files under =config/emacs/= for the QML formatter/indentation policy;
+- executable =scripts/check-quickshell=;
+- =docs/areas/emacs.org= and =docs/areas/quickshell.org=.
+
+There is no change to =flake.nix=, =flake.lock=, any NixOS/Home Manager module,
+package, service definition, Hyprland source, or other live-linked application
+configuration.
+
+* Live-Link Activation Boundary
+=home/modules/links.nix= resolves the following through the Home Manager store
+link into this one mutable checkout:
+
+- =~/.config/aerc=;
+- =~/.config/emacs=;
+- =~/.config/ghostty/shaders=;
+- =~/.config/quickshell=;
+- =~/.config/scripts=;
+- =~/.config/sky-nvim=;
+- =~/.config/wezterm=;
+- =~/.config/hypr/hyprland.lua=.
+
+Among the live-linked paths above, only Quickshell, Emacs, and scripts differ
+between the rollback and candidate trees.  Nevertheless, changing the checkout
+exposes all candidate bytes immediately without a Home Manager or NixOS
+generation change:
+
+- Quickshell watches its source tree and historical journal evidence contains
+  automatic =Reloading configuration...= events;
+- a running Emacs normally retains already-loaded Lisp until an explicit
+  reload/restart, while later loads can see the new files;
+- the checker becomes visible at =~/.config/scripts/check-quickshell= but
+  nothing invokes it automatically.
+
+Therefore the checkout switch is the activation boundary.  A Nix generation
+rollback alone cannot restore these bytes.
+
+* Completed Source Gate
+The exact payload tree was streamed to a disposable MSI directory and removed
+after validation.  =scripts/check-quickshell= reported:
+
+| Check | Result |
+|-------+--------|
+| QML source set | 31 files |
+| QML parse and canonical four-space format | pass for all 31 |
+| Actionable QML diagnostics | =0= |
+| Strict QML lint gate | pass |
+| Named =DataStreamParser.buffer= metadata diagnostics | 15, unchanged |
+| Named =PanelWindow= metadata diagnostics | 6, unchanged |
+| Named =QProcess::ExitStatus= metadata diagnostics | 17, unchanged |
+| Bash syntax | 16 files pass |
+| JSON syntax | 2 files pass |
+| Python syntax | 1 file passes without execution |
+
+The clean-Emacs QML sources parse and the explicit formatter is equivalent to
+=qmlformat --indent-width 4 --column-width -1=.  That is source evidence only.
+Classic =qml-mode= and parser-backed =sk-qml-ts-mode= still require a live
+indentation/format hand test.
+
+* Gate 1 - Publish This Handoff
+Before any MSI synchronization:
+
+1. Review the handoff and its two index links.
+2. Commit and push the documentation-only result on
+   =work/quickshell-cleanup=.
+3. Record the resulting remote branch head in the execution transcript.
+4. Require that its Quickshell, Emacs, and scripts trees still equal the
+   payload tree identities above.
+
+The activation head may therefore be a documentation-only descendant of
+=0db9953=.  The runtime payload must remain byte-identical.
+
+* Gate 2 - Synchronize Source Without Activation
+This gate updates Git objects and refs only.  It must not switch the live
+checkout or touch the Quickshell service.
+
+Run on the MSI after separate authorization:
+
+#+begin_src sh
+set -euo pipefail
+
+repo=/home/skydive420dz/Projects/nixos-dotfiles
+rollback=73e2bd82003e21c7955a9c9d12c4b80ab86eb634
+payload=0db9953a6a312fcb40ddde396667b41f2ac0696c
+stale_cleanup=4756f02dc08575b938b32991501b394d49ce77e2
+expected_qml=2f9d5a4f3ccdf6bed1635d8ff5bb4668be741c98
+expected_emacs=a3fe7cb4b9cf99b99b9901c08e8d98716cd89686
+expected_scripts=047ddc3eb0298786fbb4d434416f0da2901e26b5
+
+cd "$repo"
+test -z "$(git status --porcelain)"
+test "$(git symbolic-ref --short HEAD)" = work/nixos-maintenance
+test "$(git rev-parse HEAD)" = "$rollback"
+old_cleanup="$(git rev-parse refs/heads/work/quickshell-cleanup)"
+
+git fetch --no-tags origin \
+  refs/heads/work/quickshell-cleanup:refs/remotes/origin/work/quickshell-cleanup
+
+activation_head="$(git rev-parse refs/remotes/origin/work/quickshell-cleanup)"
+printf '%s\n' "$activation_head" | rg -q '^[0-9a-f]{40}$'
+
+git merge-base --is-ancestor "$rollback" "$activation_head"
+git merge-base --is-ancestor "$payload" "$activation_head"
+test "$(git rev-parse "${activation_head}:config/quickshell")" = "$expected_qml"
+test "$(git rev-parse "${activation_head}:config/emacs")" = "$expected_emacs"
+test "$(git rev-parse "${activation_head}:scripts")" = "$expected_scripts"
+
+expected_paths="$(
+  printf '%s\n' \
+    docs/README.org \
+    docs/areas/quickshell.org \
+    docs/handoffs/2026-07-19-quickshell-cleanup-activation.org |
+    LC_ALL=C sort
+)"
+actual_paths="$(
+  git diff --name-only "$payload" "$activation_head" |
+    LC_ALL=C sort
+)"
+test "$actual_paths" = "$expected_paths"
+
+if test "$old_cleanup" != "$stale_cleanup" &&
+   test "$old_cleanup" != "$activation_head"; then
+  echo "unexpected local cleanup ref: $old_cleanup"
+  exit 1
+fi
+git merge-base --is-ancestor "$old_cleanup" "$activation_head"
+test "$(git rev-parse refs/heads/work/quickshell-cleanup)" = "$old_cleanup"
+
+git branch -f work/quickshell-cleanup "$activation_head"
+test "$(git rev-parse work/quickshell-cleanup)" = "$activation_head"
+test "$(git symbolic-ref --short HEAD)" = work/nixos-maintenance
+test "$(git rev-parse HEAD)" = "$rollback"
+test -z "$(git status --porcelain)"
+
+printf 'ACTIVATION_HEAD=%s\n' "$activation_head"
+#+end_src
+
+Record the full =ACTIVATION_HEAD= exactly and paste that immutable value into
+every later gate.  Never re-resolve a mutable branch name in its place.  Stop
+if any assertion fails.  Do not use =git reset= to force past an unexpected
+state.
+
+* Gate 3 - Separate Pure No-Link Build
+The Quickshell audit only requires a Nix build for Nix/service changes, and a
+Nix build cannot validate out-of-store QML.  The later repository-wide
+verification contract is stricter and records a no-link build for every slice.
+Honor that stricter contract without mislabeling the result:
+
+- rerun exact-source validation from the final candidate worktree;
+- record a pure target evaluation;
+- run the current pure no-link MSI toplevel build;
+- compare the candidate derivation, output, and closure with the live output;
+- prove the live checkout, profile, generation, PID, and service remain
+  unchanged afterward;
+- do not call the build QML validation or activation.
+
+Run on the MSI after Gate 2 and separate build authorization:
+
+#+begin_src sh
+set -euo pipefail
+
+repo=/home/skydive420dz/Projects/nixos-dotfiles
+build_tree=/tmp/nixos-quickshell-activation-build
+rollback=73e2bd82003e21c7955a9c9d12c4b80ab86eb634
+activation_head=PASTE_GATE_2_FULL_SHA_HERE
+expected_qml=2f9d5a4f3ccdf6bed1635d8ff5bb4668be741c98
+expected_emacs=a3fe7cb4b9cf99b99b9901c08e8d98716cd89686
+expected_scripts=047ddc3eb0298786fbb4d434416f0da2901e26b5
+expected_profile_link=system-860-link
+expected_system=/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44
+expected_booted=/nix/store/8q4h4bp340ikcp5wzflpsswia7p12x0s-nixos-system-nixos-26.11.20260718.61b7c44
+
+test "$activation_head" != PASTE_GATE_2_FULL_SHA_HERE
+printf '%s\n' "$activation_head" | rg -q '^[0-9a-f]{40}$'
+test "$(git -C "$repo" symbolic-ref --short HEAD)" = \
+  work/nixos-maintenance
+test "$(git -C "$repo" rev-parse HEAD)" = "$rollback"
+test -z "$(git -C "$repo" status --porcelain)"
+test "$(git -C "$repo" rev-parse work/quickshell-cleanup)" = \
+  "$activation_head"
+test "$(git -C "$repo" rev-parse "${activation_head}:config/quickshell")" = \
+  "$expected_qml"
+test "$(git -C "$repo" rev-parse "${activation_head}:config/emacs")" = \
+  "$expected_emacs"
+test "$(git -C "$repo" rev-parse "${activation_head}:scripts")" = \
+  "$expected_scripts"
+
+before_branch="$(git -C "$repo" symbolic-ref --short HEAD)"
+before_head="$(git -C "$repo" rev-parse HEAD)"
+before_system="$(readlink -f /run/current-system)"
+before_booted="$(readlink -f /run/booted-system)"
+before_profile_link="$(readlink /nix/var/nix/profiles/system)"
+before_profile="$(readlink -f /nix/var/nix/profiles/system)"
+before_pid="$(
+  systemctl --user show quickshell.service -p MainPID --value
+)"
+before_restarts="$(
+  systemctl --user show quickshell.service -p NRestarts --value
+)"
+
+test "$before_system" = "$expected_system"
+test "$before_booted" = "$expected_booted"
+test "$before_profile_link" = "$expected_profile_link"
+
+cleanup_build_tree() {
+  git -C "$repo" worktree remove --force "$build_tree" || true
+}
+
+test ! -e "$build_tree"
+git -C "$repo" worktree add --detach "$build_tree" "$activation_head"
+trap cleanup_build_tree EXIT HUP INT TERM
+test "$(git -C "$build_tree" rev-parse HEAD)" = "$activation_head"
+test "$(git -C "$build_tree" rev-parse HEAD:config/quickshell)" = \
+  "$expected_qml"
+test "$(git -C "$build_tree" rev-parse HEAD:config/emacs)" = \
+  "$expected_emacs"
+test "$(git -C "$build_tree" rev-parse HEAD:scripts)" = \
+  "$expected_scripts"
+
+"$build_tree/scripts/check-quickshell" "$build_tree"
+
+cd "$build_tree"
+candidate_drv="$(
+  nix --extra-experimental-features 'nix-command flakes' \
+    eval --raw --no-write-lock-file \
+    '.#nixosConfigurations."nixos".config.system.build.toplevel.drvPath'
+)"
+current_drv="$(nix-store --query --deriver "$before_system")"
+test "$candidate_drv" = "$current_drv"
+
+candidate_output="$(
+  nix --extra-experimental-features 'nix-command flakes' \
+    build --print-out-paths \
+    '.#nixosConfigurations."nixos".config.system.build.toplevel' \
+    --no-link --no-write-lock-file --show-trace
+)"
+test "$candidate_output" = "$before_system"
+
+printf 'CANDIDATE_DRV=%s\n' "$candidate_drv"
+printf 'CANDIDATE_OUTPUT=%s\n' "$candidate_output"
+nix path-info -S "$before_system"
+nix path-info -S "$candidate_output"
+
+cd "$repo"
+git worktree remove "$build_tree"
+trap - EXIT HUP INT TERM
+test ! -e "$build_tree"
+test "$(git symbolic-ref --short HEAD)" = "$before_branch"
+test "$(git rev-parse HEAD)" = "$before_head"
+test -z "$(git status --porcelain)"
+test "$(readlink -f /run/current-system)" = "$before_system"
+test "$(readlink -f /run/booted-system)" = "$before_booted"
+test "$(readlink /nix/var/nix/profiles/system)" = "$before_profile_link"
+test "$(readlink -f /nix/var/nix/profiles/system)" = "$before_profile"
+test "$(
+  systemctl --user show quickshell.service -p MainPID --value
+)" = "$before_pid"
+test "$(
+  systemctl --user show quickshell.service -p NRestarts --value
+)" = "$before_restarts"
+test "$(
+  systemctl --user show quickshell.service -p ActiveState --value
+)" = active
+test "$(
+  systemctl --user show quickshell.service -p SubState --value
+)" = running
+#+end_src
+
+If validation or the build fails, do not proceed to activation.  Preserve its
+output, remove the disposable worktree deliberately, and diagnose the failure
+as its own gate.
+
+* Gate 4 - Final Pre-Activation Snapshot
+Immediately before activation, recheck volatile state rather than relying on
+the earlier snapshot:
+
+#+begin_src sh
+set -euo pipefail
+
+repo=/home/skydive420dz/Projects/nixos-dotfiles
+rollback=73e2bd82003e21c7955a9c9d12c4b80ab86eb634
+activation_head=PASTE_GATE_2_FULL_SHA_HERE
+expected_qml=2f9d5a4f3ccdf6bed1635d8ff5bb4668be741c98
+expected_emacs=a3fe7cb4b9cf99b99b9901c08e8d98716cd89686
+expected_scripts=047ddc3eb0298786fbb4d434416f0da2901e26b5
+expected_profile_link=system-860-link
+expected_system=/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44
+expected_booted=/nix/store/8q4h4bp340ikcp5wzflpsswia7p12x0s-nixos-system-nixos-26.11.20260718.61b7c44
+
+test "$activation_head" != PASTE_GATE_2_FULL_SHA_HERE
+printf '%s\n' "$activation_head" | rg -q '^[0-9a-f]{40}$'
+date --iso-8601=seconds
+git -C "$repo" status --short --branch
+test "$(git -C "$repo" symbolic-ref --short HEAD)" = \
+  work/nixos-maintenance
+test "$(git -C "$repo" rev-parse HEAD)" = "$rollback"
+test "$(git -C "$repo" rev-parse work/quickshell-cleanup)" = \
+  "$activation_head"
+test -z "$(git -C "$repo" status --porcelain)"
+test "$(readlink -f "$HOME/.config/quickshell")" = \
+  "$repo/config/quickshell"
+test "$(readlink -f "$HOME/.config/emacs")" = "$repo/config/emacs"
+test "$(readlink -f "$HOME/.config/scripts")" = "$repo/scripts"
+
+test "$(
+  git -C "$repo" rev-parse "${activation_head}:config/quickshell"
+)" = "$expected_qml"
+test "$(
+  git -C "$repo" rev-parse "${activation_head}:config/emacs"
+)" = "$expected_emacs"
+test "$(
+  git -C "$repo" rev-parse "${activation_head}:scripts"
+)" = "$expected_scripts"
+
+readlink /nix/var/nix/profiles/system
+readlink -f /run/current-system
+readlink -f /run/booted-system
+test "$(readlink /nix/var/nix/profiles/system)" = "$expected_profile_link"
+test "$(readlink -f /run/current-system)" = "$expected_system"
+test "$(readlink -f /run/booted-system)" = "$expected_booted"
+
+systemctl --user show quickshell.service \
+  -p ActiveState -p SubState -p Result -p MainPID -p NRestarts \
+  -p ExecMainStartTimestamp -p MemoryCurrent -p MemoryPeak \
+  -p CPUUsageNSec -p TasksCurrent
+test "$(
+  systemctl --user show quickshell.service -p ActiveState --value
+)" = active
+test "$(
+  systemctl --user show quickshell.service -p SubState --value
+)" = running
+test "$(
+  systemctl --user show quickshell.service -p Result --value
+)" = success
+test "$(
+  systemctl --user show quickshell.service -p NRestarts --value
+)" -eq 0
+test "$(
+  systemctl --user show quickshell.service -p MainPID --value
+)" -gt 0
+
+systemctl --user show mako.service \
+  -p ActiveState -p SubState -p Result -p MainPID -p NRestarts
+test "$(
+  systemctl --user show mako.service -p ActiveState --value
+)" = active
+test "$(
+  systemctl --user show mako.service -p SubState --value
+)" = running
+test "$(
+  systemctl --user show mako.service -p Result --value
+)" = success
+test "$(
+  systemctl --user show mako.service -p MainPID --value
+)" -gt 0
+
+journalctl --user -u quickshell.service -n 20 --no-pager -o short-iso
+journal_cursor="$(
+  journalctl --user -u quickshell.service -n 0 --show-cursor --no-pager |
+    sed -n 's/^-- cursor: //p'
+)"
+test -n "$journal_cursor"
+
+original_theme="$(cat "$HOME/.config/theme/current-style")"
+original_wallpaper="$(
+  jq -r '.currentPath // empty' \
+    "$HOME/.local/state/quickshell/wallpaper.json"
+)"
+original_sink="$(wpctl get-volume @DEFAULT_AUDIO_SINK@)"
+original_source="$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@)"
+original_brightness="$(brightnessctl -m)"
+test -n "$original_theme"
+test -n "$original_wallpaper"
+test -n "$original_sink"
+test -n "$original_source"
+test -n "$original_brightness"
+
+hypr_sig="$(
+  systemctl --user show-environment |
+    sed -n 's/^HYPRLAND_INSTANCE_SIGNATURE=//p'
+)"
+test -n "$hypr_sig"
+export HYPRLAND_INSTANCE_SIGNATURE="$hypr_sig"
+hyprctl -j monitors | jq '
+  .[]
+  | {name, width, height, x, y, scale, focused, reserved}
+'
+hyprctl -j layers
+
+printf 'activation_head=%q\n' "$activation_head"
+printf 'activation_cursor=%q\n' "$journal_cursor"
+printf 'original_theme=%q\n' "$original_theme"
+printf 'original_wallpaper=%q\n' "$original_wallpaper"
+printf 'original_sink=%q\n' "$original_sink"
+printf 'original_source=%q\n' "$original_source"
+printf 'original_brightness=%q\n' "$original_brightness"
+printf 'CANDIDATE_QML_TREE=%s\n' "$expected_qml"
+printf 'CANDIDATE_EMACS_TREE=%s\n' "$expected_emacs"
+printf 'CANDIDATE_SCRIPTS_TREE=%s\n' "$expected_scripts"
+#+end_src
+
+Record the current PID, restart count, journal cursor, connected outputs, layer
+geometry, system output, rollback head, candidate head, and all three candidate
+tree identities.  The lowercase lines are complete shell-escaped assignments.
+Copy each complete line, not only its displayed value, into later gates.
+
+* Gate 5 - Explicit Controlled Activation
+This gate requires explicit authorization covering the checkout switch, the
+temporary Quickshell outage/start, and immediate exposure of the candidate
+Emacs and checker bytes.  Emacs is not reloaded and the checker is not invoked
+automatically merely because those files become visible.
+
+The activation authorization must also say whether the exact source rollback,
+restoration of the Gate 4 theme/wallpaper/audio/brightness values, and their
+associated Quickshell/Mako restarts are pre-authorized for the listed failure
+triggers.  If they are not, preserve the observable failure state, stop further
+mutation, and request rollback/restoration authorization rather than inferring
+it.
+
+Stop Quickshell before changing the checkout.  This prevents its file watcher
+from loading a partially updated tree:
+
+#+begin_src sh
+set -euo pipefail
+
+repo=/home/skydive420dz/Projects/nixos-dotfiles
+rollback=73e2bd82003e21c7955a9c9d12c4b80ab86eb634
+activation_head=PASTE_GATE_2_FULL_SHA_HERE
+expected_qml=2f9d5a4f3ccdf6bed1635d8ff5bb4668be741c98
+expected_emacs=a3fe7cb4b9cf99b99b9901c08e8d98716cd89686
+expected_scripts=047ddc3eb0298786fbb4d434416f0da2901e26b5
+
+cd "$repo"
+test "$activation_head" != PASTE_GATE_2_FULL_SHA_HERE
+printf '%s\n' "$activation_head" | rg -q '^[0-9a-f]{40}$'
+test "$(git symbolic-ref --short HEAD)" = work/nixos-maintenance
+test "$(git rev-parse HEAD)" = "$rollback"
+test "$(git rev-parse work/quickshell-cleanup)" = "$activation_head"
+test -z "$(git status --porcelain)"
+test "$(git rev-parse "${activation_head}:config/quickshell")" = \
+  "$expected_qml"
+test "$(git rev-parse "${activation_head}:config/emacs")" = \
+  "$expected_emacs"
+test "$(git rev-parse "${activation_head}:scripts")" = \
+  "$expected_scripts"
+
+systemctl --user stop quickshell.service
+if systemctl --user is-active --quiet quickshell.service; then
+  echo "quickshell.service did not stop"
+  exit 1
+fi
+
+git switch work/quickshell-cleanup
+test "$(git rev-parse HEAD)" = "$activation_head"
+test "$(git rev-parse HEAD:config/quickshell)" = "$expected_qml"
+test "$(git rev-parse HEAD:config/emacs)" = "$expected_emacs"
+test "$(git rev-parse HEAD:scripts)" = "$expected_scripts"
+test -z "$(git status --porcelain)"
+test "$(readlink -f "$HOME/.config/quickshell")" = \
+  "$repo/config/quickshell"
+test "$(readlink -f "$HOME/.config/emacs")" = "$repo/config/emacs"
+test "$(readlink -f "$HOME/.config/scripts")" = "$repo/scripts"
+
+"$repo/scripts/check-quickshell" "$repo"
+systemctl --user start quickshell.service
+#+end_src
+
+There is no =nrs=, Home Manager activation, Nix profile change, generation
+creation, bootloader action, or reboot in this gate.
+
+If the switch or live-path source check fails while Quickshell is stopped, use
+the rollback gate before starting it again.
+
+* Gate 6 - Automated Runtime Assertions And Evidence Review
+After the controlled start, paste the immutable Gate 2 head and the Gate 4
+journal cursor into this block:
+
+#+begin_src sh
+set -euo pipefail
+
+repo=/home/skydive420dz/Projects/nixos-dotfiles
+activation_head=PASTE_GATE_2_FULL_SHA_HERE
+# Replace this complete line with Gate 4's activation_cursor=... output.
+activation_cursor='PASTE_GATE_4_SHELL_SAFE_ASSIGNMENT_VALUE_HERE'
+expected_qml=2f9d5a4f3ccdf6bed1635d8ff5bb4668be741c98
+expected_emacs=a3fe7cb4b9cf99b99b9901c08e8d98716cd89686
+expected_scripts=047ddc3eb0298786fbb4d434416f0da2901e26b5
+
+test "$activation_head" != PASTE_GATE_2_FULL_SHA_HERE
+test "$activation_cursor" != \
+  PASTE_GATE_4_SHELL_SAFE_ASSIGNMENT_VALUE_HERE
+printf '%s\n' "$activation_head" | rg -q '^[0-9a-f]{40}$'
+test "$(git -C "$repo" symbolic-ref --short HEAD)" = \
+  work/quickshell-cleanup
+test "$(git -C "$repo" rev-parse HEAD)" = "$activation_head"
+test "$(git -C "$repo" rev-parse work/quickshell-cleanup)" = \
+  "$activation_head"
+test "$(git -C "$repo" rev-parse HEAD:config/quickshell)" = "$expected_qml"
+test "$(git -C "$repo" rev-parse HEAD:config/emacs)" = "$expected_emacs"
+test "$(git -C "$repo" rev-parse HEAD:scripts)" = "$expected_scripts"
+test -z "$(git -C "$repo" status --porcelain)"
+test "$(readlink -f "$HOME/.config/quickshell")" = \
+  "$repo/config/quickshell"
+test "$(readlink -f "$HOME/.config/emacs")" = "$repo/config/emacs"
+test "$(readlink -f "$HOME/.config/scripts")" = "$repo/scripts"
+test "$(readlink /nix/var/nix/profiles/system)" = system-860-link
+test "$(readlink -f /run/current-system)" = \
+  /nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44
+test "$(readlink -f /run/booted-system)" = \
+  /nix/store/8q4h4bp340ikcp5wzflpsswia7p12x0s-nixos-system-nixos-26.11.20260718.61b7c44
+
+sleep 35
+
+active_state="$(
+  systemctl --user show quickshell.service -p ActiveState --value
+)"
+sub_state="$(
+  systemctl --user show quickshell.service -p SubState --value
+)"
+result="$(
+  systemctl --user show quickshell.service -p Result --value
+)"
+main_pid="$(
+  systemctl --user show quickshell.service -p MainPID --value
+)"
+restarts="$(
+  systemctl --user show quickshell.service -p NRestarts --value
+)"
+qs_pids="$(pgrep -x quickshell)"
+pid_count="$(
+  printf '%s\n' "$qs_pids" |
+    wc -l |
+    tr -d ' '
+)"
+
+test "$active_state" = active
+test "$sub_state" = running
+test "$result" = success
+test "$main_pid" -gt 0
+test "$restarts" -eq 0
+test "$pid_count" -eq 1
+test "$qs_pids" = "$main_pid"
+
+journal_output="$(
+  journalctl --user -u quickshell.service \
+    --after-cursor="$activation_cursor" --no-pager -o short-iso
+)"
+test "$(
+  printf '%s\n' "$journal_output" |
+    rg -c 'Configuration Loaded'
+)" -eq 1
+if printf '%s\n' "$journal_output" |
+   rg -i 'failed to load|qml.*(parse|import).*error|referenceerror|typeerror|binding loop|handler was registered but will not be used because another handler is registered for target|failed with result|main process exited'; then
+  echo "new Quickshell error detected"
+  exit 1
+fi
+
+hypr_sig="$(
+  systemctl --user show-environment |
+    sed -n 's/^HYPRLAND_INSTANCE_SIGNATURE=//p'
+)"
+test -n "$hypr_sig"
+export HYPRLAND_INSTANCE_SIGNATURE="$hypr_sig"
+
+monitors_json="$(hyprctl -j monitors)"
+layers_json="$(hyprctl -j layers)"
+
+printf '%s\n' "$monitors_json" | jq -e '
+  length == 1
+  and .[0].name == "eDP-1"
+  and .[0].width == 1920
+  and .[0].height == 1080
+  and .[0].x == 0
+  and .[0].y == 0
+  and .[0].scale == 1
+  and .[0].reserved == [0, 36, 0, 0]
+'
+
+printf '%s\n' "$layers_json" | jq -e '
+  (
+    [
+      .["eDP-1"].levels
+      | to_entries[].value[]
+      | select(
+          .namespace == "qs-bar"
+          and .x == 0 and .y == 0
+          and .w == 1920 and .h == 1080
+        )
+    ]
+    | length
+  ) == 1
+  and (
+    [
+      .["eDP-1"].levels
+      | to_entries[].value[]
+      | select(
+          .namespace == "qs-wallpaper"
+          and .x == 0 and .y == 0
+          and .w == 1920 and .h == 1080
+        )
+    ]
+    | length
+  ) == 1
+  and (
+    [
+      to_entries[].value.levels
+      | to_entries[].value[]
+      | select(
+          .namespace == "qs-launcher"
+          or .namespace == "qs-clipboard"
+          or .namespace == "qs-osd"
+          or .namespace == "qs-wallpaper-picker"
+        )
+    ]
+    | length
+  ) == 0
+'
+
+systemctl --user show quickshell.service \
+  -p ActiveState -p SubState -p Result -p MainPID -p NRestarts \
+  -p ExecMainStartTimestamp -p MemoryCurrent -p MemoryPeak \
+  -p CPUUsageNSec -p TasksCurrent
+printf '%s\n' "$journal_output"
+printf '%s\n' "$monitors_json" | jq '
+  .[]
+  | {name, width, height, x, y, scale, focused, reserved}
+'
+printf '%s\n' "$layers_json" | jq -r '
+  to_entries[]
+  | .key as $monitor
+  | .value.levels
+  | to_entries[]
+  | .value[]
+  | select(.namespace | startswith("qs-"))
+  | [$monitor, .namespace, .x, .y, .w, .h, .pid]
+  | @tsv
+'
+#+end_src
+
+Require:
+
+- one current Quickshell PID;
+- =active/running= and =Result=success=;
+- =NRestarts=0=;
+- a fresh =Configuration Loaded=;
+- no new QML parse, import, reference, binding-loop, failed-main-process, or
+  duplicate IPC-handler error;
+- =qs-wallpaper= and =qs-bar= remain present with correct geometry;
+- interactive overlays remain unmapped at idle;
+- the service remains healthy beyond the first 30-second timer boundary.
+
+The existing Vesktop StatusNotifier =IconName= getter failure is baseline noise
+if its shape and frequency are unchanged.  The two previously observed Brave
+MPRIS peer disconnects during property reads are also a narrow baseline
+exception only if their shape and frequency are unchanged.  Review the complete
+cursor-bounded journal output; do not silently generalize either exception to
+other warnings.
+
+* Gate 7 - Human Quickshell Hand Tests
+No automated result replaces these interactions.  Gate 7 requires separate
+authorization for the user-executed application launches, clipboard copy and
+deletion, wallpaper/audio/brightness/theme changes, and the two deliberate
+Quickshell/Mako restarts.  Gate 5 does not authorize them.
+
+Preserve the Gate 4 theme, wallpaper, sink volume/mute, source volume/mute, and
+brightness evidence.  Restore every changed value before acceptance.  Run the
+theme toggle/restore last because each style selection intentionally restarts
+both Mako and Quickshell under the current known lifecycle.
+
+Immediately before the first theme selection, record Quickshell and Mako
+cursors and retain the complete shell-safe assignments printed here:
+
+#+begin_src sh
+set -euo pipefail
+
+final_cursor="$(
+  journalctl --user -u quickshell.service -n 0 --show-cursor --no-pager |
+    sed -n 's/^-- cursor: //p'
+)"
+final_mako_cursor="$(
+  journalctl --user -u mako.service -n 0 --show-cursor --no-pager |
+    sed -n 's/^-- cursor: //p'
+)"
+test -n "$final_cursor"
+test -n "$final_mako_cursor"
+printf 'final_cursor=%q\n' "$final_cursor"
+printf 'final_mako_cursor=%q\n' "$final_mako_cursor"
+#+end_src
+
+| Surface | Test | Pass condition |
+|---------+------+----------------|
+| Launcher | Open on the focused output; inspect search height; search; use arrows and =Ctrl-j/k=; hover; launch harmless results by click and =Enter=; close by =Esc= and click-out | Highlight, icon, name, subtitle, hover, and activation belong to the same row; geometry and focus remain correct |
+| Clipboard | Test populated results and a no-match empty state; hover and keyboard-select; copy/paste a disposable text entry by click and =Enter=; delete a disposable entry; inspect one image preview; close by =Esc= and click-out | Correct row is copied/deleted, preview follows selection, empty state renders at its intended height without collapse/clipping, and previous-window focus returns |
+| Tray | On safe items, test normal left activation, right-click native menu, menu-only handling, and middle/secondary action only where harmless | Action targets the clicked icon and the native menu anchors beneath it |
+| Workspaces | Switch by bar click and normal keybind; create/close/move a window if convenient | Active and occupied state refresh and the intended workspace receives focus |
+| OSD | Trigger volume, microphone, and brightness OSD, then restore the recorded audio/mute/brightness state | Correct payload appears, focus is not stolen, the layer unmaps on timeout, and hardware/audio state is restored |
+| Theme/status, last | Record new Quickshell and Mako journal cursors; toggle once; verify the alternate theme; explicitly select the recorded original theme; observe clock, volume, network, Bluetooth, and battery for at least 35 seconds after restoration | The two intentional Quickshell/Mako restart cycles are attributable, original theme returns, values continue updating, and no geometry clips |
+| Media | Start playback and exercise metadata, previous/play/next, and analyzer behavior | Controls and analyzer behave as before with no new process/runtime error |
+| Wallpaper | Open/search the picker, select a known static and animated asset when available, restore the recorded original path, and reopen | Thumbnails, selection, persistence, focus, and close behavior remain intact and the original wallpaper is restored |
+| Global geometry | Check bar interaction and ordinary application clicks below/around it | No phantom mask, stuck focus, missing surface, or visual geometry drift |
+
+Only =eDP-1= was connected during preflight.  Record single-output acceptance
+honestly.  Dual-output behavior remains unverified until an external display is
+connected; do not imply otherwise in promotion evidence.
+
+* Gate 8 - Separate Clean-Emacs Hand Test
+The checkout switch also exposes the Slice 0B Emacs QML policy.  This must be
+tested and recorded separately from Quickshell.  Reloading or restarting Emacs
+requires its own authorization; Gate 5 does not authorize it.
+
+1. Reload or restart clean Emacs deliberately.
+2. Create a fresh disposable buffer/file after that reload for each mode; do
+   not reuse a buffer carrying pre-activation local mode state.
+3. Verify classic =qml-mode= indents with four spaces in its fresh input.
+4. Verify parser-backed =sk-qml-ts-mode= indents with four spaces in its fresh
+   input.
+5. Run the explicit QML formatter and compare its bytes with:
+
+   =qmlformat --ignore-settings --indent-width 4 --column-width -1 --newline unix=
+
+6. Confirm no Emacs load/formatter error and no unexpected two-space QML
+   behavior.
+
+A failed Emacs test blocks promotion.  If Quickshell remains healthy, decide
+explicitly whether to roll back the aggregate checkout or correct Emacs in its
+own narrow follow-up; do not silently call the aggregate candidate accepted.
+
+* Gate 9 - Final Restored-State Runtime Snapshot
+After every hand test, and after the original theme, wallpaper, audio/mute, and
+brightness state has been restored, capture a final runtime window.  Paste the
+immutable activation head, both cursors recorded immediately before the theme
+toggle, and the original Gate 4 values:
+
+#+begin_src sh
+set -euo pipefail
+
+repo=/home/skydive420dz/Projects/nixos-dotfiles
+activation_head=PASTE_GATE_2_FULL_SHA_HERE
+# Replace these complete lines with the exact lowercase assignments printed by
+# Gate 7 and Gate 4.  Do not paste unescaped values into the placeholders.
+final_cursor='PASTE_GATE_7_SHELL_SAFE_ASSIGNMENT_VALUE_HERE'
+final_mako_cursor='PASTE_GATE_7_SHELL_SAFE_MAKO_ASSIGNMENT_VALUE_HERE'
+original_theme='PASTE_GATE_4_SHELL_SAFE_THEME_ASSIGNMENT_VALUE_HERE'
+original_wallpaper='PASTE_GATE_4_SHELL_SAFE_WALLPAPER_ASSIGNMENT_VALUE_HERE'
+original_sink='PASTE_GATE_4_SHELL_SAFE_SINK_ASSIGNMENT_VALUE_HERE'
+original_source='PASTE_GATE_4_SHELL_SAFE_SOURCE_ASSIGNMENT_VALUE_HERE'
+original_brightness='PASTE_GATE_4_SHELL_SAFE_BRIGHTNESS_ASSIGNMENT_VALUE_HERE'
+expected_qml=2f9d5a4f3ccdf6bed1635d8ff5bb4668be741c98
+expected_emacs=a3fe7cb4b9cf99b99b9901c08e8d98716cd89686
+expected_scripts=047ddc3eb0298786fbb4d434416f0da2901e26b5
+
+test "$activation_head" != PASTE_GATE_2_FULL_SHA_HERE
+test "$final_cursor" != \
+  PASTE_GATE_7_SHELL_SAFE_ASSIGNMENT_VALUE_HERE
+test "$final_mako_cursor" != \
+  PASTE_GATE_7_SHELL_SAFE_MAKO_ASSIGNMENT_VALUE_HERE
+test "$original_theme" != \
+  PASTE_GATE_4_SHELL_SAFE_THEME_ASSIGNMENT_VALUE_HERE
+test "$original_wallpaper" != \
+  PASTE_GATE_4_SHELL_SAFE_WALLPAPER_ASSIGNMENT_VALUE_HERE
+test "$original_sink" != \
+  PASTE_GATE_4_SHELL_SAFE_SINK_ASSIGNMENT_VALUE_HERE
+test "$original_source" != \
+  PASTE_GATE_4_SHELL_SAFE_SOURCE_ASSIGNMENT_VALUE_HERE
+test "$original_brightness" != \
+  PASTE_GATE_4_SHELL_SAFE_BRIGHTNESS_ASSIGNMENT_VALUE_HERE
+printf '%s\n' "$activation_head" | rg -q '^[0-9a-f]{40}$'
+test "$(git -C "$repo" symbolic-ref --short HEAD)" = \
+  work/quickshell-cleanup
+test "$(git -C "$repo" rev-parse HEAD)" = "$activation_head"
+test "$(git -C "$repo" rev-parse HEAD:config/quickshell)" = "$expected_qml"
+test "$(git -C "$repo" rev-parse HEAD:config/emacs)" = "$expected_emacs"
+test "$(git -C "$repo" rev-parse HEAD:scripts)" = "$expected_scripts"
+test -z "$(git -C "$repo" status --porcelain)"
+test "$(readlink /nix/var/nix/profiles/system)" = system-860-link
+test "$(readlink -f /run/current-system)" = \
+  /nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44
+test "$(readlink -f /run/booted-system)" = \
+  /nix/store/8q4h4bp340ikcp5wzflpsswia7p12x0s-nixos-system-nixos-26.11.20260718.61b7c44
+
+sleep 35
+
+active_state="$(
+  systemctl --user show quickshell.service -p ActiveState --value
+)"
+sub_state="$(
+  systemctl --user show quickshell.service -p SubState --value
+)"
+result="$(
+  systemctl --user show quickshell.service -p Result --value
+)"
+main_pid="$(
+  systemctl --user show quickshell.service -p MainPID --value
+)"
+restarts="$(
+  systemctl --user show quickshell.service -p NRestarts --value
+)"
+qs_pids="$(pgrep -x quickshell)"
+pid_count="$(
+  printf '%s\n' "$qs_pids" |
+    wc -l |
+    tr -d ' '
+)"
+
+test "$active_state" = active
+test "$sub_state" = running
+test "$result" = success
+test "$main_pid" -gt 0
+test "$restarts" -eq 0
+test "$pid_count" -eq 1
+test "$qs_pids" = "$main_pid"
+
+mako_active="$(
+  systemctl --user show mako.service -p ActiveState --value
+)"
+mako_sub="$(
+  systemctl --user show mako.service -p SubState --value
+)"
+mako_result="$(
+  systemctl --user show mako.service -p Result --value
+)"
+mako_pid="$(
+  systemctl --user show mako.service -p MainPID --value
+)"
+mako_restarts="$(
+  systemctl --user show mako.service -p NRestarts --value
+)"
+test "$mako_active" = active
+test "$mako_sub" = running
+test "$mako_result" = success
+test "$mako_pid" -gt 0
+test "$mako_restarts" -eq 0
+
+final_journal="$(
+  journalctl --user -u quickshell.service \
+    --after-cursor="$final_cursor" --no-pager -o short-iso
+)"
+test "$(
+  printf '%s\n' "$final_journal" |
+    rg -c 'Configuration Loaded'
+)" -eq 2
+if printf '%s\n' "$final_journal" |
+   rg -i 'failed to load|qml.*(parse|import).*error|referenceerror|typeerror|binding loop|handler was registered but will not be used because another handler is registered for target|failed with result|main process exited'; then
+  echo "new Quickshell error detected after hand tests"
+  exit 1
+fi
+
+final_mako_journal="$(
+  journalctl --user -u mako.service \
+    --after-cursor="$final_mako_cursor" --no-pager -o short-iso
+)"
+test "$(
+  printf '%s\n' "$final_mako_journal" |
+    rg -c 'Stopping Mako notification daemon[.]'
+)" -eq 2
+test "$(
+  printf '%s\n' "$final_mako_journal" |
+    rg -c 'Stopped Mako notification daemon[.]'
+)" -eq 2
+test "$(
+  printf '%s\n' "$final_mako_journal" |
+    rg -c 'Starting Mako notification daemon[.]'
+)" -eq 2
+test "$(
+  printf '%s\n' "$final_mako_journal" |
+    rg -c 'Started Mako notification daemon[.]'
+)" -eq 2
+if printf '%s\n' "$final_mako_journal" |
+   rg -i 'failed to start|failed with result|main process exited|start request repeated too quickly'; then
+  echo "new Mako error detected after hand tests"
+  exit 1
+fi
+
+test "$(cat "$HOME/.config/theme/current-style")" = "$original_theme"
+test "$(
+  jq -r '.currentPath // empty' \
+    "$HOME/.local/state/quickshell/wallpaper.json"
+)" = "$original_wallpaper"
+test "$(wpctl get-volume @DEFAULT_AUDIO_SINK@)" = "$original_sink"
+test "$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@)" = "$original_source"
+test "$(brightnessctl -m)" = "$original_brightness"
+
+hypr_sig="$(
+  systemctl --user show-environment |
+    sed -n 's/^HYPRLAND_INSTANCE_SIGNATURE=//p'
+)"
+test -n "$hypr_sig"
+export HYPRLAND_INSTANCE_SIGNATURE="$hypr_sig"
+monitors_json="$(hyprctl -j monitors)"
+layers_json="$(hyprctl -j layers)"
+
+printf '%s\n' "$monitors_json" | jq -e '
+  length == 1
+  and .[0].name == "eDP-1"
+  and .[0].width == 1920
+  and .[0].height == 1080
+  and .[0].x == 0
+  and .[0].y == 0
+  and .[0].scale == 1
+  and .[0].reserved == [0, 36, 0, 0]
+'
+
+printf '%s\n' "$layers_json" | jq -e '
+  (
+    [
+      .["eDP-1"].levels
+      | to_entries[].value[]
+      | select(
+          .namespace == "qs-bar"
+          and .x == 0 and .y == 0
+          and .w == 1920 and .h == 1080
+        )
+    ]
+    | length
+  ) == 1
+  and (
+    [
+      .["eDP-1"].levels
+      | to_entries[].value[]
+      | select(
+          .namespace == "qs-wallpaper"
+          and .x == 0 and .y == 0
+          and .w == 1920 and .h == 1080
+        )
+    ]
+    | length
+  ) == 1
+  and (
+    [
+      to_entries[].value.levels
+      | to_entries[].value[]
+      | select(
+          .namespace == "qs-launcher"
+          or .namespace == "qs-clipboard"
+          or .namespace == "qs-osd"
+          or .namespace == "qs-wallpaper-picker"
+        )
+    ]
+    | length
+  ) == 0
+'
+
+systemctl --user show quickshell.service \
+  -p ActiveState -p SubState -p Result -p MainPID -p NRestarts \
+  -p ExecMainStartTimestamp -p MemoryCurrent -p MemoryPeak \
+  -p CPUUsageNSec -p TasksCurrent
+systemctl --user show mako.service \
+  -p ActiveState -p SubState -p Result -p MainPID -p NRestarts \
+  -p ExecMainStartTimestamp
+printf '%s\n' "$final_journal"
+printf '%s\n' "$final_mako_journal"
+printf 'FINAL_THEME=%s\n' "$original_theme"
+printf 'FINAL_WALLPAPER=%s\n' "$original_wallpaper"
+printf 'FINAL_SINK=%s\n' "$original_sink"
+printf 'FINAL_SOURCE=%s\n' "$original_source"
+printf 'FINAL_BRIGHTNESS=%s\n' "$original_brightness"
+#+end_src
+
+The two theme-driven Quickshell and Mako restart cycles are expected.  Any
+additional automatic or failure restart is not.
+
+* Rollback Triggers And Authority
+Use the pre-authorized rollback immediately, or stop and request rollback
+authorization if it was not pre-authorized, for any of the following:
+
+- Quickshell fails to load, exits, unexpectedly restarts, or loses the
+  bar/wallpaper;
+- any new QML/runtime error;
+- a hidden overlay remains mapped or focus remains exclusive after close;
+- bar/full-screen masks intercept ordinary application clicks;
+- launcher or clipboard geometry collapses or expands unexpectedly;
+- row data, highlight, hover, click, =Enter=, copy, deletion, or preview targets
+  the wrong item;
+- tray action or native menu targets the wrong icon or anchors incorrectly;
+- workspace, OSD, theme, status, media, or wallpaper behavior regresses.
+
+* Source Rollback
+This rollback changes live-linked bytes; restores the recorded
+theme/wallpaper/audio/brightness state; and restarts Quickshell and Mako.  It
+requires authorization unless that complete recovery scope is the
+already-approved emergency response to the activation gate.  Paste the
+complete shell-safe Gate 4 assignment lines, not unescaped values.
+
+#+begin_src sh
+set -euo pipefail
+
+repo=/home/skydive420dz/Projects/nixos-dotfiles
+rollback=73e2bd82003e21c7955a9c9d12c4b80ab86eb634
+rollback_qml=ca54f21a7c683541dacbbd6e0fe04cb556e78c21
+rollback_emacs=90ef5ffd3d31ba76b5b01a9bd902e9a5ef6d5ecb
+rollback_scripts=861ee507f99e2b05057e43611fac0af878dd8e24
+expected_profile_link=system-860-link
+expected_system=/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44
+expected_booted=/nix/store/8q4h4bp340ikcp5wzflpsswia7p12x0s-nixos-system-nixos-26.11.20260718.61b7c44
+# Replace these complete lines with Gate 4's exact lowercase assignments.
+original_theme='PASTE_GATE_4_SHELL_SAFE_THEME_ASSIGNMENT_VALUE_HERE'
+original_wallpaper='PASTE_GATE_4_SHELL_SAFE_WALLPAPER_ASSIGNMENT_VALUE_HERE'
+original_sink='PASTE_GATE_4_SHELL_SAFE_SINK_ASSIGNMENT_VALUE_HERE'
+original_source='PASTE_GATE_4_SHELL_SAFE_SOURCE_ASSIGNMENT_VALUE_HERE'
+original_brightness='PASTE_GATE_4_SHELL_SAFE_BRIGHTNESS_ASSIGNMENT_VALUE_HERE'
+
+cd "$repo"
+test "$original_theme" != \
+  PASTE_GATE_4_SHELL_SAFE_THEME_ASSIGNMENT_VALUE_HERE
+test "$original_wallpaper" != \
+  PASTE_GATE_4_SHELL_SAFE_WALLPAPER_ASSIGNMENT_VALUE_HERE
+test "$original_sink" != \
+  PASTE_GATE_4_SHELL_SAFE_SINK_ASSIGNMENT_VALUE_HERE
+test "$original_source" != \
+  PASTE_GATE_4_SHELL_SAFE_SOURCE_ASSIGNMENT_VALUE_HERE
+test "$original_brightness" != \
+  PASTE_GATE_4_SHELL_SAFE_BRIGHTNESS_ASSIGNMENT_VALUE_HERE
+test -z "$(git status --porcelain)"
+test "$(git rev-parse refs/heads/work/nixos-maintenance)" = "$rollback"
+test "$(git rev-parse "${rollback}:config/quickshell")" = "$rollback_qml"
+test "$(git rev-parse "${rollback}:config/emacs")" = "$rollback_emacs"
+test "$(git rev-parse "${rollback}:scripts")" = "$rollback_scripts"
+test "$(readlink /nix/var/nix/profiles/system)" = "$expected_profile_link"
+test "$(readlink -f /run/current-system)" = "$expected_system"
+test "$(readlink -f /run/booted-system)" = "$expected_booted"
+
+rollback_cursor="$(
+  journalctl --user -u quickshell.service -n 0 --show-cursor --no-pager |
+    sed -n 's/^-- cursor: //p'
+)"
+rollback_mako_cursor="$(
+  journalctl --user -u mako.service -n 0 --show-cursor --no-pager |
+    sed -n 's/^-- cursor: //p'
+)"
+test -n "$rollback_cursor"
+test -n "$rollback_mako_cursor"
+
+systemctl --user stop quickshell.service
+if systemctl --user is-active --quiet quickshell.service; then
+  echo "quickshell.service did not stop"
+  exit 1
+fi
+
+git switch work/nixos-maintenance
+test "$(git rev-parse HEAD)" = "$rollback"
+test "$(git rev-parse HEAD:config/quickshell)" = "$rollback_qml"
+test "$(git rev-parse HEAD:config/emacs)" = "$rollback_emacs"
+test "$(git rev-parse HEAD:scripts)" = "$rollback_scripts"
+test -z "$(git status --porcelain)"
+
+restore_wpctl_state() {
+  target=$1
+  recorded=$2
+  level="$(
+    printf '%s\n' "$recorded" |
+      awk '{print $2}'
+  )"
+  printf '%s\n' "$level" |
+    rg -q '^[0-9]+([.][0-9]+)?$'
+  wpctl set-volume "$target" "$level"
+  if printf '%s\n' "$recorded" | rg -Fq '[MUTED]'; then
+    wpctl set-mute "$target" 1
+  else
+    wpctl set-mute "$target" 0
+  fi
+}
+
+restore_wpctl_state @DEFAULT_AUDIO_SINK@ "$original_sink"
+restore_wpctl_state @DEFAULT_AUDIO_SOURCE@ "$original_source"
+
+brightness_value="$(
+  printf '%s\n' "$original_brightness" |
+    awk -F, '{print $3}'
+)"
+printf '%s\n' "$brightness_value" | rg -q '^[0-9]+$'
+brightnessctl set "$brightness_value"
+
+wallpaper_state="$HOME/.local/state/quickshell/wallpaper.json"
+wallpaper_signal="$HOME/.local/state/quickshell/wallpaper-signal"
+test -d "$(dirname "$wallpaper_state")"
+wallpaper_tmp="$(mktemp "${wallpaper_state}.rollback.XXXXXX")"
+cleanup_wallpaper_tmp() {
+  test -z "${wallpaper_tmp:-}" || rm -f -- "$wallpaper_tmp"
+}
+trap cleanup_wallpaper_tmp EXIT HUP INT TERM
+jq -n --arg currentPath "$original_wallpaper" \
+  '{currentPath: $currentPath}' |
+  tee "$wallpaper_tmp"
+mv -f -- "$wallpaper_tmp" "$wallpaper_state"
+wallpaper_tmp=
+date +%s | tee "$wallpaper_signal"
+trap - EXIT HUP INT TERM
+
+"$repo/scripts/theme-select" "$original_theme"
+sleep 35
+
+active_state="$(
+  systemctl --user show quickshell.service -p ActiveState --value
+)"
+sub_state="$(
+  systemctl --user show quickshell.service -p SubState --value
+)"
+result="$(
+  systemctl --user show quickshell.service -p Result --value
+)"
+main_pid="$(
+  systemctl --user show quickshell.service -p MainPID --value
+)"
+restarts="$(
+  systemctl --user show quickshell.service -p NRestarts --value
+)"
+qs_pids="$(pgrep -x quickshell)"
+pid_count="$(
+  printf '%s\n' "$qs_pids" |
+    wc -l |
+    tr -d ' '
+)"
+
+test "$active_state" = active
+test "$sub_state" = running
+test "$result" = success
+test "$main_pid" -gt 0
+test "$restarts" -eq 0
+test "$pid_count" -eq 1
+test "$qs_pids" = "$main_pid"
+
+mako_active="$(
+  systemctl --user show mako.service -p ActiveState --value
+)"
+mako_sub="$(
+  systemctl --user show mako.service -p SubState --value
+)"
+mako_result="$(
+  systemctl --user show mako.service -p Result --value
+)"
+mako_pid="$(
+  systemctl --user show mako.service -p MainPID --value
+)"
+mako_restarts="$(
+  systemctl --user show mako.service -p NRestarts --value
+)"
+test "$mako_active" = active
+test "$mako_sub" = running
+test "$mako_result" = success
+test "$mako_pid" -gt 0
+test "$mako_restarts" -eq 0
+
+rollback_journal="$(
+  journalctl --user -u quickshell.service \
+    --after-cursor="$rollback_cursor" --no-pager -o short-iso
+)"
+test "$(
+  printf '%s\n' "$rollback_journal" |
+    rg -c 'Configuration Loaded'
+)" -eq 1
+if printf '%s\n' "$rollback_journal" |
+   rg -i 'failed to load|qml.*(parse|import).*error|referenceerror|typeerror|binding loop|handler was registered but will not be used because another handler is registered for target|failed with result|main process exited'; then
+  echo "rollback Quickshell error detected"
+  exit 1
+fi
+
+rollback_mako_journal="$(
+  journalctl --user -u mako.service \
+    --after-cursor="$rollback_mako_cursor" --no-pager -o short-iso
+)"
+test "$(
+  printf '%s\n' "$rollback_mako_journal" |
+    rg -c 'Stopping Mako notification daemon[.]'
+)" -eq 1
+test "$(
+  printf '%s\n' "$rollback_mako_journal" |
+    rg -c 'Stopped Mako notification daemon[.]'
+)" -eq 1
+test "$(
+  printf '%s\n' "$rollback_mako_journal" |
+    rg -c 'Starting Mako notification daemon[.]'
+)" -eq 1
+test "$(
+  printf '%s\n' "$rollback_mako_journal" |
+    rg -c 'Started Mako notification daemon[.]'
+)" -eq 1
+if printf '%s\n' "$rollback_mako_journal" |
+   rg -i 'failed to start|failed with result|main process exited|start request repeated too quickly'; then
+  echo "rollback Mako error detected"
+  exit 1
+fi
+
+test "$(readlink /nix/var/nix/profiles/system)" = "$expected_profile_link"
+test "$(readlink -f /run/current-system)" = "$expected_system"
+test "$(readlink -f /run/booted-system)" = "$expected_booted"
+test "$(cat "$HOME/.config/theme/current-style")" = "$original_theme"
+test "$(
+  jq -r '.currentPath // empty' \
+    "$HOME/.local/state/quickshell/wallpaper.json"
+)" = "$original_wallpaper"
+test "$(wpctl get-volume @DEFAULT_AUDIO_SINK@)" = "$original_sink"
+test "$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@)" = "$original_source"
+test "$(brightnessctl -m)" = "$original_brightness"
+
+hypr_sig="$(
+  systemctl --user show-environment |
+    sed -n 's/^HYPRLAND_INSTANCE_SIGNATURE=//p'
+)"
+test -n "$hypr_sig"
+export HYPRLAND_INSTANCE_SIGNATURE="$hypr_sig"
+monitors_json="$(hyprctl -j monitors)"
+layers_json="$(hyprctl -j layers)"
+
+printf '%s\n' "$monitors_json" | jq -e '
+  length == 1
+  and .[0].name == "eDP-1"
+  and .[0].width == 1920
+  and .[0].height == 1080
+  and .[0].x == 0
+  and .[0].y == 0
+  and .[0].scale == 1
+  and .[0].reserved == [0, 36, 0, 0]
+'
+
+printf '%s\n' "$layers_json" | jq -e '
+  (
+    [
+      .["eDP-1"].levels
+      | to_entries[].value[]
+      | select(
+          .namespace == "qs-bar"
+          and .x == 0 and .y == 0
+          and .w == 1920 and .h == 1080
+        )
+    ]
+    | length
+  ) == 1
+  and (
+    [
+      .["eDP-1"].levels
+      | to_entries[].value[]
+      | select(
+          .namespace == "qs-wallpaper"
+          and .x == 0 and .y == 0
+          and .w == 1920 and .h == 1080
+        )
+    ]
+    | length
+  ) == 1
+  and (
+    [
+      to_entries[].value.levels
+      | to_entries[].value[]
+      | select(
+          .namespace == "qs-launcher"
+          or .namespace == "qs-clipboard"
+          or .namespace == "qs-osd"
+          or .namespace == "qs-wallpaper-picker"
+        )
+    ]
+    | length
+  ) == 0
+'
+
+systemctl --user show quickshell.service \
+  -p ActiveState -p SubState -p Result -p MainPID -p NRestarts
+systemctl --user show mako.service \
+  -p ActiveState -p SubState -p Result -p MainPID -p NRestarts
+printf '%s\n' "$rollback_journal"
+printf '%s\n' "$rollback_mako_journal"
+printf 'ROLLBACK_HEAD=%s\n' "$rollback"
+printf 'ROLLBACK_QML_TREE=%s\n' "$rollback_qml"
+printf 'ROLLBACK_EMACS_TREE=%s\n' "$rollback_emacs"
+printf 'ROLLBACK_SCRIPTS_TREE=%s\n' "$rollback_scripts"
+#+end_src
+
+If candidate Emacs Lisp was reloaded, restart or reload clean Emacs after the
+source rollback so its running definitions also return to the accepted files.
+That Emacs action needs separate authorization unless it was explicitly
+included in the pre-authorized rollback.
+
+Do not use =nixos-rebuild= or select another Nix generation for a source-only
+regression.  Generation 860 and the booted generation remain separate,
+unchanged system facts.
+
+* Acceptance And Promotion
+Before calling the cleanup checkpoint accepted, record:
+
+- final activation head and payload/tree identities;
+- pure target evaluation;
+- pure no-link build output;
+- live checkout, link, service, journal, layer, and monitor evidence;
+- passing launcher, clipboard, tray, single-output runtime, and Emacs hand tests;
+- every other completed hand test;
+- dual-output testing as the only allowable deferral, with its limitation and
+  explicit user acceptance recorded;
+- the separate Emacs result;
+- rollback evidence if rollback was used;
+- explicit user acceptance.
+
+Then update this handoff, the Quickshell/Emacs area notes, and the dashboard.
+The acceptance-evidence commit and push require separate authorization.
+
+Before promotion, bind the accepted head and prove that all post-payload changes
+are documentation-only while the three live-linked payload trees remain exact:
+
+#+begin_src sh
+set -euo pipefail
+
+repo=/home/skydive420dz/Projects/nixos-dotfiles
+payload=0db9953a6a312fcb40ddde396667b41f2ac0696c
+promotion_head=PASTE_ACCEPTED_FULL_SHA_HERE
+expected_qml=2f9d5a4f3ccdf6bed1635d8ff5bb4668be741c98
+expected_emacs=a3fe7cb4b9cf99b99b9901c08e8d98716cd89686
+expected_scripts=047ddc3eb0298786fbb4d434416f0da2901e26b5
+
+test "$promotion_head" != PASTE_ACCEPTED_FULL_SHA_HERE
+printf '%s\n' "$promotion_head" | rg -q '^[0-9a-f]{40}$'
+git -C "$repo" merge-base --is-ancestor "$payload" "$promotion_head"
+test "$(
+  git -C "$repo" rev-parse "${promotion_head}:config/quickshell"
+)" = "$expected_qml"
+test "$(
+  git -C "$repo" rev-parse "${promotion_head}:config/emacs"
+)" = "$expected_emacs"
+test "$(
+  git -C "$repo" rev-parse "${promotion_head}:scripts"
+)" = "$expected_scripts"
+
+non_docs="$(
+  git -C "$repo" diff --name-only "$payload" "$promotion_head" |
+    rg -v '^docs/' || true
+)"
+test -z "$non_docs"
+#+end_src
+
+Promotion to =main= requires another explicit authorization.  Fast-forward only
+a clean, documented, live-tested state in a separate worktree.  Changing the
+live checkout's branch name also requires authorization and happens only after
+=main= and cleanup resolve to the same commit, so promotion itself does not
+change linked bytes.
+
+* Documentation Follow-Up
+=docs/areas/git.org= still says to commit only after live behavior is accepted.
+The explicitly authorized workflow used here publishes immutable candidate
+commits before activation while keeping activation separate.  Do not rewrite
+the existing candidate history.  Reconcile that sentence later as a
+documentation-only correction.

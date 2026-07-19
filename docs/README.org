@@ -14,7 +14,7 @@ commits, pushes, service changes, or branch deletion.
 |---------+-------------------------+--------------------|
 | System | Generation 860 and its active GC timer remain accepted; the clean one-shot optimizer run is accepted; O3-A defers recurrence for a roughly 30-day observation; no optimizer timer is armed | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
 | Emacs | Clean Emacs remains active under generation 860 with the same accepted Home Manager root; Lua and Nix =lsp-mode=/Company slices are accepted | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | The generation 856 shell is accepted | Use the cleanup lane for deterministic fixes and measured optimization |
+| Quickshell | The generation 856 shell remains accepted; cleanup Slices 0A-1B are source-validated and pushed but not live | Follow the separately gated cleanup activation handoff before claiming runtime acceptance |
 | Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs, Vial discovers it, and QMK CLI intentionally remains system-wide | Keep firmware writes and flashing separate and explicitly authorized |
 | VS Code | NixOS has no VS Code configuration | Adapt the macOS Home Manager module in a future Linux-specific slice |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -33,6 +33,8 @@ The accepted system baseline remains recorded in
 [[file:handoffs/2026-07-18-main-checkpoint.org][the checkpoint handoff]].
 The reviewed tag/delete mapping for legacy branches is in
 [[file:handoffs/2026-07-19-branch-archive.org][the branch archive manifest]].
+The current Quickshell cleanup source/build/activation/rollback sequence is in
+[[file:handoffs/2026-07-19-quickshell-cleanup-activation.org][the Quickshell cleanup activation handoff]].
 
 * Current Work Lanes
 - =main=: checkpoint lane.

@@ -9,6 +9,9 @@ The measured architecture and candidate optimization slices are recorded in
 That audit is an evidence baseline, not permission to override the ownership,
 branch, or live-test contracts in this file.  The active checkpoint sequence is
 recorded in [[../handoffs/2026-07-18-main-checkpoint.org][the 2026-07-18 runway]].
+The current cleanup source/build/activation/rollback gates are recorded in
+[[../handoffs/2026-07-19-quickshell-cleanup-activation.org][the 2026-07-19 activation handoff]].
+That handoff is candidate evidence, not authorization to change the live checkout.
 
 The current =main= branch is the sober working shell. The old modular shell lives on =prototype/quickshell-legacy= and the archived quickshell branches. Treat those branches as reference material only: port useful ideas back deliberately, one module at a time.
 
