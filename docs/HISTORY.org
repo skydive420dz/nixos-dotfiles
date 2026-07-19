@@ -89,8 +89,10 @@ remain the detailed evidence.
   duplicate entries, and reduced allocated store size by =13.89 GiB= while
   preserving generation 860, booted fallback 856, all generations, GC policy,
   and boot entries.  The user accepted evidence checkpoint =c5f78d1= as the
-  one-shot optimization runtime checkpoint.  Recurring optimization remains a
-  separate, not-yet-accepted decision.
+  one-shot optimization runtime checkpoint.  The later O3-A policy decision
+  leaves recurrence disabled and calls for a read-only accumulation
+  measurement no earlier than =2026-08-18= and only after at least two actual
+  scheduled GC runs.  It installs no optimizer timer or reminder.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages initially reached the MSI system without active QMK

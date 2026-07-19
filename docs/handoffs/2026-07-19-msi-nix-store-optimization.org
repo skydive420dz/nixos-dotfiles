@@ -4,7 +4,8 @@
 * Status And Boundary
 
 Status: *ONE-SHOT OPTIMIZATION COMPLETE; CLEAN FULL REALIZATION; RUNTIME
-EVIDENCE CHECKPOINT ACCEPTED; RECURRING POLICY NOT AUTHORIZED*.
+EVIDENCE CHECKPOINT ACCEPTED; O3-A OBSERVATION POLICY ACCEPTED; RECURRING
+MECHANISM NOT AUTHORIZED*.
 
 This document records the measured preflight and the later explicitly
 authorized one-shot Nix-store hard-link optimization on the live MSI NixOS
@@ -14,6 +15,8 @@ host.  The result is:
 - the user separately authorized exactly one observed service invocation;
 - that invocation completed as a clean full realization;
 - net allocated store size fell by =14,915,272,704= bytes (=13.89 GiB=);
+- the user selected a roughly 30-day observation window before reconsidering
+  recurrence;
 - recurring optimization and =auto-optimise-store= remain disabled and
   unauthorized.
 
@@ -413,7 +416,7 @@ After the service reaches =inactive (dead)= following successful completion:
 Do not run GC, a build, activation, reboot, or boot cleanup as part of this
 verification.
 
-** Slice O3 - Decide Recurrence
+** Slice O3 - Recurrence Policy
 
 Only after O2, choose one:
 
@@ -430,6 +433,73 @@ If a timer is selected:
 - keep boot retention and cleanup out of the candidate;
 - evaluate, pure-build, inspect, accept, activate, and runtime-verify as
   separate gates.
+
+*** Accepted O3-A - Observe Before Reconsidering Recurrence
+
+The user selected the third option: defer recurring optimization and measure
+new duplicate accumulation after normal use.  This is a policy and
+documentation decision, not authorization for an optimizer run or source
+candidate.
+
+The adoption checkpoint on =2026-07-19= remained:
+
+| Surface | O3-A start state |
+|---------+------------------|
+| Checkout | clean/aligned =work/nixos-maintenance= at =8fb9dca= |
+| Current / booted | generation =860= / generation =856= |
+| Optimizer service | =inactive (dead)=, last result successful |
+| Optimizer timer | absent |
+| GC timer | enabled, =active (waiting)=, next =2026-07-26 04:56:30 EDT= |
+| =.links= entries | =705,636= |
+| Allocated =/nix/store= | =57,694,257,152= bytes |
+| Valid paths / NAR bytes | =42,746 / 66,954,639,968= |
+
+The observation window opens for review no earlier than =2026-08-18=.  Review
+also requires:
+
+- at least two actual successful scheduled GC invocations after this decision;
+- enough normal build/import activity to represent real use;
+- an idle measurement window with no GC, optimizer, build, or activation.
+
+These are eligibility gates, not instructions to trigger GC manually or
+manufacture build/import activity.
+
+The GC timer is =Persistent=false=, so a trigger missed while the laptop is off
+does not catch up.  If fewer than two scheduled runs actually complete, or
+there is little store activity, extend the observation instead of treating the
+calendar date alone as sufficient evidence.
+
+The later measurement remains read-only.  It must:
+
+1. re-prove the host, checkout, current/profile/booted outputs, service state,
+   GC history, generations, and boot manifests;
+2. measure current allocated store bytes, valid paths/NAR bytes, =.links=
+   state, still-separate content-equivalent inodes, and endpoint deltas from
+   the O3-A baseline;
+3. distinguish existing hard-linked content from new realizable savings;
+4. report new savings per elapsed day and as a share of the then-current
+   allocated store and valid-path NAR footprints; report endpoint store and
+   valid-path deltas separately and do not treat them as gross growth after GC;
+5. compare the marginal benefit with the observed one-shot cost: =4min
+   42.532s= wall time, =2min 54.150s= CPU, =5.2G= peak memory, =56.7G= read,
+   and =956.3M= written;
+6. stop without optimization and present a new recurrence recommendation.
+
+O3-A has these implications:
+
+- no automatic optimizer CPU, memory, or disk-I/O load;
+- no new optimizer/GC overlap risk and no Nix generation change;
+- existing hard links remain effective while their store objects remain;
+- normal GC may remove dead paths and corresponding =.links= entries;
+- newly imported duplicate bytes may remain separate and consume disk/inodes
+  during observation;
+- the repository records the earliest review date, but installs no reminder,
+  timer, or automatic measurement.
+
+After measurement, keeping one-shot-only maintenance, extending observation,
+or designing an MSI-only timer are still separate choices.  A timer candidate
+would require new authorization and the complete source, pure-build,
+inspection, activation, runtime, and acceptance gates.
 
 * Authorized O1 And O2 Execution
 
@@ -668,9 +738,9 @@ After reviewing documentation checkpoint =c5f78d1= and its final live seal, the
 user explicitly accepted the clean one-shot result as the current runtime
 checkpoint.  This closes O1/O2 execution and evidence acceptance.
 
-Acceptance does not authorize recurrence, =auto-optimise-store=, an optimizer
+Acceptance did not authorize recurrence, =auto-optimise-store=, an optimizer
 timer, a second run, GC, a build, activation, reboot, cleanup, or boot-retention
-work.  O3 remains a separate decision.
+work.  The later O3-A decision authorizes observation only.
 
 * Current Gates
 
@@ -688,7 +758,9 @@ work.  O3 remains a separate decision.
 | O2 journal/runtime verification | =PASSED=, clean full realization |
 | Protected generation/GC/boot preservation | =PASSED= |
 | User acceptance of observed-run checkpoint | =PASSED= at evidence checkpoint =c5f78d1= |
-| Recurring optimizer decision | *NOT ACCEPTED* |
+| O3 recurrence policy | =PASSED=: observe before reconsidering recurrence |
+| Earliest O3 measurement review | =2026-08-18=, subject to the evidence gates above |
+| Recurring optimizer mechanism | *NOT AUTHORIZED* |
 
-The next decision is whether to begin the separate O3 recurrence-policy slice.
-No recurring mechanism is armed or implied by this accepted checkpoint.
+The next optimization decision is deferred until the O3-A evidence window is
+eligible.  No recurring mechanism is armed or implied by this policy.
