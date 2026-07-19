@@ -36,6 +36,9 @@ The accepted baseline is recorded in
 later accepted maintenance evidence is in the
 [[file:docs/handoffs/2026-07-19-vial-qmk-udev.org][Vial/QMK handoff]] and
 [[file:docs/handoffs/2026-07-19-msi-pure-builds.org][MSI pure-build handoff]].
+The conservative GC policy, complete first-run preflight, and observed manual
+run are recorded in the
+[[file:docs/handoffs/2026-07-19-msi-nix-gc.org][MSI Nix GC handoff]].
 
 * System Shape
 | Surface | Owner | Main source |

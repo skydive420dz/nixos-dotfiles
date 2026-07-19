@@ -2,15 +2,23 @@
 #+startup: overview
 
 * Status And Boundary
-This is an =ACCEPTED= source, build, activation, and runtime slice.  Generation
-=859= installs an MSI-only, age-based Nix garbage-collection timer in an
-explicitly unarmed state and removes the unsafe manual
+This is an =ACCEPTED= source, build, activation, and runtime slice and a
+=COMPLETED= first observed maintenance run pending explicit user acceptance.
+Generation =859= installs an MSI-only, age-based Nix garbage-collection timer
+in an explicitly unarmed state and removes the unsafe manual
 =nix-collect-garbage -d= alias.
 
-The timer and service have not started, and this slice did not collect or
-optimize the store, delete a profile or GC root, limit or clean boot entries, or
-reboot.  The first actual GC, automatic timer arming, store optimization, and
-boot-entry retention remain separate authorization gates.
+After the complete read-only preflight, the user separately authorized and
+started exactly one =nix-gc.service= invocation.  It completed successfully
+without deleting a profile generation or changing the accepted current,
+booted, or protected rollback generations.  The timer itself has never started
+and remains inactive and unarmed.
+
+The observed run collected unreachable store paths and performed only its
+expected stale-root bookkeeping.  It did not optimize the store, manually
+delete a profile or GC root, limit or clean boot entries, activate a generation,
+or reboot.  Automatic timer arming, store optimization, and boot-entry
+retention remain separate authorization gates.
 
 * Verified Starting Point
 The read-only live inventory ended at =2026-07-19 12:20 EDT=:
@@ -47,8 +55,8 @@ the roles are:
 |------------+------+-------------------|
 | =859= | accepted current system | replaced only by a separately built and accepted generation |
 | =856= | booted fallback | retain until a later accepted generation passes a real reboot test |
-| =858= | immediate pre-859 rollback | retain through this timer slice and its separately observed first GC |
-| =857= | accepted pre-858 rollback | retain through the separately observed first GC under the earlier contract |
+| =858= | immediate pre-859 rollback | retained by the completed first run; keep pending a later explicit retention decision |
+| =857= | accepted pre-858 rollback | retained by the completed first run; future rolling-policy treatment remains a later decision |
 | =855= | historical pre-retirement state that restores Ollama configuration | no permanent protection; allow the rolling policy to age it out |
 | =848-854= | ordinary system history | allow the rolling policy to remove profile generations only after they exceed 30 days |
 
@@ -103,8 +111,10 @@ July 19 window.
 
 The =wantedBy= override is the first-run safety latch: the unit is built and can
 be inspected, but activation does not enable or start it and no calendar event
-is armed.  After the first GC is separately authorized and observed, removing
-this override is its own source, build, and activation slice.
+is armed.  The prerequisite first GC has now been separately observed.
+Removing this override still requires its own source, pure-evaluation, build,
+activation, runtime-verification, and acceptance slice; this run did not remove
+it.
 
 The pinned =nix-collect-garbage= manual confirms that
 =--delete-older-than 30d= first applies age-based generation deletion to
@@ -274,6 +284,9 @@ confirmed:
 Acceptance does not authorize a GC run or automatic timer arming.
 
 * First GC Read-Only Preflight - Passed
+This section preserves the evidence and expectations sealed before the
+separately authorized run.  The resulting observed-run record follows it.
+
 ** Boundary And Identity
 The first-run inventory was refreshed between =2026-07-19 13:05= and =13:15
 EDT= against:
@@ -462,10 +475,149 @@ For a successful first run require all of:
 6. no optimization, timer arming, boot cleanup, manual root/profile deletion,
    activation, or reboot.
 
-The read-only preflight passes.  Immediately before a later approved run,
-capture one final cutoff, before-state, privileged root-selector snapshot, and
-journal cursor.  The run still requires separate explicit authorization and
-starts only =nix-gc.service= once.
+The read-only preflight passed.  Immediately before the separately approved
+run, the final cutoff, before-state, privileged root-selector snapshot, and
+journal cursor were captured.  The user then started only =nix-gc.service=
+once.
+
+* First Observed Manual GC - Completed, Pending User Acceptance
+** Authorization And Execution Boundary
+The final before-state was sealed at =2026-07-19 13:28:46 EDT=.  The user then
+explicitly authorized and personally ran:
+
+#+begin_src sh
+sudo systemctl start nix-gc.service
+#+end_src
+
+The retained journal proves exactly one invocation:
+
+| Item | Observed value |
+|------+----------------|
+| Journal start | =2026-07-19 13:32:09.798990 EDT= |
+| Collector summary | =2026-07-19 13:32:39.251394 EDT= |
+| Final accounting line | =2026-07-19 13:32:39.269240 EDT= |
+| Invocation ID | =46de90339aff4daba08917245140e323= |
+| Collector PID | =148683= |
+| Journal result | =Deactivated successfully= and =Finished Nix Garbage Collector= |
+| End state | =inactive (dead)= |
+| Runtime | =29.469s= wall, =27.913s= CPU |
+| Peak memory | =271.3M= |
+
+There is one start line, one successful deactivation line, one finish line, and
+one final collector summary.  The journal contains =3,232= total unit lines:
+=3,228= collector-process lines and four systemd manager lines.  It contains
+=3,117= unique store-deletion lines, with no duplicates or journald suppression.
+Anchored failure checks and the journal's =err..alert= priorities contain zero
+error, abort, panic, fatal, or failure entries.
+
+After the oneshot unit object unloaded, =systemctl show= reported
+=Result=success=, =ExecMainCode=0=, =ExecMainStatus=0=, and =NRestarts=0= but
+no longer retained its timestamps, PID, or invocation ID.  Those default-looking
+post-unload fields are not used alone as execution proof.  The user's
+=systemctl start= returned without an error, and the retained journal's exact
+invocation ID, collector summary, successful deactivation, finish line, and
+absence of high-priority failures are the authoritative result evidence.
+
+The three profile messages are scan notices for the system profile and root
+channels, not deletion notices.  The exact profile-generation deletion count
+is zero.
+
+** Generation, Profile, And Boot Preservation
+The preservation contract passed:
+
+- generation =859= remains current and the system profile still resolves to
+  =3947ayk...=;
+- generation =856= remains booted and selected at =8q4h4b...=;
+- protected rollback generations =857= at =drvm536...= and =858= at
+  =1ba341...= remain present;
+- all system generation links =848-859= retain their original paths and
+  timestamps;
+- the system/root profile fingerprint remains =f2a162f...= and the user
+  XDG/Home Manager fingerprint remains =f3a9191...=;
+- the accepted Home Manager root remains =q303rn...=;
+- all 12 UKIs and all 50 legacy loader entries retain their original manifest
+  fingerprints, =911a636...= and =f2e2828...= respectively;
+- generation =859= remains the configured boot default, generation =856=
+  remains selected, Secure Boot remains enabled, and =/boot= remains =19%= used;
+- no failed system or user unit appeared.
+
+The required privileged after-check exactly matches the before-check:
+
+| Root selector | Before and after |
+|---------------+------------------|
+| =/root/.nix-profile= | timestamp =2026-04-17T21:23:56.3839786370-0400=, pointing to =/nix/var/nix/profiles/per-user/root/profile= |
+| Root profile target | absent |
+| =/root/.local/state/nix= | absent |
+
+No profile link was deleted, created, retargeted, or refreshed.
+
+** Root And Collector Bookkeeping
+Only the expected collector-owned bookkeeping occurred:
+
+| Item | Before | After | Exact change |
+|------+--------+-------+--------------|
+| Persistent root links | =20= | =19= | one stale indirect root removed |
+| Resolving persistent roots | =18= | =18= | none |
+| Dangling persistent roots | =2= | =1= | =gcroots/auto/dqss7ab...= removed |
+| Persistent-root fingerprint | =829de61...= | =46dd7ef...= | expected single-link diff |
+| Temporary-root files | =102= | =0= | 102 dead-PID files removed |
+| Temporary-root apparent bytes | =135,816,816= | =0= | =-135,816,816= |
+| Emergency reserve | =8,388,608= bytes | absent | removed by GC before collection |
+
+The dangling direct root
+=/nix/var/nix/gcroots/profiles -> /mnt/nix/var/nix/profiles= remains, as
+predicted.  No manual root cleanup was performed.  The emergency reserve was
+not deliberately recreated during the after-check.
+
+** Store And Filesystem Accounting
+The closest sealed filesystem, store-allocation, and entry-count snapshots are
+=13:28:46= and =13:34:22 EDT=.  The valid-path and NAR-byte before totals come
+from the =13:07= preflight database inventory; their after totals were queried
+later through SQLite in immutable read-only mode.  No Nix command was used for
+that database query.
+
+| Measure | Before | After | Exact change |
+|---------+--------+-------+--------------|
+| Top-level store entries, including =.links= | =45,234= | =42,117= | =-3,117= |
+| Valid store paths | =45,233= | =42,116= | =-3,117= |
+| Valid-path NAR bytes | =87,788,895,496= | =66,509,612,632= | =-21,279,282,864=, about =19.818 GiB= |
+| Allocated =/nix/store= size | =96,800,325,632= | =71,840,714,752= | =-24,959,610,880=, about =23.245 GiB= |
+| Filesystem used bytes | =563,892,441,088= | =538,790,141,952= | =-25,102,299,136=, about =23.378 GiB= |
+| Filesystem available bytes | =1,302,913,679,360= | =1,328,015,978,496= | =+25,102,299,136= |
+| Filesystem use | =31%= | =29%= | =-2= percentage points |
+| Used inodes | =3,514,268= | =2,310,362= | =-1,203,906= |
+| Inode use | =3%= | =2%= | =-1= percentage point |
+
+The collector reported:
+
+#+begin_example
+3117 store paths deleted, 19.6 GiB freed
+#+end_example
+
+The =3,117= deletion lines, valid-path reduction, and top-level entry reduction
+agree exactly.  The reported collector bytes, valid-path NAR delta, allocated
+store delta, and filesystem delta are deliberately recorded as different
+measures.  They need not match because they account differently for store-file
+allocation, NAR sizes, links, database activity, the emergency reserve, and
+ordinary filesystem activity around the snapshots.
+
+** Result Boundary
+After the run:
+
+- =nix-gc.timer= remains =inactive (dead)= and =linked= only through the
+  generation's =/etc= tree;
+- it remains absent from =timers.target.wants= and the target dependency list;
+- it has no next or last trigger and remains absent from =list-timers --all=;
+- no second collection, optimization, activation, reboot, boot cleanup, or
+  manual profile/root deletion occurred;
+- the live checkout remained clean at pre-run documentation head =19fb371=.
+
+The immediate next gate is explicit user review and acceptance of this observed
+run.  Only after that acceptance should the project decide whether to remove
+the timer's empty =wantedBy= safety latch.  If later authorized, that is a new
+source, pure-evaluation, build, activation, runtime-verification, and acceptance
+slice.  Store optimization and boot-entry retention remain independent later
+decisions.
 
 * Verification Gates
 ** Source Gate
@@ -489,16 +641,24 @@ starts only =nix-gc.service= once.
 ** Activation Gate - Passed
 The separately approved activation and runtime checks passed.  The timer is
 linked into the active generation but not target-enabled, remains inactive, has
-no next trigger, and has never run.
+no next trigger, and has never fired.  The later manual service invocation is
+recorded separately above.
 
 ** User Acceptance Gate - Passed
 The user explicitly accepted generation =859= as the current known-good
 checkpoint after machine-verifiable activation checks passed.
 
-** First Maintenance Gate - Not Authorized Here
-The full read-only preflight passed.  The first actual GC still requires another
-explicit approval and an observed manual start of the generated service while
-the timer remains unarmed.  Record the full before/after contract above.
-Automatic arming remains a later source/build/activation decision.
+** First Maintenance Execution Gate - Completed
+The full read-only preflight passed, the user separately authorized exactly one
+manual start of the generated service, and the complete before/after contract
+passed.  The timer remained unarmed throughout.
+
+** First Maintenance User Acceptance Gate - Pending
+The machine-verifiable run passed, but the user has not yet explicitly accepted
+it as the maintenance checkpoint.
+
+** Automatic Timer Arming Gate - Not Authorized Here
+Removing the empty =wantedBy= latch remains a later source, pure-evaluation,
+build, activation, runtime-verification, and acceptance decision.
 
 Store optimization and boot-entry limiting remain later independent slices.
