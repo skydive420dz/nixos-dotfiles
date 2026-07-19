@@ -20,7 +20,9 @@ commits, pushes, service changes, or branch deletion.
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
 
 Volatile hashes, outputs, live services, and exact gate results for the latest
-source/build slice belong in
+GC source/build slice belong in
+[[file:handoffs/2026-07-19-msi-nix-gc.org][the MSI Nix GC handoff]].
+The accepted pure-build workflow remains recorded in
 [[file:handoffs/2026-07-19-msi-pure-builds.org][the MSI pure-build handoff]].
 Vial/QMK device evidence remains in
 [[file:handoffs/2026-07-19-vial-qmk-udev.org][the Vial/QMK handoff]].

@@ -2,7 +2,6 @@
 
 {
   btw = "echo I use nixos, btw";
-  ncg = "sudo nix-collect-garbage -d";
   nfu = "nix flake update --flake ${repoPath}";
   nrb = "sudo nixos-rebuild boot --flake ${repoPath}#nixos";
   nrs = "sudo nixos-rebuild switch --flake ${repoPath}#nixos";

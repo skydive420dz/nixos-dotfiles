@@ -1,0 +1,150 @@
+#+title: MSI Conservative Nix GC - 2026-07-19
+#+startup: overview
+
+* Status And Boundary
+This is a =CANDIDATE= source-and-build slice.  It introduces an MSI-only,
+age-based Nix garbage-collection timer and removes the unsafe manual
+=nix-collect-garbage -d= alias.
+
+This slice does not activate the candidate, create a system generation, start a
+timer or service, collect or optimize the store, delete a profile or GC root,
+change boot entries, or reboot.  Activation, timer runtime verification, the
+first actual GC, store optimization, and boot-entry retention remain separate
+authorization gates.
+
+* Verified Starting Point
+The read-only live inventory ended at =2026-07-19 12:20 EDT=:
+
+| Item | Value |
+|------+-------|
+| Host | =nixos= at =192.168.1.175= |
+| Checkout | =/home/skydive420dz/Projects/nixos-dotfiles= |
+| Branch | =work/nixos-maintenance= |
+| Starting commit | =9a6f1505ac8e0a9f3291356dd1b908ff8b4cc888= |
+| Current generation | =858= |
+| Current output | =/nix/store/1ba341k08ccy8mz2a6dq1p6af0j0xc53-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Booted generation | =856= |
+| Booted output | =/nix/store/8q4h4bp340ikcp5wzflpsswia7p12x0s-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Root filesystem | =31%= used, about =1.30 TB= available |
+| Nix store allocated size | =95,950,934,016= bytes |
+| System generations | =11=, generations =848-858= |
+
+The store has grown since the July 18 audit, but the filesystem is not under
+space or inode pressure.  An exact reclaimable-byte figure was deliberately not
+claimed: overlapping closure sizes and filesystem-visible roots do not account
+for every runtime root.  A non-mutating comparison placed the difference
+between all valid paths and paths reachable from visible persistent roots at
+=21,159,136,072= NAR bytes; that is only an upper bound, not a GC forecast.
+
+No GC liveness, collection, optimization, root cleanup, profile deletion, or
+bootloader mutation command was used to obtain this baseline.
+
+* Generation Retention Contract
+At the starting point every system generation is younger than 30 days.
+
+| Generation | Role | Release condition |
+|------------+------+-------------------|
+| =858= | accepted current system | replaced only by a separately built and accepted generation |
+| =856= | booted fallback | retain until a later accepted generation passes a real reboot test |
+| =857= | immediate pre-858 rollback | retain through this timer slice and its separately observed first GC |
+| =855= | historical pre-retirement state that restores Ollama configuration | no permanent protection; allow the rolling policy to age it out |
+| =848-854= | ordinary system history | allow the rolling policy to remove profile generations only after they exceed 30 days |
+
+The 30-day window is rolling retention, not permanent pinning.  Before a
+protected generation approaches 30 days, its release condition must be met or
+the timer must remain disabled while an explicit protection decision is made.
+
+QMK remains an accepted system-wide capability and is not a GC target.
+
+* Confirmed Defect
+=home/modules/programs/shell-aliases.nix= defined:
+
+#+begin_src sh
+ncg='sudo nix-collect-garbage -d'
+#+end_src
+
+The =-d= operation deletes older profile generations before collecting, which
+can erase expected rollback entries.  The candidate removes the alias.  It does
+not replace it with another unprompted maintenance command.  A future manual
+alias can be considered only after the timer policy and first observed run are
+accepted.
+
+The alias table is shared by the Home Manager outputs for both flake hosts, so
+the safe alias removal is shared too.  Only the automatic timer policy is
+MSI-specific.
+
+* Candidate Policy
+The policy lives in =hosts/msi/maintenance.nix= and is imported only by the MSI
+host:
+
+#+begin_src nix
+{
+  nix.gc = {
+    automatic = true;
+    dates = "Sun *-*-* 04:15:00";
+    options = "--delete-older-than 30d";
+    persistent = false;
+    randomizedDelaySec = "45min";
+  };
+}
+#+end_src
+
+The first possible scheduled event after authoring is Sunday, July 26, 2026 at
+04:15 EDT with up to 45 minutes of randomized delay.  Normal systemd timer
+accuracy also applies, so this is not a guaranteed exact endpoint.
+=persistent = false= prevents activation from catching up the already-passed
+July 19 window.
+
+The pinned =nix-collect-garbage= manual confirms that
+=--delete-older-than 30d= first applies age-based generation deletion to
+multiple profiles it discovers in default, system, and per-user profile
+locations.  It is not restricted to the NixOS system profile and can affect
+profiles belonging to other users.  The live inventory currently found:
+
+- the 11 NixOS system generations listed above;
+- one current Home Manager GC root and no independent Home Manager generation
+  history;
+- one current root-channel generation;
+- one current user-channel generation;
+- no standalone user =profile-N-link= history.
+
+The profile inventory must be repeated immediately before the first authorized
+GC.  A newly discovered user or Home Manager history pauses that maintenance
+gate until its retention ownership is decided.
+
+This candidate intentionally excludes:
+
+- =nix.optimise= and =auto-optimise-store=;
+- a Lanzaboote or systemd-boot configuration limit;
+- cleanup of dangling GC roots or temporary roots;
+- cleanup of legacy boot entries, channels, caches, journals, or coredumps;
+- automatic flake or system upgrades.
+
+* Verification Gates
+** Source Gate
+1. Confirm the diff contains only this handoff, the MSI import and policy, and
+   removal of =ncg=.
+2. Format and parse the changed Nix files.
+3. Pure-evaluate MSI values and prove the guarded AMD output still has automatic
+   GC disabled.
+
+** Build Gate
+1. Run a pure, no-link MSI system build.
+2. Inspect the candidate's generated =nix-gc.service= and =nix-gc.timer=.
+3. Prove the service command contains =--delete-older-than 30d=.
+4. Prove the timer uses the intended calendar, =Persistent=false=, and the
+   45-minute randomized delay.
+5. Recheck live generation, profiles, store usage, service history, and
+   repository state to prove that building did not collect or activate.
+
+** Activation Gate - Not Authorized Here
+After separate approval, activate only the build-verified candidate.  Verify the
+new generation, timer schedule, =Persistent=false=, and that =nix-gc.service=
+did not run.
+
+** First Maintenance Gate - Not Authorized Here
+The first actual GC requires another explicit approval.  Record before/after
+generations, profile links, boot entries, store allocation, free space, service
+result, duration, and reclaimed bytes.
+
+Store optimization and boot-entry limiting remain later independent slices.
