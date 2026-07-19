@@ -23,9 +23,9 @@ A later =ACCEPTED= source/build candidate at =e51f91a= removes only the
 completed first-run safety latch.  The user separately authorized its exact
 built output, which is now active as generation =860=.  The timer is enabled
 and =active (waiting)= for its first trigger on =2026-07-26 04:56:30 EDT=.
-Runtime checks pass, but active-generation and timer acceptance remain pending.
-Store optimization and boot-entry retention remain separate authorization
-gates.
+Runtime checks pass, and the user accepted evidence checkpoint =f10e1ef= as the
+active generation/timer checkpoint.  Store optimization and boot-entry
+retention remain separate authorization gates.
 
 * Verified Starting Point
 The read-only live inventory ended at =2026-07-19 12:20 EDT=:
@@ -60,7 +60,7 @@ the roles are:
 
 | Generation | Role | Release condition |
 |------------+------+-------------------|
-| =860= | current timer-armed system, runtime verified but pending acceptance | retain while current; active acceptance is the next gate, while replacement or rollback remains separate |
+| =860= | accepted current timer-armed system | replace only through a separately built, activated, runtime-verified, and accepted generation |
 | =859= | accepted immediate pre-860 rollback with unarmed timer | retain until generation 860 and its active timer are explicitly accepted |
 | =856= | booted fallback | retain until a later accepted generation passes a real reboot test |
 | =858= | immediate pre-859 rollback | retained by the completed first run; keep pending a later explicit retention decision |
@@ -676,7 +676,7 @@ recorded below.
 
 Store optimization and boot-entry limiting remain later independent slices.
 
-* Automatic Timer Arming Candidate - Activated And Runtime Verified, User Acceptance Pending
+* Automatic Timer Arming Candidate - Accepted
 ** Source Boundary
 Before this candidate, both clean checkouts were at accepted documentation head
 =90f64428b1b956dc749de4d3ae598823ecb743f2=.  The actual host remained:
@@ -940,8 +940,9 @@ boot-retention slice occurred.
 | Build-candidate user acceptance | =PASSED= at evidence checkpoint =9d45149= |
 | Separately authorized activation | =PASSED= |
 | Runtime timer verification | =PASSED= |
-| User acceptance of active generation/timer | =PENDING= |
+| User acceptance of active generation/timer | =PASSED= at evidence checkpoint =f10e1ef= |
 
-User acceptance is the remaining documentation gate, not an operational pause:
-the timer is already armed.  Rejection would require a separately authorized
-rollback or disarm decision before the displayed July 26 trigger.
+The user explicitly accepted evidence checkpoint =f10e1ef=.  This closes the
+automatic timer-arming slice.  The timer remains armed and currently scheduled
+for the displayed July 26 trigger.  Store optimization and boot-entry retention
+remain independent, not-yet-authorized maintenance slices.
