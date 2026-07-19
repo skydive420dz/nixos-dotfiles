@@ -14,6 +14,8 @@ build, activation, runtime, and hand-test results kept distinct.
 * Current Direction
 - =nixosConfigurations.nixos= owns the MSI/NVIDIA laptop.
 - =nixosConfigurations.desktop-amd= is the AMD desktop bootstrap output.
+- MSI hardware facts are tracked under =hosts/msi/=; MSI evaluation, builds,
+  and the =nrs=/=nrb= rebuild aliases use pure flake syntax.
 - Hyprland is configured in Lua.
 - Quickshell owns the bar, launcher, clipboard, wallpaper, OSD, tray, media, and
   status surfaces.
@@ -31,8 +33,9 @@ build, activation, runtime, and hand-test results kept distinct.
 
 The accepted baseline is recorded in
 [[file:docs/handoffs/2026-07-18-main-checkpoint.org][the main checkpoint handoff]];
-the latest device and activation evidence is in
-[[file:docs/handoffs/2026-07-19-vial-qmk-udev.org][the Vial/QMK handoff]].
+later accepted maintenance evidence is in the
+[[file:docs/handoffs/2026-07-19-vial-qmk-udev.org][Vial/QMK handoff]] and
+[[file:docs/handoffs/2026-07-19-msi-pure-builds.org][MSI pure-build handoff]].
 
 * System Shape
 | Surface | Owner | Main source |
@@ -70,7 +73,7 @@ Run the build gate from the repository:
 nix --extra-experimental-features 'nix-command flakes' \
   build --print-out-paths \
   '.#nixosConfigurations."nixos".config.system.build.toplevel' \
-  --no-link --impure --no-write-lock-file --show-trace
+  --no-link --no-write-lock-file --show-trace
 #+end_src
 
 That command does not activate anything.  Live activation is separate:

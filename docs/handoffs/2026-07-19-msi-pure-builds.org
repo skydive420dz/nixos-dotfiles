@@ -1,0 +1,97 @@
+#+title: MSI Repository Hardware And Pure Builds - 2026-07-19
+#+startup: overview
+
+* Purpose And Boundary
+Make the MSI flake target independent of the external =/etc/nixos= hardware
+file, prove that source move behaviorally identical, then move the normal
+rebuild aliases to pure syntax as a separate build candidate.
+
+Source validation, build verification, activation, runtime checks, and reboot
+tests remain separate facts.  This slice did not activate, change a profile,
+create a generation, update the bootloader, restart a service, or reboot.
+
+* Verified Baseline
+| Item | Value |
+|------+-------|
+| Host | =nixos= at =192.168.1.175= |
+| Checkout | =/home/skydive420dz/Projects/nixos-dotfiles= |
+| Branch | =work/nixos-maintenance= |
+| Starting commit | =7f32c90bdafc837acb3ce295925c2219b1a0b901= |
+| Current generation | =857= |
+| Booted fallback | =856= |
+| Baseline derivation | =/nix/store/pz4cp3azdl2azk37k31qm83w17qhrbnz-nixos-system-nixos-26.11.20260718.61b7c44.drv= |
+| Baseline output | =/nix/store/drvm5368y01v57hj32pqn4y660ka0za0-nixos-system-nixos-26.11.20260718.61b7c44= |
+
+The impure baseline evaluation exactly matched =/run/current-system= and the
+system profile.  Pure evaluation failed only because
+=hosts/msi/default.nix= imported
+=/etc/nixos/hardware-configuration.nix=.
+
+* Live Hardware Review
+The external file was 951 bytes with SHA-256:
+
+=4bfc5ec4ce720c7bb0a0bef165a65c8f6281241485f9ca858f0bcaece08de70b=
+
+Its facts matched the live MSI:
+
+- root is NVMe ext4 UUID =5a0e7686-9b8d-4694-bcc0-fb5b382074e4=;
+- the ESP is vfat UUID =BCCE-E757= with =fmask=0022,dmask=0022=;
+- no swap is configured;
+- platform is =x86_64-linux=;
+- =kvm-amd= and AMD microcode policy match the running CPU;
+- configured initrd modules exist in the accepted initrd.
+
+A fresh hardware scan selected a slightly different convenience-module list.
+It was not substituted into this equivalence slice.  The accepted external file
+was copied byte-for-byte so behavior could be proven unchanged.
+
+* Repository Hardware Source
+Commit =897e074f50181f5dc250d42551f565c3577e5fb8=:
+
+- adds =hosts/msi/hardware-configuration.nix= with the exact live bytes;
+- changes only the MSI import to =./hardware-configuration.nix=;
+- leaves the guarded AMD bootstrap, GPU modules, shared modules, aliases, and
+  flake outputs unchanged.
+
+The staged local and remote Git trees matched.  Pure candidate evaluation
+returned the exact baseline derivation and output, and the pure no-link build
+returned the same output.  This source-only commit required no activation.
+
+* Pure Rebuild Syntax Candidate
+Commit =07566a951c48e580d7fb442198d7eaa4694732d1= removes =--impure=
+from only:
+
+- =nrb=: =sudo nixos-rebuild boot --flake ...#nixos=;
+- =nrs=: =sudo nixos-rebuild switch --flake ...#nixos=.
+
+The alias source is shared with Zsh and the generated clean-Emacs Eshell alias
+table, so both surfaces intentionally receive the pure commands.
+
+Pure evaluation and the separate no-link build passed:
+
+| Item | Value |
+|------+-------|
+| Candidate derivation | =/nix/store/ywq1ffgrqshh3wnnv05s3bpmalcrna7y-nixos-system-nixos-26.11.20260718.61b7c44.drv= |
+| Candidate output | =/nix/store/1ba341k08ccy8mz2a6dq1p6af0j0xc53-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Baseline closure | =31,186,122,808= bytes |
+| Candidate closure | =31,186,122,768= bytes |
+| Delta | =-40= bytes |
+
+The candidate Zsh and Eshell outputs contain the pure =nrb=/=nrs= commands and
+zero =--impure= occurrences.  Closure changes are the expected Home Manager
+alias propagation; package versions did not change.
+
+* Live State And Remaining Gate
+=/run/current-system= and the system profile still resolve to the generation
+857 baseline output.  =/run/booted-system= remains generation 856.  No =result=
+link was created.
+
+The candidate is build-verified, not active.  A separately approved =nrs=
+activation would create a new generation and should be followed by:
+
+1. confirm =/run/current-system= is the candidate output;
+2. start a fresh Zsh and verify =alias nrs= and =alias nrb= omit =--impure=;
+3. verify the clean-Emacs Eshell aliases expose the same pure commands;
+4. run a non-activating pure evaluation or no-link build through the normal
+   repository path;
+5. retain generation 857 as rollback until those checks pass.

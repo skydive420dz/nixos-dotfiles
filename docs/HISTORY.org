@@ -53,6 +53,12 @@ remain the detailed evidence.
   the keyboard without a firmware write.
 - The user explicitly retained QMK CLI as a system-wide host capability; its
   package and closure cost are intentional rather than pending cleanup.
+- The exact live MSI hardware file was committed under =hosts/msi/=.  Pure
+  evaluation and a pure no-link build produced the existing generation 857
+  derivation and output, so no activation or reboot was needed.
+- The =nrs= and =nrb= aliases then moved to pure flake syntax.  Their separate
+  pure candidate build passed and changed only alias-derived Home Manager and
+  system paths; activation remains a separate gate.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages initially reached the MSI system without active QMK

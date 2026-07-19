@@ -50,7 +50,7 @@ Host separation comes before GPU separation.
 hosts/
   msi/
     default.nix
-    # temporary: imports /etc/nixos/hardware-configuration.nix
+    hardware-configuration.nix
   desktop-amd/
     default.nix
     hardware-configuration.nix
@@ -67,9 +67,9 @@ system/modules/
 :END:
 - Preserve the current =#nixos= build behavior for the MSI profile until a
   deliberate rename/cutover is chosen.
-- Keep MSI hardware configuration on the current =/etc/nixos/hardware-configuration.nix=
-  path until the MSI machine is reachable and its generated hardware file can
-  be committed under =hosts/msi/=.
+- MSI hardware configuration is committed under =hosts/msi/= and imported
+  relatively.  Its first pure derivation/output exactly matched the prior
+  impure baseline before rebuild aliases were changed.
 - Move current NVIDIA Prime Sync logic from =system/modules/nvidia.nix= into
   =system/modules/gpu/nvidia-hybrid.nix=.
 - Remove the unconditional NVIDIA import from =system/modules/default.nix=.
@@ -102,8 +102,9 @@ Reproducible policy:
 - Do not keep relying on =/etc/nixos/hardware-configuration.nix= for long-term
   flake builds. That path is convenient during bootstrap, but it is outside the
   repo and weakens reproducibility.
-- Current exception: MSI still uses the legacy =/etc/nixos= hardware file until
-  that machine can provide a reviewed copy for =hosts/msi/=.
+- Current MSI state: the reviewed live hardware file is committed byte-for-byte
+  under =hosts/msi/=; =/etc/nixos/hardware-configuration.nix= is no longer an
+  evaluation dependency.
 - Keep reusable hardware policy in normal modules, such as =gpu/amd-rdna4.nix=,
   =gpu/nvidia-hybrid.nix=, audio, input, boot, and desktop modules.
 - Keep only irreducibly machine-specific disk/initrd facts in each host's

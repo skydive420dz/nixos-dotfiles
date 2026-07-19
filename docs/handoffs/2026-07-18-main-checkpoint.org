@@ -373,7 +373,9 @@ fresh-lane sequence are recorded in
   system-wide.
 - Adapt the macOS VS Code Home Manager module for Linux only as its own slice.
 - Keep later Emacs TLC tied to measured daily-use friction.
-- Commit and compare the MSI hardware configuration for pure builds.
+- Accepted 2026-07-19: the exact MSI hardware configuration is repository-owned;
+  pure evaluation/build identity passed before rebuild aliases moved to pure
+  syntax.
 - Repair confirmed portal, secret-environment, battery-governor, service
   lifecycle, and selected security defects as separate slices.
 - Move only MSI facts behind host boundaries; keep reusable mechanisms shared.

@@ -25,6 +25,9 @@ Durable ownership:
 - Ollama is retired from the intended system configuration.
 - Vial/QMK device integration is accepted on MSI, and the QMK CLI intentionally
   remains system-wide.  A Linux VS Code port remains future work.
+- MSI disk, filesystem, initrd, platform, and microcode facts are tracked in
+  =hosts/msi/hardware-configuration.nix=.  The MSI target evaluates and builds
+  purely; =nrs= and =nrb= no longer request impure evaluation.
 
 * Entry Points
 :PROPERTIES:
@@ -48,7 +51,7 @@ git status --short --branch
 nix --extra-experimental-features 'nix-command flakes' \
   build --print-out-paths \
   '.#nixosConfigurations."nixos".config.system.build.toplevel' \
-  --no-link --impure --no-write-lock-file --show-trace
+  --no-link --no-write-lock-file --show-trace
 
 nrs
 hyr reload
