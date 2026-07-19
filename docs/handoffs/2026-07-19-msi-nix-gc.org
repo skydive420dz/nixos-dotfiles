@@ -16,8 +16,14 @@ and remains inactive and unarmed.
 The observed run collected unreachable store paths and performed only its
 expected stale-root bookkeeping.  It did not optimize the store, manually
 delete a profile or GC root, limit or clean boot entries, activate a generation,
-or reboot.  Automatic timer arming, store optimization, and boot-entry
-retention remain separate authorization gates.
+or reboot.
+
+A later =CANDIDATE= source/build slice at =e51f91a= removes only the completed
+first-run safety latch.  Its pure no-link build passed and contains the expected
+=timers.target= wiring, but it is not active.  Generation =859= remains current
+and its timer remains inactive and unarmed.  Candidate acceptance, live
+activation, runtime verification, store optimization, and boot-entry retention
+remain separate authorization gates.
 
 * Verified Starting Point
 The read-only live inventory ended at =2026-07-19 12:20 EDT=:
@@ -73,16 +79,16 @@ ncg='sudo nix-collect-garbage -d'
 #+end_src
 
 The =-d= operation deletes older profile generations before collecting, which
-can erase expected rollback entries.  The candidate removes the alias.  It does
-not replace it with another unprompted maintenance command.  A future manual
-alias can be considered only after the timer policy and first observed run are
-accepted.
+can erase expected rollback entries.  The generation =859= slice removed the
+alias.  It did not replace it with another unprompted maintenance command.  A
+future manual alias can be considered only after the timer policy and first
+observed run are accepted.
 
 The alias table is shared by the Home Manager outputs for both flake hosts, so
 the safe alias removal is shared too.  Only the automatic timer policy is
 MSI-specific.
 
-* Candidate Policy
+* Accepted Generation 859 Policy
 The policy lives in =hosts/msi/maintenance.nix= and is imported only by the MSI
 host:
 
@@ -111,9 +117,8 @@ July 19 window.
 The =wantedBy= override is the first-run safety latch: the unit is built and can
 be inspected, but activation does not enable or start it and no calendar event
 is armed.  The prerequisite first GC has now been separately observed.
-Removing this override still requires its own source, pure-evaluation, build,
-activation, runtime-verification, and acceptance slice; this run did not remove
-it.
+Generation =859= still contains this override.  The later build-only candidate
+documented below removes it in source, but has not activated that change.
 
 The pinned =nix-collect-garbage= manual confirms that
 =--delete-older-than 30d= first applies age-based generation deletion to
@@ -132,7 +137,7 @@ The profile inventory must be repeated immediately before the first authorized
 GC.  A newly discovered user or Home Manager history pauses that maintenance
 gate until its retention ownership is decided.
 
-This candidate intentionally excludes:
+This accepted generation =859= slice intentionally excludes:
 
 - =nix.optimise= and =auto-optimise-store=;
 - a Lanzaboote or systemd-boot configuration limit;
@@ -140,7 +145,7 @@ This candidate intentionally excludes:
 - cleanup of legacy boot entries, channels, caches, journals, or coredumps;
 - automatic flake or system upgrades.
 
-* Source, Evaluation, And Build Results
+* Generation 859 Source, Evaluation, And Build Results
 The source candidate is the clean commit:
 
 =2b3c7f4ff1192dd2946a611326ecaefd3d47399b=
@@ -186,7 +191,7 @@ Direct inspection of the output proves:
 - unit verification reports only the pre-existing NVIDIA
   =/var/run/nvidia-persistenced= PID-file warning, unrelated to this slice.
 
-* Post-Build Live Proof
+* Generation 859 Post-Build Live Proof
 At =2026-07-19 12:40 EDT=:
 
 - =/run/current-system= and the system profile still resolve to generation
@@ -612,13 +617,13 @@ After the run:
 - the live checkout remained clean at pre-run documentation head =19fb371=.
 
 The user explicitly accepted evidence checkpoint =cccf57a= as the first-GC
-maintenance checkpoint.  The next policy decision is whether to remove the
-timer's empty =wantedBy= safety latch.  If later authorized, that is a new
-source, pure-evaluation, build, activation, runtime-verification, and acceptance
-slice.  Store optimization and boot-entry retention remain independent later
-decisions.
+maintenance checkpoint.  At that checkpoint, the next policy decision was
+whether to remove the timer's empty =wantedBy= safety latch.  The later
+=e51f91a= candidate documented below has now passed its source, pure-evaluation,
+and build gates; candidate acceptance and activation remain separate.  Store
+optimization and boot-entry retention remain independent later decisions.
 
-* Verification Gates
+* Generation 859 And First-GC Verification Gates - Passed
 ** Source Gate
 1. Confirm the diff contains only this handoff, the MSI import and policy, and
    removal of =ncg=.
@@ -656,8 +661,170 @@ passed.  The timer remained unarmed throughout.
 The user explicitly accepted evidence checkpoint =cccf57a= as the first-GC
 maintenance checkpoint after reviewing the machine-verifiable result.
 
-** Automatic Timer Arming Gate - Not Authorized Here
-Removing the empty =wantedBy= latch remains a later source, pure-evaluation,
-build, activation, runtime-verification, and acceptance decision.
+** Automatic Timer Arming Historical Boundary
+Generation =859= did not authorize timer arming.  The later source/build
+candidate below supersedes only that source/build boundary; it does not
+authorize activation.
 
 Store optimization and boot-entry limiting remain later independent slices.
+
+* Automatic Timer Arming Candidate - Build Passed, Pending User Acceptance
+** Source Boundary
+Before this candidate, both clean checkouts were at accepted documentation head
+=90f64428b1b956dc749de4d3ae598823ecb743f2=.  The actual host remained:
+
+| Item | Live value |
+|------+------------|
+| Current/system profile | generation =859=, =3947ayk...= |
+| Booted fallback | generation =856=, =8q4h4b...= |
+| Timer | =linked=, =inactive (dead)=, unarmed |
+| Target wants link | absent |
+| Next/last trigger | none |
+| Recorded GC service starts | exactly one |
+
+Source commit =e51f91a0c1c983b4f3f3ffb22b6cbf90d13940d7= changes only
+=hosts/msi/maintenance.nix=.  Its six deletions remove:
+
+- the completed first-run =lib.mkForce [ ]= =wantedBy= safety latch;
+- the now-stale latch comment;
+- the module function header, which existed only to bind =lib= for that
+  override.
+
+The result restores the maintenance module to its original plain-attribute-set
+shape while leaving every GC policy value byte-for-byte unchanged:
+
+#+begin_src nix
+{
+  nix.gc = {
+    automatic = true;
+    dates = "Sun *-*-* 04:15:00";
+    options = "--delete-older-than 30d";
+    persistent = false;
+    randomizedDelaySec = "45min";
+  };
+}
+#+end_src
+
+No explicit replacement =wantedBy= is added.  Its raw option default remains
+empty.  Removing =mkForce [ ]= allows the non-empty MSI service =startAt= value,
+synthesized from =nix.gc.automatic= and =nix.gc.dates=, to generate
+=nix-gc.timer.wantedBy = [ "timers.target" ]=.  The commit does not change
+=flake.lock=, aliases, optimization, profiles, GC roots, boot retention, or
+another host.
+
+** Source And Evaluation Gate - Passed
+The following checks passed in the clean live-host checkout:
+
+- =git diff --check=;
+- =nixfmt --check hosts/msi/maintenance.nix=;
+- =nix-instantiate --parse hosts/msi/maintenance.nix=;
+- pure flake evaluation with =--no-write-lock-file=.
+
+Pure evaluation produced:
+
+| Policy | MSI =nixos= | AMD =desktop-amd= |
+|--------+-------------+-------------------|
+| =nix.gc.automatic= | =true= | =false= |
+| GC options | =--delete-older-than 30d= | empty |
+| Effective timer schedule | =Sun *-*-* 04:15:00= | none |
+| Timer =wantedBy= | =timers.target= | timer absent |
+| Service =startAt= | scheduled through the timer | empty |
+| Service =wantedBy= | no independent target owner | empty |
+| =nix.optimise.automatic= | =false= | =false= |
+
+Pinned NixOS defines a manually invocable =nix-gc.service= whenever Nix is
+enabled, so the AMD service attribute exists.  With
+=nix.gc.automatic = false=, its =startAt= and =wantedBy= lists are empty and no
+=nix-gc.timer= exists.  AMD's raw =nix.gc.dates= default is =03:15=, but it is
+inert because automatic GC is disabled.  The MSI schedule and
+=--delete-older-than 30d= option therefore do not leak into AMD.
+
+** Pure No-Link Build Gate - Passed
+The actual MSI host ran:
+
+#+begin_src sh
+nix --extra-experimental-features 'nix-command flakes' \
+  build --print-out-paths \
+  '.#nixosConfigurations."nixos".config.system.build.toplevel' \
+  --no-link --no-write-lock-file --show-trace
+#+end_src
+
+It completed successfully:
+
+| Item | Value |
+|------+-------|
+| Source commit | =e51f91a0c1c983b4f3f3ffb22b6cbf90d13940d7= |
+| Derivation | =/nix/store/fqc1d3i6ba1qk7z6xbadvhlb8i77zc57-nixos-system-nixos-26.11.20260718.61b7c44.drv= |
+| Candidate output | =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Active closure | =31,186,123,360= bytes |
+| Candidate closure | =31,186,123,600= bytes |
+| Closure delta | =+240= bytes |
+
+=nix store diff-closures= reports no package-version change between generation
+=859= and the candidate.  The build produced the candidate paths but created no
+profile generation and did not activate the output.
+
+** Candidate Output Inspection - Passed
+Direct output inspection proves:
+
+- =nix-gc.service= still executes exactly
+  =nix-collect-garbage --delete-older-than 30d=;
+- =nix-gc.timer= still contains =OnCalendar=Sun *-*-* 04:15:00=,
+  =Persistent=false=, and =RandomizedDelaySec=45min=;
+- the timer now contains =[Install] WantedBy=timers.target=;
+- the candidate contains
+  =etc/systemd/system/timers.target.wants/nix-gc.timer -> ../nix-gc.timer=;
+- that link resolves to the candidate timer unit;
+- the candidate has no =timers.target.wants/nix-optimise.timer= link;
+- =systemd-analyze verify= reports only the pre-existing NVIDIA
+  =/var/run/nvidia-persistenced= PID-file warning;
+- =systemd-analyze calendar= reports the next nominal event as Sunday,
+  July 26, 2026 at 04:15 EDT.  The configured policy adds up to 45 minutes of
+  randomized delay; normal systemd timer accuracy also applies.
+
+That calendar output describes the candidate policy, not a live trigger.
+
+** Post-Build Live Non-Activation Proof - Passed
+After the build:
+
+- =/run/current-system= and the system profile still resolve to accepted
+  generation =859= at =3947ayk...=;
+- =/run/booted-system= remains generation =856= at =8q4h4b...=;
+- the candidate output is not live;
+- all 12 system generations =848-859= remain, including protected
+  generations =856-859= at their original store paths;
+- the live timer remains =linked= and =inactive (dead)=, with no next or last
+  trigger;
+- the live timer remains absent from =timers.target.wants=, the target
+  dependency graph, and =list-timers --all=;
+- the candidate alone contains the new target wants link;
+- the service journal still contains exactly one start, the accepted manual
+  run from =13:32:09-13:32:39 EDT=; no second GC ran;
+- all 12 UKIs retain manifest fingerprint =911a636...= and all 50 legacy
+  entries retain fingerprint =f2e2828...=;
+- no failed system or user units appeared;
+- the live checkout is clean at source head =e51f91a=.
+
+Opening the Nix store for evaluation and building recreated the expected
+=/nix/var/nix/db/reserved= emergency file at =8,388,608= bytes.  The first GC
+record already predicted that later store initialization could recreate it;
+this is not collection, profile mutation, or activation.
+
+** Remaining Gates
+| Gate | Status |
+|------+--------|
+| Source and pure evaluation | =PASSED= |
+| Pure no-link build | =PASSED= |
+| Candidate output inspection | =PASSED= |
+| Live non-activation proof | =PASSED= |
+| User acceptance of build candidate | =PENDING= |
+| Live activation | =NOT AUTHORIZED= |
+| Runtime timer verification | =PENDING AFTER ACTIVATION= |
+| User acceptance of active timer | =PENDING AFTER RUNTIME VERIFICATION= |
+
+Activation would create a new system generation and is intended to target-enable
+and start the timer through =timers.target=.  The runtime gate must prove its
+actual active state and next trigger.  Because =Persistent=false=, activation
+would not catch up a missed event.  No =nrs=, =nixos-rebuild switch=, =test=,
+=boot=, =systemctl enable/start=, daemon reload, second GC, optimization,
+cleanup, or reboot occurred in this source/build slice.

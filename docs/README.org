@@ -12,7 +12,7 @@ commits, pushes, service changes, or branch deletion.
 * Status At A Glance - 2026-07-19
 | Surface | Confirmed current state | Next accepted step |
 |---------+-------------------------+--------------------|
-| System | Generation 859 and its first observed manual GC are accepted checkpoints; zero profile generations were deleted, all protected generations were preserved, and the timer remains unarmed | Decide whether to remove the timer safety latch through a separate source, pure-evaluation, build, activation, runtime, and acceptance slice |
+| System | Generation 859 and its first manual GC are accepted; source commit =e51f91a= removes the timer safety latch and its pure no-link build passes, but the candidate is not active and the live timer remains unarmed | Review and explicitly accept or reject the build-only candidate; activation remains a separate decision |
 | Emacs | Clean Emacs is active under generation 859; Lua and Nix =lsp-mode=/Company slices are accepted | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
 | Quickshell | The generation 856 shell is accepted | Use the cleanup lane for deterministic fixes and measured optimization |
 | Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs, Vial discovers it, and QMK CLI intentionally remains system-wide | Keep firmware writes and flashing separate and explicitly authorized |
