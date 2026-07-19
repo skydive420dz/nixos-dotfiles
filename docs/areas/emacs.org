@@ -7,7 +7,8 @@ Clean Emacs is the sole active MSI Emacs configuration.  The build-verified
 recoverable from Git history.  On 2026-07-19 the separately verified user-owned
 Doom clone, cache, and dangling =~/.config/doom= link were also removed with
 explicit user authorization.  Those source and user-state cleanups are not
-claims that the checkpoint NixOS system has been activated.
+the same as editor acceptance: generation 856 now runs the checkpoint, while
+Python acceptance and broader Emacs TLC remain later slices.
 
 ** Shape
 :PROPERTIES:

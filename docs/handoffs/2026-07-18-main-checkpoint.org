@@ -295,6 +295,38 @@ Success: live behavior is recorded accurately, retired Ollama data is removed
 in safe order, and unresolved Vial/Emacs work remains labeled rather than
 silently folded into the checkpoint.
 
+** Recorded activation and runtime checks - 2026-07-19
+:PROPERTIES:
+:CUSTOM_ID: recorded-activation-and-runtime-checks
+:END:
+Activation has completed, but human acceptance and privileged data cleanup
+remain open:
+
+- The system profile is =system-856-link=.
+- =/run/current-system= and =/run/booted-system= both resolve to the verified
+  checkpoint output
+  =/nix/store/8q4h4bp340ikcp5wzflpsswia7p12x0s-nixos-system-nixos-26.11.20260718.61b7c44=.
+- =system-855-link= still resolves to the preserved rollback output
+  =/nix/store/px0spfwgd632lf9nybcb1ygarz7zg9b6-nixos-system-nixos-26.11.20260705.d407951=.
+- =ollama.service= reports =LoadState=not-found= and =ActiveState=inactive=.
+  The =ollama= command is absent and no TCP 11434 listener remains.
+- The system and user failed-unit lists are empty.  NetworkManager, Bluetooth,
+  PipeWire, WirePlumber, Emacs, and Quickshell are active.
+- Emacs 30.2 responds as a daemon, and Neovim 0.12.4 completes a headless
+  startup probe.
+- Quickshell reports =active/running=, =NRestarts=0=, and
+  =Configuration Loaded=.  Its recurring StatusNotifierItem =IconName= warning
+  remains a known flaky tray interaction for later cleanup.
+- QMK 1.2.0 and =/run/current-system/sw/bin/Vial= are present.  The expected
+  QMK udev rule remains absent, so connected-device access is still unaccepted.
+- The already-authorized privileged Ollama state cleanup could not run through
+  the non-interactive audit connection because =sudo= requires a password.
+- Visual Quickshell checks, ordinary editor use, and the physical Vial device
+  test still require human interaction.
+
+Generation 856 is therefore the active and booted checkpoint, but full runtime
+acceptance is pending the remaining human checks and Ollama data cleanup.
+
 * Branch Archive And New Work Lanes
 :PROPERTIES:
 :CUSTOM_ID: branch-archive-and-new-work-lanes

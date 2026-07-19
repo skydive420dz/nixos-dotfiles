@@ -39,6 +39,9 @@ remain the detailed evidence.
 - The user designated the successful full no-link build as the source/build
   checkpoint.  Commit =4eded33= was fast-forwarded to =main= without changing
   the live generation.  Activation and runtime evidence remain separate facts.
+- Generation 856 later activated and booted the verified output.  Ollama's unit,
+  binary, and listener are gone; privileged model-state cleanup and visual hand
+  tests remain separate completion gates.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages reached the MSI system, but QMK udev integration was

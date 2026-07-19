@@ -33,8 +33,8 @@
 :PROPERTIES:
 :CUSTOM_ID: vial-and-qmk-incomplete
 :END:
-Vial 0.7.5, QMK 1.2.0, and =qmk-udev-rules= are present in generation 855,
-but this is not an accepted device workflow.
+Vial 0.7.5, QMK 1.2.0, and =qmk-udev-rules= are present in checkpoint
+generation 856, but this is not an accepted device workflow.
 
 Confirmed defect:
 
