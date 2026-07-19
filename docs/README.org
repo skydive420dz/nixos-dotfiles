@@ -12,7 +12,7 @@ commits, pushes, service changes, or branch deletion.
 * Status At A Glance - 2026-07-19
 | Surface | Confirmed current state | Next accepted step |
 |---------+-------------------------+--------------------|
-| System | Generation 860 and its active GC timer remain accepted; one separately authorized optimizer run completed as a clean full realization and reduced allocated store size by =13.89 GiB=; no optimizer timer is armed | Accept the observed-run checkpoint, then separately decide whether recurrence is justified; boot retention remains separate |
+| System | Generation 860 and its active GC timer remain accepted; the clean one-shot optimizer run and its =13.89 GiB= allocated-store reduction are accepted as the current runtime checkpoint; no optimizer timer is armed | Decide the separate O3 recurrence policy; any timer candidate and boot retention remain separate |
 | Emacs | Clean Emacs remains active under generation 860 with the same accepted Home Manager root; Lua and Nix =lsp-mode=/Company slices are accepted | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
 | Quickshell | The generation 856 shell is accepted | Use the cleanup lane for deterministic fixes and measured optimization |
 | Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs, Vial discovers it, and QMK CLI intentionally remains system-wide | Keep firmware writes and flashing separate and explicitly authorized |

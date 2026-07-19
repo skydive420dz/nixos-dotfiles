@@ -39,6 +39,10 @@ later accepted maintenance evidence is in the
 The conservative GC policy, complete first-run preflight, and observed manual
 run are recorded in the
 [[file:docs/handoffs/2026-07-19-msi-nix-gc.org][MSI Nix GC handoff]].
+The separately accepted Nix-store optimization preflight and clean one-shot run
+are recorded in the
+[[file:docs/handoffs/2026-07-19-msi-nix-store-optimization.org][MSI Nix store
+optimization handoff]]; recurring optimization remains a separate decision.
 
 * System Shape
 | Surface | Owner | Main source |

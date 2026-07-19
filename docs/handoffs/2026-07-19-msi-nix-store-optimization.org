@@ -4,7 +4,7 @@
 * Status And Boundary
 
 Status: *ONE-SHOT OPTIMIZATION COMPLETE; CLEAN FULL REALIZATION; RUNTIME
-EVIDENCE CHECKPOINT PENDING USER ACCEPTANCE; RECURRING POLICY NOT AUTHORIZED*.
+EVIDENCE CHECKPOINT ACCEPTED; RECURRING POLICY NOT AUTHORIZED*.
 
 This document records the measured preflight and the later explicitly
 authorized one-shot Nix-store hard-link optimization on the live MSI NixOS
@@ -659,8 +659,18 @@ unchanged.
 This result does not authorize recurrence.  The first run cleared accumulated
 historical duplicates; it does not yet measure how quickly new unoptimized
 content accumulates.  Keep =auto-optimise-store=false= and
-=nix.optimise.automatic=false= until the user accepts this runtime checkpoint
-and separately chooses O3.
+=nix.optimise.automatic=false= unless a separate O3 policy is explicitly
+accepted and independently implemented.
+
+** User Acceptance
+
+After reviewing documentation checkpoint =c5f78d1= and its final live seal, the
+user explicitly accepted the clean one-shot result as the current runtime
+checkpoint.  This closes O1/O2 execution and evidence acceptance.
+
+Acceptance does not authorize recurrence, =auto-optimise-store=, an optimizer
+timer, a second run, GC, a build, activation, reboot, cleanup, or boot-retention
+work.  O3 remains a separate decision.
 
 * Current Gates
 
@@ -677,8 +687,8 @@ and separately chooses O3.
 | O1 one-shot invocation | =PASSED=, exactly one invocation |
 | O2 journal/runtime verification | =PASSED=, clean full realization |
 | Protected generation/GC/boot preservation | =PASSED= |
-| User acceptance of observed-run checkpoint | *PENDING* |
+| User acceptance of observed-run checkpoint | =PASSED= at evidence checkpoint =c5f78d1= |
 | Recurring optimizer decision | *NOT ACCEPTED* |
 
-The next decision is whether to accept this observed one-shot result as the
-current runtime checkpoint.  Recurrence remains a later separate O3 decision.
+The next decision is whether to begin the separate O3 recurrence-policy slice.
+No recurring mechanism is armed or implied by this accepted checkpoint.

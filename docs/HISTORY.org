@@ -84,6 +84,13 @@ remain the detailed evidence.
   catch-up run: the GC service journal still contains only the earlier accepted
   manual invocation.  Runtime verification passed, and the user accepted
   evidence checkpoint =f10e1ef= as the active generation/timer checkpoint.
+- The user separately authorized exactly one observed =nix-optimise.service=
+  run.  It completed as a clean full realization, hard-linked =1,062,570=
+  duplicate entries, and reduced allocated store size by =13.89 GiB= while
+  preserving generation 860, booted fallback 856, all generations, GC policy,
+  and boot entries.  The user accepted evidence checkpoint =c5f78d1= as the
+  one-shot optimization runtime checkpoint.  Recurring optimization remains a
+  separate, not-yet-accepted decision.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages initially reached the MSI system without active QMK
@@ -99,5 +106,6 @@ remain the detailed evidence.
 - [[file:audits/2026-07-14-nixos-system.org][MSI NixOS system audit]]
 - [[file:audits/2026-07-14-quickshell-optimization.org][Quickshell optimization audit]]
 - [[file:audits/2026-07-18-tree-organization-gc.org][Tree, organization, and GC audit]]
+- [[file:handoffs/2026-07-19-msi-nix-store-optimization.org][MSI Nix store optimization handoff]]
 - [[file:areas/emacs.org][Emacs area history]]
 - [[file:areas/quickshell.org][Quickshell area history]]
