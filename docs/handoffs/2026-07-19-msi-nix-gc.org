@@ -273,6 +273,181 @@ confirmed:
 
 Acceptance does not authorize a GC run or automatic timer arming.
 
+* First GC Read-Only Preflight - In Progress
+** Boundary And Identity
+The first-run inventory was refreshed between =2026-07-19 13:05= and =13:15
+EDT= against:
+
+| Item | Value |
+|------+-------|
+| Host | =nixos= at =192.168.1.175= |
+| Nix | =2.34.8= |
+| Checkout | =/home/skydive420dz/Projects/nixos-dotfiles= |
+| Branch | =work/nixos-maintenance= |
+| Head | clean =68313dd4e907c3df45166d2f66870eaeaab27f0a= |
+| Current/system profile | accepted generation =859=, =3947ayk...= |
+| Booted fallback | generation =856=, =8q4h4b...= |
+| Immediate rollback | generation =858=, =1ba341...= |
+| Earlier protected rollback | generation =857=, =drvm536...= |
+
+The system is =running= with no failed system or user units.  The GC timer is
+still linked but not target-enabled, inactive, and without a next or last
+trigger.  The service is inactive, has no activation timestamp, and has no
+journal entries.
+
+No =nix-collect-garbage=, =nix-store --gc=, =nix store gc=, dry-run,
+=--print-dead=, =--print-live=, =--print-roots=, optimization, cleanup, build,
+activation, or reboot command was used.
+
+** Profile-Generation Stage
+The active service runs:
+
+#+begin_src sh
+nix-collect-garbage --delete-older-than 30d
+#+end_src
+
+Pinned Nix =2.34.8= first processes profile generations and then runs store
+reachability GC.  Those phases are not transactional.
+
+For a =30d= policy Nix retains:
+
+- every generation created within 30 days;
+- the newest generation already older than the cutoff;
+- the current generation even when a profile has been rolled back.
+
+At =2026-07-19 13:15 EDT= the strict cutoff was
+=2026-06-19 13:15 EDT=.  The refreshed profile inventory is:
+
+| Profile | Generations | Age | Current | Expected age deletion |
+|---------+-------------+-----+---------+-----------------------|
+| NixOS system | =848-859= | =0.011-17.624d= | =859= | none |
+| Root channels | only =channels-4-link= | =85.517d= | that sole generation | none |
+| User XDG channels | only =channels-1-link= | =89.613d= | that sole generation | none |
+| Home Manager | one =current-home= GC root; no independent generation history | current | =q303rn...= | none |
+| User XDG profile | no =profile-N-link= history; selector absent | n/a | none | none |
+
+Therefore no discovered non-current profile generation is older than 30 days,
+and the expected profile-generation deletion count is zero.
+
+With root's active =use-xdg-base-directories=false= setting, the collector scans
+=/nix/var/nix/profiles=, its legacy per-user tree, root's profile directory, and
+root's default-profile location.  It does not automatically enumerate every
+modern =/home/*/.local/state/nix/profiles= directory.  The user XDG and Home
+Manager locations were inventoried separately because they remain ownership and
+rooting concerns.
+
+One privileged visibility check remains: the unprivileged SSH session cannot
+inspect =/root/.nix-profile= or root's XDG profile selectors.  The visible
+=/nix/var/nix/profiles/default= selector is dangling because
+=per-user/root/profile= is absent, and =per-user/root= visibly contains only the
+current channel profile, but the root-home selectors must still be confirmed
+read-only before collection is authorized.
+
+** Persistent And Temporary Roots
+Filesystem-visible persistent roots:
+
+| Item | Count/state |
+|------+-------------|
+| Root symlinks | =20= |
+| Resolving roots | =18= |
+| Dangling roots | =2= |
+| Normal new root | generation =859= |
+
+The two dangling roots are:
+
+- =gcroots/auto/dqss7ab... -> ~/.local/state/home-manager/gcroots/new-home=;
+- =gcroots/profiles -> /mnt/nix/var/nix/profiles=.
+
+Temporary-root state at =13:09 EDT=:
+
+| Item | Value |
+|------+-------|
+| Files | =102= |
+| Apparent bytes reported by =du -b= | =135,816,816= |
+| Filenames with a live =/proc= PID | =0= |
+| Filenames with a dead PID | =102= |
+
+The first real GC is expected to remove dead temporary-root files and the
+dangling indirect root under =gcroots/auto=.  Pinned Nix does not automatically
+remove the dangling direct =gcroots/profiles= link.  These are expected
+collector bookkeeping effects, not authorization for manual root cleanup.
+
+The =/nix/var/nix/db/reserved= emergency file is present at =8,388,608= bytes.
+GC removes that reserve before collection, and later store initialization may
+recreate it.  Its bytes are outside the collector's reported freed-byte total,
+so printed GC bytes and filesystem delta need not match.
+
+** Store And Filesystem Before-State
+At =13:07 EDT=:
+
+| Item | Value |
+|------+-------|
+| Root/store filesystem used | =563,886,424,064= bytes, =31%= |
+| Root/store filesystem available | =1,302,919,696,384= bytes |
+| Root/store inode use | =3%= |
+| Allocated =/nix/store= size | =96,800,325,632= bytes |
+| Top-level store entries | =45,234= including =.links= |
+| Valid store paths | =45,233= |
+| All valid-path NAR bytes | =87,788,895,496= |
+| Paths reachable from visible persistent roots | =6,977= |
+| Visible-root-reachable NAR bytes | =65,868,689,536= |
+| =/nix/store/.links= | zero files, =4,096= allocated bytes |
+| Nix database | =108,834,816= bytes |
+| Nix build logs | =71,233,536= bytes |
+
+The difference between all valid paths and paths reachable from the visible
+persistent roots is =38,256= paths and =21,920,205,960= NAR bytes, about
+=20.4 GiB=.  This is only a conservative upper bound on candidate garbage.
+Runtime roots, GC-time roots, new temporary roots, and NAR-versus-allocated
+accounting prevent it from being an exact deletion list or reclaim forecast.
+Disk and inode headroom remain ample, so there is no emergency pressure.
+
+** Boot And Manifest Before-State
+Secure Boot remains enabled.  Boot state is:
+
+- 12 current Type-2 UKIs for generations =848-859=;
+- generation =859= is the configured default;
+- generation =856= is selected/booted;
+- the same 50 stale Type-1 entries for generations =671-720= remain, and all
+  still reference missing kernel, initrd, and system targets;
+- =/boot= is =19%= used.
+
+The GC does not update the ESP.  Boot cleanup and an entry limit remain separate
+slices.
+
+Like-for-like manifest fingerprints for the observed run:
+
+| Manifest | SHA-256 |
+|----------+---------|
+| System/root profile links | =f2a162f365a528988d8bf3abcea35d25d692c0333d82a070981cd8d0ec719fbd= |
+| User XDG/Home Manager links | =f3a919125141c0a620e713df23ad98e1fb125ec2e9a1563a89dc0a783a60f95e= |
+| Filesystem-visible GC-root links | =829de61c66e71d600920962b055430fc31a3ac0b73fd021daa9ccab07de9bf67= |
+| Current UKIs | =911a63657a05906da55a91ca3ecf1e2020451df6491c9b0fe9d3a335cd0413d8= |
+| Legacy loader entries | =f2e2828774f8f57d11d15c1e49d11a675d2405141b1afdc87419cd0c10b03290= |
+
+** Failure And Observation Contract
+The profile-pruning and store-collection phases are not one transaction.  A
+failure can occur after profile links, stale roots, or some store paths have
+already changed.  Do not blindly retry a failed service; repeat the read-only
+inventory first.
+
+For a successful first run require all of:
+
+1. =Result=success= and =ExecMainStatus=0=, not only the collector's final
+   summary;
+2. current generation =859=, booted generation =856=, and rollback generations
+   =858= and =857= still present with their original store paths;
+3. an exact before/after profile-link and root diff;
+4. timer still inactive and unarmed with no next trigger;
+5. before/after store allocation, path count, filesystem bytes/inodes, temporary
+   roots, reserve file, UKIs, loader entries, and failed units;
+6. no optimization, timer arming, boot cleanup, manual root/profile deletion,
+   activation, or reboot.
+
+After the privileged root-profile check passes, capture one immediate final
+before-state and journal cursor.  The later run requires separate explicit
+authorization and starts only =nix-gc.service= once.
+
 * Verification Gates
 ** Source Gate
 1. Confirm the diff contains only this handoff, the MSI import and policy, and
@@ -302,10 +477,10 @@ The user explicitly accepted generation =859= as the current known-good
 checkpoint after machine-verifiable activation checks passed.
 
 ** First Maintenance Gate - Not Authorized Here
-The first actual GC requires another explicit approval and an observed manual
-start of the generated service while the timer remains unarmed.  Record
-before/after generations, profile links, boot entries, store allocation, free
-space, service result, duration, and reclaimed bytes.  Automatic arming remains
-a later source/build/activation decision.
+The unprivileged preflight is complete; the privileged root-profile selector
+check remains pending.  After it passes, the first actual GC still requires
+another explicit approval and an observed manual start of the generated service
+while the timer remains unarmed.  Record the full before/after contract above.
+Automatic arming remains a later source/build/activation decision.
 
 Store optimization and boot-entry limiting remain later independent slices.
