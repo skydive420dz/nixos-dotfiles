@@ -2,15 +2,15 @@
 #+startup: overview
 
 * Status And Boundary
-This is a =SOURCE/BUILD VERIFIED= candidate.  It installs an MSI-only, age-based
-Nix garbage-collection timer in an explicitly unarmed state and removes the
-unsafe manual =nix-collect-garbage -d= alias.
+This is an =ACTIVATED / RUNTIME VERIFIED= source-and-build slice.  Generation
+=859= installs an MSI-only, age-based Nix garbage-collection timer in an
+explicitly unarmed state and removes the unsafe manual
+=nix-collect-garbage -d= alias.
 
-This slice does not activate the candidate, create a system generation, start a
-timer or service, collect or optimize the store, delete a profile or GC root,
-change boot entries, or reboot.  Activation, timer runtime verification, the
-first actual GC, store optimization, and boot-entry retention remain separate
-authorization gates.
+The timer and service have not started, and this slice did not collect or
+optimize the store, delete a profile or GC root, limit or clean boot entries, or
+reboot.  The first actual GC, automatic timer arming, store optimization, and
+boot-entry retention remain separate authorization gates.
 
 * Verified Starting Point
 The read-only live inventory ended at =2026-07-19 12:20 EDT=:
@@ -40,13 +40,15 @@ No GC liveness, collection, optimization, root cleanup, profile deletion, or
 bootloader mutation command was used to obtain this baseline.
 
 * Generation Retention Contract
-At the starting point every system generation is younger than 30 days.
+Every current system generation remains younger than 30 days.  After activation,
+the roles are:
 
 | Generation | Role | Release condition |
 |------------+------+-------------------|
-| =858= | accepted current system | replaced only by a separately built and accepted generation |
+| =859= | current activated system, pending explicit user acceptance | replaced only by a separately built and accepted generation |
 | =856= | booted fallback | retain until a later accepted generation passes a real reboot test |
-| =857= | immediate pre-858 rollback | retain through this timer slice and its separately observed first GC |
+| =858= | immediate pre-859 rollback | retain through this timer slice and its separately observed first GC |
+| =857= | accepted pre-858 rollback | retain through the separately observed first GC under the earlier contract |
 | =855= | historical pre-retirement state that restores Ollama configuration | no permanent protection; allow the rolling policy to age it out |
 | =848-854= | ordinary system history | allow the rolling policy to remove profile generations only after they exceed 30 days |
 
@@ -197,6 +199,64 @@ That =109,547,520=-byte increase is expected build material, not a collection.
 This work ran no removal command; generation, profile, boot-entry, and visible
 GC-root inventories remained unchanged.
 
+* Activation And Runtime Verification
+The user completed the separately authorized activation at approximately
+=2026-07-19 12:52 EDT=.  Generation =859= is current:
+
+=/nix/store/3947ayk07qq4bfs948yrxk15spbgdidx-nixos-system-nixos-26.11.20260718.61b7c44=
+
+That is exactly the pure-evaluated and no-link-built output.  Runtime evidence:
+
+- the system profile and =/run/current-system= resolve to generation =859=;
+- =/run/booted-system= remains generation =856=;
+- system profile links remain =848-858= and add only =859=;
+- generation =858= is the immediate pre-activation rollback;
+- the current Home Manager root is the build-verified
+  =q303rnqzv1fgw8d6p1qvbn95vfyrkzyb-home-manager-generation=;
+- the system state is =running= with no failed system or user units;
+- the checkout is clean at documentation head =d48e995=, whose pure evaluation
+  still returns the built output above.
+
+The live GC unit state preserves the first-run safety contract:
+
+| Property | Live value |
+|----------+------------|
+| Timer unit-file state | =linked= through the generation's =/etc= tree |
+| Timer target enablement | absent from =timers.target.wants= and from the target's dependency list |
+| Timer active state | =inactive (dead)= |
+| Next trigger | none |
+| Last trigger | none |
+| Service active state | =inactive (dead)= |
+| Service journal | no entries |
+
+=linked= is not being used here to claim the timer is enabled.  NixOS links the
+unit file into =/etc/systemd/system=, but the empty =wantedBy= list leaves it
+unarmed: no target wants it and =systemctl list-timers --all= does not list it.
+The service remains available only for the later, explicitly authorized manual
+first run.
+
+Alias and Home Manager verification passed:
+
+- the live generated Zsh configuration and a fresh Zsh contain pure =nrs= and
+  =nrb= aliases and no =ncg= alias;
+- Home Manager deliberately stopped and started the Emacs daemon once because
+  its generated alias file changed;
+- the current daemon is =active (running)= with =NRestarts=0=,
+  =Result=success=, and =ExecMainStatus=0=; =NRestarts=0= means systemd did not
+  automatically restart this current invocation;
+- the daemon loaded the candidate generated Eshell alias file, where =ncg= is
+  absent and =nrs=/=nrb= remain pure;
+- the system Home Manager activation service completed successfully.
+
+Activation added the expected signed generation =859= UKI.  The ESP now has 12
+current UKIs for generations =848-859= and retains the same 50 stale legacy
+loader entries; no entry limit or cleanup occurred.  Visible GC roots increased
+from 19 to 20 only because generation =859= gained its normal profile root.
+
+At =12:55 EDT=, allocated store size was =96,763,015,168= bytes with =45,233=
+top-level entries.  Root usage remains =31%= and =/boot= remains =19%= used.
+These are post-activation baselines, not reclaimed-space results.
+
 * Verification Gates
 ** Source Gate
 1. Confirm the diff contains only this handoff, the MSI import and policy, and
@@ -216,10 +276,15 @@ GC-root inventories remained unchanged.
 6. Recheck live generation, profiles, store usage, service history, and
    repository state to prove that building did not collect or activate.
 
-** Activation Gate - Not Authorized Here
-After separate approval, activate only the build-verified candidate.  Verify the
-new generation, =Persistent=false=, the timer's disabled/inactive state, absence
-of a next trigger, and that =nix-gc.service= did not run.
+** Activation Gate - Passed
+The separately approved activation and runtime checks passed.  The timer is
+linked into the active generation but not target-enabled, remains inactive, has
+no next trigger, and has never run.
+
+** User Acceptance Gate - Pending
+Machine-verifiable activation checks passed.  Explicit user acceptance of
+generation =859= as the current checkpoint remains separate and precedes any
+first maintenance run.
 
 ** First Maintenance Gate - Not Authorized Here
 The first actual GC requires another explicit approval and an observed manual

@@ -61,6 +61,11 @@ remain the detailed evidence.
   system paths.  Generation 858 activated that candidate; fresh Zsh and
   clean-Emacs Eshell both expose the pure aliases, while generations 856 and
   857 remain available as booted fallback and rollback respectively.
+- Generation 859 activated the first conservative MSI Nix-GC slice.  It removes
+  the unsafe =nix-collect-garbage -d= alias and installs the reviewed 30-day
+  service and timer, but an explicit safety latch leaves the timer unarmed.  No
+  collection ran; the first manual GC and later automatic arming remain
+  separate decisions.
 
 * Unfinished Experiments Preserved As Direction
 - Vial and QMK packages initially reached the MSI system without active QMK
