@@ -273,7 +273,7 @@ confirmed:
 
 Acceptance does not authorize a GC run or automatic timer arming.
 
-* First GC Read-Only Preflight - In Progress
+* First GC Read-Only Preflight - Passed
 ** Boundary And Identity
 The first-run inventory was refreshed between =2026-07-19 13:05= and =13:15
 EDT= against:
@@ -315,8 +315,9 @@ For a =30d= policy Nix retains:
 - the newest generation already older than the cutoff;
 - the current generation even when a profile has been rolled back.
 
-At =2026-07-19 13:15 EDT= the strict cutoff was
-=2026-06-19 13:15 EDT=.  The refreshed profile inventory is:
+At =2026-07-19 13:15 EDT= the preflight cutoff was
+=2026-06-19 13:15 EDT=.  The collector recomputes its strict cutoff at actual
+invocation time.  The refreshed profile inventory is:
 
 | Profile | Generations | Age | Current | Expected age deletion |
 |---------+-------------+-----+---------+-----------------------|
@@ -336,12 +337,23 @@ modern =/home/*/.local/state/nix/profiles= directory.  The user XDG and Home
 Manager locations were inventoried separately because they remain ownership and
 rooting concerns.
 
-One privileged visibility check remains: the unprivileged SSH session cannot
-inspect =/root/.nix-profile= or root's XDG profile selectors.  The visible
-=/nix/var/nix/profiles/default= selector is dangling because
-=per-user/root/profile= is absent, and =per-user/root= visibly contains only the
-current channel profile, but the root-home selectors must still be confirmed
-read-only before collection is authorized.
+The user completed the final privileged, read-only selector check:
+
+| Selector | Confirmed state |
+|----------+-----------------|
+| =/root/.nix-profile= | =-> /nix/var/nix/profiles/per-user/root/profile=, timestamp =2026-04-17 21:23 EDT= |
+| Root profile target | absent |
+| =/root/.local/state/nix= | absent |
+
+This confirms that root has no hidden profile generation history.  The expected
+profile-generation deletion count is therefore zero across every discovered
+profile.
+
+Pinned Nix may create or refresh root's default-profile selector while
+discovering profiles, even when its target is currently absent.  Repeat the
+same privileged selector check after collection.  A selector timestamp or link
+refresh would be collector bookkeeping, not evidence that a profile generation
+was deleted.
 
 ** Persistent And Temporary Roots
 Filesystem-visible persistent roots:
@@ -415,7 +427,7 @@ Secure Boot remains enabled.  Boot state is:
 The GC does not update the ESP.  Boot cleanup and an entry limit remain separate
 slices.
 
-Like-for-like manifest fingerprints for the observed run:
+Internal comparison fingerprints for the observed run:
 
 | Manifest | SHA-256 |
 |----------+---------|
@@ -424,6 +436,11 @@ Like-for-like manifest fingerprints for the observed run:
 | Filesystem-visible GC-root links | =829de61c66e71d600920962b055430fc31a3ac0b73fd021daa9ccab07de9bf67= |
 | Current UKIs | =911a63657a05906da55a91ca3ecf1e2020451df6491c9b0fe9d3a335cd0413d8= |
 | Legacy loader entries | =f2e2828774f8f57d11d15c1e49d11a675d2405141b1afdc87419cd0c10b03290= |
+
+Each fingerprint hashes a lexically sorted manifest of =path -> link target=
+lines, or =filename size= lines for boot files.  They are quick drift checks;
+the observed run must still retain the raw before/after inventories and report
+their exact diff.
 
 ** Failure And Observation Contract
 The profile-pruning and store-collection phases are not one transaction.  A
@@ -440,13 +457,15 @@ For a successful first run require all of:
 3. an exact before/after profile-link and root diff;
 4. timer still inactive and unarmed with no next trigger;
 5. before/after store allocation, path count, filesystem bytes/inodes, temporary
-   roots, reserve file, UKIs, loader entries, and failed units;
+   roots, root's privileged profile selectors, reserve file, UKIs, loader
+   entries, and failed units;
 6. no optimization, timer arming, boot cleanup, manual root/profile deletion,
    activation, or reboot.
 
-After the privileged root-profile check passes, capture one immediate final
-before-state and journal cursor.  The later run requires separate explicit
-authorization and starts only =nix-gc.service= once.
+The read-only preflight passes.  Immediately before a later approved run,
+capture one final cutoff, before-state, privileged root-selector snapshot, and
+journal cursor.  The run still requires separate explicit authorization and
+starts only =nix-gc.service= once.
 
 * Verification Gates
 ** Source Gate
@@ -477,10 +496,9 @@ The user explicitly accepted generation =859= as the current known-good
 checkpoint after machine-verifiable activation checks passed.
 
 ** First Maintenance Gate - Not Authorized Here
-The unprivileged preflight is complete; the privileged root-profile selector
-check remains pending.  After it passes, the first actual GC still requires
-another explicit approval and an observed manual start of the generated service
-while the timer remains unarmed.  Record the full before/after contract above.
+The full read-only preflight passed.  The first actual GC still requires another
+explicit approval and an observed manual start of the generated service while
+the timer remains unarmed.  Record the full before/after contract above.
 Automatic arming remains a later source/build/activation decision.
 
 Store optimization and boot-entry limiting remain later independent slices.
