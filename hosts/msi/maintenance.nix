@@ -1,3 +1,5 @@
+{ lib, ... }:
+
 {
   nix.gc = {
     automatic = true;
@@ -6,4 +8,8 @@
     persistent = false;
     randomizedDelaySec = "45min";
   };
+
+  # Keep the reviewed timer installed but unarmed until the first GC is
+  # separately authorized and observed.
+  systemd.timers.nix-gc.wantedBy = lib.mkForce [ ];
 }

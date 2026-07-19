@@ -2,9 +2,9 @@
 #+startup: overview
 
 * Status And Boundary
-This is a =CANDIDATE= source-and-build slice.  It introduces an MSI-only,
-age-based Nix garbage-collection timer and removes the unsafe manual
-=nix-collect-garbage -d= alias.
+This is a =CANDIDATE= source-and-build slice.  It installs an MSI-only,
+age-based Nix garbage-collection timer in an explicitly unarmed state and
+removes the unsafe manual =nix-collect-garbage -d= alias.
 
 This slice does not activate the candidate, create a system generation, start a
 timer or service, collect or optimize the store, delete a profile or GC root,
@@ -78,6 +78,8 @@ The policy lives in =hosts/msi/maintenance.nix= and is imported only by the MSI
 host:
 
 #+begin_src nix
+{ lib, ... }:
+
 {
   nix.gc = {
     automatic = true;
@@ -86,14 +88,21 @@ host:
     persistent = false;
     randomizedDelaySec = "45min";
   };
+
+  systemd.timers.nix-gc.wantedBy = lib.mkForce [ ];
 }
 #+end_src
 
-The first possible scheduled event after authoring is Sunday, July 26, 2026 at
-04:15 EDT with up to 45 minutes of randomized delay.  Normal systemd timer
-accuracy also applies, so this is not a guaranteed exact endpoint.
+The timer's first nominal calendar event after authoring is Sunday, July 26,
+2026 at 04:15 EDT with up to 45 minutes of randomized delay.  Normal systemd
+timer accuracy also applies, so this is not a guaranteed exact endpoint.
 =persistent = false= prevents activation from catching up the already-passed
 July 19 window.
+
+The =wantedBy= override is the first-run safety latch: the unit is built and can
+be inspected, but activation does not enable or start it and no calendar event
+is armed.  After the first GC is separately authorized and observed, removing
+this override is its own source, build, and activation slice.
 
 The pinned =nix-collect-garbage= manual confirms that
 =--delete-older-than 30d= first applies age-based generation deletion to
@@ -127,6 +136,7 @@ This candidate intentionally excludes:
 2. Format and parse the changed Nix files.
 3. Pure-evaluate MSI values and prove the guarded AMD output still has automatic
    GC disabled.
+4. Prove the MSI timer has an empty =wantedBy= list.
 
 ** Build Gate
 1. Run a pure, no-link MSI system build.
@@ -134,17 +144,20 @@ This candidate intentionally excludes:
 3. Prove the service command contains =--delete-older-than 30d=.
 4. Prove the timer uses the intended calendar, =Persistent=false=, and the
    45-minute randomized delay.
-5. Recheck live generation, profiles, store usage, service history, and
+5. Prove the candidate has no =timers.target.wants/nix-gc.timer= link.
+6. Recheck live generation, profiles, store usage, service history, and
    repository state to prove that building did not collect or activate.
 
 ** Activation Gate - Not Authorized Here
 After separate approval, activate only the build-verified candidate.  Verify the
-new generation, timer schedule, =Persistent=false=, and that =nix-gc.service=
-did not run.
+new generation, =Persistent=false=, the timer's disabled/inactive state, absence
+of a next trigger, and that =nix-gc.service= did not run.
 
 ** First Maintenance Gate - Not Authorized Here
-The first actual GC requires another explicit approval.  Record before/after
-generations, profile links, boot entries, store allocation, free space, service
-result, duration, and reclaimed bytes.
+The first actual GC requires another explicit approval and an observed manual
+start of the generated service while the timer remains unarmed.  Record
+before/after generations, profile links, boot entries, store allocation, free
+space, service result, duration, and reclaimed bytes.  Automatic arming remains
+a later source/build/activation decision.
 
 Store optimization and boot-entry limiting remain later independent slices.
