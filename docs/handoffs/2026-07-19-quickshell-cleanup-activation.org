@@ -2,22 +2,35 @@
 #+startup: overview
 
 * Status And Authority
-This handoff is =CANDIDATE=.  It records the completed read-only preflight and
-the exact remaining gates for cleanup Slices 0A, 0B, 1A, and 1B.
+This handoff is the =ACCEPTED SOURCE-LIVE CHECKPOINT= for cleanup Slices 0A,
+0B, 1A, and 1B.  Gates 1 through 9 were executed separately on the MSI and
+passed against immutable activation head
+=84bc1b96f465f4f59634372f19a27ebabefce39d=.  The source is live through the
+repository's out-of-store links.  At =2026-07-19T21:51:32-04:00= the user
+explicitly accepted the tested single-output checkpoint and deferred
+dual-output validation until an external display is available.  The checkpoint
+has not been promoted to =main=.
 
-This document does not authorize a fetch, branch update, build, checkout
-switch, service stop/start/restart, hand-test mutation, mutable-state
-restoration, Emacs reload, promotion, or rollback.  Those remain separate
-decisions.  At the time of this record:
+This documentation update does not authorize another fetch, branch update,
+build, checkout switch, service change, mutable-state change, Emacs restart,
+rollback, commit, push, or promotion.  At the time of this record:
 
-- the four-commit payload source is committed and pushed; this handoff and its
-  index updates are not yet committed or pushed;
-- exact isolated MSI source validation passes;
-- the live MSI checkout and Quickshell process are unchanged;
-- build verification, live activation, runtime verification, human hand tests,
-  and promotion remain unperformed.
+- the four-commit payload and original activation handoff are committed and
+  pushed at the immutable activation head above;
+- source validation, the pure no-link build, source-live checkout activation,
+  automated runtime assertions, Quickshell hand tests, and the separate
+  clean-Emacs QML test all pass;
+- the live checkout is clean on =work/quickshell-cleanup= with the three
+  payload trees unchanged;
+- generation 860, the current system output, and the booted system output did
+  not change; no =nrs=, Home Manager activation, generation creation, bootloader
+  action, or reboot was used for this source-live activation;
+- rollback remained available and was not used;
+- dual-output behavior remains unverified by explicit accepted deferral;
+- the acceptance-evidence commit/push and promotion remain separate,
+  unauthorized decisions.
 
-* Verified Read-Only Baseline
+* Historical Pre-Activation Baseline
 The final containment snapshot was taken on =2026-07-19T19:21:14-04:00=.
 
 | Item | Value |
@@ -43,14 +56,15 @@ The final containment snapshot was taken on =2026-07-19T19:21:14-04:00=.
 | Branch divergence | maintenance =0=, cleanup =4= |
 | Connected outputs | only =eDP-1=, =1920x1080@1.0=, reserved =0,36,0,0= |
 
-The live MSI's local =work/quickshell-cleanup= branch and matching
-=origin/work/quickshell-cleanup= tracking ref are stale at
-=4756f02dc08575b938b32991501b394d49ce77e2=.  The candidate object is not yet
-present in that checkout.  GitHub resolves the remote branch to the payload
-commit above before this handoff/index documentation is added.
-
-Do not switch to the stale local branch.  That would temporarily expose older
-=main= bytes through every out-of-store link.
+At this historical snapshot, the live MSI's local
+=work/quickshell-cleanup= branch and matching
+=origin/work/quickshell-cleanup= tracking ref were stale at
+=4756f02dc08575b938b32991501b394d49ce77e2=, and the candidate object was not
+yet present in that checkout.  GitHub resolved the remote branch to the payload
+commit above before the original handoff/index documentation was added.  The
+activation protocol therefore prohibited switching to that stale local branch,
+which would have temporarily exposed older =main= bytes through every
+out-of-store link.
 
 * Candidate History And Scope
 The cleanup payload is four narrow commits on top of the accepted maintenance
@@ -120,9 +134,111 @@ after validation.  =scripts/check-quickshell= reported:
 | Python syntax | 1 file passes without execution |
 
 The clean-Emacs QML sources parse and the explicit formatter is equivalent to
-=qmlformat --indent-width 4 --column-width -1=.  That is source evidence only.
-Classic =qml-mode= and parser-backed =sk-qml-ts-mode= still require a live
-indentation/format hand test.
+=qmlformat --indent-width 4 --column-width -1=.  At this source-only stage,
+classic =qml-mode= and parser-backed =sk-qml-ts-mode= still required a live
+indentation/format hand test; Gate 8 in the execution record below completed
+that test.
+
+* Live Verification Record - 2026-07-19
+This section records what was actually executed.  It does not collapse the
+source, build, activation, runtime, and hand-test gates into one result.
+
+| Gate | Evidence | Result |
+|------+----------+--------|
+| 1 - publish handoff | Original documentation committed and pushed; remote cleanup head resolved exactly to =84bc1b96f465f4f59634372f19a27ebabefce39d= | pass |
+| 2 - synchronize source | MSI fetched and advanced only the cleanup refs; live checkout remained clean on =work/nixos-maintenance= at rollback head =73e2bd82003e21c7955a9c9d12c4b80ab86eb634=; Quickshell PID =4132= and =NRestarts=0= were unchanged | pass, no activation |
+| 3 - pure no-link build | Exact-source checker passed; candidate derivation equaled the current derivation at =/nix/store/fqc1d3i6ba1qk7z6xbadvhlb8i77zc57-nixos-system-nixos-26.11.20260718.61b7c44.drv=; output equaled the current system at =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44= | pass, no activation |
+| 4 - pre-activation snapshot | =2026-07-19T20:15:29-04:00=; Quickshell PID =4132=, Mako PID =4130=, both at =NRestarts=0=; only =eDP-1= connected | pass |
+| 5 - source-live activation | With explicit authorization, Quickshell was stopped, the clean checkout switched to the activation head, the live checker passed, and Quickshell started with one successful configuration load | pass; no Nix activation |
+| 6 - automated runtime | Corrected wrapper-aware assertions passed at =2026-07-19T20:27:58-04:00= after 470 seconds; candidate PID =374503=, =NRestarts=0=, one configuration load, correct single-output layers, no candidate-attributable error | pass |
+| 7 - Quickshell hand tests | Launcher, clipboard including image coverage, tray left activation/native right menu/menu-only handling, workspaces, OSD, media, static and animated wallpaper selection/restoration, global geometry, and theme/status behavior passed; original mutable state was restored | pass on =eDP-1= |
+| 8 - clean-Emacs QML | Authorized daemon restart changed PID =124641= to =400490= with =NRestarts=0=; classic =qml-mode= and parser-backed =sk-qml-ts-mode= both used four-space indentation and produced canonical formatter bytes | pass |
+| 9 - restored-state soak | =2026-07-19T21:23:10-04:00=; the journal contained exactly the two intentional theme-toggle/restore Quickshell and Mako restart cycles; the following 35-second soak held Quickshell PID =397583=, Mako PID =397096=, and Emacs PID =400490= stable; every service was =active/running= with =Result=success= and =NRestarts=0= | pass |
+
+Gate 3 also recorded a 3,553-path closure digest of
+=019df652b9d3129a854c4cbe902cbfb9b01cd53eab3f2e7b3e1d5fb5040f0d00=
+and closure size =31,186,123,600= bytes.  The build output matched the already
+active current system; that does not validate the out-of-store QML bytes and
+was never presented as live activation.
+
+** Final Identity And Restored State
+A read-only recheck at =2026-07-19T21:35:12-04:00= confirmed:
+
+| Item | Final value |
+|------+-------------|
+| Live checkout | clean =work/quickshell-cleanup= at =84bc1b96f465f4f59634372f19a27ebabefce39d= |
+| QML tree | =2f9d5a4f3ccdf6bed1635d8ff5bb4668be741c98= |
+| Emacs tree | =a3fe7cb4b9cf99b99b9901c08e8d98716cd89686= |
+| Scripts tree | =047ddc3eb0298786fbb4d434416f0da2901e26b5= |
+| System profile | =system-860-link= |
+| Current system | =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Booted system | =/nix/store/8q4h4bp340ikcp5wzflpsswia7p12x0s-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Quickshell | PID =397583=, =active/running=, =Result=success=, =NRestarts=0= |
+| Mako | PID =397096=, =active/running=, =Result=success=, =NRestarts=0= |
+| Emacs | PID =400490=, =active/running=, =Result=success=, =NRestarts=0= |
+| Theme | =SkyDark= |
+| Wallpaper | =/home/skydive420dz/Projects/nixos-dotfiles/wallpapers/wp3915756-city-girls-wallpapers.png= |
+| Sink | =Volume: 0.55= |
+| Source | =Volume: 1.00= |
+| Brightness | =amdgpu_bl1,backlight,59328,95%,62451= |
+
+The final Hyprland evidence contained only =eDP-1= at =1920x1080=, scale 1,
+reserved =0,36,0,0=.  =qs-wallpaper= and =qs-bar= each had the expected
+=1920x1080= layer geometry, with no launcher, clipboard, picker, or OSD overlay
+left open.
+
+** Honest Limitations And Follow-Ups
+- Dual-output behavior was not testable because no external display was
+  connected.  Historical dual-output evidence does not replace this candidate's
+  test.  At =2026-07-19T21:51:32-04:00= the user explicitly accepted this
+  limitation and deferred that validation until an external display is
+  available.
+- The tray's configured left activation and native right-click menu passed.
+  No safe middle/secondary action was defined on the available items, so that
+  optional path was unavailable rather than failed.
+- Eglot connected to =qmlls-wrapped= but logged one unsupported
+  =workspace.didChangeWatchedFiles= registration warning.  It did not block
+  parsing, indentation, formatting, or either QML mode; retain it as a later
+  Emacs/QML TLC item.
+- The first manual formatter sample was invalid QML because
+  =property int count 1= omitted its colon.  The formatter correctly rejected
+  it.  After correction, both =~/test.qml= in =sk-qml-ts-mode= and
+  =~/test-classic.qml= in =qml-mode= matched canonical
+  =qmlformat --ignore-settings --indent-width 4 --column-width -1 --newline unix=
+  output with SHA-256
+  =6220a5937bb0440fb86905542c038f0a32718546a830407aa35c54b366e51833=.
+  These disposable files remain outside the repository because deletion was
+  not authorized.
+- Systemd recorded a =1.1G= peak for the first candidate Quickshell process
+  over 34 minutes 25 seconds that included the complete interactive test
+  sequence.  That isolated historical peak is not enough to claim a leak.
+  Gate 9 measured =136,626,176= bytes current and =148,885,504= bytes peak; the
+  later read-only recheck measured =143,048,704= bytes current and
+  =153,407,488= bytes peak.  Investigate the interactive overlays, especially
+  the image-heavy wallpaper picker, with controlled action-labeled sampling in
+  a later optimization slice.
+- The first Gate 6 command used =pgrep -x quickshell= and produced a verifier
+  false failure because Nix's wrapper exposes kernel command name
+  =.quickshell-wra=.  No service failure occurred.  The executable, full argv,
+  systemd =MainPID=, and corrected checks identified the healthy process.
+- The pre-authorized rollback remained available throughout and was not used.
+
+** Accepted Checkpoint Boundary
+All planned source, build, source-live activation, automated runtime, and
+available hand-test evidence has been collected.  Explicit aggregate user
+acceptance of the single-output checkpoint, including the dual-output deferral,
+was recorded at =2026-07-19T21:51:32-04:00=.  That acceptance authorizes only
+the status recorded here.  It does not authorize:
+
+1. the acceptance-evidence commit or push;
+2. a fast-forward promotion to =main=;
+3. changing the live checkout's branch name;
+4. deleting the disposable QML test files;
+5. any additional live-system or service change.
+
+The original gate protocol is retained below as a reproducible execution and
+rollback runbook.  Its imperative wording does not mean the completed gates are
+still pending and does not authorize rerunning them.
 
 * Gate 1 - Publish This Handoff
 Before any MSI synchronization:
@@ -593,19 +709,36 @@ main_pid="$(
 restarts="$(
   systemctl --user show quickshell.service -p NRestarts --value
 )"
-qs_pids="$(pgrep -x quickshell)"
-pid_count="$(
-  printf '%s\n' "$qs_pids" |
-    wc -l |
-    tr -d ' '
+test "$main_pid" -gt 0
+process_exe="$(readlink -f "/proc/$main_pid/exe")"
+case "$process_exe" in
+  /nix/store/*-quickshell-*/bin/.quickshell-wrapped) ;;
+  *)
+    printf 'unexpected Quickshell executable: %s\n' "$process_exe"
+    exit 1
+    ;;
+esac
+quickshell_store="${process_exe%/bin/.quickshell-wrapped}"
+expected_argv="$quickshell_store/bin/quickshell -p $HOME/.config/quickshell"
+process_argv="$(tr '\0' ' ' < "/proc/$main_pid/cmdline")"
+process_argv="${process_argv% }"
+test "$process_argv" = "$expected_argv"
+qs_pids="$(
+  for proc_dir in /proc/[0-9]*; do
+    proc_exe="$(readlink -f "$proc_dir/exe" 2>/dev/null)" || continue
+    case "$proc_exe" in
+      /nix/store/*-quickshell-*/bin/.quickshell-wrapped)
+        printf '%s\n' "${proc_dir##*/}"
+        ;;
+    esac
+  done |
+    sort -n
 )"
 
 test "$active_state" = active
 test "$sub_state" = running
 test "$result" = success
-test "$main_pid" -gt 0
 test "$restarts" -eq 0
-test "$pid_count" -eq 1
 test "$qs_pids" = "$main_pid"
 
 journal_output="$(
@@ -862,19 +995,36 @@ main_pid="$(
 restarts="$(
   systemctl --user show quickshell.service -p NRestarts --value
 )"
-qs_pids="$(pgrep -x quickshell)"
-pid_count="$(
-  printf '%s\n' "$qs_pids" |
-    wc -l |
-    tr -d ' '
+test "$main_pid" -gt 0
+process_exe="$(readlink -f "/proc/$main_pid/exe")"
+case "$process_exe" in
+  /nix/store/*-quickshell-*/bin/.quickshell-wrapped) ;;
+  *)
+    printf 'unexpected Quickshell executable: %s\n' "$process_exe"
+    exit 1
+    ;;
+esac
+quickshell_store="${process_exe%/bin/.quickshell-wrapped}"
+expected_argv="$quickshell_store/bin/quickshell -p $HOME/.config/quickshell"
+process_argv="$(tr '\0' ' ' < "/proc/$main_pid/cmdline")"
+process_argv="${process_argv% }"
+test "$process_argv" = "$expected_argv"
+qs_pids="$(
+  for proc_dir in /proc/[0-9]*; do
+    proc_exe="$(readlink -f "$proc_dir/exe" 2>/dev/null)" || continue
+    case "$proc_exe" in
+      /nix/store/*-quickshell-*/bin/.quickshell-wrapped)
+        printf '%s\n' "${proc_dir##*/}"
+        ;;
+    esac
+  done |
+    sort -n
 )"
 
 test "$active_state" = active
 test "$sub_state" = running
 test "$result" = success
-test "$main_pid" -gt 0
 test "$restarts" -eq 0
-test "$pid_count" -eq 1
 test "$qs_pids" = "$main_pid"
 
 mako_active="$(
@@ -1171,19 +1321,36 @@ main_pid="$(
 restarts="$(
   systemctl --user show quickshell.service -p NRestarts --value
 )"
-qs_pids="$(pgrep -x quickshell)"
-pid_count="$(
-  printf '%s\n' "$qs_pids" |
-    wc -l |
-    tr -d ' '
+test "$main_pid" -gt 0
+process_exe="$(readlink -f "/proc/$main_pid/exe")"
+case "$process_exe" in
+  /nix/store/*-quickshell-*/bin/.quickshell-wrapped) ;;
+  *)
+    printf 'unexpected Quickshell executable: %s\n' "$process_exe"
+    exit 1
+    ;;
+esac
+quickshell_store="${process_exe%/bin/.quickshell-wrapped}"
+expected_argv="$quickshell_store/bin/quickshell -p $HOME/.config/quickshell"
+process_argv="$(tr '\0' ' ' < "/proc/$main_pid/cmdline")"
+process_argv="${process_argv% }"
+test "$process_argv" = "$expected_argv"
+qs_pids="$(
+  for proc_dir in /proc/[0-9]*; do
+    proc_exe="$(readlink -f "$proc_dir/exe" 2>/dev/null)" || continue
+    case "$proc_exe" in
+      /nix/store/*-quickshell-*/bin/.quickshell-wrapped)
+        printf '%s\n' "${proc_dir##*/}"
+        ;;
+    esac
+  done |
+    sort -n
 )"
 
 test "$active_state" = active
 test "$sub_state" = running
 test "$result" = success
-test "$main_pid" -gt 0
 test "$restarts" -eq 0
-test "$pid_count" -eq 1
 test "$qs_pids" = "$main_pid"
 
 mako_active="$(

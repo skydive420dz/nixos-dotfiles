@@ -11,7 +11,9 @@ branch, or live-test contracts in this file.  The active checkpoint sequence is
 recorded in [[../handoffs/2026-07-18-main-checkpoint.org][the 2026-07-18 runway]].
 The current cleanup source/build/activation/rollback gates are recorded in
 [[../handoffs/2026-07-19-quickshell-cleanup-activation.org][the 2026-07-19 activation handoff]].
-That handoff is candidate evidence, not authorization to change the live checkout.
+That handoff now records the accepted source-live checkpoint; it does not
+authorize promotion, publication of the acceptance evidence, or another live
+change.
 
 The current =main= branch is the sober working shell. The old modular shell lives on =prototype/quickshell-legacy= and the archived quickshell branches. Treat those branches as reference material only: port useful ideas back deliberately, one module at a time.
 
@@ -257,6 +259,9 @@ This is descriptive, not a mandate to create empty folders. Split only when a mo
 - 2026-07-19: Cleanup Slice 0A added the exact-source validation harness. Slice 0B adopts the audit's four-space Qt formatting policy for the five previously drifting QML files and aligns both clean-Emacs QML modes and their explicit formatter with that policy; Neovim already uses the four-space Qt default. The dated audit's Doom alignment item is historical because Doom is retired. These candidate source changes remain isolated from the live checkout until separately authorized.
 - 2026-07-19: Cleanup Slice 1A candidate replaces three layout-owned =height= bindings with explicit =Layout.preferredHeight= constraints and removes four import-aware =qmllint= unused imports. Exact isolated MSI source validation reduces actionable diagnostics from 24 to 17: layout and unused-import findings are zero, all remaining findings are =unqualified=, and the 38 narrowly named tooling diagnostics are unchanged. The strict lint gate therefore remains intentionally red; this candidate has not been made live or runtime-hand-tested.
 - 2026-07-19: Cleanup Slice 1B candidate gives the launcher and clipboard result delegates explicit IDs and qualifies all 17 parent-delegate =modelData=/=index= accesses, including the four tray accesses through its existing =trayIcon= ID. Exact isolated MSI source validation reduces actionable diagnostics from 17 to zero and passes the strict lint gate; the 38 narrowly named tooling diagnostics are unchanged. This lexical cleanup preserves the current delegate models and interaction paths. No Nix build, live checkout update, Quickshell reload, runtime verification, or hand test has been performed.
+- 2026-07-19: Cleanup Slices 0A-1B are now live-verified on the MSI from immutable activation head =84bc1b96f465f4f59634372f19a27ebabefce39d=.  Exact-source validation, the separate pure no-link build, controlled source-live checkout activation, automated runtime assertions, available Quickshell hand tests, restored-state soak, and the separate clean-Emacs QML test passed while generation 860 and both system outputs stayed unchanged.  Current evidence is limited to connected output =eDP-1=: dual-output behavior remains unverified, no safe tray middle action was available, and aggregate acceptance plus promotion remain separate decisions.
+- 2026-07-19: Performance follow-up remains open.  The first candidate process recorded a =1.1G= systemd peak during the complete interactive test sequence, while the stable final process was about 130-136 MiB current with a 142-146 MiB peak.  This is not proof of a leak; measure image-heavy overlays, especially the wallpaper picker, under controlled action-labeled runs before changing code.
+- 2026-07-19: At =21:51:32-04:00= the user explicitly accepted Cleanup Slices 0A-1B as the known-good source-live checkpoint on =eDP-1= and accepted deferral of dual-output validation until an external display is available.  The acceptance-evidence commit/push, promotion to =main=, any live branch-name change, and later optimization slices remain separate decisions.
 
 ** Known Lesson
 :PROPERTIES:

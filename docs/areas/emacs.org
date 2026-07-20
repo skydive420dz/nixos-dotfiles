@@ -7,8 +7,9 @@ Clean Emacs is the sole active MSI Emacs configuration.  The build-verified
 recoverable from Git history.  On 2026-07-19 the separately verified user-owned
 Doom clone, cache, and dangling =~/.config/doom= link were also removed with
 explicit user authorization.  Those source and user-state cleanups are not
-the same as editor acceptance: generation 856 now runs the checkpoint, while
-Python acceptance and broader Emacs TLC remain later slices.
+the same as editor acceptance: generation 856 first activated the checkpoint,
+and current generation 860 retains the same accepted Home Manager root.  Python
+acceptance and broader Emacs TLC remain later slices.
 
 ** Shape
 :PROPERTIES:
@@ -703,16 +704,16 @@ the Eglot/Corfu baseline until deliberately migrated.
 - [X] Tune completion across minibuffer, Corfu, LSP, and real project buffers after daily use exposes friction.
 - [X] Treat QML LSP as fragile under automated stress: repeated scripted completion probes spawned many =qmlls= children and wedged the Emacs daemon. Prefer manual/light checks; current accepted automated check is limited to opening a real QML buffer and verifying =qml-mode=, =qmlls-wrapped= attachment, CAPF, Eldoc, and Flymake providers without firing completion requests.
 - [X] Switch clean Emacs Nix LSP from =nil= to =nixd= after direct standalone-file comparison showed richer =nixd= completion.
-- [X] Sensible tab and indentation baseline: spaces globally, width 4 by default, width 2 for Nix/Lua/QML/JS/TS/JSON/YAML, and no =TAB= / =S-TAB= remaps.
+- [X] Sensible tab and indentation baseline: spaces globally, width 4 by default and for QML, width 2 for Nix/Lua/JS/TS/JSON/YAML, and no =TAB= / =S-TAB= remaps.
 - [X] Ledger Mode baseline: Nix owns the =ledger= CLI, Emacs owns =ledger-mode=, private accounting files live outside dotfiles under =~/Documents/finance=, and Ledger buffers expose local =SPC m= helpers for add transaction and reports.
 - [X] Solaire Mode baseline: secondary buffers use =solaire-mode= with Sky theme faces for panel-style background depth.
 - [X] Utility window baseline: help, eldoc, Dired, ibuffer, Magit, warnings, and compilation buffers use predictable side-window display rules instead of scattered fullscreen/minibuffer defaults.
 - [X] Spacious Padding baseline: =spacious-padding-mode= adds subtle frame, fringe, divider, and mode/header-line breathing room without changing the editor layout model.
 - [X] Tabline baseline: built-in =tab-line-mode= shows open buffers with Nerd Icons and Sky/modeline-style active and inactive faces.
+- [X] ACCEPTED 2026-07-19: Quickshell cleanup Slice 0B changed clean-Emacs QML indentation and the explicit =qmlformat= command to the four-space Qt policy.  After a separately authorized daemon restart, fresh classic =qml-mode= and parser-backed =sk-qml-ts-mode= buffers both produced canonical four-space formatter bytes.  A first hand sample was invalid because its property declaration omitted a colon; corrected samples passed.  Eglot's unsupported =workspace.didChangeWatchedFiles= registration warning was nonblocking and remains a later QML TLC item.
 
 Next passes:
 
-- [ ] CANDIDATE 2026-07-19: Quickshell cleanup Slice 0B changes clean-Emacs QML indentation and its explicit =qmlformat= command to the four-space Qt policy. Isolated source parsing and formatter-equivalence checks pass; a live Emacs reload plus classic =qml-mode= and parser-backed =sk-qml-ts-mode= indentation/format hand test is still required before replacing the accepted two-space runtime evidence above.
 - [ ] Watch for real-use key edge cases and add them deliberately as they come up.
 - [ ] Decide whether HTML/CSS diagnostics need a separate validator layer such as project-owned =stylelint= config or an HTML validator; do not fake this with broad parser diagnostics unless it catches real errors.
 - [ ] Observe completion documentation richness during real use; =M-d= can show popup docs when the active source/server provides them, but file/dabbrev/keyword/snippet sources are usually sparse.
