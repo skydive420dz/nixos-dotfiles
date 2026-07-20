@@ -8,12 +8,16 @@ passed against immutable activation head
 =84bc1b96f465f4f59634372f19a27ebabefce39d=.  The source is live through the
 repository's out-of-store links.  At =2026-07-19T21:51:32-04:00= the user
 explicitly accepted the tested single-output checkpoint and deferred
-dual-output validation until an external display is available.  The checkpoint
-has not been promoted to =main=.
+dual-output validation until an external display is available.  A completion
+snapshot at =2026-07-19T22:18:51-04:00= verified that the separately authorized
+promotion had fast-forwarded =main= to bound accepted head
+=8d8848739e44f27af253f4092333fbbe243f7ce7=.
 
-This documentation update does not authorize another fetch, branch update,
-build, checkout switch, service change, mutable-state change, Emacs restart,
-rollback, commit, push, or promotion.  At the time of this record:
+The user separately authorized this completion record's commit and push to
+=work/quickshell-cleanup=.  That authorization does not cover another =main=
+update, live-checkout synchronization or branch switch, build, service change,
+mutable-state change, Emacs restart, rollback, or runtime action.  At the time
+of this record:
 
 - the four-commit payload and original activation handoff are committed and
   pushed at the immutable activation head above;
@@ -30,7 +34,9 @@ rollback, commit, push, or promotion.  At the time of this record:
 - the separately authorized acceptance-evidence commit was published and
   remote-verified at
   =41ba6f4d891374e18b002a777e86414a8076bfca=;
-- promotion remains a separate, unauthorized decision.
+- the separately authorized promotion completed at
+  =8d8848739e44f27af253f4092333fbbe243f7ce7= without changing the live MSI
+  checkout or runtime.
 
 * Historical Pre-Activation Baseline
 The final containment snapshot was taken on =2026-07-19T19:21:14-04:00=.
@@ -243,6 +249,38 @@ evidence was committed, pushed, and remote-verified at
 =41ba6f4d891374e18b002a777e86414a8076bfca=.  That completed publication does
 not authorize this promotion-readiness correction's commit/push, promotion,
 live branch-name changes, or any runtime action.
+
+** Recorded Main Promotion
+After another explicit authorization, the bound promotion head was applied:
+
+| Item | Result |
+|------+--------|
+| Promotion verification time | =2026-07-19T22:18:51-04:00= |
+| Previous =main= | =73e2bd82003e21c7955a9c9d12c4b80ab86eb634= |
+| Promoted head | =8d8848739e44f27af253f4092333fbbe243f7ce7= |
+| Ancestry | strict fast-forward, =0= commits unique to =main= and =7= accepted commits ahead |
+| Method | =git merge --ff-only= in a disposable separate worktree, followed by a non-forced =git push origin main= |
+| GitHub verification | =main= and =work/quickshell-cleanup= both resolved exactly to the promoted head |
+| Payload identity | QML =2f9d5a4f3ccdf6bed1635d8ff5bb4668be741c98=; Emacs =a3fe7cb4b9cf99b99b9901c08e8d98716cd89686=; scripts =047ddc3eb0298786fbb4d434416f0da2901e26b5= |
+| Temporary worktree | removed after clean local and remote verification |
+
+The live MSI checkout was not switched or fetched during promotion.  It
+remained clean on =work/quickshell-cleanup= at activation head
+=84bc1b96f465f4f59634372f19a27ebabefce39d=, whose three runtime payload trees
+equal the promoted identities above.  Quickshell PID =397583=, Mako PID
+=397096=, and Emacs PID =400490= remained =active/running= with
+=Result=success= and =NRestarts=0=.  The profile remained =system-860-link= and
+the current system remained
+=/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44=.
+No NixOS/Home Manager activation, service restart, branch switch, or runtime
+mutation occurred.
+
+This promotion-completion record is a documentation-only descendant of the
+promoted head.  Its separately authorized commit/push to
+=work/quickshell-cleanup= does not itself advance =main=; =main= intentionally
+remains anchored at the promoted head.  Synchronizing the live checkout,
+changing its branch name, and starting another optimization slice each remain
+separate decisions.
 
 The original gate protocol is retained below as a reproducible execution and
 rollback runbook.  Its imperative wording does not mean the completed gates are
