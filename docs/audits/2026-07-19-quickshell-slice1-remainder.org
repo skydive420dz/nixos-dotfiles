@@ -1,0 +1,377 @@
+#+title: Quickshell Slice 1 Remainder Audit - 2026-07-19
+#+startup: overview
+
+* Status And Authority
+This is a =READ-ONLY AUDIT= and a =PROPOSED MICRO-SLICE AND ACCEPTANCE PLAN=.
+It rechecks the remaining deterministic Quickshell work after cleanup Slices
+0A, 0B, 1A, and 1B were accepted and their payload was promoted to =main= at
+=8d8848739e44f27af253f4092333fbbe243f7ce7=.
+
+This document does not authorize a source edit, build, live-checkout update,
+Quickshell restart, NixOS or Home Manager activation, mutable-state cleanup,
+commit, push, promotion, or branch deletion.  Each remains a separate decision.
+
+The contracts consulted were:
+
+- [[../../README.org][the repository README]], which keeps =main= as the checkpoint lane and source,
+  build, activation, runtime, and hand-test results separate;
+- [[../areas/quickshell.org][the Quickshell ownership and branch contract]];
+- [[../handoffs/2026-07-19-quickshell-cleanup-activation.org][the accepted cleanup activation handoff]];
+- [[file:2026-07-14-quickshell-optimization.org][the original optimization audit]], which is dated evidence rather than
+  standing implementation authority.
+
+* Verified Audit Boundary
+The final binding snapshot was taken on the actual MSI at
+=2026-07-19T22:49:18-04:00=.
+
+| Item | Verified value |
+|------+----------------|
+| Host | =nixos= at =192.168.1.175=, user =skydive420dz= |
+| Live checkout | =/home/skydive420dz/Projects/nixos-dotfiles= |
+| Live branch | clean =work/quickshell-cleanup= |
+| Live and remote cleanup head | =fb71bd382ae1a14991cdbfe9bc7f611027b0dbb5= |
+| Accepted =main= head | =8d8848739e44f27af253f4092333fbbe243f7ce7= |
+| QML tree | =2f9d5a4f3ccdf6bed1635d8ff5bb4668be741c98= |
+| Live link | =~/.config/quickshell= resolves into the live checkout |
+| Current system | =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Quickshell | PID =4193=, =active/running=, =Result=success=, =NRestarts=0= |
+| Mako | PID =4197=, =active/running=, =Result=success=, =NRestarts=0= |
+| Emacs | PID =3052=, =active/running=, =Result=success=, =NRestarts=0= |
+
+The cleanup branch is a documentation-only descendant of the accepted =main=
+head.  Its Quickshell, Emacs, and scripts payload trees still equal the accepted
+payload.  The separately authorized live-checkout fast-forward from
+=84bc1b96f465f4f59634372f19a27ebabefce39d= to =fb71bd3= changed documentation
+only; it did not build, activate, reload, or restart anything.
+
+The exact-source checker passed against the live source:
+
+- 31 QML files parsed and matched four-space =qmlformat= output;
+- 16 Bash files, two JSON files, and one Python file passed;
+- actionable =qmllint= diagnostics were zero;
+- the 38 narrowly named Quickshell metadata diagnostics remained 15
+  =DataStreamParser.buffer=, six =PanelWindow=, and 17
+  =QProcess::ExitStatus= diagnostics.
+
+This clean syntax and lint state does not prove the runtime state machines below
+are correct.
+
+* Contract Cross-Check
+Cleanup labels 0A through 1B do not mean that the original audit's complete
+Slice 0 and Slice 1 are finished.
+
+Completed and accepted:
+
+- Slice 0A added =scripts/check-quickshell= and the exact-source validation
+  boundary.
+- Slice 0B established four-space Qt formatting and aligned clean Emacs; Doom
+  alignment in the dated audit is obsolete because Doom is retired.
+- Slice 1A fixed the three layout-owned height defects and removed four
+  import-aware unused imports.
+- Slice 1B qualified 17 delegate accesses and brought actionable lint to zero.
+- Source validation, the pure no-link build, controlled source-live activation,
+  automated runtime checks, single-output hand tests, clean-Emacs QML tests, and
+  restored-state soak were executed as separate gates.
+
+Still incomplete from original Slice 0:
+
+- the read-only, action-labelled profiling helper has not been added;
+- old performance samples remain historical evidence and must not be presented
+  as a current baseline.
+
+Still incomplete from original Slice 1:
+
+- wallpaper process-boundary safety and atomic publication;
+- stable CAVA configuration;
+- launcher and clipboard close/reopen timer cancellation;
+- background-window title correctness;
+- network handoff baseline reset;
+- CAVA sample freshness and exit handling;
+- clipboard preview success handling;
+- clipboard delete selection.
+
+The accepted single-output deferral does not automatically waive topology
+testing for a new candidate.  A later candidate must either obtain fresh
+dual-output evidence or record a new explicit deferral.  The shared-backend work
+in original Slice 3 still requires both outputs.
+
+* Current Findings
+** R1 - Wallpaper Shell Boundary And Atomic Publication
+:PROPERTIES:
+:CUSTOM_ID: r1-wallpaper-shell-boundary
+:END:
+Classification: =CONFIRMED P0 SECURITY/CORRECTNESS=.
+
+[[../../config/quickshell/modules/wallpaper/WallpaperStore.qml][WallpaperStore.qml]] still uses =JSON.stringify= as Bash quoting in the
+thumbnail command, state save, state load, and wallpaper directory list.  JSON
+double quotes do not disable Bash variable, backtick, or command substitution.
+
+A no-file proof on the target used the inert value
+=wall$(printf SHELL_EXPANSION).mp4=.  JSON produced
+="wall$(printf SHELL_EXPANSION).mp4"=, and Bash evaluated it as
+=wallSHELL_EXPANSION.mp4=.  This confirms code evaluation without creating a
+fixture or modifying live state.
+
+The 23 currently visible wallpaper filenames contained no =$=, backtick, or
+=$(...)= trigger, and the current state file was valid JSON.  No current exploit
+or compromise was observed.  Benign current inputs do not close the boundary.
+
+State is truncated and rewritten in place.  FFmpeg also writes directly to the
+published thumbnail path.  Interruption can therefore leave partial state or a
+partial thumbnail, and a failed thumbnail process can still cause the selector
+to reload the final path.
+
+** R2 - CAVA Temporary Configuration
+:PROPERTIES:
+:CUSTOM_ID: r2-cava-temporary-configuration
+:END:
+Classification: =CONFIRMED P0 CORRECTNESS/HYGIENE=.
+
+[[../../config/quickshell/modules/media/MediaAnalyzer.qml][MediaAnalyzer.qml]] still creates a file with =mktemp=, installs an EXIT trap,
+and then uses =exec cava=.  Successful =exec= replaces Bash, so Bash cannot run
+its EXIT trap.
+
+The original audit counted 254 matching files.  This read-only recheck found 380
+matching mode-private, 190-byte configs under =/tmp=, about 71 KiB total.  The
+growth confirms the leak; the small byte total means it is hygiene and lifecycle
+debt rather than a meaningful disk-pressure or Nix-store problem.
+
+Nix garbage collection does not own these files.  Any removal must occur only
+after the generator is fixed, must match the exact known config fingerprint, and
+requires separate mutable-state authorization.
+
+** R3 - Overlay Close And Reopen Timers
+:PROPERTIES:
+:CUSTOM_ID: r3-overlay-close-reopen
+:END:
+Classification: =CONFIRMED P1 CORRECTNESS=.
+
+[[../../config/quickshell/modules/launcher/LauncherView.qml][LauncherView.qml]] and
+[[../../config/quickshell/modules/clipboard/ClipboardView.qml][ClipboardView.qml]] each restart a 150 ms close timer in =close()= but do not
+stop it in =show()=.  Reopening during the fade leaves the old timer armed, so it
+can clear a newly typed query or new preview state.
+
+This is independent of the later file-IPC replacement and does not require a
+visual redesign.
+
+** R4 - Background Window Title Clearing
+:PROPERTIES:
+:CUSTOM_ID: r4-window-title
+:END:
+Classification: =CONFIRMED P1 CORRECTNESS=.
+
+[[../../config/quickshell/modules/window/WindowTitle.qml][WindowTitle.qml]] clears =activeClass= and =activeTitle= for every Hyprland
+=closewindow= event.  It does not check whether the closed window was focused and
+does not refresh the actual active window.  Closing an unrelated background
+window can therefore display =Desktop= while a focused window remains.
+
+The narrow correction must not pull native active-toplevel migration or shared
+per-output state into this slice.
+
+** R5 - Network Handoff Baseline
+:PROPERTIES:
+:CUSTOM_ID: r5-network-handoff
+:END:
+Classification: =CONFIRMED P1 CORRECTNESS=.
+
+[[../../config/quickshell/modules/status/StatusCluster.qml][StatusCluster.qml]] overwrites =networkDevice= without clearing prior counters,
+timestamps, rates, or graph samples.  A new device can be compared against the
+old device and produce a false first-sample spike or stale graph.
+
+There is a second deterministic race: an already running traffic process returns
+only counters, not the device identity it sampled.  Its old result can arrive
+after a device change and contaminate the newly reset baseline.
+
+Default-route selection, event-driven Networking migration, and shared
+multi-output status ownership remain later work.
+
+** R6 - Clipboard Preview Publication
+:PROPERTIES:
+:CUSTOM_ID: r6-clipboard-preview
+:END:
+Classification: =CONFIRMED P1 CORRECTNESS=.
+
+[[../../config/quickshell/modules/clipboard/ClipboardView.qml][ClipboardView.qml]] publishes a =file://= URL whenever the completed target
+matches the requested target.  It does not require successful process exit or a
+nonempty output file.  A failed ImageMagick conversion can therefore hide the
+placeholder and expose a blank or broken preview.
+
+A correction must distinguish:
+
+1. matching target and successful nonempty output: publish;
+2. matching target and failure: leave the placeholder, stop loading, and do not
+   immediately retry forever;
+3. stale completion after selection changed: discard it and start or coalesce
+   only the newest request.
+
+Content-addressing, resource limits, cancellation, cache pruning, ID-reuse
+hardening, and session cleanup remain later clipboard-lifecycle work.
+
+** R7 - Clipboard Delete Selection
+:PROPERTIES:
+:CUSTOM_ID: r7-clipboard-delete
+:END:
+Classification: =CONFIRMED P1 CORRECTNESS=.
+
+After removing the entry, =ClipboardView.qml= clamps selection with
+=results.length - 2=.  With three results, deleting either index one or index two
+selects index zero; the correct successor/predecessor index is one.
+
+The correction must derive the remaining filtered result count explicitly and
+choose zero only when empty, otherwise
+=min(deletedIndex, remainingCount - 1)=.  It must not depend on QML binding
+reevaluation timing.
+
+** R8 - CAVA Stale Samples
+:PROPERTIES:
+:CUSTOM_ID: r8-cava-stale-samples
+:END:
+Classification: =CONFIRMED MISSING GUARD; RUNTIME FREQUENCY UNMEASURED=.
+
+=MediaAnalyzer.qml= considers any nonempty =levels= array live.  Levels are
+cleared only when media becomes inactive; samples have no freshness timestamp,
+and process exit has no handler.  A stalled or exited analyzer can therefore
+freeze the last spectrum and prevent the fallback animation from resuming.
+
+The missing guard is definite.  The frequency of actual CAVA stalls on this
+machine is not measured, so implementation must begin with a controlled
+one-sample-then-stall or process-exit fixture rather than a performance claim.
+
+* Proposed Micro-Slices
+The labels below are proposals, not accepted state.  Each slice should remain one
+independently reviewable and revertible commit.
+
+** Slice 0C - Read-Only Profiling Helper
+Add the original audit's missing action-labelled measurement helper before
+making new CPU, GPU, memory, child-process, picker, or leak claims.
+
+It may read cgroup accounting, PSS, child launches, CAVA temp counts, layer
+geometry, journal warnings, and available GPU samples.  It must not open an
+overlay, start media, restart Quickshell, arm a timer, or mutate state.
+
+This observability slice does not block the confirmed wallpaper safety fix.
+
+** Slice 1C - Wallpaper Process Boundary And Atomic Writes
+Preferred organization:
+
+- keep wallpaper-private behavior under =modules/wallpaper/=;
+- use one small, tracked, module-private helper or fixed shell text whose
+  dynamic values arrive only as positional arguments;
+- register any helper with =scripts/check-quickshell= and ShellCheck it;
+- keep =JSON.stringify= only for JSON serialization, never shell quoting;
+- write state and thumbnails to same-directory temporary files and rename only
+  after successful completion;
+- emit the state signal only after the state rename;
+- reload a thumbnail only after successful publication.
+
+Disposable source tests must cover spaces, quotes, =$HOME=, backticks, =$()=,
+and leading hyphens; a stub FFmpeg must observe exact argv without expansion.
+Preseeded valid state and thumbnails must survive forced helper failure.
+
+Do not include picker virtualization, thumbnail-cache redesign, wallpaper power
+policy, or visual changes.
+
+** Slice 1D - Stable CAVA Configuration
+Keep the CAVA package scope unchanged.  Prefer one tracked
+=modules/media/cava.conf= beside =MediaAnalyzer.qml= and direct argv using the
+current Quickshell shell directory.  Remove Bash, =mktemp=, the heredoc, the trap,
+and =exec= from the analyzer command.
+
+Record the exact pre-test matching temp count, exercise repeated playback
+start/stop cycles, and require zero new configs.  Existing orphan deletion
+remains separate.
+
+** Slice 1E - Overlay Reopen Timer Cancellation
+Stop each pending close timer at the beginning of launcher and clipboard
+=show()=.  Test close, reopen within 150 ms, enter a sentinel query, wait beyond
+300 ms, and prove the new state survives.  Also prove an ordinary close still
+clears state after the fade.
+
+** Slice 1F - Clipboard Preview And Delete State
+Make preview publication success-aware and non-looping, reject stale
+completions, and compute post-delete selection deterministically.
+
+Test preview success, command failure, zero-byte output, stale-target completion,
+and repeated selection changes.  Test deletion of the only item and the first,
+middle, and last item in filtered and unfiltered three-item result sets.
+
+Do not include the broader preview cache and secret-lifecycle redesign.
+
+** Slice 1G - Window Close Correctness
+On =closewindow=, schedule or coalesce a refresh of the actual active window
+instead of clearing immediately.  Test focused window A with background window
+B: closing B must retain A; closing A must show the next focus or =Desktop=
+without stale text.
+
+Do not include shared controller or native-model migration.
+
+** Slice 1H - Network Handoff Correctness
+Route device changes through a reset that clears counters, timestamp, rates, and
+sample arrays.  Tag each traffic result with the device sampled and reject a
+result that no longer matches the current device.  The first sample seeds the
+new baseline; only a later sample may calculate a rate.
+
+Test disconnect/reconnect and Wi-Fi/Ethernet handoff with explicit authorization.
+Default-route selection and native Networking migration remain separate.
+
+** Slice 1I - Analyzer Freshness
+First reproduce one valid sample followed by a controlled stall or exit.  If the
+fixture confirms the frozen-state path, add a documented freshness deadline and
+exit clearing.  Prove fallback resumes after expiry and live mode returns with a
+new sample.
+
+Do not combine this with frame-rate tuning, shared analyzer ownership,
+=PwNodePeakMonitor= comparison, or bar render experiments.
+
+* Verification Contract For Every Code Slice
+The gates remain distinct and must be reported separately.  This Quickshell
+lane deliberately retains the conservative pure no-link build for QML-only
+slices as well as Nix/service slices.  For live-linked QML it is an additional
+closure/evaluation check, not proof of the candidate QML bytes and not
+activation.
+
+1. *Bound candidate*: record branch, commit, parent, intended paths, rollback
+   head, and exact live-link boundary.
+2. *Source validation*: run the exact checker against the source path that would
+   become live, plus slice-specific disposable fixtures.
+3. *Pure no-link build*: use the current pure flake syntax from the repository
+   README.  A matching derivation or successful build is not activation and does
+   not validate out-of-store QML bytes.
+4. *Explicit live action*: only after separate authorization, capture the
+   pre-activation snapshot, stop Quickshell, update the live checkout to the
+   immutable candidate, run the exact-source checker there, and start
+   Quickshell.  Record the old and new PID.  Do not change linked QML underneath
+   a running service, and do not imply a Nix generation was created for a
+   source-live change.
+5. *Automated runtime verification*: inspect configuration load, journal delta,
+   restart count, process/temp delta, layer geometry, and the slice-specific
+   invariant.
+6. *Human hand test*: exercise the affected interaction and restore mutable
+   state.  Record connected outputs and any explicit deferral.
+7. *Acceptance and publication*: user acceptance, commit/push, promotion, branch
+   cleanup, and mutable-state cleanup remain separate decisions.
+
+The source gate is:
+
+#+begin_src sh
+./scripts/check-quickshell "$PWD"
+#+end_src
+
+The separate pure build gate is:
+
+#+begin_src sh
+nix --extra-experimental-features 'nix-command flakes' \
+  build --print-out-paths \
+  '.#nixosConfigurations."nixos".config.system.build.toplevel' \
+  --no-link --no-write-lock-file --show-trace
+#+end_src
+
+No command in this document is an instruction to activate the machine.
+
+* Recommended Next Decision
+Review and accept or revise this documentation contract first.  If accepted,
+the first implementation decision should be Slice 1C because it closes the only
+remaining P0 user-input shell boundary without changing the approved design.
+
+Do not begin 1C merely because this audit exists; source implementation still
+requires a separate explicit instruction.
