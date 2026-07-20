@@ -17,6 +17,7 @@ QtObject {
     readonly property string signalFile: stateDir + "/wallpaper-signal"
     readonly property string thumbnailDir: stateDir + "/wallpaper-thumbnails"
     readonly property string ffmpegBin: Quickshell.env("SKY_FFMPEG") || "ffmpeg"
+    readonly property string wallpaperHelper: Quickshell.shellPath("modules/wallpaper/wallpaper-io")
 
     property bool selectorOpen: false
     property string currentPath: wallpaperDir + "/wallpaper-003.gif"
@@ -60,11 +61,7 @@ QtObject {
     }
 
     function videoThumbnailCommand(path) {
-        var output = videoThumbnailPath(path);
-        var filter = "scale=360:-1:flags=lanczos";
-        var command = "mkdir -p " + JSON.stringify(thumbnailDir) + " && if [ ! -s " + JSON.stringify(output) + " ] || [ " + JSON.stringify(path) + " -nt " + JSON.stringify(output) + " ]; then " + JSON.stringify(ffmpegBin) + " -hide_banner -loglevel error -y -ss 2 -i " + JSON.stringify(path) + " -frames:v 1 -vf " + JSON.stringify(filter) + " -update 1 " + JSON.stringify(output) + "; fi";
-
-        return ["bash", "-lc", command];
+        return [wallpaperHelper, "thumbnail", ffmpegBin, path, videoThumbnailPath(path)];
     }
 
     function toggleSelector() {
@@ -95,9 +92,8 @@ QtObject {
         var payload = JSON.stringify({
             currentPath: currentPath
         });
-        var command = "mkdir -p " + JSON.stringify(stateDir) + " && printf %s " + JSON.stringify(payload) + " > " + JSON.stringify(stateFile) + " && date +%s > " + JSON.stringify(signalFile);
 
-        saveStateProc.command = ["bash", "-lc", command];
+        saveStateProc.command = [wallpaperHelper, "save-state", stateFile, signalFile, payload];
         saveStateProc.running = true;
     }
 
@@ -126,11 +122,12 @@ QtObject {
 
     property Process loadStateProc: Process {
         id: loadStateProc
-        command: ["bash", "-lc", "cat " + JSON.stringify(root.stateFile) + " 2>/dev/null || true"]
+        command: ["cat", "--", root.stateFile]
         stdout: SplitParser {
             property string buffer: ""
             onRead: data => buffer += data
         }
+        stderr: StdioCollector {}
         onExited: {
             try {
                 var payload = JSON.parse(stdout.buffer.trim());
@@ -142,11 +139,12 @@ QtObject {
 
     property Process listWallpapersProc: Process {
         id: listWallpapersProc
-        command: ["bash", "-lc", "find " + JSON.stringify(root.wallpaperDir) + " -maxdepth 1 -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' -o -iname '*.gif' -o -iname '*.mp4' -o -iname '*.m4v' -o -iname '*.mov' -o -iname '*.webm' -o -iname '*.mkv' \\) 2>/dev/null | sort"]
+        command: ["find", "--", root.wallpaperDir, "-maxdepth", "1", "-type", "f", "(", "-iname", "*.jpg", "-o", "-iname", "*.jpeg", "-o", "-iname", "*.png", "-o", "-iname", "*.webp", "-o", "-iname", "*.gif", "-o", "-iname", "*.mp4", "-o", "-iname", "*.m4v", "-o", "-iname", "*.mov", "-o", "-iname", "*.webm", "-o", "-iname", "*.mkv", ")"]
         stdout: SplitParser {
             property string buffer: ""
             onRead: data => buffer += data + "\n"
         }
+        stderr: StdioCollector {}
         onExited: {
             root.applyWallpaperList(stdout.buffer);
             stdout.buffer = "";

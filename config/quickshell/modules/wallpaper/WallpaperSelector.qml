@@ -200,13 +200,14 @@ Item {
                             readonly property int cardWidth: Math.floor((wallpaperGrid.width - wallpaperGrid.spacing * (wallpaperGrid.columns - 1)) / wallpaperGrid.columns)
                             property string thumbnailSource: video ? WallpaperStore.fileUrl(thumbnailPath) : ""
 
-                            function reloadThumbnail() {
-                                if (!video)
+                            function reloadThumbnail(expectedPath) {
+                                if (!video || expectedPath !== thumbnailPath)
                                     return;
 
                                 thumbnailSource = "";
                                 Qt.callLater(function () {
-                                    thumbnailSource = WallpaperStore.fileUrl(thumbnailPath);
+                                    if (expectedPath === wallpaperCard.thumbnailPath)
+                                        wallpaperCard.thumbnailSource = WallpaperStore.fileUrl(expectedPath);
                                 });
                             }
 
@@ -356,13 +357,22 @@ Item {
                             Process {
                                 id: thumbnailProc
 
-                                command: wallpaperCard.video ? WallpaperStore.videoThumbnailCommand(wallpaperCard.modelData) : []
-                                onExited: wallpaperCard.reloadThumbnail()
+                                property string requestedWallpaper: ""
+                                property string requestedThumbnail: ""
+
+                                onExited: exitCode => {
+                                    if (exitCode === 0 && requestedWallpaper === wallpaperCard.modelData && requestedThumbnail === wallpaperCard.thumbnailPath)
+                                        wallpaperCard.reloadThumbnail(requestedThumbnail);
+                                }
                             }
 
                             Component.onCompleted: {
-                                if (wallpaperCard.video)
+                                if (wallpaperCard.video) {
+                                    thumbnailProc.requestedWallpaper = wallpaperCard.modelData;
+                                    thumbnailProc.requestedThumbnail = wallpaperCard.thumbnailPath;
+                                    thumbnailProc.command = WallpaperStore.videoThumbnailCommand(wallpaperCard.modelData);
                                     thumbnailProc.running = true;
+                                }
                             }
                         }
                     }

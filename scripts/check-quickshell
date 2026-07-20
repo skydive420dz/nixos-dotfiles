@@ -45,6 +45,7 @@ qml_root="$repo_root/config/quickshell"
 scripts_root="$repo_root/scripts"
 styles_json="$repo_root/theme/styles.json"
 launcher_apps_json="$qml_root/modules/launcher/apps.json"
+wallpaper_helper="$qml_root/modules/wallpaper/wallpaper-io"
 
 [[ -d $qml_root ]] || die "missing Quickshell source directory: $qml_root"
 [[ -d $scripts_root ]] || die "missing scripts directory: $scripts_root"
@@ -54,6 +55,10 @@ launcher_apps_json="$qml_root/modules/launcher/apps.json"
 [[ -f $launcher_apps_json ]] ||
   die "missing launcher registry: $launcher_apps_json"
 [[ -f $styles_json ]] || die "missing theme registry: $styles_json"
+[[ -f $wallpaper_helper ]] ||
+  die "missing wallpaper helper: $wallpaper_helper"
+[[ -x $wallpaper_helper ]] ||
+  die "wallpaper helper is not executable: $wallpaper_helper"
 
 required_theme_helpers=(
   "$scripts_root/theme-select.d/consumers.sh"
@@ -71,7 +76,7 @@ for file in "${required_theme_helpers[@]}"; do
 done
 
 missing_tools=()
-for tool in bash find jq nix python3 qmlformat qmllint sort; do
+for tool in bash find jq nix python3 qmlformat qmllint shellcheck sort; do
   if ! command -v "$tool" >/dev/null 2>&1; then
     missing_tools[${#missing_tools[@]}]=$tool
   fi
@@ -103,6 +108,7 @@ done < <(find "$qml_root" -type f -name '*.qml' -print0 | sort -z)
 (( ${#qml_files[@]} > 0 )) || die "no QML files found under $qml_root"
 
 bash_files=(
+  "$wallpaper_helper"
   "$scripts_root/clipboard-toggle"
   "$scripts_root/launcher-toggle"
   "$scripts_root/osd-brightness"
@@ -343,6 +349,14 @@ if (( bash_failures == 0 )); then
   printf '  pass: %d files\n' "${#bash_files[@]}"
 else
   printf '  fail: %d file(s)\n' "$bash_failures"
+  failed=1
+fi
+
+printf '\nWallpaper helper ShellCheck\n'
+if shellcheck -- "$wallpaper_helper"; then
+  printf '  pass: %s\n' "$(relative_path "$wallpaper_helper")"
+else
+  printf '  fail: %s\n' "$(relative_path "$wallpaper_helper")"
   failed=1
 fi
 

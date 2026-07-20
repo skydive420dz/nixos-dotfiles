@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+set -euo pipefail
+export LC_ALL=C
+umask 077
+
+program_name=${0##*/}
+temporary_path=
+
+usage() {
+  printf 'usage: %s save-state STATE_FILE SIGNAL_FILE JSON_PAYLOAD\n' "$program_name"
+  printf '       %s thumbnail FFMPEG_BIN INPUT_FILE OUTPUT_JPG\n' "$program_name"
+}
+
+die() {
+  printf '%s: %s\n' "$program_name" "$*" >&2
+  exit 2
+}
+
+cleanup() {
+  if [[ -n $temporary_path ]]; then
+    rm -f -- "$temporary_path"
+  fi
+}
+
+trap cleanup EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+save_state() {
+  (( $# == 3 )) || {
+    usage >&2
+    exit 2
+  }
+
+  local state_file=$1
+  local signal_file=$2
+  local payload=$3
+  local state_dir
+  local signal_dir
+
+  [[ -n $state_file ]] || die "state path must not be empty"
+  [[ -n $signal_file ]] || die "signal path must not be empty"
+  [[ $state_file != "$signal_file" ]] ||
+    die "state and signal paths must be different"
+
+  state_dir=$(dirname -- "$state_file")
+  signal_dir=$(dirname -- "$signal_file")
+  mkdir -p -- "$state_dir" "$signal_dir"
+
+  temporary_path=$(
+    mktemp \
+      --tmpdir="$state_dir" \
+      -- ".wallpaper-state.tmp.XXXXXX"
+  )
+  printf '%s' "$payload" >"$temporary_path"
+
+  jq -e \
+    'type == "object" and (.currentPath | type == "string")' \
+    "$temporary_path" >/dev/null ||
+    die "refusing to publish invalid wallpaper state"
+
+  chmod 600 -- "$temporary_path"
+  mv -fT -- "$temporary_path" "$state_file"
+  temporary_path=
+
+  # Keep the watched signal inode stable; publish it only after state succeeds.
+  printf '%s\n' "$(date +%s)" >"$signal_file"
+}
+
+publish_thumbnail() {
+  (( $# == 3 )) || {
+    usage >&2
+    exit 2
+  }
+
+  local ffmpeg_bin=$1
+  local input_file=$2
+  local output_file=$3
+  local output_dir
+  local ffmpeg_status
+
+  [[ -n $ffmpeg_bin ]] || die "FFmpeg path must not be empty"
+  [[ -f $input_file && -r $input_file ]] ||
+    die "input is not a readable regular file: $input_file"
+  [[ -n $output_file ]] || die "thumbnail path must not be empty"
+
+  output_dir=$(dirname -- "$output_file")
+  mkdir -p -- "$output_dir"
+
+  if [[ -f $output_file && -s $output_file && ! $input_file -nt $output_file ]]; then
+    return 0
+  fi
+
+  temporary_path=$(
+    mktemp \
+      --tmpdir="$output_dir" \
+      --suffix=.jpg \
+      -- ".wallpaper-thumbnail.tmp.XXXXXX"
+  )
+
+  if "$ffmpeg_bin" \
+    -hide_banner \
+    -loglevel error \
+    -nostdin \
+    -y \
+    -ss 2 \
+    -i "$input_file" \
+    -frames:v 1 \
+    -vf "scale=360:-1:flags=lanczos" \
+    -update 1 \
+    -f image2 \
+    -c:v mjpeg \
+    "$temporary_path"; then
+    :
+  else
+    ffmpeg_status=$?
+    return "$ffmpeg_status"
+  fi
+
+  [[ -s $temporary_path ]] ||
+    die "FFmpeg produced an empty thumbnail"
+
+  chmod 600 -- "$temporary_path"
+  mv -fT -- "$temporary_path" "$output_file"
+  temporary_path=
+}
+
+(( $# > 0 )) || {
+  usage >&2
+  exit 2
+}
+
+command_name=$1
+shift
+
+case $command_name in
+  save-state)
+    save_state "$@"
+    ;;
+  thumbnail)
+    publish_thumbnail "$@"
+    ;;
+  -h|--help)
+    usage
+    ;;
+  *)
+    usage >&2
+    die "unknown command: $command_name"
+    ;;
+esac
