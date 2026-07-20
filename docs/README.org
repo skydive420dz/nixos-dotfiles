@@ -9,12 +9,12 @@ state.  Audits are dated evidence, not implementation authority.
 Documentation does not turn a build into activation and does not authorize
 commits, pushes, service changes, or branch deletion.
 
-* Status At A Glance - 2026-07-19
+* Status At A Glance - 2026-07-20
 | Surface | Confirmed current state | Next accepted step |
 |---------+-------------------------+--------------------|
 | System | Generation 860 and its active GC timer remain accepted; the clean one-shot optimizer run is accepted; O3-A defers recurrence for a roughly 30-day observation; no optimizer timer is armed | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
 | Emacs | Clean Emacs remains active under generation 860 with the same accepted Home Manager root; Lua and Nix =lsp-mode=/Company slices are accepted; the accepted QML policy uses verified four-space formatting in classic and parser-backed modes | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | Cleanup Slices 0A-1B are accepted live after separate source, build, runtime, and hand-test gates passed on =eDP-1=; accepted head =8d88487= is on =main=; the separately authorized live checkout is clean at documentation-only descendant =fb71bd3= with the accepted payload unchanged; generation 860 is unchanged; dual-output validation is explicitly deferred | Review the read-only Slice 1 remainder plan; any Slice 1C implementation remains a separate authorization |
+| Quickshell | Cleanup Slices 0A-1B remain accepted on =main=; Slice 1C is accepted source-live at immutable head =3e3d581= after separate source, pure-build, source-live activation, automated-runtime, and user =eDP-1= gates; generation 860 is unchanged; the user explicitly deferred this candidate's fresh dual-output test until the second monitor is connected | Review the acceptance handoff; its documentation commit, push, any =main= promotion, fresh dual-output test, and Slice 1D each require separate authorization, with Git and remote-ref evidence recording any later completion |
 | Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs, Vial discovers it, and QMK CLI intentionally remains system-wide | Keep firmware writes and flashing separate and explicitly authorized |
 | VS Code | NixOS has no VS Code configuration | Adapt the macOS Home Manager module in a future Linux-specific slice |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -33,8 +33,12 @@ The accepted system baseline remains recorded in
 [[file:handoffs/2026-07-18-main-checkpoint.org][the checkpoint handoff]].
 The reviewed tag/delete mapping for legacy branches is in
 [[file:handoffs/2026-07-19-branch-archive.org][the branch archive manifest]].
-The current Quickshell cleanup source/build/activation/rollback sequence is in
-[[file:handoffs/2026-07-19-quickshell-cleanup-activation.org][the Quickshell cleanup activation handoff]].
+The accepted Quickshell Slices 0A-1B base sequence is in
+[[file:handoffs/2026-07-19-quickshell-cleanup-activation.org][the 0A-1B
+activation handoff]].  The current accepted Slice 1C wallpaper-safety delta,
+live state-write evidence, and fresh dual-output deferral are in
+[[file:handoffs/2026-07-20-quickshell-slice1c-acceptance.org][the Slice 1C
+acceptance handoff]].
 
 * Current Work Lanes
 - =main=: checkpoint lane.
@@ -62,6 +66,7 @@ The current Quickshell cleanup source/build/activation/rollback sequence is in
 
 * Evidence And History
 - [[file:HISTORY.org][Human-readable history and decision log]]
+- [[file:handoffs/2026-07-20-quickshell-slice1c-acceptance.org][2026-07-20 Quickshell Slice 1C activation and acceptance]]
 - [[file:audits/2026-07-19-quickshell-slice1-remainder.org][2026-07-19 Quickshell Slice 1 remainder audit]]
 - [[file:audits/2026-07-18-tree-organization-gc.org][2026-07-18 tree, organization, and GC audit]]
 - [[file:audits/2026-07-14-nixos-system.org][2026-07-14 NixOS system audit]]

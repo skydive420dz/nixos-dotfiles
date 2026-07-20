@@ -1,0 +1,532 @@
+#+title: Quickshell Slice 1C Wallpaper Safety Acceptance - 2026-07-20
+#+startup: overview
+
+* Status And Authority
+
+Status: *ACCEPTED SOURCE-LIVE ON =eDP-1=; DUAL-OUTPUT VALIDATION EXPLICITLY
+DEFERRED*.
+
+At this document's preparation snapshot, the acceptance evidence existed only
+as an uncommitted, unpushed documentation candidate.  Git history and any later
+completion record are authoritative for whether its separate commit and push
+gates subsequently occurred.
+
+This handoff records the separately executed source, build, publication,
+fetch, source-live activation, automated runtime, and user hand-test gates for
+Quickshell cleanup Slice 1C.  The accepted payload is immutable commit
+=3e3d581ac0222b5c789e5ee2464b67f6128d7d98= on
+=work/quickshell-cleanup=.
+
+The user reported that the candidate works on =eDP-1= and explicitly stated
+that it will be tested with two monitors later.  That is a fresh deferral for
+this candidate; the earlier Slices 0A-1B deferral was not reused silently.
+
+This document was prepared in the isolated local worktree.  Preparation itself
+did not authorize or perform a commit, push, =main= promotion, MSI checkout
+update, service action, Nix activation, generation change, mutable-state
+change, rollback, or later optimization slice.
+
+Any commit containing this handoff is a documentation-only descendant of the
+accepted payload.  The handoff was not part of the tested source head and must
+not silently replace that payload identity in runtime claims.
+
+* Contract Cross-Check
+
+This result preserves the decisions in:
+
+- [[file:../../README.org][the repository README]], which keeps source, build,
+  activation, runtime, and hand-test gates separate;
+- [[file:../audits/2026-07-19-quickshell-slice1-remainder.org][the Slice 1
+  remainder audit]], which defines the Slice 1C positional-argument, atomic
+  publication, ShellCheck, and hostile-path contract;
+- [[file:../areas/quickshell.org][the Quickshell area note]], which assigns
+  private helpers and process calls to their owning module;
+- [[file:2026-07-19-quickshell-cleanup-activation.org][the Slices 0A-1B
+  activation handoff]], whose accepted checkpoint remains the source rollback
+  boundary used here.
+
+The result does not claim that a Nix build validates out-of-store QML bytes.
+The source checker validates those bytes; the pure no-link build validates Nix
+evaluation and the system closure.  With Quickshell stopped, moving the live
+checkout exposes the new source bytes at the linked path; the subsequent
+service start loads and activates them in a running shell.  Neither action is a
+Nix activation.
+
+* Bound Identities
+
+| Item | Bound value |
+|------+-------------|
+| Host | =nixos= at =192.168.1.175= |
+| Live checkout | =/home/skydive420dz/Projects/nixos-dotfiles= |
+| Live branch | =work/quickshell-cleanup= |
+| Source rollback commit | =fb71bd382ae1a14991cdbfe9bc7f611027b0dbb5= |
+| Audit/documentation parent | =3905a7fa0a50eb2b6fec5495fe0afa3a2af35e20= |
+| Accepted payload/live head | =3e3d581ac0222b5c789e5ee2464b67f6128d7d98= |
+| Relationship | accepted head is a strict two-commit descendant of rollback |
+| Accepted QML tree | =d055774e312a1948beac1fb74d751d7cf95cdd89= |
+| Unchanged Emacs tree | =a3fe7cb4b9cf99b99b9901c08e8d98716cd89686= |
+| Accepted scripts tree | =9905494f517592112f5df0a13db3312ff410fc2b= |
+| Helper Git mode/blob | =100755= / =bdf9d62d009daff5401454c5301883b792f8f773= |
+| Current =main= | =8d8848739e44f27af253f4092333fbbe243f7ce7= |
+| Live-link boundary | =~/.config/quickshell= resolves into the checkout |
+| Current/profile system output | =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Existing accepted system generation | =860=, unchanged |
+| Connected output | =eDP-1= only, =1920x1080@144.00301= |
+
+The aggregate fast-forward from the rollback to the accepted head changes only
+these seven paths:
+
+- =config/quickshell/modules/wallpaper/WallpaperSelector.qml=;
+- =config/quickshell/modules/wallpaper/WallpaperStore.qml=;
+- new executable
+  =config/quickshell/modules/wallpaper/wallpaper-io=;
+- =scripts/check-quickshell=;
+- =docs/README.org=;
+- =docs/areas/quickshell.org=;
+- new audit
+  =docs/audits/2026-07-19-quickshell-slice1-remainder.org=.
+
+No NixOS module, Home Manager module, package, service definition, Hyprland
+source, =flake.nix=, or =flake.lock= changed.
+
+* Accepted Implementation Boundary
+
+Slice 1C makes four narrow behavior changes:
+
+1. Wallpaper state load and directory listing use direct =Process.command=
+   argument arrays instead of dynamic =bash -lc= strings.
+2. The module-private =wallpaper-io= helper receives all dynamic values as
+   positional arguments.  =JSON.stringify= remains only JSON serialization.
+3. State and video thumbnails are written to unique same-directory temporary
+   files and renamed only after validation or successful FFmpeg completion.
+   State publication precedes the in-place watched signal update.
+4. A thumbnail card reloads only after helper exit zero and only when the
+   completed wallpaper/output identity still matches that card.
+
+The checker requires the helper, its executable bit, Bash syntax, and targeted
+ShellCheck without making unrelated legacy scripts part of a new ShellCheck
+cleanup.
+
+* Separate Gate Record
+
+| Gate | Evidence | Result |
+|------+----------+--------|
+| Source implementation | Five-file candidate on local cleanup branch; dynamic shell strings removed; helper mode =100755= | pass; no build or live action |
+| Exact source validation | 31 QML, 17 Bash, 2 JSON, and 1 Python file; four-space format; zero actionable diagnostics; strict lint; targeted helper ShellCheck | pass |
+| Disposable behavior fixtures | Hostile spaces/quotes/=$HOME=/backticks/=$()=/leading hyphens; exact FFmpeg argv; valid prior JSON/JPEG preservation; invalid/empty/rename failures; cache hit; state-before-signal; real FFmpeg | pass |
+| Pure no-link build | Fresh disposable MSI tree, unchanged lock, no =result= link | pass; output equals current system |
+| Immutable checkpoint | Commit =3e3d581= created and pushed without force; GitHub resolved cleanup to the exact SHA | pass; no MSI change |
+| Fetch-only synchronization | MSI updated only =origin/work/quickshell-cleanup= and verified ancestry, seven paths, trees, and helper mode | pass; checkout remained at rollback |
+| Pre-activation snapshot | =2026-07-20T07:45:20-04:00=; clean rollback head; Quickshell PID =4193=; Mako =4197=; Emacs =3052=; one connected output | pass |
+| Source-live activation | Quickshell stopped; checkout fast-forwarded to exact candidate; live checker passed; Quickshell started | pass; no Nix activation |
+| Automated runtime | One configuration load, no candidate error/reload, PID =268275=, =NRestarts=0=, correct idle layers, state unchanged across restart, no matching helper temporary remained | pass on =eDP-1= |
+| Stability | Independent 94-second observation plus local 178-second and post-hand 442-second checks held the same PID and clean state | pass |
+| User hand test | User reported “it works on eDP-1” | accepted on =eDP-1= |
+| Dual output | User stated it will be tested with two monitors later | explicitly deferred |
+
+Rollback to =fb71bd3= remained available throughout and was not needed.
+
+* Source And Fixture Evidence
+
+The exact live checker reported:
+
+| Check | Result |
+|-------+--------|
+| QML parse and canonical four-space format | all 31 pass |
+| Actionable QML diagnostics | zero |
+| Strict QML lint | pass |
+| Named =DataStreamParser.buffer= diagnostics | 15 |
+| Named =PanelWindow= diagnostics | 6 |
+| Named =QProcess::ExitStatus= diagnostics | 17 |
+| Bash syntax | all 17 pass |
+| Wallpaper helper ShellCheck | pass |
+| JSON syntax | both pass |
+| Python syntax | one file passes without execution |
+
+The disposable fixture used a private temporary directory and never touched
+the real XDG state paths.  It proved:
+
+- dynamic metacharacters remained literal arguments and created no marker
+  files;
+- direct =find --= and =cat --= preserved hostile paths;
+- a valid prior wallpaper JSON survived invalid input and forced pre-rename
+  failure byte-for-byte;
+- a decode-verified prior JPEG survived FFmpeg exit 42, successful empty
+  output, and forced thumbnail rename failure byte-for-byte;
+- FFmpeg received the hostile input as one argument and a same-directory
+  temporary =.jpg=, never the published final path;
+- cache hits did not invoke FFmpeg;
+- a real FFmpeg invocation produced a decodable JPEG;
+- the state file was observable before the signal;
+- a later signal-write failure can return nonzero after state commit, proving
+  that the two files are ordered but not one rollback-capable transaction.
+
+The temporary source tree, archive, and fixture harness were removed after the
+gate.
+
+* Build Evidence
+
+The separately authorized pure command returned:
+
+#+begin_example
+/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44
+#+end_example
+
+That equals the current/profile system output.  =flake.lock= remained at
+SHA-256
+=cb7a00e10a8f92019acc50586fec57ddd64ac5b2a04032b8484fa09ce44e6473=
+and no =result= link was created.
+
+The post-build result sentence in =docs/areas/quickshell.org= was necessarily a
+documentation-only change after the disposable build tree.  No functional
+candidate byte changed afterward, and the exact committed QML/helper bytes
+later passed the checker in the live checkout.  The build is therefore not
+misrepresented as QML validation.
+
+* Source-Live Activation Evidence
+
+Immediately before activation:
+
+| Item | Value |
+|------+-------|
+| Live HEAD/QML tree | =fb71bd3= / =2f9d5a4f3ccdf6bed1635d8ff5bb4668be741c98= |
+| Quickshell | PID =4193=, =active/running=, =NRestarts=0= |
+| Mako / Emacs | PID =4197= / =3052= |
+| Wallpaper state SHA-256 | =22752651559241979f3b78cf347d9d9d0938cad25d12b1448e4f3bbdff461273= |
+| Wallpaper signal SHA-256 | =b04d4c883b45068a7fc6f3121dea1e26d62893867a1ad7f7a96bc2e37003e4fd= |
+| Cached thumbnails | 5 files, 67,363 bytes |
+| Idle Quickshell layers | =qs-bar= and =qs-wallpaper=, both =1920x1080= on =eDP-1= |
+
+Quickshell was deliberately stopped before the checkout changed.  The
+=ExecMainStatus=15= observed while stopped was the expected termination status
+from that controlled stop, not a candidate crash.
+
+After the fast-forward, the live checkout was clean at the exact candidate and
+the exact live source checker passed before Quickshell was started.  Startup
+then produced:
+
+- one =Configuration Loaded=;
+- PID =268275=, =active/running=, =Result=success=, =NRestarts=0=,
+  =ExecMainStatus=0=;
+- no new named QML/service error and no unexpected configuration reload;
+- exactly the baseline idle =qs-bar= and =qs-wallpaper= layers at
+  =1920x1080=;
+- no launcher, clipboard, OSD, or wallpaper-picker layer left mapped while
+  idle;
+- unchanged current/profile NixOS output;
+- unchanged Mako and Emacs PIDs;
+- unchanged wallpaper JSON/signal digests across the restart itself;
+- no =.wallpaper-state.tmp.*= or =.wallpaper-thumbnail.tmp.*= file.
+
+The final automated single-output checkpoint observed the candidate PID stable
+for 178 seconds.  The post-hand snapshot at
+=2026-07-20T07:54:55-04:00= observed it stable for 442 seconds.
+
+A final documentation-time read-only spot check at
+=2026-07-20T08:08:18-04:00= reconfirmed host =nixos=; a clean live checkout at
+the accepted head and all three bound payload trees; the unchanged current
+system output; and Quickshell PID =268275= at =active/running=,
+=Result=success=, and =NRestarts=0=.  It changed no source, service, or system
+state.
+
+* Live State-Write Evidence
+
+The user interaction exercised the state-save path while preserving the same
+selected wallpaper JSON:
+
+| Item | Post-hand value |
+|------+-----------------|
+| State SHA-256 | =22752651559241979f3b78cf347d9d9d0938cad25d12b1448e4f3bbdff461273= |
+| State mode/size | =0600= / 107 bytes |
+| State mtime | =2026-07-20 07:52:41.747308919 -0400= |
+| Signal SHA-256 | =141fd901ea07ca00da12b7ef7eef8a210ebe45587165652a86f005601f13ed1e= |
+| Signal mode/size | =0644= / 11 bytes |
+| Signal mtime | =2026-07-20 07:52:41.752916661 -0400= |
+| Signal token | =1784548361= |
+| Cached thumbnails | unchanged at 5 files / 67,363 bytes |
+| Helper temporaries | zero |
+
+The state mtime precedes the signal mtime by about 5.6 ms, matching the helper
+contract.  Because all five video thumbnails remained cached, this hand test
+does not claim a live cache-miss regeneration.  The disposable real-FFmpeg and
+failure fixtures are the evidence for thumbnail generation/publication.
+The selected wallpaper JSON equals the pre-activation value; the signal token
+advanced intentionally as part of the accepted state-save interaction.
+The pre-test signal inode was not recorded, so this evidence does not make an
+independent inode-identity claim.
+
+* Accepted Scope And Explicit Deferrals
+
+Accepted now:
+
+- the Slice 1C source and organization;
+- exact source validation and targeted ShellCheck;
+- the pure no-link build as Nix evaluation/closure evidence only;
+- controlled source-live activation at immutable head =3e3d581=;
+- automated runtime and stability on =eDP-1=;
+- the user's =eDP-1= hand result;
+- a live ordered state-save/signal update after which no matching helper
+  temporary remained.
+
+Still deferred:
+
+- fresh dual-output behavior until the external display is connected;
+- live cache-miss thumbnail generation; the disposable real-FFmpeg fixture is
+  the publication evidence for that path;
+- newline-containing wallpaper filenames and leading/trailing-whitespace
+  fidelity in the line-based list parser;
+- concurrent-writer locking;
+- directory =fsync= and power-loss durability;
+- cleanup after =SIGKILL= or a killed delegate/FFmpeg child;
+- stale/orphan temporary scavenging;
+- rollback across state and signal as one transaction;
+- thumbnail-key collision repair, pruning, cache redesign, worker bounding,
+  picker virtualization, and wallpaper power policy.
+
+These exclusions are not regressions discovered during activation.  They are
+the intentionally bounded remainder after the P0 shell and publication defect
+was closed.  This checkpoint also makes no general performance improvement,
+long-soak leak, or dual-output performance claim.
+
+* Rollback Boundary
+
+Rollback was not exercised because every gate passed.  If a later Slice 1C
+regression requires source rollback, use the bound source rollback rather than
+a Nix generation.
+
+The following is a *runbook, not authorization*.  It requires fresh explicit
+rollback authority unless this exact recovery scope was pre-authorized for the
+current gate.  It is bound to a clean live checkout on
+=work/quickshell-cleanup= at =3e3d581=, the current single-=eDP-1= topology,
+generation 860, and the recorded live link.  If any of those facts has drifted,
+stop and prepare a newly bound runbook.
+
+#+begin_src sh
+set -euo pipefail
+
+repo=/home/skydive420dz/Projects/nixos-dotfiles
+candidate=3e3d581ac0222b5c789e5ee2464b67f6128d7d98
+rollback=fb71bd382ae1a14991cdbfe9bc7f611027b0dbb5
+rollback_qml=2f9d5a4f3ccdf6bed1635d8ff5bb4668be741c98
+rollback_emacs=a3fe7cb4b9cf99b99b9901c08e8d98716cd89686
+rollback_scripts=047ddc3eb0298786fbb4d434416f0da2901e26b5
+expected_system=/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44
+
+cd "$repo"
+test "$(git symbolic-ref --short HEAD)" = work/quickshell-cleanup
+test "$(git rev-parse HEAD)" = "$candidate"
+test "$(git rev-parse work/quickshell-cleanup)" = "$candidate"
+test "$(git rev-parse refs/remotes/origin/work/quickshell-cleanup)" = \
+  "$candidate"
+test -z "$(git status --porcelain)"
+test "$(readlink -f "$HOME/.config/quickshell")" = \
+  "$repo/config/quickshell"
+test "$(readlink /nix/var/nix/profiles/system)" = system-860-link
+test "$(readlink -f /run/current-system)" = "$expected_system"
+
+test "$(
+  systemctl --user show quickshell.service -p ActiveState --value
+)" = active
+test "$(
+  systemctl --user show quickshell.service -p SubState --value
+)" = running
+test "$(
+  systemctl --user show quickshell.service -p Result --value
+)" = success
+test "$(
+  systemctl --user show quickshell.service -p NRestarts --value
+)" -eq 0
+
+pre_hypr_sig="$(
+  systemctl --user show-environment |
+    sed -n 's/^HYPRLAND_INSTANCE_SIGNATURE=//p'
+)"
+test -n "$pre_hypr_sig"
+export HYPRLAND_INSTANCE_SIGNATURE="$pre_hypr_sig"
+hyprctl -j monitors | jq -e '
+  length == 1
+  and .[0].name == "eDP-1"
+  and .[0].width == 1920
+  and .[0].height == 1080
+'
+
+rollback_cursor="$(
+  journalctl --user -u quickshell.service -n 0 --show-cursor --no-pager |
+    sed -n 's/^-- cursor: //p'
+)"
+test -n "$rollback_cursor"
+
+service_stopped=0
+restart_quickshell_if_needed() {
+  if test "$service_stopped" -eq 1; then
+    printf '%s\n' \
+      "rollback incomplete; attempting to restore quickshell.service" >&2
+    systemctl --user start quickshell.service || true
+  fi
+}
+trap restart_quickshell_if_needed EXIT
+
+systemctl --user stop quickshell.service
+service_stopped=1
+test "$(
+  systemctl --user show quickshell.service -p ActiveState --value
+)" = inactive
+test "$(
+  systemctl --user show quickshell.service -p SubState --value
+)" = dead
+test "$(
+  systemctl --user show quickshell.service -p MainPID --value
+)" -eq 0
+
+# Preserve both cleanup refs at the accepted candidate.  Only the live
+# checkout becomes detached at the immutable rollback.
+git switch --detach "$rollback"
+test -z "$(git symbolic-ref -q --short HEAD || true)"
+test "$(git rev-parse HEAD)" = "$rollback"
+test "$(git rev-parse HEAD:config/quickshell)" = "$rollback_qml"
+test "$(git rev-parse HEAD:config/emacs)" = "$rollback_emacs"
+test "$(git rev-parse HEAD:scripts)" = "$rollback_scripts"
+test "$(git rev-parse work/quickshell-cleanup)" = "$candidate"
+test "$(git rev-parse refs/remotes/origin/work/quickshell-cleanup)" = \
+  "$candidate"
+test -z "$(git status --porcelain)"
+"$repo/scripts/check-quickshell" "$repo"
+
+systemctl --user start quickshell.service
+started_pid="$(
+  systemctl --user show quickshell.service -p MainPID --value
+)"
+test "$started_pid" -gt 0
+
+sleep 35
+
+test "$(
+  systemctl --user show quickshell.service -p ActiveState --value
+)" = active
+test "$(
+  systemctl --user show quickshell.service -p SubState --value
+)" = running
+test "$(
+  systemctl --user show quickshell.service -p Result --value
+)" = success
+test "$(
+  systemctl --user show quickshell.service -p NRestarts --value
+)" -eq 0
+test "$(
+  systemctl --user show quickshell.service -p MainPID --value
+)" = "$started_pid"
+
+rollback_journal="$(
+  journalctl --user -u quickshell.service \
+    --after-cursor="$rollback_cursor" --no-pager -o short-iso
+)"
+test "$(
+  printf '%s\n' "$rollback_journal" |
+    rg -c 'Configuration Loaded'
+)" -eq 1
+if printf '%s\n' "$rollback_journal" |
+   rg -i 'failed to load|qml.*(parse|import).*error|referenceerror|typeerror|binding loop|handler was registered but will not be used because another handler is registered for target|failed with result|main process exited'; then
+  echo "rollback Quickshell error detected"
+  exit 1
+fi
+
+hypr_sig="$(
+  systemctl --user show-environment |
+    sed -n 's/^HYPRLAND_INSTANCE_SIGNATURE=//p'
+)"
+test -n "$hypr_sig"
+export HYPRLAND_INSTANCE_SIGNATURE="$hypr_sig"
+
+monitors_json="$(hyprctl -j monitors)"
+layers_json="$(hyprctl -j layers)"
+printf '%s\n' "$monitors_json" | jq -e '
+  length == 1
+  and .[0].name == "eDP-1"
+  and .[0].width == 1920
+  and .[0].height == 1080
+'
+printf '%s\n' "$layers_json" | jq -e '
+  (
+    [
+      .["eDP-1"].levels
+      | to_entries[].value[]
+      | select(
+          .namespace == "qs-bar"
+          and .x == 0 and .y == 0
+          and .w == 1920 and .h == 1080
+        )
+    ]
+    | length
+  ) == 1
+  and (
+    [
+      .["eDP-1"].levels
+      | to_entries[].value[]
+      | select(
+          .namespace == "qs-wallpaper"
+          and .x == 0 and .y == 0
+          and .w == 1920 and .h == 1080
+        )
+    ]
+    | length
+  ) == 1
+  and (
+    [
+      to_entries[].value.levels
+      | to_entries[].value[]
+      | select(
+          .namespace == "qs-launcher"
+          or .namespace == "qs-clipboard"
+          or .namespace == "qs-osd"
+          or .namespace == "qs-wallpaper-picker"
+        )
+    ]
+    | length
+  ) == 0
+'
+
+test -z "$(git status --porcelain)"
+test "$(git rev-parse HEAD)" = "$rollback"
+test "$(git rev-parse work/quickshell-cleanup)" = "$candidate"
+test "$(git rev-parse refs/remotes/origin/work/quickshell-cleanup)" = \
+  "$candidate"
+test "$(readlink -f /run/current-system)" = "$expected_system"
+
+service_stopped=0
+trap - EXIT
+#+end_src
+
+This preserves local and remote =work/quickshell-cleanup= at the candidate and
+leaves only the live checkout detached at the rollback.  A later branch switch
+can expose candidate bytes again and therefore remains a controlled source-live
+action.  If the live checkout, cleanup ref, system generation, or output
+topology advances, bind and review a replacement procedure first.  Do not use a
+Nix generation rollback for an out-of-store source regression.
+
+The exit trap only attempts to restore the service after a post-stop failure.
+It cannot prove which source bytes are then live or that startup succeeded.  A
+nonzero result is an incomplete rollback requiring direct HEAD, link, service,
+journal, and layer inspection; it must not be recorded as a successful
+recovery.
+
+* Publication Boundary And Remaining Decisions
+
+At this document's preparation snapshot, the following were separate decisions
+and were not authorized by this record:
+
+1. review and commit this documentation-only acceptance evidence;
+2. push that documentation commit;
+3. optionally synchronize the live checkout to the documentation-only
+   descendant without restarting Quickshell;
+4. promote the accepted cleanup head to =main=;
+5. perform the fresh two-monitor test when the external display is available;
+6. select Slice 1D or any other optimization/correction slice.
+
+Git history and later completion records, rather than this pre-publication
+snapshot, determine which of the first three decisions subsequently completed.
+Their later completion would not authorize any following item.
+
+Before any documentation-only descendant is committed or promoted, prove that
+its =config/quickshell= and =scripts= trees remain exactly
+=d055774e312a1948beac1fb74d751d7cf95cdd89= and
+=9905494f517592112f5df0a13db3312ff410fc2b=.
