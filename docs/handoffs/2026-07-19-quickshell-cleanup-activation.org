@@ -27,8 +27,10 @@ rollback, commit, push, or promotion.  At the time of this record:
   action, or reboot was used for this source-live activation;
 - rollback remained available and was not used;
 - dual-output behavior remains unverified by explicit accepted deferral;
-- the acceptance-evidence commit/push and promotion remain separate,
-  unauthorized decisions.
+- the separately authorized acceptance-evidence commit was published and
+  remote-verified at
+  =41ba6f4d891374e18b002a777e86414a8076bfca=;
+- promotion remains a separate, unauthorized decision.
 
 * Historical Pre-Activation Baseline
 The final containment snapshot was taken on =2026-07-19T19:21:14-04:00=.
@@ -235,6 +237,12 @@ the status recorded here.  It does not authorize:
 3. changing the live checkout's branch name;
 4. deleting the disposable QML test files;
 5. any additional live-system or service change.
+
+The first item above was later separately authorized and completed: acceptance
+evidence was committed, pushed, and remote-verified at
+=41ba6f4d891374e18b002a777e86414a8076bfca=.  That completed publication does
+not authorize this promotion-readiness correction's commit/push, promotion,
+live branch-name changes, or any runtime action.
 
 The original gate protocol is retained below as a reproducible execution and
 rollback runbook.  Its imperative wording does not mean the completed gates are
@@ -1565,8 +1573,8 @@ live checkout's branch name also requires authorization and happens only after
 change linked bytes.
 
 * Documentation Follow-Up
-=docs/areas/git.org= still says to commit only after live behavior is accepted.
-The explicitly authorized workflow used here publishes immutable candidate
-commits before activation while keeping activation separate.  Do not rewrite
-the existing candidate history.  Reconcile that sentence later as a
-documentation-only correction.
+=docs/areas/git.org= now records the narrow, explicitly authorized exception
+used here: immutable candidate commits may be published before activation while
+candidate publication, activation, runtime verification, hand tests,
+acceptance, and promotion remain separate facts.  The existing candidate
+history was not rewritten.

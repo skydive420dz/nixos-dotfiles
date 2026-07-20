@@ -9,7 +9,15 @@
 - Work in small checkpoints.
 - Keep clean git state between jobs.
 - Sync live machine before testing when needed.
-- Commit only after the live behavior is accepted.
+- By default, commit after the affected live behavior is accepted.
+- An immutable candidate may be committed and published before activation only
+  when that exception is explicitly authorized and its handoff binds the exact
+  source, build, rollback, activation, runtime, and hand-test gates.  Candidate
+  publication is neither activation nor acceptance.
+- Keep source validation, build verification, activation, runtime verification,
+  human hand tests, acceptance, and promotion as separate facts.
+- Fast-forward =main= only from a clean, documented, accepted head and use a
+  separate worktree so live-linked bytes do not temporarily move backward.
 
 ** Commands
 :PROPERTIES:
