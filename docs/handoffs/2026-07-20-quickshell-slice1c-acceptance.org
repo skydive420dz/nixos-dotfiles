@@ -3,13 +3,19 @@
 
 * Status And Authority
 
-Status: *ACCEPTED SOURCE-LIVE ON =eDP-1=; DUAL-OUTPUT VALIDATION EXPLICITLY
-DEFERRED*.
+Status: *ACCEPTED SOURCE-LIVE ON =eDP-1= AND PROMOTED TO =main=;
+DUAL-OUTPUT VALIDATION EXPLICITLY DEFERRED*.
 
 At this document's preparation snapshot, the acceptance evidence existed only
 as an uncommitted, unpushed documentation candidate.  Git history and any later
 completion record are authoritative for whether its separate commit and push
 gates subsequently occurred.
+
+Those acceptance-publication gates, the documentation-only live-checkout
+synchronization, and the =main= promotion later completed under separate user
+authorizations.  At the promotion-completion preparation snapshot, the update
+recording those later gates was itself an uncommitted, unpushed documentation
+candidate.
 
 This handoff records the separately executed source, build, publication,
 fetch, source-live activation, automated runtime, and user hand-test gates for
@@ -61,13 +67,15 @@ Nix activation.
 | Live branch | =work/quickshell-cleanup= |
 | Source rollback commit | =fb71bd382ae1a14991cdbfe9bc7f611027b0dbb5= |
 | Audit/documentation parent | =3905a7fa0a50eb2b6fec5495fe0afa3a2af35e20= |
-| Accepted payload/live head | =3e3d581ac0222b5c789e5ee2464b67f6128d7d98= |
-| Relationship | accepted head is a strict two-commit descendant of rollback |
+| Accepted runtime payload head | =3e3d581ac0222b5c789e5ee2464b67f6128d7d98= |
+| Promotion-snapshot live/documentation head | =e4438b75de39ef1a2eb3d9d83cbac9bc94cefb0c= |
+| Payload relationship | payload is a strict two-commit descendant of rollback; documentation head is its direct child |
 | Accepted QML tree | =d055774e312a1948beac1fb74d751d7cf95cdd89= |
 | Unchanged Emacs tree | =a3fe7cb4b9cf99b99b9901c08e8d98716cd89686= |
 | Accepted scripts tree | =9905494f517592112f5df0a13db3312ff410fc2b= |
 | Helper Git mode/blob | =100755= / =bdf9d62d009daff5401454c5301883b792f8f773= |
-| Current =main= | =8d8848739e44f27af253f4092333fbbe243f7ce7= |
+| Previous =main= | =8d8848739e44f27af253f4092333fbbe243f7ce7= |
+| Promotion-snapshot =main= / cleanup ref | =e4438b75de39ef1a2eb3d9d83cbac9bc94cefb0c= |
 | Live-link boundary | =~/.config/quickshell= resolves into the checkout |
 | Current/profile system output | =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44= |
 | Existing accepted system generation | =860=, unchanged |
@@ -123,6 +131,10 @@ cleanup.
 | Stability | Independent 94-second observation plus local 178-second and post-hand 442-second checks held the same PID and clean state | pass |
 | User hand test | User reported “it works on eDP-1” | accepted on =eDP-1= |
 | Dual output | User stated it will be tested with two monitors later | explicitly deferred |
+| Acceptance evidence publication | Three-file documentation child =e4438b7= committed, pushed without force, and remote-verified | pass; payload trees unchanged |
+| Documentation-only live synchronization | MSI cleanup checkout fast-forwarded from =3e3d581= to =e4438b7= | pass; no service restart or system change |
+| Promotion readiness | Authoritative refs, =0=/=4= ancestry, nine aggregate paths, accepted trees, live head, and runtime rechecked | pass; no ref mutation |
+| =main= promotion | Disposable =main= worktree fast-forwarded =8d88487= to =e4438b7= and pushed without force | pass; GitHub refs equal and worktree removed |
 
 Rollback to =fb71bd3= remained available throughout and was not needed.
 
@@ -288,6 +300,62 @@ the intentionally bounded remainder after the P0 shell and publication defect
 was closed.  This checkpoint also makes no general performance improvement,
 long-soak leak, or dual-output performance claim.
 
+* Recorded Acceptance Publication And Main Promotion
+
+After separate user authorizations, the acceptance document was committed and
+pushed at =e4438b75de39ef1a2eb3d9d83cbac9bc94cefb0c=, the live MSI checkout
+fast-forwarded documentation-only to that exact head, and the accepted cleanup
+history was promoted to =main=.
+
+| Item | Result |
+|------+--------|
+| Completion verification snapshot | =2026-07-20T19:11:36-04:00= |
+| Previous =main= | =8d8848739e44f27af253f4092333fbbe243f7ce7= |
+| Promoted/documentation head | =e4438b75de39ef1a2eb3d9d83cbac9bc94cefb0c= |
+| Ancestry | strict fast-forward: =0= commits unique to old =main= and =4= accepted commits ahead |
+| Method | =git merge --ff-only= in a disposable =main= worktree, then non-forced =git push origin main= |
+| GitHub verification | =main= and =work/quickshell-cleanup= both resolved exactly to =e4438b7= |
+| Payload identity | QML =d055774e312a1948beac1fb74d751d7cf95cdd89=; Emacs =a3fe7cb4b9cf99b99b9901c08e8d98716cd89686=; scripts =9905494f517592112f5df0a13db3312ff410fc2b= |
+| Temporary worktree | removed after clean local and remote verification |
+
+The four promoted commits are, in order:
+
+1. =fb71bd382ae1a14991cdbfe9bc7f611027b0dbb5=, the prior promotion record;
+2. =3905a7fa0a50eb2b6fec5495fe0afa3a2af35e20=, the Slice 1 remainder audit;
+3. =3e3d581ac0222b5c789e5ee2464b67f6128d7d98=, the accepted Slice 1C
+   runtime payload;
+4. =e4438b75de39ef1a2eb3d9d83cbac9bc94cefb0c=, the Slice 1C acceptance
+   evidence.
+
+Their aggregate delta contains exactly three wallpaper paths, the Quickshell
+checker, two documentation indexes, the Slice 1 remainder audit, the prior
+activation handoff, and the Slice 1C handoff: nine paths total.  No NixOS/Home
+Manager module, package, service definition, =flake.nix=, or =flake.lock=
+changed.
+
+Promotion itself did not fetch or switch the live MSI checkout.  At the final
+verification snapshot, that checkout was already clean on
+=work/quickshell-cleanup= at =e4438b7= with the promoted payload trees.
+Quickshell retained PID =268275= and its =2026-07-20 07:47:32 EDT= start time,
+remained =active/running= with =Result=success= and =NRestarts=0=, and the
+system remained =system-860-link= at
+=/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44=.
+No build, NixOS/Home Manager activation, service restart, branch switch, or
+runtime mutation occurred during promotion.
+
+The MSI's inactive local =main= ref remained at
+=4756f02dc08575b938b32991501b394d49ce77e2= and its stale
+=origin/main= tracking ref remained at
+=9a6f1505ac8e0a9f3291356dd1b908ff8b4cc888=.  They do not affect the live
+cleanup checkout, but fetching =main= and advancing the inactive local branch
+are later, separately authorized Git-maintenance decisions.
+
+This promotion-completion edit is documentation-only and was not part of the
+promoted head.  If it is later committed and pushed on the cleanup branch,
+=main= remains anchored at =e4438b7= unless another promotion is explicitly
+authorized; publication does not imply a second =main= update or live-checkout
+synchronization.
+
 * Rollback Boundary
 
 Rollback was not exercised because every gate passed.  If a later Slice 1C
@@ -296,10 +364,13 @@ a Nix generation.
 
 The following is a *runbook, not authorization*.  It requires fresh explicit
 rollback authority unless this exact recovery scope was pre-authorized for the
-current gate.  It is bound to a clean live checkout on
-=work/quickshell-cleanup= at =3e3d581=, the current single-=eDP-1= topology,
-generation 860, and the recorded live link.  If any of those facts has drifted,
-stop and prepare a newly bound runbook.
+current gate.  It is retained as a historical template and is *not directly
+runnable now*: the live checkout advanced documentation-only from =3e3d581= to
+=e4438b7=, so its exact-head precondition intentionally fails.  It must be
+rebound and reviewed before use.  The recorded version is bound to a clean live
+checkout on =work/quickshell-cleanup= at =3e3d581=, the recorded
+activation-snapshot single-=eDP-1= topology, generation 860, and the live link.
+If any of those facts has drifted, stop and prepare a newly bound runbook.
 
 #+begin_src sh
 set -euo pipefail
@@ -511,22 +582,28 @@ recovery.
 
 * Publication Boundary And Remaining Decisions
 
-At this document's preparation snapshot, the following were separate decisions
-and were not authorized by this record:
+At the original acceptance-document preparation snapshot, its commit, push,
+optional documentation-only MSI synchronization, and =main= promotion were
+separate and unauthorized decisions.  Each was later authorized and completed
+individually; completion does not retroactively broaden the original
+authority.
 
-1. review and commit this documentation-only acceptance evidence;
-2. push that documentation commit;
-3. optionally synchronize the live checkout to the documentation-only
+At this promotion-completion preparation snapshot, this edit's commit and push
+were also separate pending gates and were not authorized by the record itself.
+Git history and remote-ref evidence determine whether they later completed.  A
+cleanup-only documentation publication does not advance =main=.
+
+The durable remaining decisions are:
+
+1. optionally synchronize the live checkout to a later documentation-only
    descendant without restarting Quickshell;
-4. promote the accepted cleanup head to =main=;
-5. perform the fresh two-monitor test when the external display is available;
-6. select Slice 1D or any other optimization/correction slice.
+2. reconcile the MSI's stale =main= and =origin/main= refs, with fetch and
+   local-branch movement treated as explicit Git-maintenance gates;
+3. perform the fresh two-monitor test when the external display is available;
+4. select Slice 1D or any other optimization/correction slice.
 
-Git history and later completion records, rather than this pre-publication
-snapshot, determine which of the first three decisions subsequently completed.
-Their later completion would not authorize any following item.
-
-Before any documentation-only descendant is committed or promoted, prove that
-its =config/quickshell= and =scripts= trees remain exactly
-=d055774e312a1948beac1fb74d751d7cf95cdd89= and
-=9905494f517592112f5df0a13db3312ff410fc2b=.
+Each durable item requires separate authorization.  Any commit containing this
+completion edit must preserve =config/quickshell= and =scripts= trees exactly
+at =d055774e312a1948beac1fb74d751d7cf95cdd89= and
+=9905494f517592112f5df0a13db3312ff410fc2b=; it must not automatically advance
+=main= again.

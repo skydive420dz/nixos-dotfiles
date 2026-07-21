@@ -14,7 +14,7 @@ commits, pushes, service changes, or branch deletion.
 |---------+-------------------------+--------------------|
 | System | Generation 860 and its active GC timer remain accepted; the clean one-shot optimizer run is accepted; O3-A defers recurrence for a roughly 30-day observation; no optimizer timer is armed | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
 | Emacs | Clean Emacs remains active under generation 860 with the same accepted Home Manager root; Lua and Nix =lsp-mode=/Company slices are accepted; the accepted QML policy uses verified four-space formatting in classic and parser-backed modes | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | Cleanup Slices 0A-1B remain accepted on =main=; Slice 1C is accepted source-live at immutable head =3e3d581= after separate source, pure-build, source-live activation, automated-runtime, and user =eDP-1= gates; generation 860 is unchanged; the user explicitly deferred this candidate's fresh dual-output test until the second monitor is connected | Review the acceptance handoff; its documentation commit, push, any =main= promotion, fresh dual-output test, and Slice 1D each require separate authorization, with Git and remote-ref evidence recording any later completion |
+| Quickshell | Cleanup Slices 0A-1C are accepted; tested payload =3e3d581= and documentation head =e4438b7= were promoted by strict fast-forward; the promotion snapshot verified GitHub =main= and =work/quickshell-cleanup= together at =e4438b7= and the live MSI clean at that head with generation 860 unchanged; a later completion-record publication may place cleanup on a documentation-only descendant without advancing =main=; this candidate's fresh dual-output test remains explicitly deferred | At this dashboard preparation snapshot, the completion record's commit and push were separate pending gates, with Git and remote-ref evidence determining later completion; optional live synchronization, MSI =main=-ref reconciliation, the fresh dual-output test, and Slice 1D remain separately authorized decisions |
 | Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs, Vial discovers it, and QMK CLI intentionally remains system-wide | Keep firmware writes and flashing separate and explicitly authorized |
 | VS Code | NixOS has no VS Code configuration | Adapt the macOS Home Manager module in a future Linux-specific slice |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -36,7 +36,8 @@ The reviewed tag/delete mapping for legacy branches is in
 The accepted Quickshell Slices 0A-1B base sequence is in
 [[file:handoffs/2026-07-19-quickshell-cleanup-activation.org][the 0A-1B
 activation handoff]].  The current accepted Slice 1C wallpaper-safety delta,
-live state-write evidence, and fresh dual-output deferral are in
+live state-write evidence, completed =main= promotion, and fresh dual-output
+deferral are in
 [[file:handoffs/2026-07-20-quickshell-slice1c-acceptance.org][the Slice 1C
 acceptance handoff]].
 
