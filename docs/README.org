@@ -9,12 +9,12 @@ state.  Audits are dated evidence, not implementation authority.
 Documentation does not turn a build into activation and does not authorize
 commits, pushes, service changes, or branch deletion.
 
-* Status At A Glance - 2026-07-22
+* Status At A Glance - 2026-07-23
 | Surface | Confirmed current state | Next accepted step |
 |---------+-------------------------+--------------------|
 | System | Generation 860 and its active GC timer remain accepted; the clean one-shot optimizer run is accepted; O3-A defers recurrence for a roughly 30-day observation; no optimizer timer is armed | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
 | Emacs | Clean Emacs remains active under generation 860 with the same accepted Home Manager root; Lua and Nix =lsp-mode=/Company slices are accepted; the accepted QML policy uses verified four-space formatting in classic and parser-backed modes | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | The cleanup sequence through Slice 1D is accepted.  Slice 1D payload =ae1736b= replaces per-process temporary CAVA configuration with tracked =cava.conf=, was accepted on =eDP-1=, and awaits ref integration; its acceptance evidence is published at =89a7255=.  The live MSI is clean and detached at the payload, Quickshell is healthy, generation 860 is unchanged, and three pause/play cycles created no new matching CAVA temporary configs.  The 387 historical matching CAVA temp-config files and dual-output validation remain deferred | Use the published documentation head as the integration source and require a fresh readiness check before each separately authorized fast-forward through =work/quickshell-cleanup= and =main=.  Deletion of the 387 historical files remains its own mutable-state cleanup gate; dual-output validation, analyzer freshness/exit handling, and shared-analyzer or performance work remain later slices |
+| Quickshell | The cleanup sequence through Slice 1D is accepted and promoted.  Slice 1D payload =ae1736b= replaces per-process temporary CAVA configuration with tracked =cava.conf= and was accepted on =eDP-1=; acceptance documentation through =89a2256= is published.  The live MSI remains clean and detached at the payload with byte-identical promoted QML, healthy Quickshell, and generation 860 unchanged.  Three pause/play cycles created no new matching CAVA temporary configs; the 387 historical matching CAVA temp-config files and dual-output validation remain deferred | Deletion of the 387 historical files remains its own mutable-state cleanup gate.  Run dual-output validation when an external display is available; analyzer freshness/exit handling, shared-analyzer work, and performance changes remain separate measured slices.  Optional live documentation-only synchronization and Slice 1D branch retirement remain separate hygiene decisions |
 | Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs, Vial discovers it, and QMK CLI intentionally remains system-wide | Keep firmware writes and flashing separate and explicitly authorized |
 | VS Code | NixOS has no VS Code configuration | Adapt the macOS Home Manager module in a future Linux-specific slice |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -45,13 +45,13 @@ source/build/live/runtime evidence, and remaining boundaries are in
 acceptance handoff]].
 
 * Current Work Lanes
-- =main=: stable checkpoint lane; any promotion remains separately authorized.
+- =main=: stable checkpoint lane carrying the accepted Slice 1D state.
 - =work/nixos-maintenance=: designated post-checkpoint system and hygiene work.
 - =work/quickshell-cleanup=: designated post-checkpoint correctness,
-  optimization, and integration lane.
-- =work/quickshell-slice1d=: integration source carrying accepted payload
-  =ae1736b= and published acceptance evidence =89a7255=; cleanup and =main=
-  integration remain separate gates.
+  optimization, and integration lane; start the next slice from the promoted
+  head.
+- =work/quickshell-slice1d=: accepted Slice 1D evidence lane; retaining or
+  retiring it remains a separate repository-hygiene decision.
 - Emacs: complete the current Python acceptance decision before selecting
   another language or optimization slice.
 
