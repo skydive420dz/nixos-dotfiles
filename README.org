@@ -36,6 +36,12 @@ The accepted baseline is recorded in
 later accepted maintenance evidence is in the
 [[file:docs/handoffs/2026-07-19-vial-qmk-udev.org][Vial/QMK handoff]] and
 [[file:docs/handoffs/2026-07-19-msi-pure-builds.org][MSI pure-build handoff]].
+The accepted and promoted Quickshell cleanup sequence through Slice 1D is
+recorded in
+[[file:docs/handoffs/2026-07-22-quickshell-slice1d-acceptance.org][the Slice 1D
+acceptance handoff]].  Its stable CAVA configuration is live on =eDP-1=;
+fresh dual-output validation and removal of the old temporary configs remain
+separate work.
 The conservative GC policy, complete first-run preflight, and observed manual
 run are recorded in the
 [[file:docs/handoffs/2026-07-19-msi-nix-gc.org][MSI Nix GC handoff]].
@@ -100,7 +106,9 @@ Work stays slice-based:
 
 1. Apply confirmed NixOS maintenance, security, service, and GC corrections one
    small change at a time.
-2. Optimize Quickshell after deterministic correctness and lifecycle defects.
+2. For Quickshell, run the deferred dual-output check when a second display is
+   available, keep old CAVA temp-file deletion separate, and take later
+   correctness or performance work as measured slices.
 3. Give Emacs measured, real-use-driven TLC; Lua and Nix LSP slices are accepted,
    while Python's manual acceptance remains in progress.
 4. Port the macOS VS Code configuration only as a Linux-specific Home Manager
