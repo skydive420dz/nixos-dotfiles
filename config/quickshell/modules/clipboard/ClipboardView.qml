@@ -43,6 +43,7 @@ Item {
     onOpenChanged: refreshPreview()
 
     function show() {
+        closeTimer.stop();
         closing = false;
         open = true;
         query = "";

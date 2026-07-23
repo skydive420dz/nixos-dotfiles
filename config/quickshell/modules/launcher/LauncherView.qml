@@ -34,6 +34,7 @@ Item {
     readonly property color chipColor: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.90)
 
     function show() {
+        closeTimer.stop();
         closing = false;
         open = true;
         query = "";
