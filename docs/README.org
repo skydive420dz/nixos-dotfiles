@@ -14,7 +14,7 @@ commits, pushes, service changes, or branch deletion.
 |---------+-------------------------+--------------------|
 | System | Generation 860 and its active GC timer remain accepted; the clean one-shot optimizer run is accepted; O3-A defers recurrence for a roughly 30-day observation; no optimizer timer is armed | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
 | Emacs | Clean Emacs remains active under generation 860 with the same accepted Home Manager root; Lua and Nix =lsp-mode=/Company slices are accepted; the accepted QML policy uses verified four-space formatting in classic and parser-backed modes | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | The cleanup sequence through Slice 1D is accepted and promoted.  Slice 1D payload =ae1736b= replaces per-process temporary CAVA configuration with tracked =cava.conf= and was accepted on =eDP-1=; acceptance documentation through =89a2256= is published.  The live MSI remains clean and detached at the payload with byte-identical promoted QML, healthy Quickshell, and generation 860 unchanged.  Three pause/play cycles created no new matching CAVA temporary configs; the 387 historical matching CAVA temp-config files and dual-output validation remain deferred | Deletion of the 387 historical files remains its own mutable-state cleanup gate.  Run dual-output validation when an external display is available; analyzer freshness/exit handling, shared-analyzer work, and performance changes remain separate measured slices.  Optional live documentation-only synchronization and Slice 1D branch retirement remain separate hygiene decisions |
+| Quickshell | The cleanup sequence through Slice 1E is accepted and promoted.  Runtime payload =84b111b= adds only the launcher and clipboard reopen-timer cancellation.  Automated live interaction on =eDP-1= passed both rapid-reopen preservation and ordinary-close clearing; the live MSI is clean on =main= carrying that payload, Quickshell is healthy, and generation 860 is unchanged.  Slice 1D's tracked CAVA configuration remains accepted; its 387 historical temporary configs and fresh dual-output validation remain deferred | Slice 1F is the next proposed bounded correctness candidate and requires separate authorization.  Keep the broader preview-cache and secret-lifecycle redesign, historical-file deletion, dual-output validation, analyzer work, and performance claims in separate slices |
 | Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs, Vial discovers it, and QMK CLI intentionally remains system-wide | Keep firmware writes and flashing separate and explicitly authorized |
 | VS Code | NixOS has no VS Code configuration | Adapt the macOS Home Manager module in a future Linux-specific slice |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -43,15 +43,18 @@ acceptance handoff]].  The accepted Slice 1D tracked-CAVA delta, separated
 source/build/live/runtime evidence, and remaining boundaries are in
 [[file:handoffs/2026-07-22-quickshell-slice1d-acceptance.org][the Slice 1D
 acceptance handoff]].
+The accepted Slice 1E overlay-timer correction, its separated verification
+gates, promotion, and remaining boundaries are in
+[[file:handoffs/2026-07-23-quickshell-slice1e-acceptance.org][the Slice 1E
+acceptance handoff]].
 
 * Current Work Lanes
-- =main=: stable checkpoint lane carrying the accepted Slice 1D state.
+- =main=: stable checkpoint lane carrying the accepted Slice 1E payload.
 - =work/nixos-maintenance=: designated post-checkpoint system and hygiene work.
-- =work/quickshell-cleanup=: designated post-checkpoint correctness,
-  optimization, and integration lane; start the next slice from the promoted
-  head.
-- =work/quickshell-slice1d=: accepted Slice 1D evidence lane; retaining or
-  retiring it remains a separate repository-hygiene decision.
+- =work/quickshell-cleanup= remains at the accepted pre-1E checkpoint
+  =51c0396=; advancing or retiring it is a separate workflow decision.
+- =work/quickshell-slice1d= at =51c0396= and =work/quickshell-slice1e= at
+  =84b111b= are retained evidence refs, not active worktrees.
 - Emacs: complete the current Python acceptance decision before selecting
   another language or optimization slice.
 
@@ -73,6 +76,7 @@ acceptance handoff]].
 
 * Evidence And History
 - [[file:HISTORY.org][Human-readable history and decision log]]
+- [[file:handoffs/2026-07-23-quickshell-slice1e-acceptance.org][2026-07-23 Quickshell Slice 1E activation and acceptance]]
 - [[file:handoffs/2026-07-22-quickshell-slice1d-acceptance.org][2026-07-22 Quickshell Slice 1D activation and acceptance]]
 - [[file:handoffs/2026-07-20-quickshell-slice1c-acceptance.org][2026-07-20 Quickshell Slice 1C activation and acceptance]]
 - [[file:audits/2026-07-19-quickshell-slice1-remainder.org][2026-07-19 Quickshell Slice 1 remainder audit]]

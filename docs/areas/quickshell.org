@@ -24,7 +24,7 @@ Slice 1C acceptance handoff]].  That handoff also records the completed strict
 fast-forward promotion through documentation head =e4438b7=.  None of these
 records authorizes another ref update, live change, dual-output test, or later
 slice.
-The current accepted Slice 1D tracked-CAVA delta is recorded in
+The accepted Slice 1D tracked-CAVA delta is recorded in
 [[../handoffs/2026-07-22-quickshell-slice1d-acceptance.org][the 2026-07-22
 Slice 1D acceptance handoff]].  Payload =ae1736b= passed its separate source,
 pure-build, source-live, automated-runtime, and hand-test gates on =eDP-1=;
@@ -35,6 +35,20 @@ remains a separate mutable-state gate.  Strict non-forced integration through
 =work/quickshell-cleanup= and =main= completed on 2026-07-23.  The immutable
 pre-payload rollback anchor remains =9377dba= even though the moving branch
 refs advanced.
+
+The current accepted Slice 1E overlay-timer correction is recorded in
+[[../handoffs/2026-07-23-quickshell-slice1e-acceptance.org][the 2026-07-23
+Slice 1E acceptance handoff]].  Payload =84b111b= stops a pending close timer
+when either the launcher or clipboard is reopened.  Its exact-source and pure
+no-link build gates remained separate from controlled source activation and
+automated live interaction on =eDP-1=.  Both overlays preserved a sentinel
+through a close/reopen interval shorter than 150 ms and still cleared after an
+ordinary close.  The MSI checkout is clean on =main= carrying that payload,
+Quickshell is healthy, and generation 860 is unchanged.  At the
+pre-documentation snapshot, local and GitHub =main= and
+=work/quickshell-slice1e= resolved to =84b111b=, while
+=work/quickshell-cleanup= and =work/quickshell-slice1d= remained at =51c0396=.
+Slice 1F remains proposed and unimplemented.
 
 The current =main= branch is the sober working shell. The old modular shell lives on =prototype/quickshell-legacy= and the archived quickshell branches. Treat those branches as reference material only: port useful ideas back deliberately, one module at a time.
 
@@ -301,6 +315,7 @@ This is descriptive, not a mandate to create empty folders. Split only when a mo
 - 2026-07-20: After separate commit, push, MSI documentation-sync, readiness, and promotion authorizations, GitHub =main= and =work/quickshell-cleanup= both resolved to documentation head =e4438b75de39ef1a2eb3d9d83cbac9bc94cefb0c=.  The promotion was a strict non-forced =0=-behind/=4=-ahead fast-forward from =8d8848739e44f27af253f4092333fbbe243f7ce7= in a disposable =main= worktree, which was removed after verification.  The live MSI checkout was already clean on the cleanup branch at =e4438b7= with the accepted QML, Emacs, and scripts trees; Quickshell PID =268275=, its start timestamp, =NRestarts=0=, generation 860, and the current system remained unchanged.  The inactive MSI local =main= and stale =origin/main= refs were intentionally untouched.  At this completion-record preparation snapshot, its own commit and push were separate pending gates, with Git and remote-ref evidence determining later completion.  Optional live synchronization, MSI ref reconciliation, dual-output testing, and Slice 1D remain separate decisions.
 - 2026-07-22: Cleanup Slice 1D is accepted source-live on =eDP-1= at immutable payload =ae1736bfcf4d38fca501d14b19111137942b1386=, with acceptance evidence published at =89a725578c5d121560c76f1c2660112e1ed22fd1=.  The payload replaces shell-created =/tmp= configurations with tracked =modules/media/cava.conf= and direct CAVA argv.  Its exact-source and pure no-link build gates remained separate from controlled source activation; three typed IPC pause/play cycles, restored-state checks, and the user hand test passed with one direct-config CAVA while playing, none while paused, zero new matching CAVA temp configs, and generation 860 unchanged.  At the integration-readiness snapshot, the live checkout remained clean and detached at =ae1736b= while remote Slice 1D, cleanup, and =main= remained =89a7255=, =9377dba=, and =e4438b7= respectively.  No cleanup or =main= ref update followed from acceptance-evidence publication.  Dual-output validation, deletion of the 387 historical matches, analyzer freshness/exit handling, shared-analyzer work, and performance claims remain deferred.  Exact evidence and authority boundaries are in [[file:../handoffs/2026-07-22-quickshell-slice1d-acceptance.org][the Slice 1D acceptance handoff]].
 - 2026-07-23: After separate readiness, local fast-forward, publication, and disposable-worktree cleanup gates, =main=, =work/quickshell-cleanup=, and =work/quickshell-slice1d= all resolved to accepted documentation head =89a2256efa701ab5c01e0c3caeddaa2801a345da=.  The live checkout remained clean and detached at payload =ae1736b= with the same QML tree, Quickshell PID, generation 860, and current system.  Promotion did not build or activate NixOS, restart services, delete historical configs, perform the deferred dual-output test, or authorize another optimization slice.
+- 2026-07-23: Slice 1E is accepted and promoted at runtime payload =84b111b402cd34f42fd895725fde1810ee6e455c=.  Its only payload changes add =closeTimer.stop()= at the start of launcher and clipboard =show()=.  Exact-source validation and a separate pure no-link build passed before a controlled Quickshell source activation.  Automated live tests on =eDP-1= proved that both overlays preserve a typed sentinel across close/reopen within 150 ms, still clear state after an ordinary close, and finish closed.  Quickshell remained healthy with zero restarts or warning-level journal entries after activation; generation 860 and the current system did not change.  The branch was published, =main= was fast-forwarded and published separately, the live checkout was attached cleanly to =main=, and the clean Slice 1D and Slice 1E worktrees were removed while their branch refs were retained.  No NixOS activation, human hand test, historical CAVA cleanup, dual-output validation, Slice 1F implementation, or broader optimization was performed.
 
 ** Known Lesson
 :PROPERTIES:

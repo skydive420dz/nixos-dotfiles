@@ -1,0 +1,146 @@
+#+title: Quickshell Slice 1E Overlay Reopen Timer Acceptance - 2026-07-23
+#+startup: overview
+
+* Status
+Slice 1E is =ACCEPTED= and promoted.
+
+- Accepted runtime payload:
+  =84b111b402cd34f42fd895725fde1810ee6e455c=
+- Pre-slice rollback commit:
+  =51c03960e646ea21c15e6de88a18482841b3a614=
+- Retained evidence branch: =work/quickshell-slice1e=
+- Active system: generation 860,
+  =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44=
+
+At the pre-documentation snapshot, local, tracking, and GitHub =main= all
+resolved to the runtime payload.  This later documentation candidate has its
+own commit, push, promotion, and worktree-cleanup gates.
+
+This handoff records evidence; it does not authorize another commit, push,
+activation, mutable-state cleanup, or implementation slice.
+
+* Contract And Fix
+The controlling contract is
+[[file:../audits/2026-07-19-quickshell-slice1-remainder.org][the Slice 1
+remainder audit]], section =Slice 1E - Overlay Reopen Timer Cancellation=.
+
+Launcher and clipboard =close()= start a 150 ms timer so their fade can finish
+before transient state is cleared.  Before this slice, =show()= did not stop a
+timer left by an interrupted close.  Reopening an overlay quickly could
+therefore let the old timer clear the newly entered query or preview state.
+
+The accepted payload adds only one statement to each affected =show()=:
+
+#+begin_src qml
+closeTimer.stop();
+#+end_src
+
+Affected paths:
+
+- =config/quickshell/modules/launcher/LauncherView.qml=
+- =config/quickshell/modules/clipboard/ClipboardView.qml=
+
+The normal =close()= path still calls =closeTimer.restart()=.  Slice 1E does
+not change animation timing, input bindings, clipboard contents, preview
+publication, deletion logic, or the NixOS configuration.
+
+* Verification Gates
+** Source
+The candidate was isolated from accepted =main=.  Its diff against the rollback
+commit contained exactly two insertions: the two =closeTimer.stop()= calls.
+
+=scripts/check-quickshell= passed:
+
+- 31 QML files;
+- 17 Bash files;
+- 2 JSON files;
+- 1 Python file;
+- strict actionable QML lint with no failures.
+
+** Pure Build
+A separate pure no-link Nix build passed and returned the already-active
+generation-860 system closure.  It did not create a =result= link or change
+=flake.lock=.
+
+This is build evidence only.  Quickshell is linked out of the Nix store, so the
+exact source checker and live tests remain independent requirements.
+
+** Controlled Source Activation
+Quickshell was stopped before the live checkout moved from the rollback commit
+to exact payload =84b111b=.  The source checker passed in the live checkout
+before Quickshell was started again.
+
+The new process started successfully as PID =2223278=.  After testing:
+
+- =ActiveState= was =active= and =SubState= was =running=;
+- =Result= was =success=;
+- =NRestarts= was =0=;
+- the service journal had no warning-level entries since activation;
+- generation 860 and =/run/current-system= were unchanged.
+
+No NixOS build result was activated.
+
+** Automated Live Overlay Tests
+The tests used the connected =eDP-1= output and typed only fixed sentinel
+queries.  Clipboard entries were not activated or deleted.  These were
+automated live interactions, not a separate human hand test.
+
+Launcher:
+
+1. Close, reopen after 80 ms, enter =s1e-launcher-survives=, and wait more than
+   300 ms.
+2. The sentinel remained visible.
+3. A separate ordinary close completed, reopening showed the empty
+   =Spotlight Search= placeholder, and the overlay finished closed.
+
+Clipboard:
+
+1. Close, reopen after 80 ms, enter =s1e-clipboard-survives=, and wait more
+   than 300 ms.
+2. The sentinel remained visible.
+3. A separate ordinary close completed, reopening showed the empty
+   =Clipboard Search= placeholder, and the overlay finished closed.
+
+One combined launcher sequence left the final overlay open after its last
+asynchronous toggle.  The empty reopened field had already proved normal state
+clearing; the launcher was then normalized with one independently spaced toggle
+and confirmed closed.  The service did not restart or log a warning.
+
+All test screenshots were removed afterward.
+
+* Promotion And Repository State
+The accepted payload was committed as:
+
+#+begin_example
+84b111b quickshell: cancel stale overlay close timers
+#+end_example
+
+The evidence branch was published first.  Local =main= was then advanced by a
+verified strict fast-forward and attached to the already-identical live
+checkout without rewriting source bytes or restarting Quickshell.  The user
+published =main= separately.
+
+At the pre-documentation snapshot:
+
+- local, tracking, and GitHub =main= resolved to =84b111b=;
+- local and GitHub =work/quickshell-slice1e= resolved to =84b111b=;
+- =work/quickshell-cleanup= and =work/quickshell-slice1d= remained at
+  =51c0396=;
+- the live checkout was clean on =main=;
+- clean Slice 1D and Slice 1E worktree directories had been removed while
+  their branch refs were retained.
+
+* Boundaries And Next Slice
+Slice 1E did not:
+
+- activate or rebuild NixOS;
+- include a separate human hand test;
+- delete the 387 historical CAVA temporary configuration files;
+- complete the deferred fresh dual-output validation;
+- change clipboard preview success or delete-selection behavior;
+- claim analyzer, memory, or broader performance improvements.
+
+The next documented correctness candidate is Slice 1F: make clipboard preview
+publication success-aware and non-looping, reject stale completions, and make
+post-delete selection deterministic.  Its preview-cache and secret-lifecycle
+redesign remain explicitly out of scope.
