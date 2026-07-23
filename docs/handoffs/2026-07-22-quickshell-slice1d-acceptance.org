@@ -1,0 +1,253 @@
+#+title: Quickshell Slice 1D Stable CAVA Configuration Acceptance - 2026-07-22
+#+startup: overview
+
+* Status And Authority
+
+Status: *ACCEPTED SOURCE-LIVE ON =eDP-1=; DUAL-OUTPUT VALIDATION
+EXPLICITLY DEFERRED*.
+
+This handoff records the separately completed source, build, immutable-candidate,
+source-live activation, automated runtime, and user hand-test gates for
+Quickshell Slice 1D.  The accepted runtime payload is local commit
+=ae1736bfcf4d38fca501d14b19111137942b1386=.
+
+After three automated pause/play cycles, the user visually checked the spectrum,
+media controls, and bar on =eDP-1= and reported that everything looked good.
+The user then authorized this document with the fresh dual-output test deferred
+until an external display is available.
+
+At this document's preparation snapshot, the payload commit had no upstream and
+this handoff was uncommitted and unpushed.  Preparation did not authorize or
+perform a documentation commit, push, remote-ref update, =main= promotion, live
+checkout synchronization, service action, Nix activation, orphan deletion,
+rollback, or later optimization slice.
+
+Any future documentation commit is a descendant of the tested payload, not a new
+runtime payload identity.  Git history and remote-ref evidence remain
+authoritative for later publication claims.
+
+* Contract Cross-Check
+
+This result follows:
+
+- [[file:../../README.org][the repository README]], which separates source,
+  build, activation, runtime, and hand-test evidence;
+- [[file:../audits/2026-07-19-quickshell-slice1-remainder.org][the Slice 1
+  remainder audit]], whose Slice 1D contract requires a tracked module-private
+  config, direct argv, repeated playback cycles, and zero new matching configs;
+- [[file:../audits/2026-07-14-quickshell-optimization.org][the original
+  Quickshell optimization audit]], which identified the successful =exec=
+  bypass of Bash's EXIT trap;
+- [[file:2026-07-20-quickshell-slice1c-acceptance.org][the prior Slice 1C
+  acceptance]], which established the source-live and separate-gate workflow.
+
+The pure no-link build proves Nix evaluation and closure availability.  It does
+not validate the live-linked QML/config bytes.  Exact-source checks validate the
+candidate bytes.  With Quickshell stopped, moving the checkout to the detached
+candidate exposes those bytes through the live symlink; starting the service
+activates them at runtime.  The live checker, process evidence, and hand test
+provide those separate proofs.
+
+* Bound Identities
+
+| Item | Bound value |
+|------+-------------|
+| Host | =nixos= at =192.168.1.175= |
+| Isolated worktree | =/home/skydive420dz/Projects/nixos-dotfiles-slice1d= |
+| Local candidate ref | =work/quickshell-slice1d= at =ae1736bfcf4d38fca501d14b19111137942b1386=; no upstream |
+| Live checkout | =/home/skydive420dz/Projects/nixos-dotfiles=, clean and detached at =ae1736bfcf4d38fca501d14b19111137942b1386= |
+| Source parent and rollback ref | =work/quickshell-cleanup= at =9377dba266b989e27f43ad06424f5a46bb78e05e= |
+| Candidate relationship | strict =0= behind / =1= ahead descendant of rollback |
+| Local/remote =main= | =e4438b75de39ef1a2eb3d9d83cbac9bc94cefb0c= |
+| Remote cleanup ref | =9377dba266b989e27f43ad06424f5a46bb78e05e= |
+| Candidate QML tree | =fd50126b6620911269e74d9c3b3fdf593a3a8ffa= |
+| Unchanged Emacs tree | =a3fe7cb4b9cf99b99b9901c08e8d98716cd89686= |
+| Unchanged scripts tree | =9905494f517592112f5df0a13db3312ff410fc2b= |
+| =MediaAnalyzer.qml= mode/blob | =100644= / =63b3995e237a3050016d2cf6ae49356178448843= |
+| =cava.conf= mode/blob | =100644= / =e7eefffc2db187c106ccbe4e6e1352327b7dce1f= |
+| =cava.conf= SHA-256/size | =0c3e3fd58eb74c1e2afdd52e128f23cb7460cfbba7035f63b9c7ce505afccd74= / 190 bytes |
+| Live link | =~/.config/quickshell= resolves into the live checkout |
+| System profile | =system-860-link=, unchanged |
+| Current/booted system | =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Connected output | =eDP-1= only, =1920x1080@144.00301= |
+
+* Accepted Implementation Boundary
+
+The payload changes exactly two paths:
+
+1. [[file:../../config/quickshell/modules/media/MediaAnalyzer.qml][MediaAnalyzer.qml]]
+   imports =Quickshell= and invokes direct argv:
+
+   #+begin_example
+   ["cava", "-p", Quickshell.shellPath("modules/media/cava.conf")]
+   #+end_example
+
+2. New tracked
+   [[file:../../config/quickshell/modules/media/cava.conf][cava.conf]] keeps the
+   previous 12 bars, 24 fps, autosensitivity, Pulse automatic source, mono raw
+   ASCII output, and range 100.
+
+The installed Quickshell 0.3.0 API exposes =shellPath(QString)=.  CAVA remains a
+system-wide package and resolves in Quickshell's inherited PATH.  Bash,
+=command -v=, =sleep=, =mktemp=, the heredoc, EXIT trap, and =exec= were removed
+from the analyzer command.
+
+The activity binding, fallback animation, level parser, Canvas, geometry, media
+controls, 24 fps rate, and per-output analyzer ownership were not changed.
+Because CAVA is a bound system package, replacing the old missing-command sleep
+with direct process failure is acceptable for this MSI checkpoint; this slice
+does not claim absent-package recovery behavior.
+
+No NixOS/Home Manager module, package set, service definition, controller,
+rendering policy, =flake.nix=, or =flake.lock= changed.
+
+* Separate Gate Record
+
+| Gate | Evidence | Result |
+|------+----------+--------|
+| Read-only audit | Current source retained the =exec=/trap defect; 383 identical 190-byte matching files existed at audit time | confirmed lifecycle/hygiene defect |
+| Isolated source candidate | Exact parent =9377dba=; only =MediaAnalyzer.qml= and new =cava.conf= changed | pass; no live action |
+| General source checker | 31 QML, 17 Bash, 2 JSON, and 1 Python source; canonical format; zero actionable diagnostics; strict lint and helper ShellCheck pass | pass |
+| Slice-specific validation | Direct argv exact; forbidden shell/temp path absent; config mode =100644=, 190 bytes, exact SHA-256 above | pass |
+| Pure no-link build | =path:= flake source contained both changed bytes; unchanged lock; no =result= link | pass; output equals current system |
+| Immutable candidate | Local commit =ae1736b= contains exactly two paths and is a direct child of =9377dba= | pass; no push |
+| Pre-activation | Old Quickshell PID =268275=; old CAVA used =/tmp/tmp.1WSHo2TT3w=; one output; generation 860 | bound |
+| Source-live activation | Stop; post-stop baseline 387; detach live checkout at =ae1736b=; live checker; start | pass; no Nix activation |
+| Automated runtime | Three pause/play cycles; every pause had zero CAVA, every play one direct-config child; temp delta zero | pass on =eDP-1= |
+| User hand test | Spectrum, pause/resume behavior, media controls, and bar appearance checked; user reported everything looked good | accepted on =eDP-1= |
+| Dual output | External display unavailable; this candidate's fresh test was explicitly deferred | deferred |
+
+=scripts/check-quickshell= does not parse CAVA INI files.  Its QML result is
+therefore reported separately from the exact staged/committed config mode,
+content hash, size, and direct-argv assertions.
+
+* Build Evidence
+
+The separately authorized pure path-flake command returned:
+
+#+begin_example
+/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44
+#+end_example
+
+The archived flake source was
+=/nix/store/vfln0z96v196xj0jyxsjnrx34lv1pnzm-source=.  It contained
+=cava.conf= with the exact accepted SHA-256 and the direct-argv QML.  After the
+immutable commit, both changed file hashes matched that archived source.  No
+=result= link or lock-file change was created.
+
+The output equals generation 860 because the application-native Quickshell tree
+is intentionally out-of-store linked.  This equality is not presented as QML
+validation or activation.
+
+* Source-Live And Runtime Evidence
+
+The count rose from 383 to 387 while the rollback implementation was still live
+between the read-only audit and the controlled stop.  Those four configs were
+therefore old-wrapper output, not candidate output; the final bound old CAVA
+child used =/tmp/tmp.1WSHo2TT3w=.  Candidate lifecycle evidence begins from the
+post-stop baseline of 387.
+
+At =2026-07-22T21:51:44-04:00= Quickshell was deliberately stopped.  The old
+live process and its CAVA child exited, leaving an exact post-stop baseline of
+387 matching mode-0600, 190-byte files with SHA-256
+=0c3e3fd58eb74c1e2afdd52e128f23cb7460cfbba7035f63b9c7ce505afccd74=.
+
+The clean live checkout then moved from branch =work/quickshell-cleanup= at
+=9377dba= to detached candidate =ae1736b=.  The exact live source checker passed
+before Quickshell was started.  Startup at =2026-07-22T21:52:26-04:00= produced:
+
+- one =Configuration Loaded=;
+- Quickshell PID =1956061=, =active/running=, =Result=success=, and
+  =NRestarts=0=;
+- one CAVA child, initially PID =1956091=, in =quickshell.service= with argv
+  ending in
+  =~/.config/quickshell/modules/media/cava.conf= and no =/tmp= argument;
+- zero new matching temporary configs;
+- zero journal warnings or higher-severity entries;
+- unchanged generation 860 and current/booted system output;
+- =qs-wallpaper= and =qs-bar= at =0,0 1920x1080= on =eDP-1=.
+
+The typed =media.playPause= IPC target then exercised three complete
+pause-to-play cycles:
+
+| Cycle | Paused observation | Playing observation | Matching temp count |
+|-------+--------------------+---------------------+---------------------|
+| 1 | CAVA =0= | direct-config PID =1958314= | 387 |
+| 2 | CAVA =0= | direct-config PID =1958550= | 387 |
+| 3 | CAVA =0= | direct-config PID =1958748= | 387 |
+
+The initial Playing state was restored.  Quickshell retained PID =1956061= and
+zero restarts; the cycle journal had no entries and zero warnings.  The final
+automated count was 387, for an exact delta of zero.
+
+After the user hand test, a read-only snapshot at
+=2026-07-22T22:02:32-04:00= again found a clean detached live checkout at
+=ae1736b=, Quickshell healthy at the same PID, one CAVA process using the tracked
+config, 387 matching files, zero warning-or-higher journal entries, and the same
+system generation.
+
+* Accepted Scope And Explicit Deferrals
+
+Accepted now:
+
+- the two-file stable-config implementation at =ae1736b=;
+- exact source and slice-specific validation;
+- the pure no-link build as separate Nix evaluation/closure evidence;
+- controlled source-live activation with rollback retained;
+- three automated lifecycle cycles with zero new configs;
+- the user's current =eDP-1= visual and control hand result.
+
+Still deferred:
+
+- fresh dual-output validation until the external display is connected;
+- deletion of the existing 387 files, which is a separate mutable-state gate;
+- CAVA sample freshness and exit clearing, reserved for Slice 1I;
+- one shared analyzer and other per-output backend changes;
+- frame-rate tuning, =PwNodePeakMonitor= comparison, Canvas/render experiments,
+  and action-labelled CPU/GPU measurement;
+- any general performance, disk-pressure, long-soak leak, or crash-recovery
+  claim.
+
+The accepted claim is narrow: the tested activation and three playback cycles
+created zero new matching configs.  It does not claim that historical files were
+removed or that every CAVA failure mode is equivalent to the old wrapper.
+
+* Rollback Boundary
+
+Rollback was not needed.  The source rollback remains the clean local branch
+=work/quickshell-cleanup= at
+=9377dba266b989e27f43ad06424f5a46bb78e05e=.  The live checkout is detached at
+the accepted candidate, so a future authorized rollback would:
+
+1. re-bind the live HEAD, link, topology, generation, service state, and current
+   temp count;
+2. stop Quickshell;
+3. switch the live checkout back to =work/quickshell-cleanup=;
+4. validate the exact restored live bytes;
+5. start Quickshell and verify its journal and runtime.
+
+This is a recorded procedure, not authorization.  It would restore the old CAVA
+temporary-file behavior and therefore exists only as a regression escape hatch.
+If either ref or the live checkout advances, bind a replacement procedure first.
+A Nix generation rollback alone cannot restore out-of-store QML bytes.
+
+* Publication Boundary And Next Decisions
+
+At preparation time:
+
+- =work/quickshell-slice1d= exists only locally at =ae1736b= with no upstream;
+- the live checkout is clean and detached at that payload;
+- =origin/work/quickshell-cleanup= remains =9377dba=;
+- =main= and =origin/main= remain =e4438b7=;
+- this handoff is the only uncommitted documentation path.
+
+The next decisions remain separate:
+
+1. review and optionally commit this documentation-only handoff;
+2. push and remote-verify the accepted slice branch;
+3. decide whether and when to fast-forward the cleanup/main checkpoint lanes;
+4. later perform the fresh dual-output test;
+5. separately dry-run and authorize deletion of the 387 historical configs;
+6. select Slice 1E, Slice 1I, or another bounded correction/optimization slice.
+
+No item above is authorized merely by this record.
