@@ -19,6 +19,7 @@ Item {
     property string previewPath: ""
     property string previewTarget: ""
     property bool previewLoading: false
+    property int previewRevision: 0
     property int selectedIndex: 0
     property var entries: []
     readonly property var results: filteredResults()
@@ -158,7 +159,8 @@ Item {
 
         Quickshell.execDetached(["bash", "-lc", "printf '%s' \"$1\" | cliphist delete", "clipboard-delete", item.raw]);
         entries = entries.filter(entry => entry.raw !== item.raw);
-        selectedIndex = Math.min(selectedIndex, Math.max(results.length - 2, 0));
+        var remainingCount = filteredResults().length;
+        selectedIndex = remainingCount === 0 ? 0 : Math.min(index, remainingCount - 1);
     }
 
     function previewFileFor(item) {
@@ -167,22 +169,35 @@ Item {
     }
 
     function refreshPreview() {
+        previewRevision += 1;
+        previewPath = "";
+        previewLoading = false;
+
         var item = selectedEntry;
         if (!open || !item || !item.isImage) {
-            previewPath = "";
+            previewTarget = "";
+            return;
+        }
+
+        previewTarget = previewFileFor(item);
+        previewLoading = true;
+        startPreview();
+    }
+
+    function startPreview() {
+        var item = selectedEntry;
+        if (!open || !item || !item.isImage || previewTarget.length === 0) {
             previewLoading = false;
             return;
         }
 
-        var target = previewFileFor(item);
-        previewTarget = target;
-        previewPath = "";
-        previewLoading = true;
         if (previewProc.running)
             return;
 
-        previewProc.activeTarget = target;
-        previewProc.command = ["bash", "-lc", "out=$1; raw=$2; if [ ! -s \"$out\" ]; then printf '%s' \"$raw\" | cliphist decode | magick - -auto-orient -thumbnail 420x280 -strip png:\"$out\"; fi", "clipboard-preview", target, item.raw];
+        previewLoading = true;
+        previewProc.activeTarget = previewTarget;
+        previewProc.activeRevision = previewRevision;
+        previewProc.command = ["bash", "-lc", "set -o pipefail; out=$1; raw=$2; if [ -s \"$out\" ]; then exit 0; fi; rm -f -- \"$out\"; if ! printf '%s' \"$raw\" | cliphist decode | magick - -auto-orient -thumbnail 420x280 -strip png:\"$out\"; then rm -f -- \"$out\"; exit 1; fi; if [ ! -s \"$out\" ]; then rm -f -- \"$out\"; exit 1; fi", "clipboard-preview", previewTarget, item.raw];
         previewProc.running = true;
     }
 
@@ -195,6 +210,7 @@ Item {
             root.selectedIndex = 0;
             root.previewPath = "";
             root.previewTarget = "";
+            root.previewRevision += 1;
             root.previewLoading = false;
             root.closing = false;
         }
@@ -220,18 +236,25 @@ Item {
         id: previewProc
 
         property string activeTarget: ""
+        property int activeRevision: -1
 
-        onExited: {
-            if (activeTarget === root.previewTarget && root.previewTarget.length > 0)
-                root.previewPath = "file://" + activeTarget + "?v=" + Date.now();
-            else if (activeTarget === root.previewTarget)
-                root.previewPath = "";
+        onExited: (exitCode, exitStatus) => {
+            var completedTarget = activeTarget;
+            var completedRevision = activeRevision;
+            var isCurrent = completedTarget.length > 0 && completedTarget === root.previewTarget && completedRevision === root.previewRevision;
 
-            root.previewLoading = false;
             activeTarget = "";
+            activeRevision = -1;
 
-            if (root.open && root.selectedEntry && root.selectedEntry.isImage && root.previewPath.length === 0)
-                root.refreshPreview();
+            if (isCurrent) {
+                root.previewLoading = false;
+                var completedSuccessfully = exitStatus === 0 && exitCode === 0;
+                root.previewPath = completedSuccessfully ? "file://" + completedTarget + "?v=" + Date.now() : "";
+                return;
+            }
+
+            root.previewPath = "";
+            root.startPreview();
         }
     }
 
