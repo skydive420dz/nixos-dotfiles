@@ -118,19 +118,22 @@ activation, runtime, publication, and promotion decisions:
 - R4 / Slice 1G: window-close correctness; see
   [[file:../handoffs/2026-07-25-quickshell-slice1g-acceptance.org][the Slice 1G
   acceptance handoff]].
+- R5 / Slice 1H: network-handoff baseline correctness; see
+  [[file:../handoffs/2026-07-25-quickshell-slice1h-acceptance.org][the Slice 1H
+  acceptance handoff]].
 
 Still open:
 
 - Slice 0C profiling;
-- R5 / Slice 1H network handoff correctness;
 - R8 / Slice 1I analyzer freshness.
 
 The original =Recommended Next Decision= at the end of this audit was fulfilled
 by Slice 1C and is now historical guidance.  Slice 1F publication and promotion
 completed after separate authorization, as did R4 / Slice 1G publication and
-promotion.  R5 / Slice 1H is the next documented open correction; preparing an
-unchanged branch and worktree does not implement it, and this disposition does
-not authorize its source changes or live tests.
+promotion.  R5 / Slice 1H is accepted and promoted on the available evidence;
+its real disconnect/reconnect and Wi-Fi/Ethernet handoff remains explicitly
+deferred until a wired alternate route is available.  R8 / Slice 1I is the next
+documented open correction; this disposition does not authorize it.
 
 * Current Findings
 ** R1 - Wallpaper Shell Boundary And Atomic Publication

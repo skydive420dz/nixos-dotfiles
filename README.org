@@ -36,14 +36,17 @@ The accepted baseline is recorded in
 later accepted maintenance evidence is in the
 [[file:docs/handoffs/2026-07-19-vial-qmk-udev.org][Vial/QMK handoff]] and
 [[file:docs/handoffs/2026-07-19-msi-pure-builds.org][MSI pure-build handoff]].
-The accepted and promoted Quickshell cleanup sequence through Slice 1G is
+The accepted and promoted Quickshell cleanup sequence through Slice 1H is
 recorded in
+[[file:docs/handoffs/2026-07-25-quickshell-slice1h-acceptance.org][the Slice 1H
+acceptance handoff]].  It resets network traffic history on device changes and
+rejects stale in-flight samples.  Runtime payload =ead19fe= passed the separated
+source, fixture, pure-build, source-live, and live-sampling gates.  Real
+Wi-Fi/Ethernet handoff remains deferred until Ethernet provides a safe
+alternate route.
+The preceding Slice 1G window-close correction remains recorded in
 [[file:docs/handoffs/2026-07-25-quickshell-slice1g-acceptance.org][the Slice 1G
-acceptance handoff]].  It refreshes authoritative active-window state after a
-window closes instead of clearing the title immediately.  Runtime payload
-=e8358af= and published acceptance evidence =180d7c2= passed the separated
-verification gates; =main= and =work/quickshell-cleanup= carry the accepted
-payload and evidence.
+acceptance handoff]].
 The preceding Slice 1F clipboard correction remains recorded in
 [[file:docs/handoffs/2026-07-24-quickshell-slice1f-acceptance.org][the Slice 1F
 acceptance handoff]].
@@ -118,12 +121,11 @@ Work stays slice-based:
 
 1. Apply confirmed NixOS maintenance, security, service, and GC corrections one
    small change at a time.
-2. For Quickshell, Slice 1H network-handoff correctness is the next documented
-   bounded candidate.  It must begin from the final Slice 1G closeout head;
-   preparing its branch and worktree is not implementation or verification.
-   Run the deferred dual-output check when a second display is available, keep
-   old CAVA temp-file deletion separate, and keep clipboard-lifecycle,
-   analyzer, and performance work in later measured slices.
+2. For Quickshell, Slice 1I analyzer freshness is the next documented bounded
+   candidate and must begin from the final Slice 1H closeout head.  Run the
+   deferred real network-handoff check only after Ethernet provides a verified
+   alternate route.  Keep dual-output validation, old CAVA temp-file deletion,
+   clipboard lifecycle, and performance work separate.
 3. Give Emacs measured, real-use-driven TLC; Lua and Nix LSP slices are accepted,
    while Python's manual acceptance remains in progress.
 4. Port the macOS VS Code configuration only as a Linux-specific Home Manager

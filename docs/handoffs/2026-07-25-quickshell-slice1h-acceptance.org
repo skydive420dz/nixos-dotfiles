@@ -1,0 +1,145 @@
+#+title: Quickshell Slice 1H Network Handoff Acceptance - 2026-07-25
+#+startup: overview
+
+* Status
+Slice 1H is =ACCEPTED AND PROMOTED= on the available MSI evidence.
+
+- Runtime payload:
+  =ead19fe5ef2f986e60a3f956ada7b0c30576b94c=
+- Immutable pre-slice rollback:
+  =62002d59a63c05c753d3f180136c182d956c9e2f=
+- Retained payload ref:
+  =work/quickshell-slice1h=
+- Active system: generation 860,
+  =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44=
+
+Real disconnect/reconnect and Wi-Fi/Ethernet handoff remains explicitly
+deferred.  At acceptance, =wlp4s0= was the sole SSH and default-route device,
+while =eno1= had no carrier.  Disconnecting Wi-Fi remotely would have removed
+the management path rather than produced a safe test.
+
+* Contract And Change
+The controlling contract is
+[[file:../audits/2026-07-19-quickshell-slice1-remainder.org][the Slice 1
+remainder audit]], section =Slice 1H - Network Handoff Correctness=.
+
+The payload changes exactly one path:
+
+- =config/quickshell/modules/status/StatusCluster.qml=
+
+An actual network-device transition now resets current and previous counters,
+the sample timestamp, formatted rates, and both graph histories.  Unchanged
+device refreshes preserve history.  Every traffic request captures both its
+device and a device revision; completion is rejected unless its output tag,
+captured device, captured revision, and current state still agree.  RX and TX
+are applied as one sample.  The first accepted sample seeds the baseline,
+including a legitimate zero-byte baseline; only later samples calculate rates.
+
+This is the bounded R5 correctness fix.  It does not change NetworkManager
+selection, polling intervals, rate formatting, graph geometry, layout,
+multi-output ownership, or migrate to native Networking models.
+
+* Verification Gates
+** Source And Deterministic Behavior
+The unchanged rollback failed the isolated exact-component fixture at
+=device-change-did-not-reset=.
+
+The payload passed =git diff --check= and =scripts/check-quickshell=:
+
+- all 31 QML files parsed and matched the four-space format;
+- strict QML lint had no actionable diagnostics;
+- all 17 Bash, 2 JSON, and 1 Python sources passed their checks.
+
+The disposable offscreen fixture then passed 14 assertions covering:
+
+- unchanged-device history preservation;
+- Wi-Fi to Ethernet reset;
+- stale Wi-Fi result rejection;
+- output-device tag rejection;
+- first-sample baseline seeding and second-sample rate calculation;
+- disconnect reset and stale Ethernet rejection;
+- same-interface disconnect/reconnect revision advance;
+- A-to-B-to-A stale-result rejection;
+- a zero-counter first baseline and later rate calculation.
+
+The accepted file hash is
+=7f0b4abb92bc3ccde34fa693e6fa5f1804d8f91cd73fedeb95fcd49fcf0710e1=.
+An independent read-only review found no actionable defect or scope expansion.
+All disposable fixture files were removed.
+
+** Pure Build
+A separate pure no-link Nix build passed:
+
+#+begin_example
+/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44
+#+end_example
+
+It did not change =flake.lock=, create a =result= link, or activate anything.
+Because Quickshell is linked out of the store, this is Nix evaluation and
+closure evidence; the exact-source and runtime gates validate the QML bytes.
+
+** Controlled Source Activation
+Before activation, =~/.config/quickshell= resolved to the clean =main=
+checkout at rollback =62002d5=.  Quickshell was stopped before local =main=
+fast-forwarded to payload =ead19fe=.  The exact checker passed against the
+linked source before the service restarted.
+
+- Pre-activation PID: =104022=
+- Accepted PID: =137488=
+- =ActiveState= =active= and =SubState= =running=
+- =Result= =success= and =NRestarts= =0=
+- one =qs list --all --json= instance at the linked configuration
+- one clean =Configuration Loaded= and no warning/error journal entry
+- generation 860 and =/run/current-system= unchanged
+
+No NixOS or Home Manager activation ran.
+
+** Live Sampling
+A disposable offscreen process imported the exact live component while a
+selective shell shim allowed only its real NetworkManager and traffic-counter
+reads.  After seven seconds it reported:
+
+#+begin_example
+network=wifi
+device=wlp4s0
+revision=1
+downRate=004K
+upRate=004K
+downSamples=2
+upSamples=2
+#+end_example
+
+This proves the live process command, tagged output, parser, baseline, and
+subsequent sampling path on the current Wi-Fi device.  The probe displayed no
+UI, changed no network state, and left no temporary files.
+
+* Promotion And Repository State
+The payload branch was published at =ead19fe=.  The clean live checkout was
+fast-forwarded to the exact payload for source-live validation.  This handoff
+and the concise current-state links were then added as a documentation-only
+closeout.  =main= and =work/quickshell-cleanup= carry that closeout, while the
+published payload ref remains available for exact source evidence.
+
+The isolated Slice 1H worktree was removed after publication.  Documentation
+integration did not alter the accepted Quickshell bytes or require another
+service restart.
+
+* Boundaries And Rollback
+Slice 1H did not:
+
+- disconnect or reconnect Wi-Fi;
+- bring up Ethernet or change routes, NetworkManager profiles, or connectivity;
+- fix the pre-existing first-connected-device selection behavior;
+- change native/shared ownership, polling cadence, layout, or graph design;
+- claim dual-output or physical Wi-Fi/Ethernet handoff validation;
+- run =nrs=, switch NixOS, change generation 860, or perform broader tuning.
+
+Once Ethernet has carrier and a verified alternate SSH route, repeat a real
+disconnect/reconnect and Wi-Fi/Ethernet handoff as a separate controlled test.
+
+Because Quickshell is an out-of-store link, a Nix generation rollback cannot
+restore the old QML.  The immutable source rollback is =62002d5=, followed by
+exact-source validation and a controlled Quickshell stop/start.
+
+R8 / Slice 1I analyzer freshness is the next documented open correction.  This
+record does not authorize it.
