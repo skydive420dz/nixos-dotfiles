@@ -4,15 +4,14 @@
 :PROPERTIES:
 :CUSTOM_ID: status
 :END:
-=CANDIDATE - COMMITTED AND BUILD VERIFIED, NOT ACTIVATED=
+=ACCEPTED LIVE - FINAL ORIGIN/MAIN PUBLICATION PENDING=
 
-The isolated =work/quickshell-slice2= candidate passes source validation, pure
-evaluation, generated-unit verification, and a pure no-link system build.
-The implementation and this handoff are committed together on the local
-candidate branch.
-The live =main= checkout, generation 860, Quickshell, Mako, and theme state were
-not changed.  No push, source-live promotion, activation, toggle, or hand test
-has occurred.
+Commit =85760186a747bbee653c9860a2308e365c427989= is published on
+=origin/work/quickshell-slice2=, fast-forwarded to local =main=, activated as
+generation 861, and runtime accepted.  The controlled theme test restored
+=SkyDark= and left Quickshell running without a restart.  Local =main= remains
+one commit ahead of =origin/main= until the final publication gate is
+authorized.
 
 * Contract Reconciliation
 :PROPERTIES:
@@ -31,7 +30,7 @@ later accepted decisions:
 - QML tooling, Mako reload design, shared backends, rendering, frame rate,
   wallpaper, and application-surface work remain separate.
 
-* Verified Baseline
+* Pre-change Baseline
 :PROPERTIES:
 :CUSTOM_ID: verified-baseline
 :END:
@@ -78,25 +77,28 @@ No QML file changes.
 | Pure no-link build | =/nix/store/p4bsgdw9mg0y5hjgnsm1ap58kj003mpa-nixos-system-nixos-26.11.20260718.61b7c44= |
 | Closure size | current and candidate both report =29.0 GiB= |
 | Build side effects | no =result= link; live output and service PIDs unchanged |
-| Local commit | implementation and candidate record committed together; not pushed |
-| Activation/runtime | not run |
+| Commit | =85760186a747bbee653c9860a2308e365c427989=; published on =origin/work/quickshell-slice2= and fast-forwarded to local =main= |
+| Activation | generation 861 at the exact verified build output |
+| Runtime | oneshot =active/exited= with =Result=success=; Quickshell and Mako =active/running= with =NRestarts=0=; one Quickshell instance |
+| Toggle/restore | =SkyDark -> SkyLight -> SkyDark=; Quickshell PID =568927= and invocation stayed unchanged; Mako restarted at both transitions |
+| Final publication | local =main= is one commit ahead of =origin/main= |
 
-* Live Boundary And Pending Gates
+* Live Acceptance And Remaining Gate
 :PROPERTIES:
 :CUSTOM_ID: live-boundary-and-pending-gates
 :END:
 =repoPath= intentionally points live links at
-=/home/skydive420dz/Projects/nixos-dotfiles=.  The isolated worktree therefore
-does not alter live script bytes.  A later fast-forward of =main= would make the
-one-line selector change live immediately without restarting a service; treat
-that source promotion separately from Nix activation.
+=/home/skydive420dz/Projects/nixos-dotfiles=.  Fast-forwarding local =main=
+therefore made the selector change live before activation, without restarting a
+service.  The later =nrs= activation installed the generated units and produced
+this accepted state:
 
-Pending acceptance:
+- =sky-theme-apply.service= ran successfully before Mako and Quickshell;
+- the installed Mako and Quickshell units contain no theme =ExecStartPre=;
+- Quickshell has the accurate description and =RestartSec=2s=;
+- one controlled toggle and restore changed only Mako's invocation;
+- the final state is =SkyDark= with all three units healthy.
 
-1. publish the reviewed candidate branch without changing live =main=;
-2. separately authorize source-live promotion to =main=;
-3. rerun the exact-source checker and confirm stable PIDs;
-4. separately activate the built Nix configuration;
-5. verify the oneshot result, unit ordering, service health, one alternate-theme
-   toggle and restoration with an unchanged Quickshell PID;
-6. record acceptance before final =main= publication.
+A future natural login may reconfirm the same startup ordering; no graphical
+session restart was forced solely to manufacture that evidence.  The only
+remaining Slice 2 gate is publishing local =main= to =origin/main=.
