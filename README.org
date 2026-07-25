@@ -128,6 +128,9 @@ Work stays slice-based:
 2. For Quickshell, cleanup through Slice 1I and Slice 0C's read-only profiling
    helper are accepted and published.  Use =scripts/quickshell-profile= to take
    fresh, action-labelled measurements before making new performance claims.
+   Slice 2 service and theme lifecycle is the selected candidate; it preserves
+   the accepted live links and changes only startup ownership, normal theme
+   reload behavior, service description, and restart backoff.
    Run the deferred real network-handoff check only after Ethernet provides a
    verified alternate route.  Keep dual-output validation, old CAVA temp-file
    deletion, clipboard lifecycle, shared ownership, and rendering or frame-rate

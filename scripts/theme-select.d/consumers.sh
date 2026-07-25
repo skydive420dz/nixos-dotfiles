@@ -31,5 +31,4 @@ update_session_env() {
 reload_consumers() {
   tmux source-file "$current_dir/tmux.conf" >/dev/null 2>&1 || true
   systemctl --user restart mako.service >/dev/null 2>&1 || true
-  systemctl --user restart quickshell.service >/dev/null 2>&1 || true
 }

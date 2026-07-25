@@ -8,12 +8,15 @@ in
   systemd.user.services.mako = {
     Unit = {
       Description = "Mako notification daemon";
-      After = [ "graphical-session.target" ];
+      Wants = [ "sky-theme-apply.service" ];
+      After = [
+        "graphical-session.target"
+        "sky-theme-apply.service"
+      ];
       PartOf = [ "graphical-session.target" ];
     };
 
     Service = {
-      ExecStartPre = "${pkgs.bash}/bin/bash %h/.config/scripts/theme-select apply";
       ExecStart = "${pkgs.mako}/bin/mako -c %h/.config/theme/current/mako.conf";
       Restart = "on-failure";
     };

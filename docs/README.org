@@ -14,7 +14,7 @@ commits, pushes, service changes, or branch deletion.
 |---------+-------------------------+--------------------|
 | System | Generation 860 and its active GC timer remain accepted; the clean one-shot optimizer run is accepted; O3-A defers recurrence for a roughly 30-day observation; no optimizer timer is armed | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
 | Emacs | Clean Emacs remains active under generation 860 with the same accepted Home Manager root; Lua and Nix =lsp-mode=/Company slices are accepted; the accepted QML policy uses verified four-space formatting in classic and parser-backed modes | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | Cleanup through Slice 1I and the Slice 0C read-only profiler are accepted and published.  Slice 0C commit =41095ab= passed the source checker, pure no-link build, and a stable no-action live observation on =eDP-1= without changing generation 860 or restarting Quickshell | No additional Quickshell slice is selected.  Use the profiler for fresh evidence before new performance claims, and keep the deferred network handoff, historical CAVA cleanup, clipboard lifecycle, native/shared ownership, dual-output validation, rendering, and frame-rate work separate |
+| Quickshell | Cleanup through Slice 1I and the Slice 0C read-only profiler are accepted and published.  Slice 0C commit =41095ab= passed the source checker, pure no-link build, and a stable no-action live observation on =eDP-1= without changing generation 860 or restarting Quickshell | Slice 2 service and theme lifecycle is selected.  Its isolated candidate is locally committed and passed source validation, pure evaluation, generated-unit verification, and a pure no-link build; publication, source-live promotion, activation, and runtime tests remain separate pending gates |
 | Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs, Vial discovers it, and QMK CLI intentionally remains system-wide | Keep firmware writes and flashing separate and explicitly authorized |
 | VS Code | NixOS has no VS Code configuration | Adapt the macOS Home Manager module in a future Linux-specific slice |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -67,10 +67,16 @@ fixtures, controlled source-live activation, lifecycle checks, visual pass, and
 remaining boundaries are in
 [[file:handoffs/2026-07-25-quickshell-slice1i-acceptance.org][the Slice 1I
 acceptance handoff]].
+The current build-verified, not-activated Slice 2 service/theme candidate is in
+[[file:handoffs/2026-07-25-quickshell-slice2-lifecycle.org][the Slice 2
+lifecycle handoff]].
 
 * Current Work Lanes
 - =main= and =work/quickshell-cleanup= are aligned at the stable checkpoint
   carrying Slice 1I and its acceptance record.
+- =work/quickshell-slice2= is the isolated current candidate; source validation,
+  pure evaluation, generated-unit verification, and the pure no-link build pass,
+  while live =main= and generation 860 remain unchanged.
 - =work/nixos-maintenance=: designated post-checkpoint system and hygiene work.
 - =work/quickshell-slice1d= at =51c0396= and =work/quickshell-slice1e= at
   =84b111b= are retained evidence refs, not active worktrees.
@@ -87,7 +93,8 @@ acceptance handoff]].
   evidence refs, not active worktrees.
 - Published =work/quickshell-slice0c= at =41095ab= is the retained Slice 0C
   implementation and evidence ref, not an active worktree.
-- No additional Quickshell slice is selected.
+- Quickshell Slice 2 is selected and locally committed; publication, source-live
+  promotion, activation, and runtime acceptance remain pending.
 - Emacs: complete the current Python acceptance decision before selecting
   another language or optimization slice.
 

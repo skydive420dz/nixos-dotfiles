@@ -1,0 +1,102 @@
+#+title: Quickshell Slice 2 Service And Theme Lifecycle - 2026-07-25
+
+* Status
+:PROPERTIES:
+:CUSTOM_ID: status
+:END:
+=CANDIDATE - COMMITTED AND BUILD VERIFIED, NOT ACTIVATED=
+
+The isolated =work/quickshell-slice2= candidate passes source validation, pure
+evaluation, generated-unit verification, and a pure no-link system build.
+The implementation and this handoff are committed together on the local
+candidate branch.
+The live =main= checkout, generation 860, Quickshell, Mako, and theme state were
+not changed.  No push, source-live promotion, activation, toggle, or hand test
+has occurred.
+
+* Contract Reconciliation
+:PROPERTIES:
+:CUSTOM_ID: contract-reconciliation
+:END:
+This resumes the original Quickshell Slice 2 lifecycle work while preserving
+later accepted decisions:
+
+- =theme/styles.json= and =scripts/theme-select= remain the global theme owners.
+- The intentional =~/.config/quickshell= and =~/.config/scripts= live links
+  remain unchanged.
+- The original stable/store-backed-mode proposal is superseded by the accepted
+  rule that any store conversion requires a separate per-path decision.
+- Existing UWSM compositor and =wayland-session-waitenv.service= ordering remains
+  the readiness owner; no second polling helper is added.
+- QML tooling, Mako reload design, shared backends, rendering, frame rate,
+  wallpaper, and application-surface work remain separate.
+
+* Verified Baseline
+:PROPERTIES:
+:CUSTOM_ID: verified-baseline
+:END:
+| Item | Read-only result |
+|------+------------------|
+| Host | =nixos= |
+| Live checkout | clean =main= at =1790716beaf242dea7519fa566026168c40ab248=, equal to =origin/main= |
+| Live system | =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Quickshell | PID =431950=, =Result=success=, =NRestarts=0= |
+| Mako | PID =4202=, =Result=success=, =NRestarts=0= |
+| Existing startup | Mako and Quickshell each run =theme-select apply= |
+| Existing toggle | regenerates once, then restarts Mako and Quickshell; each restart regenerates again |
+| Existing restart delay | =100ms= |
+
+* Candidate
+:PROPERTIES:
+:CUSTOM_ID: candidate
+:END:
+The behavioral delta is intentionally small:
+
+1. =home/modules/theme.nix= replaces the Home Manager activation call with one
+   =sky-theme-apply.service= oneshot for graphical-session startup.
+2. Mako and Quickshell want and start after that oneshot; their duplicate theme
+   =ExecStartPre= calls are removed.
+3. =scripts/theme-select.d/consumers.sh= stops restarting Quickshell.  The
+   existing =Theme.qml= signal watcher reloads colors in place.  Mako's existing
+   restart remains unchanged.
+4. Quickshell's description becomes “Quickshell desktop shell” and
+   =RestartSec= becomes =2s=.
+
+No QML file changes.
+
+* Verification
+:PROPERTIES:
+:CUSTOM_ID: verification
+:END:
+| Gate | Result |
+|------+--------|
+| Diff hygiene | =git diff --check= passes |
+| Nix formatting/parsing | changed Nix files pass =nixfmt --check= and =nix-instantiate --parse= |
+| Exact source | =scripts/check-quickshell= passes 31 QML, 18 Bash, 2 JSON, and 1 Python file |
+| Pure evaluation | one oneshot; ordered Mako/Quickshell; no theme =ExecStartPre=; Quickshell =RestartSec=2s= |
+| Generated units | all three candidate units pass =systemd-analyze --user verify= |
+| Pure no-link build | =/nix/store/p4bsgdw9mg0y5hjgnsm1ap58kj003mpa-nixos-system-nixos-26.11.20260718.61b7c44= |
+| Closure size | current and candidate both report =29.0 GiB= |
+| Build side effects | no =result= link; live output and service PIDs unchanged |
+| Local commit | implementation and candidate record committed together; not pushed |
+| Activation/runtime | not run |
+
+* Live Boundary And Pending Gates
+:PROPERTIES:
+:CUSTOM_ID: live-boundary-and-pending-gates
+:END:
+=repoPath= intentionally points live links at
+=/home/skydive420dz/Projects/nixos-dotfiles=.  The isolated worktree therefore
+does not alter live script bytes.  A later fast-forward of =main= would make the
+one-line selector change live immediately without restarting a service; treat
+that source promotion separately from Nix activation.
+
+Pending acceptance:
+
+1. publish the reviewed candidate branch without changing live =main=;
+2. separately authorize source-live promotion to =main=;
+3. rerun the exact-source checker and confirm stable PIDs;
+4. separately activate the built Nix configuration;
+5. verify the oneshot result, unit ordering, service health, one alternate-theme
+   toggle and restoration with an unchanged Quickshell PID;
+6. record acceptance before final =main= publication.

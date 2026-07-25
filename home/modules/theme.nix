@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   home.packages = with pkgs; [
@@ -24,10 +24,18 @@
     size = 24;
   };
 
-  home.activation.applySkyTheme = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    theme_select="$HOME/.config/scripts/theme-select"
-    if [ -x "$theme_select" ]; then
-      $DRY_RUN_CMD "$theme_select" apply
-    fi
-  '';
+  systemd.user.services.sky-theme-apply = {
+    Unit = {
+      Description = "Generate Sky runtime theme";
+      PartOf = [ "graphical-session.target" ];
+    };
+
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.bash}/bin/bash %h/.config/scripts/theme-select apply";
+      RemainAfterExit = true;
+    };
+
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
 }

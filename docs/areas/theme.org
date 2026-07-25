@@ -14,6 +14,7 @@ The Sky theme selector is system-wide state. Quickshell exposes a button for it,
   - =SkyLight=: light companion palette.
 - =scripts/theme-select= is the runtime selector entrypoint.
 - =scripts/theme-select.d/= owns helper functions, generated output writers, session environment updates, and live app reloads.
+- =sky-theme-apply.service= invokes the selector once before Mako and Quickshell at graphical-session startup.
 - =~/.config/theme/current-style= stores the active runtime style.
 - =~/.config/theme/current/= stores generated runtime files.
 - =theme/tokens.nix= exports the rebuild-time default for Nix consumers.
@@ -84,7 +85,7 @@ Generated outside the current bundle:
 :END:
 These can change without =nrs=, usually after =theme-select toggle= or =theme-select SkyDark=/=theme-select SkyLight=.
 
-- Quickshell reads =quickshell.json= and watches =quickshell-signal=. The selector also restarts =quickshell.service=.
+- Quickshell reads =quickshell.json= and watches =quickshell-signal=. Normal selector changes reload it in place without restarting =quickshell.service=.
 - Mako is restarted and reads =mako.conf=.
 - Ghostty reads =ghostty.conf= from its generated config include. Existing windows can reload with =Ctrl+Shift+,=; some options only affect new terminals.
 - tmux reloads through =tmux source-file ~/.config/theme/current/tmux.conf=.
@@ -159,8 +160,8 @@ Health checks after a rebuild or reboot:
 #+begin_src sh
 theme-select current
 systemctl --user show-environment | grep -E '^(SKY_THEME|GTK_THEME|QT_)'
-systemctl --user is-active quickshell.service mako.service
-journalctl --user -u quickshell.service -u mako.service -b --no-pager
+systemctl --user is-active sky-theme-apply.service quickshell.service mako.service
+journalctl --user -u sky-theme-apply.service -u quickshell.service -u mako.service -b --no-pager
 #+end_src
 
 ** Rules
