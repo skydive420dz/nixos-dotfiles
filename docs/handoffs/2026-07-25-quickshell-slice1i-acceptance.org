@@ -1,0 +1,184 @@
+#+title: Quickshell Slice 1I Analyzer Freshness Acceptance - 2026-07-25
+#+startup: overview
+
+* Status
+Slice 1I is =ACCEPTED SOURCE-LIVE= on the available =eDP-1= evidence.  Its
+payload is published, and the separately authorized commit and push of this
+record publish the acceptance evidence.  Checkpoint promotion to =main= remains
+pending.
+
+- Accepted runtime payload:
+  =f7107cb545741f53c2ae588d405297ed705e4180=
+- Immutable pre-slice rollback:
+  =cda0213faa1614c097982f505918b49d3cf6aff8=
+- Retained payload ref:
+  =work/quickshell-slice1i=
+- Acceptance-evidence ref:
+  =docs/quickshell-slice1i-acceptance=
+- Accepted file SHA-256:
+  =7139565870459366e38ffa2c79348eb5d86b0cad1cb77a2957f77ad24bfe6627=
+- Active system: generation 860,
+  =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44=
+
+At acceptance, the live checkout was clean and detached at the immutable
+payload.  Local and remote =main= and =work/quickshell-cleanup= remained at the
+rollback.  Quickshell was healthy at PID =431950= with =NRestarts=0=.  This
+record does not authorize promotion, live branch attachment, NixOS activation,
+or worktree cleanup.
+
+* Contract And Change
+The controlling contract is
+[[file:../audits/2026-07-19-quickshell-slice1-remainder.org][the Slice 1
+remainder audit]], sections =R8 - CAVA Stale Samples= and =Slice 1I - Analyzer
+Freshness=.
+
+The payload changes exactly one path:
+
+- =config/quickshell/modules/media/MediaAnalyzer.qml=
+
+The analyzer now records the receipt time of each accepted CAVA row and expires
+live levels after =sampleFreshnessMs: 500=.  At the retained 24-fps CAVA
+cadence this allows approximately 12 missed rows before declaring the sample
+stale.  Expiry clears live levels so the unchanged 90-ms fallback timer can
+publish fallback animation again.
+
+The freshness timer rechecks the current sample age and rearms only for the
+remaining interval.  An older timeout therefore cannot clear a newer sample.
+Blank or inactive output does not refresh freshness, while a numeric all-zero
+row remains a valid live sample.  Media deactivation and CAVA process exit both
+clear the timestamp and levels.  Final parser output is drained before exit
+clearing, so exit state wins deterministically.
+
+A later valid row restores live mode through the same running process.  The
+change deliberately adds no automatic CAVA restart or crash-loop policy.
+
+* Verification Gates
+** Baseline And Exact-Source Fixtures
+The unchanged rollback reproduced both R8 failures in a disposable
+exact-component fixture:
+
+#+begin_example
+SLICE1I_FAIL fallback-did-not-resume-after-stall
+SLICE1I_FAIL exit-did-not-clear-live-levels
+#+end_example
+
+The payload passed the same fixture with 13 checks:
+
+#+begin_example
+SLICE1I_STALL_PASS checks=8
+SLICE1I_EXIT_PASS checks=5
+#+end_example
+
+Coverage included:
+
+- freshness expiry and the next fallback tick after a stalled valid row;
+- recovery when a later row arrives from the same process;
+- rejection of an old expiry callback after a newer row;
+- invalid input that does not refresh freshness;
+- a numeric all-zero row as valid live data;
+- process-exit clearing after final parser drainage;
+- rejection of late output while media is inactive;
+- inactive-to-active recovery.
+
+=git diff --check= and =scripts/check-quickshell= passed:
+
+- all 31 QML files parsed and matched four-space formatting;
+- strict QML lint had no actionable diagnostics;
+- all 17 Bash, 2 JSON, and 1 Python sources passed their checks.
+
+An independent read-only review found no actionable correctness, race, parsing,
+scope, or minimality defect.  All disposable fixture files were removed.
+
+** Pure Build
+A separate pure no-link Nix build passed:
+
+#+begin_example
+/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44
+#+end_example
+
+The =flake.lock= SHA-256 remained
+=cb7a00e10a8f92019acc50586fec57ddd64ac5b2a04032b8484fa09ce44e6473=.
+The build created no =result= link and activated nothing.  Because Quickshell is
+linked out of the Nix store, this is evaluation and closure evidence rather
+than validation of the linked QML bytes.
+
+** Controlled Source Activation
+Before activation, the live checkout was clean =main= at rollback =cda0213= and
+Quickshell was PID =137488=.  Quickshell was stopped before the checkout
+detached at immutable payload =f7107cb=.  The exact checker passed against the
+linked source before the service restarted.
+
+- Accepted PID: =431950=
+- =ActiveState= =active= and =SubState= =running=
+- =Result= =success=, =ExecMainStatus= =0=, and =NRestarts= =0=
+- one =qs list --all --json= instance at the linked configuration
+- one clean =Configuration Loaded= and no warning-or-higher journal entry
+- live analyzer SHA-256 equal to the accepted hash above
+- generation 860 and =/run/current-system= unchanged
+
+No NixOS or Home Manager activation ran.
+
+** Controlled Runtime And Human Acceptance
+Brave naturally exposed a =Playing= MPRIS item, and Quickshell owned exactly one
+CAVA child using the tracked =modules/media/cava.conf=.
+
+The controlled lifecycle test then proved:
+
+- pause changed MPRIS to =Paused= and removed the CAVA child;
+- play restored =Playing= with one new CAVA child;
+- =SIGTERM= was sent only to the verified CAVA child, after which no CAVA child
+  remained while Quickshell kept the same PID and restart count;
+- pause/play restored =Playing= and exactly one new CAVA child.
+
+The original media state was restored and no runtime script remained.
+
+The authorized visual sequence used five-second observation windows:
+
+1. normal live analyzer output;
+2. =SIGSTOP= of the verified CAVA child, with fallback expected within about
+   500 ms;
+3. =SIGCONT= and live analyzer recovery;
+4. =SIGTERM= and fallback after process exit;
+5. pause/play and live analyzer restoration through a new CAVA child.
+
+Automated phase assertions passed for live, stall, resume, exit, and final-live
+states.  The user visually accepted the sequence.  Only =eDP-1= was connected,
+so fresh dual-output evidence remains explicitly deferred.
+
+* Repository And Publication Boundary
+At the acceptance-publication preflight:
+
+- live checkout: clean detached =f7107cb=;
+- =work/quickshell-slice1i=: clean and published at =f7107cb=;
+- local and remote =main= and =work/quickshell-cleanup=: =cda0213=;
+- documentation lane: clean branch =docs/quickshell-slice1i-acceptance= created
+  from the immutable payload;
+- Quickshell: =active/running= at PID =431950=, =NRestarts=0=;
+- current system: generation 860 and the unchanged closure above.
+
+The separately authorized commit and push of this documentation publish the
+acceptance evidence only.  They do not advance =main= or
+=work/quickshell-cleanup=, alter the live checkout, restart Quickshell, mutate
+playback, activate NixOS, or remove either Slice 1I worktree.
+
+* Boundaries And Rollback
+Slice 1I did not:
+
+- change the retained 12-bar, 24-fps CAVA configuration or the 90-ms fallback
+  cadence;
+- add automatic CAVA restart, backoff, or crash-loop behavior;
+- tune frame rate or compare =PwNodePeakMonitor=;
+- change Canvas rendering, shared analyzer ownership, per-output ownership,
+  layout, or broader performance behavior;
+- delete the 387 historical CAVA temporary configurations;
+- claim fresh dual-output, CPU, GPU, memory, or general optimization evidence;
+- run =nrs=, switch NixOS, change generation 860, or perform Home Manager
+  activation.
+
+Because Quickshell is an out-of-store link, a Nix generation rollback cannot
+restore the old QML.  The immutable source rollback is =cda0213=.  If rollback
+is separately authorized, stop Quickshell, move the clean live checkout to that
+source, run the exact-source checker, and start Quickshell.
+
+Promotion readiness and any fast-forward of =work/quickshell-cleanup= or
+=main= remain the next separate decision.  This record does not authorize them.
