@@ -1,0 +1,187 @@
+#+title: Quickshell Slice 1F Clipboard Preview And Delete State Acceptance - 2026-07-24
+#+startup: overview
+
+* Status
+Slice 1F is =ACCEPTED SOURCE-LIVE= on =eDP-1=.  It is not published or
+promoted.
+
+- Accepted runtime payload:
+  =0022620328f32e847bf15afc9af473913858484c=
+- Pre-slice rollback and current =main=:
+  =7734eb4ef378fe4a95e9776072ea4b5145a81f50=
+- Retained local payload branch: =work/quickshell-slice1f=
+- Documentation candidate: =docs/quickshell-slice1f-acceptance=
+- Active system: generation 860,
+  =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44=
+
+At the documentation snapshot, the live checkout was clean and detached at the
+accepted payload.  The payload branch was clean and local-only.  Local and
+remote =main= both remained at the rollback commit.  This document records
+evidence; it does not authorize a commit, push, promotion, branch update,
+worktree cleanup, service action, NixOS activation, mutable clipboard action,
+or another implementation slice.
+
+* Contract And Fix
+The controlling contract is
+[[file:../audits/2026-07-19-quickshell-slice1-remainder.org][the Slice 1
+remainder audit]], section =Slice 1F - Clipboard Preview And Delete State=.
+
+The payload changes exactly one path:
+
+- =config/quickshell/modules/clipboard/ClipboardView.qml=
+
+It contains 39 insertions and 16 deletions.  The accepted behavior:
+
+- ties each preview completion to both its request revision and target;
+- keeps at most one preview process active and coalesces toward the newest
+  request, including an A to B to A selection sequence;
+- publishes only after normal process exit, exit code zero, and nonempty output;
+- removes failed, zero-byte, or partial output without publishing it or entering
+  an immediate retry loop;
+- invalidates pending preview state on text selection or close;
+- after deletion selects zero only for an empty filtered result set, otherwise
+  =min(deletedIndex, remainingCount - 1)=.
+
+This is a correctness slice, not a preview-cache redesign.
+
+* Verification Gates
+** Source
+The payload is one commit ahead of the rollback.  Its diff contains only the
+one intended QML path, and =git diff --check= passed.
+
+=scripts/check-quickshell= passed:
+
+- 31 QML files;
+- 17 Bash files;
+- 2 JSON files;
+- 1 Python file;
+- strict actionable QML lint with no failures.
+
+The exact accepted file hash is
+=ffac1b9a766ba22255984062b82cd446506d09579f18f4cfcc2b4875cf953945=.
+
+** Isolated Exact-Component Fixture
+The fixture used synthetic commands and temporary data; it did not mutate the
+real clipboard.  The rollback produced 13 expected failures.  The candidate
+passed:
+
+- successful preview publication;
+- nonzero exit, zero-byte output, partial output, and direct child crash;
+- no immediate retry loop after failure;
+- image to text and image to close invalidation;
+- A to B to A revision matching and A to B to C newest-only coalescing;
+- deletion of the only, first, middle, and last item in filtered and unfiltered
+  result sets.
+
+The eight delete-selection cases were fixture-only.  The live UI Delete and
+empty-query Backspace paths were not exercised.
+
+** Pure Build
+A separate pure no-link Nix build passed and returned the already-active
+generation-860 closure:
+
+#+begin_example
+/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44
+#+end_example
+
+It did not create a =result= link, update =flake.lock=, or activate anything.
+Quickshell is linked out of the Nix store, so this build is closure and
+evaluation evidence, not proof of the live QML bytes.
+
+** Controlled Source Activation
+At the activation boundary, =~/.config/quickshell= resolved to
+=/home/skydive420dz/Projects/nixos-dotfiles/config/quickshell=.  Quickshell was
+stopped before that live checkout moved to the immutable payload.  The
+pre-activation PID was =2223278=.  The exact source checker passed in the live
+checkout before the service started again.
+
+The initial candidate process started as PID =2622173= and logged one
+=Configuration Loaded=.  It later emitted the same known
+=ClipboardView.qml= rectangle-height binding-loop warning class already present
+under the pre-slice PID; neither PID had error-or-higher journal entries.  After
+the machine later returned online, the final accepted snapshot showed:
+
+- =ActiveState= =active= and =SubState= =running=;
+- =Result= =success= and =ExecMainStatus= =0=;
+- PID =4204= and =NRestarts= =0=;
+- generation 860 and =/run/current-system= unchanged.
+
+No NixOS build result was activated.
+
+** Automated Remote Hand-Equivalent Preview Test
+The user was away from the MSI and asked for the interaction tests to be
+performed remotely.  After an exact history snapshot, the test temporarily
+inserted uniquely generated synthetic =cliphist= entries and used only
+non-destructive Down/Up selection dispatches plus Escape for close.  It did not
+use =wl-copy=, =Enter=, pointer clicks, =Delete=, or empty-query =Backspace=.
+Captures were restricted to the synthetic preview area.
+
+The accepted result labels were:
+
+#+begin_example
+INITIAL_PREVIEW_PASS
+LATEST_SELECTION_PASS sequence=image-b,text,image-a
+ABA_STALE_COMPLETION_PASS sequence=image-b,text,image-b
+ORDINARY_REOPEN_CLOSE_PASS
+SERVICE_STABILITY_PASS pid=4204 restarts=0 generation=860
+CLEANUP_CURSOR_RESTORED x=858 y=400
+CLEANUP_HISTORY_IDENTICAL
+CLEANUP_PREVIEW_INVENTORY_IDENTICAL
+CLEANUP_MIME_OFFERS_IDENTICAL
+CLEANUP_OVERLAY_CLOSED
+CLEANUP_PRIVATE_RUNTIME_REMOVED
+SLICE1F_REMOTE_PREVIEW_TEST_PASS
+#+end_example
+
+Cleanup used =cliphist delete= only for the test-owned synthetic rows.  The test
+then proved exact restoration of the cursor, clipboard-history snapshot,
+preview inventory, MIME offers, overlay state, and private runtime files.  The
+user explicitly accepted this remote hand-equivalent evidence and waived a
+separate physical hand test.
+
+* Repository Snapshot
+At =2026-07-24T23:25:56-04:00=:
+
+- live checkout: clean detached =0022620=;
+- =work/quickshell-slice1f=: clean =0022620=, local-only;
+- local and remote =main=: =7734eb4=;
+- =work/quickshell-cleanup= and =work/quickshell-slice1d=: =51c0396=;
+- =work/quickshell-slice1e=: =84b111b=;
+- Quickshell: active/running, PID =4204=, =NRestarts=0=;
+- current system: generation 860 and the unchanged closure above.
+
+The documentation lane was then created from the accepted payload.  Its commit,
+publication, integration, promotion, and cleanup remain independent gates.
+
+* Boundaries And Rollback
+Slice 1F did not:
+
+- activate or copy a live clipboard entry, exercise the live UI Delete path, or
+  delete any preexisting clipboard-history row; cleanup removed only the exact
+  synthetic test rows;
+- run =nrs= or =nixos-rebuild switch=, activate a NixOS output, or change
+  generations;
+- publish any branch or advance =main=;
+- perform a physical hand test or fresh dual-output validation;
+- change preview content addressing, resource limits, cancellation, cache
+  pruning, ID-reuse or symlink hardening, session cleanup, or secret lifecycle;
+- change window-title, network-handoff, analyzer-freshness, or CAVA behavior;
+- delete historical files or claim memory, CPU, GPU, or broader performance
+  improvement.
+
+Because Quickshell is an out-of-store link, generation rollback alone cannot
+restore these QML bytes.  The source rollback is the clean =main= commit
+=7734eb4ef378fe4a95e9776072ea4b5145a81f50=, followed by exact-source
+validation and a controlled Quickshell stop/start if separately authorized.
+
+* Next Separate Decisions
+In order:
+
+1. review and authorize or revise this documentation candidate;
+2. commit the acceptance evidence;
+3. publish the payload and documentation evidence;
+4. perform a fresh integration-readiness check;
+5. decide separately whether to promote by strict non-forced fast-forward;
+6. decide separately whether to synchronize branch names or clean worktrees.
+
+No later correctness or optimization slice is selected by this handoff.

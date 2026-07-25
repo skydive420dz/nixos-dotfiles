@@ -95,12 +95,12 @@ testing for a new candidate.  A later candidate must either obtain fresh
 dual-output evidence or record a new explicit deferral.  The shared-backend work
 in original Slice 3 still requires both outputs.
 
-* Post-Audit Disposition - 2026-07-23
+* Post-Audit Disposition - Through 2026-07-24
 This section records later outcomes without rewriting the verified 2026-07-19
 snapshot or turning the remaining proposals into authorization.
 
-Accepted after separate source, build, controlled source-live activation,
-runtime, publication, and promotion decisions:
+Accepted and promoted after separate source, build, controlled source-live
+activation, runtime, publication, and promotion decisions:
 
 - R1 / Slice 1C: wallpaper process-boundary and atomic-publication correction;
   see
@@ -113,17 +113,26 @@ runtime, publication, and promotion decisions:
   [[file:../handoffs/2026-07-23-quickshell-slice1e-acceptance.org][the Slice 1E
   acceptance handoff]].
 
+Accepted source-live after separate source, fixture, pure-build, controlled
+source-live, automated-runtime, restored-state, and user-acceptance decisions;
+publication and promotion remain pending:
+
+- R6 and R7 / Slice 1F: clipboard preview and delete state; see
+  [[file:../handoffs/2026-07-24-quickshell-slice1f-acceptance.org][the Slice 1F
+  acceptance handoff]].
+
 Still open:
 
 - Slice 0C profiling;
 - R4 / Slice 1G window-close correctness;
 - R5 / Slice 1H network handoff correctness;
-- R6 and R7 / Slice 1F clipboard preview and delete state;
 - R8 / Slice 1I analyzer freshness.
 
 The original =Recommended Next Decision= at the end of this audit was fulfilled
-by Slice 1C and is now historical guidance.  Slice 1F is the next proposed
-bounded correction, but this disposition does not authorize its implementation.
+by Slice 1C and is now historical guidance.  The next repository decisions are
+the separate Slice 1F evidence-publication and promotion gates.  This
+disposition authorizes neither, and it does not select or authorize another
+implementation slice.
 
 * Current Findings
 ** R1 - Wallpaper Shell Boundary And Atomic Publication
