@@ -36,16 +36,16 @@ The accepted baseline is recorded in
 later accepted maintenance evidence is in the
 [[file:docs/handoffs/2026-07-19-vial-qmk-udev.org][Vial/QMK handoff]] and
 [[file:docs/handoffs/2026-07-19-msi-pure-builds.org][MSI pure-build handoff]].
-The accepted and promoted Quickshell cleanup sequence through Slice 1E is
+The accepted and promoted Quickshell cleanup sequence through Slice 1F is
 recorded in
-[[file:docs/handoffs/2026-07-23-quickshell-slice1e-acceptance.org][the Slice 1E
-acceptance handoff]].  Slice 1E prevents an old launcher or clipboard close
-timer from clearing a newly reopened overlay.
-Slice 1F is accepted source-live at payload =0022620= and recorded in
 [[file:docs/handoffs/2026-07-24-quickshell-slice1f-acceptance.org][the Slice 1F
-acceptance handoff]].  It hardens clipboard preview publication and stale
-request handling, and makes post-delete selection deterministic.  Its evidence
-has not been published and =main= has not been promoted to it.
+acceptance handoff]].  Runtime payload =0022620= hardens clipboard preview
+publication and stale-request handling and makes post-delete selection
+deterministic.  Its acceptance evidence was published at =6ea87f5=; =main= and
+=work/quickshell-cleanup= carry the accepted payload and evidence.
+The preceding Slice 1E timer correction remains recorded in
+[[file:docs/handoffs/2026-07-23-quickshell-slice1e-acceptance.org][the Slice 1E
+acceptance handoff]].
 The preceding stable CAVA work remains recorded in
 [[file:docs/handoffs/2026-07-22-quickshell-slice1d-acceptance.org][the Slice 1D
 acceptance handoff]].  Fresh dual-output validation and removal of the old
@@ -114,11 +114,12 @@ Work stays slice-based:
 
 1. Apply confirmed NixOS maintenance, security, service, and GC corrections one
    small change at a time.
-2. For Quickshell, review and separately authorize Slice 1F evidence
-   publication and promotion before choosing another implementation slice.
+2. For Quickshell, Slice 1G window-close correctness is the next documented
+   bounded candidate.  It must begin from the final Slice 1F closeout head;
+   preparing its branch and worktree is not implementation or verification.
    Run the deferred dual-output check when a second display is available, keep
-   old CAVA temp-file deletion separate, and take later correctness or
-   performance work as measured slices.
+   old CAVA temp-file deletion separate, and keep clipboard-lifecycle,
+   analyzer, and performance work in later measured slices.
 3. Give Emacs measured, real-use-driven TLC; Lua and Nix LSP slices are accepted,
    while Python's manual acceptance remains in progress.
 4. Port the macOS VS Code configuration only as a Linux-specific Home Manager

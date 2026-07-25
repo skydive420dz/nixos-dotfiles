@@ -2,24 +2,24 @@
 #+startup: overview
 
 * Status
-Slice 1F is =ACCEPTED SOURCE-LIVE= on =eDP-1=.  It is not published or
-promoted.
+Slice 1F is =ACCEPTED AND PROMOTED= on the evidence available from =eDP-1=.
 
 - Accepted runtime payload:
   =0022620328f32e847bf15afc9af473913858484c=
-- Pre-slice rollback and current =main=:
+- Immutable pre-slice rollback:
   =7734eb4ef378fe4a95e9776072ea4b5145a81f50=
-- Retained local payload branch: =work/quickshell-slice1f=
-- Documentation candidate: =docs/quickshell-slice1f-acceptance=
+- Published acceptance evidence:
+  =6ea87f52366719d3dbfb5f39d5f0312682074481=
+- Retained published refs: =work/quickshell-slice1f= at the runtime payload and
+  =docs/quickshell-slice1f-acceptance= at the acceptance evidence
 - Active system: generation 860,
   =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44=
 
-At the documentation snapshot, the live checkout was clean and detached at the
-accepted payload.  The payload branch was clean and local-only.  Local and
-remote =main= both remained at the rollback commit.  This document records
-evidence; it does not authorize a commit, push, promotion, branch update,
-worktree cleanup, service action, NixOS activation, mutable clipboard action,
-or another implementation slice.
+At the pre-promotion documentation snapshot, the live checkout was clean and
+detached at the accepted payload.  The payload branch was clean and local-only.
+Local and remote =main= both remained at the rollback commit.  This is
+historical gate evidence, not standing authorization for a service action,
+NixOS activation, mutable clipboard action, or another implementation slice.
 
 * Contract And Fix
 The controlling contract is
@@ -150,11 +150,12 @@ At =2026-07-24T23:25:56-04:00=:
 - Quickshell: active/running, PID =4204=, =NRestarts=0=;
 - current system: generation 860 and the unchanged closure above.
 
-The documentation lane was then created from the accepted payload.  Its commit,
-publication, integration, promotion, and cleanup remain independent gates.
+The documentation lane was then created from the accepted payload.  At that
+snapshot its commit, publication, integration, promotion, and cleanup remained
+independent gates.
 
 * Boundaries And Rollback
-Slice 1F did not:
+The payload implementation and source-live acceptance gates did not:
 
 - activate or copy a live clipboard entry, exercise the live UI Delete path, or
   delete any preexisting clipboard-history row; cleanup removed only the exact
@@ -170,18 +171,30 @@ Slice 1F did not:
   improvement.
 
 Because Quickshell is an out-of-store link, generation rollback alone cannot
-restore these QML bytes.  The source rollback is the clean =main= commit
+restore these QML bytes.  The immutable source rollback is
 =7734eb4ef378fe4a95e9776072ea4b5145a81f50=, followed by exact-source
-validation and a controlled Quickshell stop/start if separately authorized.
+validation and a controlled Quickshell stop/start if separately authorized;
+=main= now carries Slice 1F.
 
-* Next Separate Decisions
-In order:
+* Publication, Promotion, And Closeout
+The payload and acceptance-evidence refs were published at =0022620= and
+=6ea87f5= respectively.  A fresh readiness check proved strict linear
+fast-forwards: the evidence head was two commits ahead of the former =main= and
+four commits ahead of =work/quickshell-cleanup=, with no divergent commits.
+Local and GitHub cleanup and =main= were then advanced without force.
 
-1. review and authorize or revise this documentation candidate;
-2. commit the acceptance evidence;
-3. publish the payload and documentation evidence;
-4. perform a fresh integration-readiness check;
-5. decide separately whether to promote by strict non-forced fast-forward;
-6. decide separately whether to synchronize branch names or clean worktrees.
+The live checkout attached from detached payload =0022620= to =main= through
+only the five acceptance-documentation paths.  Its =config/quickshell= tree did
+not change; Quickshell remained PID =4204= with =NRestarts=0=, and generation
+860 remained unchanged.  The clean Slice 1F payload and documentation
+worktrees were removed while their published refs were retained.
 
-No later correctness or optimization slice is selected by this handoff.
+The commit containing this closeout record changes documentation only.  When
+=main= and =work/quickshell-cleanup= are aligned to it and published beyond
+immutable evidence head =6ea87f5=, successful ref verification closes the
+record without another documentation commit or any QML/runtime change.
+
+The next documented candidate is Slice 1G window-close correctness.  Any Slice
+1G branch and worktree must start from the final closeout head; preparing them
+contains no implementation.  This handoff does not authorize live tests or
+include shared-controller or native-model migration.

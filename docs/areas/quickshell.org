@@ -50,7 +50,7 @@ pre-documentation snapshot, local and GitHub =main= and
 =work/quickshell-slice1e= resolved to =84b111b=, while
 =work/quickshell-cleanup= and =work/quickshell-slice1d= remained at =51c0396=.
 
-Slice 1F is accepted source-live on =eDP-1= at payload =0022620=; exact evidence
+Slice 1F is accepted and promoted at runtime payload =0022620=; exact evidence
 and claim boundaries are in
 [[../handoffs/2026-07-24-quickshell-slice1f-acceptance.org][the 2026-07-24 Slice
 1F acceptance handoff]].  The one-file payload hardens clipboard preview
@@ -60,11 +60,14 @@ separate pure build, controlled source activation, remote synthetic
 hand-equivalent preview testing, restored-state checks, and user acceptance
 passed.  The user waived a separate physical hand test.  The live UI Delete
 path was not exercised; cleanup removed only synthetic test rows, while all
-eight filtered and unfiltered cases passed in the isolated fixture.  The live
-checkout is clean and detached at the payload, Quickshell is healthy, and
-generation 860 is unchanged.  Local and remote =main= remain at the accepted
-Slice 1E checkpoint =7734eb4=; publication and promotion are separate pending
-gates.
+eight filtered and unfiltered cases passed in the isolated fixture.  Published
+acceptance evidence =6ea87f5= was integrated through
+=work/quickshell-cleanup= and =main= by strict non-forced fast-forward.  The
+live checkout is clean on =main= with the identical accepted QML, Quickshell is
+healthy, and generation 860 is unchanged.  The two Slice 1F worktrees were
+removed while their published evidence refs were retained.  Slice 1G must start
+from the final closeout head; preparing its branch and worktree does not
+implement or verify it.
 
 =main= remains the sober checkpoint shell.  The old modular shell lives on
 =prototype/quickshell-legacy= and the archived Quickshell branches.  Treat
@@ -336,6 +339,7 @@ This is descriptive, not a mandate to create empty folders. Split only when a mo
 - 2026-07-23: After separate readiness, local fast-forward, publication, and disposable-worktree cleanup gates, =main=, =work/quickshell-cleanup=, and =work/quickshell-slice1d= all resolved to accepted documentation head =89a2256efa701ab5c01e0c3caeddaa2801a345da=.  The live checkout remained clean and detached at payload =ae1736b= with the same QML tree, Quickshell PID, generation 860, and current system.  Promotion did not build or activate NixOS, restart services, delete historical configs, perform the deferred dual-output test, or authorize another optimization slice.
 - 2026-07-23: Slice 1E is accepted and promoted at runtime payload =84b111b402cd34f42fd895725fde1810ee6e455c=.  Its only payload changes add =closeTimer.stop()= at the start of launcher and clipboard =show()=.  Exact-source validation and a separate pure no-link build passed before a controlled Quickshell source activation.  Automated live tests on =eDP-1= proved that both overlays preserve a typed sentinel across close/reopen within 150 ms, still clear state after an ordinary close, and finish closed.  Quickshell remained healthy with zero restarts or warning-level journal entries after activation; generation 860 and the current system did not change.  The branch was published, =main= was fast-forwarded and published separately, the live checkout was attached cleanly to =main=, and the clean Slice 1D and Slice 1E worktrees were removed while their branch refs were retained.  No NixOS activation, human hand test, historical CAVA cleanup, dual-output validation, Slice 1F implementation, or broader optimization was performed.
 - 2026-07-24: Slice 1F is accepted source-live on =eDP-1= at payload =0022620328f32e847bf15afc9af473913858484c=.  Its only payload path is =config/quickshell/modules/clipboard/ClipboardView.qml=.  Exact-source and isolated-fixture gates, the separate pure no-link build, controlled source activation, automated synthetic preview/race and restored-state checks, service stability, and user acceptance passed without changing generation 860.  The user accepted the remote hand-equivalent evidence and waived a separate physical hand test.  The live UI Delete path was not exercised; cleanup removed only synthetic test rows, while all eight delete-selection cases passed in the isolated exact-component fixture.  The live checkout is clean and detached at the payload while local and remote =main= remain =7734eb4=.  Commit/push of this acceptance record, payload publication, promotion, worktree cleanup, dual-output validation, and later clipboard-lifecycle or optimization work remain separate decisions.  Exact evidence is in [[file:../handoffs/2026-07-24-quickshell-slice1f-acceptance.org][the Slice 1F acceptance handoff]].
+- 2026-07-24: After separate evidence publication and readiness gates, local and GitHub =work/quickshell-cleanup= and =main= were strictly fast-forwarded through Slice 1F acceptance evidence =6ea87f52366719d3dbfb5f39d5f0312682074481=.  The live checkout then attached to =main= through a documentation-only delta; its Quickshell tree remained exactly equal to runtime payload =0022620328f32e847bf15afc9af473913858484c=.  Quickshell PID =4204=, =NRestarts=0=, generation 860, and the current system remained unchanged.  The clean payload and documentation worktrees were removed while their published branch refs were retained.  The commit containing this closeout record is documentation-only.  Aligning and publishing =main= and =work/quickshell-cleanup= at that commit closes the record without another documentation commit or any runtime, acceptance, or promotion gate.  Slice 1G must start from that final head; branch/worktree preparation alone includes no implementation.
 
 ** Known Lesson
 :PROPERTIES:
