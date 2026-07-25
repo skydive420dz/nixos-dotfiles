@@ -14,7 +14,7 @@ commits, pushes, service changes, or branch deletion.
 |---------+-------------------------+--------------------|
 | System | Generation 860 and its active GC timer remain accepted; the clean one-shot optimizer run is accepted; O3-A defers recurrence for a roughly 30-day observation; no optimizer timer is armed | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
 | Emacs | Clean Emacs remains active under generation 860 with the same accepted Home Manager root; Lua and Nix =lsp-mode=/Company slices are accepted; the accepted QML policy uses verified four-space formatting in classic and parser-backed modes | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | Cleanup through Slice 1H is accepted and promoted.  Runtime payload =ead19fe= passed exact-source, 14-case fixture, pure-build, controlled source-live, and live =wlp4s0= sampling gates.  The live checkout is clean on =main= with identical accepted QML; Quickshell is healthy and generation 860 is unchanged.  Real Wi-Fi/Ethernet handoff remains deferred because Ethernet has no carrier and Wi-Fi is the sole management route | Slice 1I analyzer freshness is the next bounded candidate.  Run the deferred network handoff only with a verified wired route; keep native/shared ownership, dual-output validation, and performance claims separate |
+| Quickshell | Cleanup through Slice 1I is accepted and promoted.  Runtime payload =f7107cb= passed exact-source, 13 fixture checks, pure-build, controlled source-live, lifecycle, and visual gates on =eDP-1=; immutable acceptance evidence =f8a4c90= records them.  The live checkout is clean on =main= with identical accepted QML; Quickshell is healthy, the two Slice 1I worktrees were removed with their refs retained, and generation 860 is unchanged | Slice 0C's read-only profiling helper is the only still-open remainder candidate; selecting it remains separate.  Keep the deferred network handoff, historical CAVA cleanup, clipboard lifecycle, native/shared ownership, dual-output validation, rendering, frame-rate, and performance claims separate |
 | Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs, Vial discovers it, and QMK CLI intentionally remains system-wide | Keep firmware writes and flashing separate and explicitly authorized |
 | VS Code | NixOS has no VS Code configuration | Adapt the macOS Home Manager module in a future Linux-specific slice |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -62,10 +62,15 @@ controlled source-live activation, live sampling probe, and remaining physical
 handoff boundary are in
 [[file:handoffs/2026-07-25-quickshell-slice1h-acceptance.org][the Slice 1H
 acceptance handoff]].
+The accepted and promoted Slice 1I analyzer-freshness correction, exact
+fixtures, controlled source-live activation, lifecycle checks, visual pass, and
+remaining boundaries are in
+[[file:handoffs/2026-07-25-quickshell-slice1i-acceptance.org][the Slice 1I
+acceptance handoff]].
 
 * Current Work Lanes
 - =main= and =work/quickshell-cleanup= are aligned at the stable checkpoint
-  carrying Slice 1H and its acceptance record.
+  carrying Slice 1I and its acceptance record.
 - =work/nixos-maintenance=: designated post-checkpoint system and hygiene work.
 - =work/quickshell-slice1d= at =51c0396= and =work/quickshell-slice1e= at
   =84b111b= are retained evidence refs, not active worktrees.
@@ -77,8 +82,11 @@ acceptance handoff]].
   evidence refs, not active worktrees.
 - Published =work/quickshell-slice1h= at =ead19fe= is the retained Slice 1H
   payload ref, not an active worktree.
-- Slice 1I must start from the final Slice 1H closeout head; branch preparation
-  does not authorize implementation.
+- Published =work/quickshell-slice1i= at =f7107cb= and
+  =docs/quickshell-slice1i-acceptance= at =f8a4c90= are retained Slice 1I
+  evidence refs, not active worktrees.
+- Slice 0C's read-only profiling helper is the only still-open remainder
+  proposal; branch preparation does not authorize implementation.
 - Emacs: complete the current Python acceptance decision before selecting
   another language or optimization slice.
 
@@ -99,6 +107,7 @@ acceptance handoff]].
 - [[file:projects/clipboard-launcher.org][Completed clipboard and launcher work]]
 
 * Evidence And History
+- [[file:handoffs/2026-07-25-quickshell-slice1i-acceptance.org][2026-07-25 Quickshell Slice 1I acceptance and promotion]]
 - [[file:handoffs/2026-07-25-quickshell-slice1h-acceptance.org][2026-07-25 Quickshell Slice 1H acceptance and promotion]]
 - [[file:handoffs/2026-07-25-quickshell-slice1g-acceptance.org][2026-07-25 Quickshell Slice 1G acceptance and promotion]]
 - [[file:handoffs/2026-07-24-quickshell-slice1f-acceptance.org][2026-07-24 Quickshell Slice 1F acceptance and promotion]]

@@ -2,10 +2,7 @@
 #+startup: overview
 
 * Status
-Slice 1I is =ACCEPTED SOURCE-LIVE= on the available =eDP-1= evidence.  Its
-payload is published, and the separately authorized commit and push of this
-record publish the acceptance evidence.  Checkpoint promotion to =main= remains
-pending.
+Slice 1I is =ACCEPTED AND PROMOTED= on the available =eDP-1= evidence.
 
 - Accepted runtime payload:
   =f7107cb545741f53c2ae588d405297ed705e4180=
@@ -15,16 +12,19 @@ pending.
   =work/quickshell-slice1i=
 - Acceptance-evidence ref:
   =docs/quickshell-slice1i-acceptance=
+- Published acceptance evidence:
+  =f8a4c90b1033fbf94bf42ef08a13a4700c90d05c=
 - Accepted file SHA-256:
   =7139565870459366e38ffa2c79348eb5d86b0cad1cb77a2957f77ad24bfe6627=
 - Active system: generation 860,
   =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44=
 
-At acceptance, the live checkout was clean and detached at the immutable
-payload.  Local and remote =main= and =work/quickshell-cleanup= remained at the
-rollback.  Quickshell was healthy at PID =431950= with =NRestarts=0=.  This
-record does not authorize promotion, live branch attachment, NixOS activation,
-or worktree cleanup.
+The payload and acceptance evidence were published under the retained refs
+above.  Local and remote =main= and =work/quickshell-cleanup= strictly
+fast-forwarded through the evidence.  The live checkout attached cleanly to
+=main= through a documentation-only delta, and both disposable Slice 1I
+worktrees were removed.  Quickshell remained PID =431950= with =NRestarts=0=,
+and generation 860 remained unchanged.
 
 * Contract And Change
 The controlling contract is
@@ -145,21 +145,32 @@ Automated phase assertions passed for live, stall, resume, exit, and final-live
 states.  The user visually accepted the sequence.  Only =eDP-1= was connected,
 so fresh dual-output evidence remains explicitly deferred.
 
-* Repository And Publication Boundary
-At the acceptance-publication preflight:
+* Promotion And Repository State
+The published payload branch is retained at =f7107cb= and the published
+acceptance-evidence branch at =f8a4c90=.  A fresh readiness check proved the
+strict linear history =cda0213 -> f7107cb -> f8a4c90=, with both target branches
+zero commits ahead and two commits behind the evidence.
 
-- live checkout: clean detached =f7107cb=;
-- =work/quickshell-slice1i=: clean and published at =f7107cb=;
-- local and remote =main= and =work/quickshell-cleanup=: =cda0213=;
-- documentation lane: clean branch =docs/quickshell-slice1i-acceptance= created
-  from the immutable payload;
-- Quickshell: =active/running= at PID =431950=, =NRestarts=0=;
-- current system: generation 860 and the unchanged closure above.
+GitHub =main= and =work/quickshell-cleanup= then fast-forwarded atomically
+through =f8a4c90= without force; the matching local refs advanced with
+expected-old guards.  The live checkout attached from detached payload
+=f7107cb= to =main= through exactly these two documentation paths:
 
-The separately authorized commit and push of this documentation publish the
-acceptance evidence only.  They do not advance =main= or
-=work/quickshell-cleanup=, alter the live checkout, restart Quickshell, mutate
-playback, activate NixOS, or remove either Slice 1I worktree.
+- =docs/audits/2026-07-19-quickshell-slice1-remainder.org=
+- =docs/handoffs/2026-07-25-quickshell-slice1i-acceptance.org=
+
+Its Quickshell tree remained
+=a362984be1d5812afe811c91f6fac257c4fffac2= and the analyzer hash remained the
+accepted hash above.  Quickshell stayed =active/running= at PID =431950= with
+=NRestarts=0=; generation 860 and =/run/current-system= did not change.  The
+clean payload and acceptance-documentation worktrees were removed while both
+published refs were retained.
+
+The commit containing this closeout record changes exactly five documentation
+paths.  When local and remote =main= and =work/quickshell-cleanup= are aligned
+to it beyond immutable evidence =f8a4c90=, the clean closeout worktree is
+removed, and exact ref/worktree verification passes, the record closes without
+another documentation commit or runtime action.
 
 * Boundaries And Rollback
 Slice 1I did not:
@@ -180,5 +191,6 @@ restore the old QML.  The immutable source rollback is =cda0213=.  If rollback
 is separately authorized, stop Quickshell, move the clean live checkout to that
 source, run the exact-source checker, and start Quickshell.
 
-Promotion readiness and any fast-forward of =work/quickshell-cleanup= or
-=main= remain the next separate decision.  This record does not authorize them.
+Slice 0C's read-only profiling helper is the only still-open remainder proposal.
+Selecting or implementing it remains a separate decision and is not authorized
+by this record.

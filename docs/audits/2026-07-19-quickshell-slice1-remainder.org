@@ -121,12 +121,8 @@ activation, runtime, publication, and promotion decisions:
 - R5 / Slice 1H: network-handoff baseline correctness; see
   [[file:../handoffs/2026-07-25-quickshell-slice1h-acceptance.org][the Slice 1H
   acceptance handoff]].
-
-Accepted source-live and published after separate source, build, controlled
-source-live activation, runtime, human-acceptance, and publication decisions;
-checkpoint promotion remains pending:
-
-- R8 / Slice 1I: analyzer freshness and exit clearing at payload =f7107cb=; see
+- R8 / Slice 1I: analyzer freshness and exit clearing at payload =f7107cb= with
+  immutable acceptance evidence =f8a4c90=; see
   [[file:../handoffs/2026-07-25-quickshell-slice1i-acceptance.org][the Slice 1I
   acceptance handoff]].
 
@@ -140,10 +136,10 @@ completed after separate authorization, as did R4 / Slice 1G publication and
 promotion.  R5 / Slice 1H is accepted and promoted on the available evidence;
 its real disconnect/reconnect and Wi-Fi/Ethernet handoff remains explicitly
 deferred until a wired alternate route is available.  R8 / Slice 1I is accepted
-source-live on =eDP-1= and published at =f7107cb=; checkpoint promotion remains
-an independent pending gate, while local and remote =main= and
-=work/quickshell-cleanup= remain at =cda0213=.  This disposition does not
-authorize promotion.
+and promoted on =eDP-1= at payload =f7107cb= with immutable acceptance evidence
+=f8a4c90=.  Its fresh dual-output test remains explicitly deferred.  Slice 0C
+profiling is the only still-open remainder proposal; this disposition does not
+authorize it.
 
 * Current Findings
 ** R1 - Wallpaper Shell Boundary And Atomic Publication
