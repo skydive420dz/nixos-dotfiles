@@ -95,7 +95,7 @@ testing for a new candidate.  A later candidate must either obtain fresh
 dual-output evidence or record a new explicit deferral.  The shared-backend work
 in original Slice 3 still requires both outputs.
 
-* Post-Audit Disposition - Through 2026-07-24
+* Post-Audit Disposition - Through 2026-07-25
 This section records later outcomes without rewriting the verified 2026-07-19
 snapshot or turning the remaining proposals into authorization.
 
@@ -116,18 +116,25 @@ activation, runtime, publication, and promotion decisions:
   [[file:../handoffs/2026-07-24-quickshell-slice1f-acceptance.org][the Slice 1F
   acceptance handoff]].
 
+Accepted source-live after separate source, fixture, pure-build, controlled
+source-live, automated-runtime, restored-state, and human-acceptance decisions;
+publication and promotion remain pending:
+
+- R4 / Slice 1G: window-close correctness; see
+  [[file:../handoffs/2026-07-25-quickshell-slice1g-acceptance.org][the Slice 1G
+  acceptance handoff]].
+
 Still open:
 
 - Slice 0C profiling;
-- R4 / Slice 1G window-close correctness;
 - R5 / Slice 1H network handoff correctness;
 - R8 / Slice 1I analyzer freshness.
 
 The original =Recommended Next Decision= at the end of this audit was fulfilled
 by Slice 1C and is now historical guidance.  Slice 1F publication and promotion
-completed after separate authorization.  R4 / Slice 1G is the next documented
-open correction; preparing an unchanged branch and worktree does not implement
-it, and this disposition does not authorize its source changes or live tests.
+completed after separate authorization.  R4 / Slice 1G is accepted source-live;
+its publication and promotion remain separate pending gates.  This disposition
+does not select or authorize Slice 1H or another implementation slice.
 
 * Current Findings
 ** R1 - Wallpaper Shell Boundary And Atomic Publication

@@ -1,0 +1,165 @@
+#+title: Quickshell Slice 1G Window Close Acceptance - 2026-07-25
+#+startup: overview
+
+* Status
+Slice 1G is =ACCEPTED SOURCE-LIVE= on the connected =eDP-1= output.  It is not
+published or promoted.
+
+- Accepted runtime payload:
+  =e8358af1c6d6171d32f4bf51f1ca652c9a130d99=
+- Pre-slice rollback and current =main=:
+  =95c0c49606d9303865b60a576211084d66999fc2=
+- Local payload branch: =work/quickshell-slice1g=
+- Local documentation lane: =docs/quickshell-slice1g-acceptance=
+- Active system: generation 860,
+  =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44=
+
+At the documentation snapshot, the live checkout was clean and detached at the
+accepted payload.  The payload branch was clean and local-only.  Local and
+remote =main= and =work/quickshell-cleanup= remained at the rollback commit.
+The user accepted the live visual result and authorized this local
+documentation commit.  This does not authorize a push, promotion, live branch
+attachment, worktree cleanup, NixOS activation, or another implementation
+slice.
+
+* Contract And Change
+The controlling contract is
+[[file:../audits/2026-07-19-quickshell-slice1-remainder.org][the Slice 1
+remainder audit]], section =Slice 1G - Window Close Correctness=.
+
+The payload changes exactly one path:
+
+- =config/quickshell/modules/window/WindowTitle.qml=
+
+It contains 35 insertions and 4 deletions.  A =closewindow= event now schedules
+a 100 ms refresh through the existing =hyprctl activewindow -j= process instead
+of clearing the title immediately.  A pending bit preserves a refresh requested
+while the process is running, and request revisions prevent an older process
+result from overwriting a newer close or =activewindow= event.  Synchronous
+closes coalesce into one query.
+
+This is the bounded R4 correctness fix.  It does not introduce a shared
+controller or migrate to =Hyprland.activeToplevel=.
+
+* Verification Gates
+** Source And Isolated Behavior
+The payload is one commit ahead of the rollback.  Its diff contains only the
+intended QML path, and =git diff --check= passed.
+
+=scripts/check-quickshell= passed:
+
+- 31 QML files with exact four-space formatting;
+- 17 Bash files;
+- 2 JSON files;
+- 1 Python file;
+- actionable and strict QML lint with no failures.
+
+The exact accepted file hash is
+=38ee573316bf33cfaa4bf9ef927d825033198513894316131240c9eb779daaf4=.
+
+A disposable exact-component fixture reproduced the rollback defect as
+=state-cleared-immediately=.  The accepted payload passed eight scenarios:
+
+- background B closes while focused A remains;
+- focused A closes to the next window;
+- focused A closes to =Desktop=;
+- synchronous close events coalesce;
+- a close during a delayed query triggers one trailing refresh;
+- a newer =activewindow= event defeats an older query result;
+- both active-before-close and close-before-active event orders;
+- a close overlapping the startup query is not lost.
+
+The fixture used an offscreen Quickshell process and a PATH-shadowed synthetic
+=hyprctl=.  It did not touch the live service or compositor, and all temporary
+fixture files were removed.
+
+** Pure Build
+A separate pure no-link Nix build passed and returned the already-active
+generation-860 closure:
+
+#+begin_example
+/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44
+#+end_example
+
+It created no =result= link, did not update =flake.lock=, and did not activate
+anything.  Quickshell is linked out of the Nix store, so this is closure and
+evaluation evidence rather than proof of the live QML bytes.
+
+** Controlled Source Activation
+Before the live action, =~/.config/quickshell= resolved to
+=/home/skydive420dz/Projects/nixos-dotfiles/config/quickshell=.  Quickshell was
+stopped before the clean live checkout moved from rollback =95c0c49= to the
+immutable payload.  The exact checker passed against the now-live source before
+the service restarted.
+
+- Pre-activation PID: =4204=
+- Accepted PID: =104022=
+- =ActiveState= =active= and =SubState= =running=
+- =Result= =success=, =ExecMainStatus= =0=, and =NRestarts= =0=
+- one =qs list --all --json= instance at the exact linked configuration
+- no warning-or-higher journal entries after activation
+- generation 860 and =/run/current-system= unchanged
+
+No NixOS build result was activated.
+
+** Live Runtime And Human Acceptance
+The automated live test used two uniquely named Kitty windows on otherwise
+empty workspace 98.  It focused A, closed background B by its exact address,
+proved A remained active, then closed A and proved the workspace had no active
+window.  Quickshell retained PID =104022= throughout.
+
+Cleanup restored workspace 1 and the original focused Brave address.  No
+synthetic client, process, workspace, or runtime script remained.
+
+The visual sequence was then repeated at the user's request with eight-second
+observation intervals.  The user confirmed:
+
+- the title was never B because B was never focused;
+- after B closed, A remained displayed;
+- after A closed, =Desktop= remained displayed.
+
+This is the required human visual pass on =eDP-1=.  Fresh dual-output validation
+remains deferred until a second display is connected.
+
+* Repository Snapshot
+At =2026-07-25T01:42:54-04:00=:
+
+- live checkout: clean detached =e8358af=;
+- =work/quickshell-slice1g=: clean local-only payload =e8358af=;
+- local and remote =main=: =95c0c49=;
+- local and remote =work/quickshell-cleanup=: =95c0c49=;
+- Quickshell: active/running, PID =104022=, =NRestarts=0=;
+- current system: generation 860 and the unchanged closure above.
+
+The documentation lane was created from the accepted payload.  Publication,
+integration, promotion, live branch attachment, and cleanup remain independent
+gates.
+
+* Boundaries, Rollback, And Next Decisions
+Slice 1G did not:
+
+- run =nrs= or =nixos-rebuild switch=, activate NixOS, or change generations;
+- publish a branch or advance =main= or =work/quickshell-cleanup=;
+- change title normalization, the bar layout, theme, workspace module, or
+  per-output ownership;
+- add a shared controller or native Hyprland model;
+- change the pre-existing malformed/failed =hyprctl= output policy;
+- perform fresh dual-output validation or claim CPU, memory, GPU, or broader
+  performance improvement.
+
+Because Quickshell is an out-of-store link, generation rollback cannot restore
+these QML bytes.  The source rollback is clean =main= at =95c0c49=, followed by
+exact-source validation and a controlled Quickshell stop/start if separately
+authorized.
+
+The next separate decisions are:
+
+1. publish the payload and acceptance-evidence refs;
+2. perform a fresh strict-fast-forward readiness check;
+3. decide separately whether to promote through =work/quickshell-cleanup= and
+   =main=;
+4. attach the live checkout to the promoted branch and remove disposable
+   worktrees only after separate authorization.
+
+Slice 1H remains only the next documented proposal; this handoff does not
+authorize it.

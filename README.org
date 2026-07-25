@@ -43,6 +43,11 @@ acceptance handoff]].  Runtime payload =0022620= hardens clipboard preview
 publication and stale-request handling and makes post-delete selection
 deterministic.  Its acceptance evidence was published at =6ea87f5=; =main= and
 =work/quickshell-cleanup= carry the accepted payload and evidence.
+Slice 1G is accepted source-live on =eDP-1= at payload =e8358af= and recorded in
+[[file:docs/handoffs/2026-07-25-quickshell-slice1g-acceptance.org][the Slice 1G
+acceptance handoff]].  It refreshes authoritative active-window state after a
+window closes instead of clearing the title immediately.  Its payload and
+acceptance evidence remain local; =main= has not been promoted to them.
 The preceding Slice 1E timer correction remains recorded in
 [[file:docs/handoffs/2026-07-23-quickshell-slice1e-acceptance.org][the Slice 1E
 acceptance handoff]].
@@ -114,9 +119,8 @@ Work stays slice-based:
 
 1. Apply confirmed NixOS maintenance, security, service, and GC corrections one
    small change at a time.
-2. For Quickshell, Slice 1G window-close correctness is the next documented
-   bounded candidate.  It must begin from the final Slice 1F closeout head;
-   preparing its branch and worktree is not implementation or verification.
+2. For Quickshell, review and separately authorize Slice 1G evidence
+   publication and promotion before choosing another implementation slice.
    Run the deferred dual-output check when a second display is available, keep
    old CAVA temp-file deletion separate, and keep clipboard-lifecycle,
    analyzer, and performance work in later measured slices.
