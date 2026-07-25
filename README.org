@@ -36,18 +36,17 @@ The accepted baseline is recorded in
 later accepted maintenance evidence is in the
 [[file:docs/handoffs/2026-07-19-vial-qmk-udev.org][Vial/QMK handoff]] and
 [[file:docs/handoffs/2026-07-19-msi-pure-builds.org][MSI pure-build handoff]].
-The accepted and promoted Quickshell cleanup sequence through Slice 1F is
+The accepted and promoted Quickshell cleanup sequence through Slice 1G is
 recorded in
-[[file:docs/handoffs/2026-07-24-quickshell-slice1f-acceptance.org][the Slice 1F
-acceptance handoff]].  Runtime payload =0022620= hardens clipboard preview
-publication and stale-request handling and makes post-delete selection
-deterministic.  Its acceptance evidence was published at =6ea87f5=; =main= and
-=work/quickshell-cleanup= carry the accepted payload and evidence.
-Slice 1G is accepted source-live on =eDP-1= at payload =e8358af= and recorded in
 [[file:docs/handoffs/2026-07-25-quickshell-slice1g-acceptance.org][the Slice 1G
 acceptance handoff]].  It refreshes authoritative active-window state after a
-window closes instead of clearing the title immediately.  Its payload and
-acceptance evidence remain local; =main= has not been promoted to them.
+window closes instead of clearing the title immediately.  Runtime payload
+=e8358af= and published acceptance evidence =180d7c2= passed the separated
+verification gates; =main= and =work/quickshell-cleanup= carry the accepted
+payload and evidence.
+The preceding Slice 1F clipboard correction remains recorded in
+[[file:docs/handoffs/2026-07-24-quickshell-slice1f-acceptance.org][the Slice 1F
+acceptance handoff]].
 The preceding Slice 1E timer correction remains recorded in
 [[file:docs/handoffs/2026-07-23-quickshell-slice1e-acceptance.org][the Slice 1E
 acceptance handoff]].
@@ -119,8 +118,9 @@ Work stays slice-based:
 
 1. Apply confirmed NixOS maintenance, security, service, and GC corrections one
    small change at a time.
-2. For Quickshell, review and separately authorize Slice 1G evidence
-   publication and promotion before choosing another implementation slice.
+2. For Quickshell, Slice 1H network-handoff correctness is the next documented
+   bounded candidate.  It must begin from the final Slice 1G closeout head;
+   preparing its branch and worktree is not implementation or verification.
    Run the deferred dual-output check when a second display is available, keep
    old CAVA temp-file deletion separate, and keep clipboard-lifecycle,
    analyzer, and performance work in later measured slices.
