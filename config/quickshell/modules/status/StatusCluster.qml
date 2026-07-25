@@ -23,6 +23,7 @@ Rectangle {
     property bool muted: false
     property string network: ""
     property string networkDevice: ""
+    property int networkDeviceRevision: 0
     property int networkSignal: -1
     property double networkRxBytes: 0
     property double networkTxBytes: 0
@@ -54,15 +55,11 @@ Rectangle {
             else if (key === "network")
                 root.network = value;
             else if (key === "network_device")
-                root.networkDevice = value;
+                root.setNetworkDevice(value);
             else if (key === "network_signal") {
                 var signalValue = parseInt(value);
                 root.networkSignal = Number.isFinite(signalValue) ? signalValue : -1;
-            } else if (key === "rx_bytes")
-                root.updateNetworkRate("rx", Number(value));
-            else if (key === "tx_bytes")
-                root.updateNetworkRate("tx", Number(value));
-            else if (key === "bluetooth")
+            } else if (key === "bluetooth")
                 root.bluetoothAvailable = value === "1";
             else if (key === "bluetooth_connected")
                 root.bluetoothConnected = value === "1";
@@ -73,6 +70,28 @@ Rectangle {
             else if (key === "battery_status")
                 root.updateBatteryStatus(value);
         }
+    }
+
+    function resetNetworkTraffic() {
+        networkRxBytes = 0;
+        networkTxBytes = 0;
+        networkLastRxBytes = 0;
+        networkLastTxBytes = 0;
+        networkLastSampleMs = 0;
+        networkDownRate = "";
+        networkUpRate = "";
+        networkDownSamples = [];
+        networkUpSamples = [];
+    }
+
+    function setNetworkDevice(value) {
+        var nextDevice = value || "";
+        if (nextDevice === networkDevice)
+            return;
+
+        networkDevice = nextDevice;
+        networkDeviceRevision++;
+        resetNetworkTraffic();
     }
 
     function formatRate(bytesPerSecond) {
@@ -94,31 +113,71 @@ Rectangle {
         return "99M+";
     }
 
-    function updateNetworkRate(kind, value) {
-        var now = Date.now();
-        if (!Number.isFinite(value))
-            value = 0;
+    function applyNetworkTrafficSample(sampledDevice, sampledRevision, rxValue, txValue, sampleMs) {
+        if (!sampledDevice || sampledDevice !== networkDevice || sampledRevision !== networkDeviceRevision)
+            return;
 
-        if (kind === "rx") {
-            if (networkLastSampleMs > 0 && networkLastRxBytes > 0) {
-                var rxElapsed = Math.max((now - networkLastSampleMs) / 1000, 1);
-                var rxRate = Math.max(0, value - networkLastRxBytes) / rxElapsed;
-                networkDownRate = formatRate(rxRate);
-                networkDownSamples = appendNetworkSample(networkDownSamples, rxRate);
-            }
-            networkRxBytes = value;
-            networkLastRxBytes = value;
-        } else {
-            if (networkLastSampleMs > 0 && networkLastTxBytes > 0) {
-                var txElapsed = Math.max((now - networkLastSampleMs) / 1000, 1);
-                var txRate = Math.max(0, value - networkLastTxBytes) / txElapsed;
-                networkUpRate = formatRate(txRate);
-                networkUpSamples = appendNetworkSample(networkUpSamples, txRate);
-            }
-            networkTxBytes = value;
-            networkLastTxBytes = value;
-            networkLastSampleMs = now;
+        var rxBytes = Number(rxValue);
+        var txBytes = Number(txValue);
+        if (!Number.isFinite(rxBytes))
+            rxBytes = 0;
+        if (!Number.isFinite(txBytes))
+            txBytes = 0;
+
+        var now = Number(sampleMs);
+        if (!Number.isFinite(now) || now <= 0)
+            now = Date.now();
+
+        if (networkLastSampleMs > 0) {
+            var elapsed = Math.max((now - networkLastSampleMs) / 1000, 1);
+            var rxRate = Math.max(0, rxBytes - networkLastRxBytes) / elapsed;
+            var txRate = Math.max(0, txBytes - networkLastTxBytes) / elapsed;
+            networkDownRate = formatRate(rxRate);
+            networkUpRate = formatRate(txRate);
+            networkDownSamples = appendNetworkSample(networkDownSamples, rxRate);
+            networkUpSamples = appendNetworkSample(networkUpSamples, txRate);
         }
+
+        networkRxBytes = rxBytes;
+        networkTxBytes = txBytes;
+        networkLastRxBytes = rxBytes;
+        networkLastTxBytes = txBytes;
+        networkLastSampleMs = now;
+    }
+
+    function parseNetworkTraffic(text, sampledDevice, sampledRevision) {
+        var reportedDevice = "";
+        var rxBytes = 0;
+        var txBytes = 0;
+        var rows = (text || "").trim().split("\n");
+
+        for (var i = 0; i < rows.length; i++) {
+            var parts = rows[i].split("=");
+            var key = parts[0] ?? "";
+            var value = parts.slice(1).join("=");
+
+            if (key === "traffic_device")
+                reportedDevice = value;
+            else if (key === "rx_bytes")
+                rxBytes = Number(value);
+            else if (key === "tx_bytes")
+                txBytes = Number(value);
+        }
+
+        if (reportedDevice !== sampledDevice)
+            return;
+
+        applyNetworkTrafficSample(sampledDevice, sampledRevision, rxBytes, txBytes, Date.now());
+    }
+
+    function startTrafficSample() {
+        if (trafficProc.running || !networkDevice)
+            return;
+
+        trafficProc.sampledDevice = networkDevice;
+        trafficProc.sampledRevision = networkDeviceRevision;
+        trafficProc.command = ["bash", "-lc", "dev=$1; rx=0; tx=0; if [ -r \"/sys/class/net/$dev/statistics/rx_bytes\" ]; then rx=$(cat \"/sys/class/net/$dev/statistics/rx_bytes\"); tx=$(cat \"/sys/class/net/$dev/statistics/tx_bytes\"); fi; printf 'traffic_device=%s\\nrx_bytes=%s\\ntx_bytes=%s\\n' \"$dev\" \"$rx\" \"$tx\"", "quickshell-network-traffic", trafficProc.sampledDevice];
+        trafficProc.running = true;
     }
 
     function appendNetworkSample(samples, value) {
@@ -170,7 +229,7 @@ Rectangle {
     Component.onCompleted: {
         volumeProc.running = true;
         networkInfoProc.running = true;
-        trafficProc.running = true;
+        root.startTrafficSample();
         bluetoothProc.running = true;
         batteryProc.running = true;
     }
@@ -191,10 +250,7 @@ Rectangle {
         interval: 2000
         repeat: true
         running: true
-        onTriggered: {
-            if (!trafficProc.running)
-                trafficProc.running = true;
-        }
+        onTriggered: root.startTrafficSample()
     }
 
     Timer {
@@ -258,14 +314,21 @@ Rectangle {
 
     Process {
         id: trafficProc
-        command: ["bash", "-lc", "dev=" + JSON.stringify(root.networkDevice) + "; rx=0; tx=0; if [ -n \"$dev\" ] && [ -r \"/sys/class/net/$dev/statistics/rx_bytes\" ]; then rx=$(cat \"/sys/class/net/$dev/statistics/rx_bytes\"); tx=$(cat \"/sys/class/net/$dev/statistics/tx_bytes\"); fi; printf 'rx_bytes=%s\\ntx_bytes=%s\\n' \"$rx\" \"$tx\""]
+        property string sampledDevice: ""
+        property int sampledRevision: -1
+        command: []
         stdout: SplitParser {
             property string buffer: ""
             onRead: data => buffer += data + "\n"
         }
         onExited: {
-            root.parseKeyValue(stdout.buffer);
+            var output = stdout.buffer;
+            var device = sampledDevice;
+            var revision = sampledRevision;
             stdout.buffer = "";
+            sampledDevice = "";
+            sampledRevision = -1;
+            root.parseNetworkTraffic(output, device, revision);
         }
     }
 
