@@ -125,13 +125,13 @@ Work stays slice-based:
 
 1. Apply confirmed NixOS maintenance, security, service, and GC corrections one
    small change at a time.
-2. For Quickshell, Slice 0C's read-only, action-labelled profiling helper is the
-   only still-open micro-slice in the 2026-07-19 remainder plan.  Selecting or
-   implementing it remains a separate decision, and fresh measurements must
-   precede new performance claims.  Run the deferred real network-handoff check
-   only after Ethernet provides a verified alternate route.  Keep dual-output
-   validation, old CAVA temp-file deletion, clipboard lifecycle, shared
-   ownership, and rendering or frame-rate work separate.
+2. For Quickshell, cleanup through Slice 1I and Slice 0C's read-only profiling
+   helper are accepted and published.  Use =scripts/quickshell-profile= to take
+   fresh, action-labelled measurements before making new performance claims.
+   Run the deferred real network-handoff check only after Ethernet provides a
+   verified alternate route.  Keep dual-output validation, old CAVA temp-file
+   deletion, clipboard lifecycle, shared ownership, and rendering or frame-rate
+   work separate.
 3. Give Emacs measured, real-use-driven TLC; Lua and Nix LSP slices are accepted,
    while Python's manual acceptance remains in progress.
 4. Port the macOS VS Code configuration only as a Linux-specific Home Manager

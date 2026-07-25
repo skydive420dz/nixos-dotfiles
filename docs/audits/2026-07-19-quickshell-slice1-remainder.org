@@ -126,9 +126,8 @@ activation, runtime, publication, and promotion decisions:
   [[file:../handoffs/2026-07-25-quickshell-slice1i-acceptance.org][the Slice 1I
   acceptance handoff]].
 
-Still open:
-
-- Slice 0C profiling.
+Slice 0C profiling is accepted and published at =41095ab=.  No additional
+remainder micro-slice is selected.
 
 The original =Recommended Next Decision= at the end of this audit was fulfilled
 by Slice 1C and is now historical guidance.  Slice 1F publication and promotion
@@ -138,8 +137,8 @@ its real disconnect/reconnect and Wi-Fi/Ethernet handoff remains explicitly
 deferred until a wired alternate route is available.  R8 / Slice 1I is accepted
 and promoted on =eDP-1= at payload =f7107cb= with immutable acceptance evidence
 =f8a4c90=.  Its fresh dual-output test remains explicitly deferred.  Slice 0C
-profiling is the only still-open remainder proposal; this disposition does not
-authorize it.
+profiling is accepted at =41095ab=; its paused, single-output observation does
+not authorize a broader performance claim.
 
 * Current Findings
 ** R1 - Wallpaper Shell Boundary And Atomic Publication
@@ -288,6 +287,8 @@ The labels below are proposals, not accepted state.  Each slice should remain on
 independently reviewable and revertible commit.
 
 ** Slice 0C - Read-Only Profiling Helper
+Status: accepted and published at =41095ab=.
+
 Add the original audit's missing action-labelled measurement helper before
 making new CPU, GPU, memory, child-process, picker, or leak claims.
 
@@ -299,10 +300,10 @@ Here, "arm a timer" excludes persistent or background scheduling.  An explicitly
 invoked foreground observation may wait for at most 60 seconds; the wait must
 end with the command and create no persistent state.
 
-*** Candidate Evidence - 2026-07-25
-The uncommitted =work/quickshell-slice0c= candidate adds one Bash observer and
-registers it with the existing source checker.  That checker passed, and the
-separate pure no-link build returned the unchanged generation-860 closure
+*** Acceptance Evidence - 2026-07-25
+Commit =41095ab= adds one Bash observer and registers it with the existing
+source checker.  That checker passed, and the separate pure no-link build
+returned the unchanged generation-860 closure
 =/nix/store/4a502xwqahv4q20niz34215l1iypp2zy-nixos-system-nixos-26.11.20260718.61b7c44=.
 
 A read-only =current-state-no-actions= observation completed with a stable
@@ -314,8 +315,9 @@ framebuffer allocation =94 MiB=, zero journal warnings, and CAVA remnants
 
 This validates the helper's read-only boundary, not a performance regression or
 optimization claim.  It is one paused, single-output sample; NVIDIA reported no
-numeric utilization.  No activation, restart, commit, push, UI action, or media
-action occurred, and live =main= and generation 860 remained unchanged.
+numeric utilization.  The observation itself performed no activation, restart,
+UI action, or media action.  The accepted commit was later fast-forwarded to
+clean =main= and published; Quickshell and generation 860 remained unchanged.
 
 This observability slice does not block the confirmed wallpaper safety fix.
 
