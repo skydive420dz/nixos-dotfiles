@@ -46,6 +46,7 @@ scripts_root="$repo_root/scripts"
 styles_json="$repo_root/theme/styles.json"
 launcher_apps_json="$qml_root/modules/launcher/apps.json"
 wallpaper_helper="$qml_root/modules/wallpaper/wallpaper-io"
+profile_helper="$scripts_root/quickshell-profile"
 
 [[ -d $qml_root ]] || die "missing Quickshell source directory: $qml_root"
 [[ -d $scripts_root ]] || die "missing scripts directory: $scripts_root"
@@ -59,6 +60,10 @@ wallpaper_helper="$qml_root/modules/wallpaper/wallpaper-io"
   die "missing wallpaper helper: $wallpaper_helper"
 [[ -x $wallpaper_helper ]] ||
   die "wallpaper helper is not executable: $wallpaper_helper"
+[[ -f $profile_helper ]] ||
+  die "missing Quickshell profiling helper: $profile_helper"
+[[ -x $profile_helper ]] ||
+  die "Quickshell profiling helper is not executable: $profile_helper"
 
 required_theme_helpers=(
   "$scripts_root/theme-select.d/consumers.sh"
@@ -109,6 +114,7 @@ done < <(find "$qml_root" -type f -name '*.qml' -print0 | sort -z)
 
 bash_files=(
   "$wallpaper_helper"
+  "$profile_helper"
   "$scripts_root/clipboard-toggle"
   "$scripts_root/launcher-toggle"
   "$scripts_root/osd-brightness"
@@ -352,11 +358,13 @@ else
   failed=1
 fi
 
-printf '\nWallpaper helper ShellCheck\n'
-if shellcheck -- "$wallpaper_helper"; then
-  printf '  pass: %s\n' "$(relative_path "$wallpaper_helper")"
+printf '\nBoundary helper ShellCheck\n'
+if shellcheck -- "$wallpaper_helper" "$profile_helper"; then
+  printf '  pass: %s, %s\n' \
+    "$(relative_path "$wallpaper_helper")" \
+    "$(relative_path "$profile_helper")"
 else
-  printf '  fail: %s\n' "$(relative_path "$wallpaper_helper")"
+  printf '  fail: helper ShellCheck\n'
   failed=1
 fi
 

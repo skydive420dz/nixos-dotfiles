@@ -1,0 +1,324 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# One foreground, bounded, read-only observation. It creates no timer, service,
+# background process, or persistent state.
+
+usage() {
+  printf 'usage: %s LABEL [SECONDS]\n' "${0##*/}"
+}
+
+die() {
+  printf 'quickshell-profile: %s\n' "$*" >&2
+  exit 2
+}
+
+property() {
+  local text=$1 key=$2
+  awk -F= -v key="$key" '$1 == key { sub(/^[^=]*=/, ""); print; exit }' <<<"$text"
+}
+
+proc_ticks() {
+  sed 's/^.*) //' "/proc/$1/stat" 2>/dev/null |
+    awk '{ print $12 + $13 }'
+}
+
+proc_start() {
+  sed 's/^.*) //' "/proc/$1/stat" 2>/dev/null |
+    awk '{ print $20 }'
+}
+
+proc_pss() {
+  awk '$1 == "Pss:" { print $2 * 1024 }' "/proc/$1/smaps_rollup" 2>/dev/null
+}
+
+cava_count() {
+  local count=0 file digest
+  while IFS= read -r -d '' file; do
+    digest="$(sha256sum -- "$file" 2>/dev/null)" || continue
+    if [[ ${digest%% *} == 0c3e3fd58eb74c1e2afdd52e128f23cb7460cfbba7035f63b9c7ce505afccd74 ]]; then
+      count=$((count + 1))
+    fi
+  done < <(
+    find /tmp -xdev -maxdepth 1 -type f -uid "$UID" -perm 0600 -size 190c -print0
+  )
+  printf '%d\n' "$count"
+}
+
+playback_state() {
+  local name owner raw state
+  while read -r name owner _; do
+    [[ $name == org.mpris.MediaPlayer2.* && $owner != - ]] || continue
+    raw="$(
+      busctl --user --auto-start=no --json=short get-property \
+        "$name" \
+        /org/mpris/MediaPlayer2 \
+        org.mpris.MediaPlayer2.Player \
+        PlaybackStatus 2>/dev/null
+    )" || continue
+    state="$(jq -r '.data // empty' <<<"$raw")"
+    [[ -n $state ]] && printf '%s\n' "$state"
+  done < <(busctl --user list --no-pager --no-legend 2>/dev/null) |
+    sort |
+    uniq -c |
+    awk '{ printf "%s%s=%s", separator, $2, $1; separator=";" } END { print "" }'
+}
+
+case "${1:-}" in
+  -h | --help)
+    usage
+    exit 0
+    ;;
+esac
+
+(( $# == 1 || $# == 2 )) || {
+  usage >&2
+  exit 2
+}
+
+label=$1
+seconds=${2:-20}
+[[ -n $label && ${#label} -le 80 && $label != *[$'\001'-$'\037']* ]] ||
+  die "LABEL must be 1-80 printable characters"
+if ! [[ $seconds =~ ^[0-9]+$ ]] ||
+  ! (( seconds >= 1 && seconds <= 60 )); then
+  die "SECONDS must be an integer from 1 through 60"
+fi
+
+export LC_ALL=C
+username="$(id -un)"
+export PATH="/run/current-system/sw/bin:/etc/profiles/per-user/$username/bin"
+
+for command in awk busctl find jq journalctl sed sha256sum systemctl; do
+  command -v "$command" >/dev/null || die "missing required command: $command"
+done
+
+show_properties=(
+  ActiveState
+  SubState
+  MainPID
+  ControlGroup
+  InvocationID
+  CPUUsageNSec
+  MemoryCurrent
+  MemoryPeak
+  MemorySwapCurrent
+  TasksCurrent
+)
+systemctl_args=(--user show quickshell.service --no-pager)
+for name in "${show_properties[@]}"; do
+  systemctl_args+=("--property=$name")
+done
+
+before="$(systemctl "${systemctl_args[@]}")" ||
+  die "cannot query quickshell.service"
+pid="$(property "$before" MainPID)"
+control_group="$(property "$before" ControlGroup)"
+[[ $(property "$before" ActiveState) == active &&
+  $(property "$before" SubState) == running &&
+  $pid =~ ^[1-9][0-9]*$ &&
+  $control_group == /* &&
+  $control_group != *..* ]] ||
+  die "quickshell.service is not a bound running service"
+cgroup="/sys/fs/cgroup$control_group"
+[[ -r $cgroup/cgroup.procs ]] || die "cannot read Quickshell cgroup"
+
+session_environment="$(systemctl --user show-environment)"
+while IFS='=' read -r name value; do
+  case "$name" in
+    HYPRLAND_INSTANCE_SIGNATURE | XDG_RUNTIME_DIR)
+      export "$name=$value"
+      ;;
+  esac
+done <<<"$session_environment"
+
+started_utc="$(date --utc --iso-8601=seconds)"
+started_ns="$(date +%s%N)"
+cpu_before="$(property "$before" CPUUsageNSec)"
+ticks_before="$(proc_ticks "$pid")"
+pss_before="$(proc_pss "$pid")"
+cava_before="$(cava_count)"
+playback_before="$(playback_state)"
+cursor="$(
+  journalctl --user -u quickshell.service -n 0 --show-cursor --no-pager --quiet |
+    sed -n 's/^-- cursor: //p'
+)"
+
+declare -A children=()
+declare -a gpu_sm=()
+declare -a gpu_fb=()
+deadline=$((SECONDS + seconds))
+while (( SECONDS < deadline )); do
+  while read -r child; do
+    [[ $child =~ ^[1-9][0-9]*$ && $child != "$pid" ]] || continue
+    start="$(proc_start "$child")"
+    [[ $start =~ ^[0-9]+$ ]] || continue
+    executable="$(readlink -f "/proc/$child/exe" 2>/dev/null)" || continue
+    children["$child:$start"]=${executable##*/}
+  done <"$cgroup/cgroup.procs"
+
+  if command -v nvidia-smi >/dev/null; then
+    while read -r sm fb; do
+      [[ $sm =~ ^[0-9]+$ ]] && gpu_sm+=("$sm")
+      [[ $fb =~ ^[0-9]+$ ]] && gpu_fb+=("$fb")
+    done < <(
+      nvidia-smi pmon -i 0 -s um -o DT -c 1 2>/dev/null |
+        awk -v pid="$pid" '$4 == pid { print $6, $12 }'
+    )
+  fi
+  sleep 1
+done
+
+after="$(systemctl "${systemctl_args[@]}")" ||
+  die "cannot query quickshell.service after observation"
+ended_ns="$(date +%s%N)"
+elapsed_ns=$((ended_ns - started_ns))
+cpu_after="$(property "$after" CPUUsageNSec)"
+ticks_after="$(proc_ticks "$pid")"
+pss_after="$(proc_pss "$pid")"
+cava_after="$(cava_count)"
+playback_after="$(playback_state)"
+
+stable=false
+if [[ $(property "$after" ActiveState) == active &&
+  $(property "$after" SubState) == running &&
+  $(property "$after" MainPID) == "$pid" &&
+  $(property "$after" InvocationID) == "$(property "$before" InvocationID)" ]]; then
+  stable=true
+fi
+comparison_ready=false
+if [[ $stable == true && $playback_before == "$playback_after" ]]; then
+  comparison_ready=true
+fi
+
+cgroup_cpu=null
+if [[ $cpu_before =~ ^[0-9]+$ && $cpu_after =~ ^[0-9]+$ ]]; then
+  cgroup_cpu="$(
+    awk -v delta="$((cpu_after - cpu_before))" -v elapsed="$elapsed_ns" \
+      'BEGIN { printf "%.3f", delta / elapsed * 100 }'
+  )"
+fi
+
+main_cpu=null
+if [[ $ticks_before =~ ^[0-9]+$ && $ticks_after =~ ^[0-9]+$ ]]; then
+  main_cpu="$(
+    awk \
+      -v delta="$((ticks_after - ticks_before))" \
+      -v elapsed="$elapsed_ns" \
+      -v hz="$(getconf CLK_TCK)" \
+      'BEGIN { printf "%.3f", delta / hz / (elapsed / 1000000000) * 100 }'
+  )"
+fi
+
+gpu_sm_mean=null
+gpu_sm_max=null
+if (( ${#gpu_sm[@]} > 0 )); then
+  read -r gpu_sm_mean gpu_sm_max < <(
+    printf '%s\n' "${gpu_sm[@]}" |
+      awk '{ sum += $1; if ($1 > max) max=$1 } END { printf "%.3f %d\n", sum / NR, max }'
+  )
+fi
+gpu_fb_max=null
+if (( ${#gpu_fb[@]} > 0 )); then
+  gpu_fb_max="$(printf '%s\n' "${gpu_fb[@]}" | sort -n | tail -n 1)"
+fi
+
+monitors=null
+layers=null
+if command -v hyprctl >/dev/null &&
+  [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+  monitors="$(
+    hyprctl -j monitors 2>/dev/null |
+      jq -c '[.[] | {name,x,y,width,height,scale,transform}]'
+  )" || monitors=null
+  layers="$(
+    hyprctl -j layers 2>/dev/null |
+      jq -c '[
+        to_entries[] as $monitor
+        | $monitor.value.levels | to_entries[] as $level
+        | $level.value[]
+        | select(.namespace | startswith("qs-"))
+        | {
+            monitor: $monitor.key,
+            level: ($level.key | tonumber),
+            namespace,
+            x,
+            y,
+            width: .w,
+            height: .h
+          }
+      ]'
+  )" || layers=null
+fi
+
+warning_total=null
+warning_current=null
+warning_truncated=null
+if [[ -n $cursor ]]; then
+  warnings="$(
+    journalctl \
+      --user \
+      -u quickshell.service \
+      "--after-cursor=$cursor" \
+      -p warning \
+      --output=json \
+      --output-fields=PRIORITY,_SYSTEMD_INVOCATION_ID \
+      --lines=201 \
+      --no-pager \
+      --quiet
+  )" || warnings=
+  if [[ -n $warnings ]]; then
+    warning_total="$(jq -s 'length | if . > 200 then 200 else . end' <<<"$warnings")"
+    warning_current="$(
+      jq -s \
+        --arg invocation "$(property "$after" InvocationID)" \
+        '[.[] | select(._SYSTEMD_INVOCATION_ID == $invocation)] | length
+         | if . > 200 then 200 else . end' <<<"$warnings"
+    )"
+    warning_truncated="$(jq -s 'length > 200' <<<"$warnings")"
+  else
+    warning_total=0
+    warning_current=0
+    warning_truncated=false
+  fi
+fi
+
+printf 'profile.label=%s\n' "$label"
+printf 'profile.started_utc=%s\n' "$started_utc"
+printf 'profile.requested_seconds=%s\n' "$seconds"
+printf 'profile.elapsed_seconds=%.3f\n' \
+  "$(awk -v elapsed="$elapsed_ns" 'BEGIN { print elapsed / 1000000000 }')"
+printf 'profile.comparison_ready=%s\n' "$comparison_ready"
+printf 'service.main_pid=%s\n' "$pid"
+printf 'service.invocation_id=%s\n' "$(property "$after" InvocationID)"
+printf 'cpu.cgroup_percent_of_one_core=%s\n' "$cgroup_cpu"
+printf 'cpu.main_percent_of_one_core=%s\n' "$main_cpu"
+printf 'memory.cgroup_current_bytes=%s\n' "$(property "$after" MemoryCurrent)"
+printf 'memory.cgroup_peak_bytes=%s\n' "$(property "$after" MemoryPeak)"
+printf 'memory.cgroup_swap_bytes=%s\n' "$(property "$after" MemorySwapCurrent)"
+printf 'memory.main_pss_bytes.start=%s\n' "${pss_before:-null}"
+printf 'memory.main_pss_bytes.end=%s\n' "${pss_after:-null}"
+printf 'processes.tasks_current=%s\n' "$(property "$after" TasksCurrent)"
+printf 'processes.sampled_children=%d\n' "${#children[@]}"
+for child in "${!children[@]}"; do
+  printf 'process.child=%s,%s\n' "$child" "${children[$child]}"
+done | sort
+printf 'cava_temp_files_exact.start=%s\n' "$cava_before"
+printf 'cava_temp_files_exact.end=%s\n' "$cava_after"
+printf 'cava_temp_files_exact.delta=%s\n' "$((cava_after - cava_before))"
+printf 'workload.mpris.start=%s\n' "${playback_before:-none}"
+printf 'workload.mpris.end=%s\n' "${playback_after:-none}"
+printf 'workload.mpris.stable=%s\n' "$([[ $playback_before == "$playback_after" ]] && printf true || printf false)"
+printf 'gpu.numeric_sm_samples=%d\n' "${#gpu_sm[@]}"
+printf 'gpu.sm_percent_mean=%s\n' "$gpu_sm_mean"
+printf 'gpu.sm_percent_max=%s\n' "$gpu_sm_max"
+printf 'gpu.framebuffer_mib_max=%s\n' "$gpu_fb_max"
+printf 'layers.monitors=%s\n' "$monitors"
+printf 'layers.quickshell=%s\n' "$layers"
+printf 'journal.warning_total=%s\n' "$warning_total"
+printf 'journal.warning_current_invocation=%s\n' "$warning_current"
+printf 'journal.warning_truncated=%s\n' "$warning_truncated"
+printf 'limitation=one-second sampling may miss shorter child processes\n'
+printf 'limitation=NVIDIA pmon may report dashes instead of utilization\n'
+
+[[ $comparison_ready == true ]] || exit 3
