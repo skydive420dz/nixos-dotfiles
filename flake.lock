@@ -497,6 +497,26 @@
         "type": "github"
       }
     },
+    "nix-vscode-extensions": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783568868,
+        "narHash": "sha256-JDOHfb/kr6+QZGDMLfQkSjL2VNYZJJAZ3bjeLhPEeaU=",
+        "owner": "nix-community",
+        "repo": "nix-vscode-extensions",
+        "rev": "d9ba7a11bb1d215da08df254a5c4f48c93f63a34",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nix-vscode-extensions",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1784356753,
@@ -543,6 +563,22 @@
       "original": {
         "owner": "notashelf",
         "repo": "nvf",
+        "type": "github"
+      }
+    },
+    "ponytail": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784151135,
+        "narHash": "sha256-Y7d4s7uqjH6IbEXhqAiQ+yaxr6iiGcv2X64LuMtG1T8=",
+        "owner": "DietrichGebert",
+        "repo": "ponytail",
+        "rev": "16f29800fd2681bdf24f3eb4ccffe38be3baec6b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "DietrichGebert",
+        "repo": "ponytail",
         "type": "github"
       }
     },
@@ -616,8 +652,10 @@
         "home-manager": "home-manager",
         "hyprland": "hyprland",
         "lanzaboote": "lanzaboote",
+        "nix-vscode-extensions": "nix-vscode-extensions",
         "nixpkgs": "nixpkgs",
         "nvf": "nvf",
+        "ponytail": "ponytail",
         "quickshell": "quickshell"
       }
     },

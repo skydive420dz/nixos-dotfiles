@@ -15,6 +15,7 @@
     ./programs/kitty.nix
     ./programs/starship.nix
     ./programs/tmux
+    ./programs/vscode.nix
     ./programs/yazi.nix
     ./programs/vesktop.nix
     ./programs/wezterm.nix
