@@ -2,10 +2,12 @@
 #+startup: overview
 
 * Outcome
-Slice 4A is =ACCEPTED= on the MSI.
+Slice 4A is =ACCEPTED AND PROMOTED= on the MSI.
 
 - Accepted payload:
   =5c55f7c6f0f6ab94afe82a0e1b93ae67d550c90e=
+- Acceptance evidence and promoted head:
+  =0281fd90709edffb98d2bf1d1cbe589a3abf0636=
 - Pre-slice =main= and rollback commit:
   =cddeae299300d3e36966379884b9942eed45b63f=
 - Accepted Git tree:
@@ -13,9 +15,10 @@ Slice 4A is =ACCEPTED= on the MSI.
 - Pure no-link build:
   =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
 
-The user accepted the separated source, build, and controlled runtime gates.
-The payload is a clean local commit on =work/quickshell-slice4a=.  Publication,
-=main= promotion, and final live activation remain separate decisions.
+The user accepted the separated source, build, controlled runtime, publication,
+promotion, and final live activation gates.  The payload and acceptance
+evidence are published, local and GitHub =main= strictly fast-forwarded through
+them, and the Home Manager-managed source link resolves to promoted =main=.
 
 * Contract And Change
 This implements only the first event-driven source in
@@ -134,11 +137,30 @@ This slice does not:
 - require a second monitor because controller fan-out and the view are
   unchanged;
 - begin UPower, Bluetooth, networking, traffic, or native Hyprland migration;
-- authorize NixOS/Home Manager activation, publication, =main= promotion,
-  worktree removal, branch deletion, or broader cleanup.
+- by itself authorize NixOS/Home Manager activation, publication, =main=
+  promotion, worktree removal, branch deletion, or broader cleanup.
 
-* Publication State
-At this record's preparation snapshot, =work/quickshell-slice4a= is one clean
-local payload commit ahead of =main=.  Local and GitHub =main= remain aligned at
-=cddeae299300d3e36966379884b9942eed45b63f=.  This handoff is not yet committed
-or published.
+* Closeout State
+The payload and acceptance evidence were published together at
+=0281fd90709edffb98d2bf1d1cbe589a3abf0636= on
+=work/quickshell-slice4a=.  Local and GitHub =main= then strictly
+fast-forwarded from =cddeae299300d3e36966379884b9942eed45b63f= through both
+commits without force.
+
+To keep promotion separate from activation, live Quickshell was pinned to an
+exact detached copy of the pre-slice commit while =main= advanced.  The
+Home Manager-managed link was then restored and resolved to promoted =main=.
+Quickshell started at =2026-07-26T09:52:24-04:00= as PID =448678=, invocation
+=35dc6c71e1224e27a104b6e88f6773ff=, with one configuration load, zero
+restarts, no warnings, and one =qs-bar= and =qs-wallpaper= on =eDP-1=.
+
+The Sound Blaster used for candidate testing was disconnected outside this
+gate.  Final activation discovered the current laptop speaker through
+=@DEFAULT_AUDIO_SINK@= and preserved its =50%=, unmuted state without audio
+manipulation.  This is not a default-sink handoff test.
+
+System profile generation 863 and the current system output remained unchanged.
+The unrelated =config/hypr/hyprland.lua= edit remained byte-identical and
+uncommitted.  The local and remote Slice 4A evidence refs are retained.  The
+clean candidate worktree, detached pre-promotion worktree, and managed-link
+rollback copy remain only until separately authorized cleanup.
