@@ -14,7 +14,7 @@ commits, pushes, service changes, or branch deletion.
 |---------+-------------------------+--------------------|
 | System | Generation 861 and its active GC timer are accepted; the clean one-shot optimizer run is accepted; O3-A defers recurrence for a roughly 30-day observation; no optimizer timer is armed | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
 | Emacs | Clean Emacs remains active under generation 861 with the same accepted Home Manager root; Lua and Nix =lsp-mode=/Company slices are accepted; the accepted QML policy uses verified four-space formatting in classic and parser-backed modes | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | Cleanup through Slice 1I, Slice 0C profiling, Slice 2 lifecycle, and shared ownership Slices 3A-3C are accepted and promoted.  One root owner now supplies workspace, active-title, and status state to both outputs; the managed =main= link is healthy | Keep one-CAVA and shared-clock work as separate later slices |
+| Quickshell | Cleanup through Slice 1I, Slice 0C profiling, Slice 2 lifecycle, and shared ownership Slices 3A-3D are accepted and promoted.  Root controllers now supply workspace, active-title, status, and CAVA state to both outputs; the managed =main= link is healthy | Keep the shared minute-aligned clock as the remaining separate original Slice 3 job |
 | Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs, Vial discovers it, and QMK CLI intentionally remains system-wide | Keep firmware writes and flashing separate and explicitly authorized |
 | VS Code | The MSI Home Manager profile owns VS Code settings/extensions and Codex tooling; window state is preserved between launches, and =nix-ld= supports Remote SSH | Refine from measured Linux use; adapt remaining macOS choices without Darwin-specific pins |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -70,17 +70,21 @@ acceptance handoff]].
 The accepted and published Slice 2 service/theme lifecycle is in
 [[file:handoffs/2026-07-25-quickshell-slice2-lifecycle.org][the Slice 2
 lifecycle handoff]].
-The accepted shared workspace, active-title, and status ownership slices are in
+The accepted shared workspace, active-title, status, and CAVA ownership slices
+are in
 [[file:handoffs/2026-07-25-quickshell-slice3a-acceptance.org][Slice 3A]],
-[[file:handoffs/2026-07-25-quickshell-slice3b-acceptance.org][Slice 3B]], and
-[[file:handoffs/2026-07-26-quickshell-slice3c-acceptance.org][Slice 3C]].
+[[file:handoffs/2026-07-25-quickshell-slice3b-acceptance.org][Slice 3B]],
+[[file:handoffs/2026-07-26-quickshell-slice3c-acceptance.org][Slice 3C]], and
+[[file:handoffs/2026-07-26-quickshell-slice3d-acceptance.org][Slice 3D]].
 
 * Current Work Lanes
-- Local and GitHub =main= carry accepted Slice 3C payload =acdf5fc=.
+- Local and GitHub =main= contain accepted Slice 3D payload =1101924= and
+  acceptance evidence =2a74d3d=.
 - =work/quickshell-cleanup= remains Slice 1I evidence, while retained
-  =work/quickshell-slice2= and =work/quickshell-slice3a= refs preserve their
-  accepted payloads.  Slice 3B and Slice 3C temporary refs were removed after
-  promotion.
+  =work/quickshell-slice2=, =work/quickshell-slice3a=, and
+  =work/quickshell-slice3d= refs preserve accepted evidence.  Slice 3B and Slice
+  3C temporary refs were removed after promotion; Slice 3D has no active
+  worktree.
 - =work/nixos-maintenance=: designated post-checkpoint system and hygiene work.
 - =work/quickshell-slice1d= at =51c0396= and =work/quickshell-slice1e= at
   =84b111b= are retained evidence refs, not active worktrees.
@@ -97,8 +101,8 @@ The accepted shared workspace, active-title, and status ownership slices are in
   evidence refs, not active worktrees.
 - Published =work/quickshell-slice0c= at =41095ab= is the retained Slice 0C
   implementation and evidence ref, not an active worktree.
-- No Quickshell candidate is active.  The roadmap's one shared CAVA backend is
-  next; shared clock ownership remains a separate later slice.
+- No Quickshell candidate is active.  Shared minute-aligned clock ownership is
+  the remaining original Slice 3 job.
 - Emacs: complete the current Python acceptance decision before selecting
   another language or optimization slice.
 
@@ -119,6 +123,7 @@ The accepted shared workspace, active-title, and status ownership slices are in
 - [[file:projects/clipboard-launcher.org][Completed clipboard and launcher work]]
 
 * Evidence And History
+- [[file:handoffs/2026-07-26-quickshell-slice3d-acceptance.org][2026-07-26 Quickshell Slice 3D acceptance and promotion]]
 - [[file:handoffs/2026-07-25-quickshell-slice1i-acceptance.org][2026-07-25 Quickshell Slice 1I acceptance and promotion]]
 - [[file:handoffs/2026-07-25-quickshell-slice1h-acceptance.org][2026-07-25 Quickshell Slice 1H acceptance and promotion]]
 - [[file:handoffs/2026-07-25-quickshell-slice1g-acceptance.org][2026-07-25 Quickshell Slice 1G acceptance and promotion]]

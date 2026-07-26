@@ -113,6 +113,16 @@ measurement evidence, not a performance claim.  Fresh dual-output validation,
 automatic restart policy, historical CAVA cleanup, shared ownership, rendering,
 frame-rate, and broader performance work remain separate.
 
+Original Slice 3 is accepted and promoted through shared workspace, active-title,
+status, and CAVA ownership.  Exact evidence is in the
+[[../handoffs/2026-07-25-quickshell-slice3a-acceptance.org][Slice 3A]],
+[[../handoffs/2026-07-25-quickshell-slice3b-acceptance.org][Slice 3B]],
+[[../handoffs/2026-07-26-quickshell-slice3c-acceptance.org][Slice 3C]], and
+[[../handoffs/2026-07-26-quickshell-slice3d-acceptance.org][Slice 3D]] handoffs.
+Root controllers now supply those four backend domains to both output bars while
+per-output views and rendering remain local.  The managed =main= link is active;
+shared minute-aligned clock ownership remains the final original Slice 3 job.
+
 =main= remains the sober checkpoint shell.  The old modular shell lives on
 =prototype/quickshell-legacy= and the archived Quickshell branches.  Treat
 those branches as reference material only: port useful ideas back deliberately,
@@ -396,6 +406,7 @@ This is descriptive, not a mandate to create empty folders. Split only when a mo
 - 2026-07-25: Slice 3A workspace sharing is accepted and promoted at =c9337c69dcdb36de6de2df6080144c3d9ac14c97=.  One root controller now owns occupied-workspace polling and refresh events while each output derives its active workspace from its own Hyprland monitor.  Exact-source validation, the separate pure no-link build, controlled two-output activation, two stable playing-media profiles, and the user visual check passed.  The managed live link was restored to =main= with one Quickshell instance and zero restarts.  This completes only the workspace portion of original Slice 3; status, title, CAVA, and clock sharing remain separate.  Exact evidence and claim boundaries are in [[file:../handoffs/2026-07-25-quickshell-slice3a-acceptance.org][the Slice 3A acceptance handoff]].
 - 2026-07-25: Slice 3B active-window-title sharing is accepted and promoted at =846f8623919e27718848f59d095e5d14b1f336cd=.  One root controller now owns the existing title-event, close-debounce, revision, and refresh state while every output renders the same accepted title.  Exact-source checks, the separate pure no-link build, and the automated and captured two-output A/background-B/Desktop sequence passed.  The managed link was restored to =main= with zero restarts or warnings, and all temporary Slice 3B artifacts and refs were removed.  Shared status, CAVA, and clock ownership remain separate.  Exact evidence and boundaries are in [[file:../handoffs/2026-07-25-quickshell-slice3b-acceptance.org][the Slice 3B acceptance handoff]].
 - 2026-07-26: Slice 3C shared status ownership is accepted and promoted at =acdf5fc78b69cd832184ee7f12d50acae0e79921=.  One root controller now owns the unchanged five status pollers, network state, and battery-transition notifications while both bars retain their existing views, clicks, and local clocks.  The exact backend move, strict 34-QML source gate, disposable shared-view/network/battery fixture, separate pure no-link build, matched two-output captures, and paired playing-media observations passed.  Sampled children fell from 19 to the two unchanged CAVA processes, but CPU varied upward, so this is an ownership/process-churn result rather than a CPU claim.  The managed =main= link is healthy with zero restarts or warnings, and temporary Slice 3C artifacts and refs were removed.  Shared CAVA and clock ownership remain separate.  Exact evidence and boundaries are in [[file:../handoffs/2026-07-26-quickshell-slice3c-acceptance.org][the Slice 3C acceptance handoff]].
+- 2026-07-26: Slice 3D shared CAVA ownership is accepted and promoted at payload =1101924147840f4a68aea2197f4aebf31a95fede= with acceptance evidence =2a74d3dd9d7b1a0e47e8706bd418854d6bb4c448=.  The existing root media controller now owns one unchanged CAVA parser/freshness backend while each output retains its Canvas and fallback rendering.  The exact source move, strict checker, separate pure no-link build, controlled two-output activation, pause/play, stall/resume, forced-exit recovery, and captured visual gates passed.  Local and GitHub =main= strictly fast-forwarded through the evidence; the managed link is healthy at PID =352826= with one CAVA child, zero restarts, and no warnings.  Temporary captures, rollback marker, and candidate worktree were removed while the local and remote evidence refs were retained.  This is an ownership result, not a CPU/GPU claim; shared minute-aligned clock ownership remains separate.  Exact evidence and boundaries are in [[file:../handoffs/2026-07-26-quickshell-slice3d-acceptance.org][the Slice 3D acceptance handoff]].
 
 ** Known Lesson
 :PROPERTIES:

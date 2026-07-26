@@ -46,9 +46,10 @@ unchanged fallback animation to resume.  Runtime payload =f7107cb= passed the
 separated source, fixture, pure-build, controlled source-live, lifecycle, and
 visual gates on =eDP-1=; immutable acceptance evidence =f8a4c90= records them.
 Original Quickshell Slice 3 is accepted through shared workspace, active-title,
-and status ownership.  The latest boundary and two-output evidence are in
-[[file:docs/handoffs/2026-07-26-quickshell-slice3c-acceptance.org][the Slice 3C
-acceptance handoff]]; shared CAVA and clock ownership remain separate.
+status, and CAVA ownership.  The latest boundary and two-output lifecycle
+evidence are in
+[[file:docs/handoffs/2026-07-26-quickshell-slice3d-acceptance.org][the Slice 3D
+acceptance handoff]]; shared minute-aligned clock ownership remains separate.
 The preceding Slice 1H network-handoff correction remains recorded in
 [[file:docs/handoffs/2026-07-25-quickshell-slice1h-acceptance.org][the Slice 1H
 acceptance handoff]].  Its real Wi-Fi/Ethernet handoff remains deferred until

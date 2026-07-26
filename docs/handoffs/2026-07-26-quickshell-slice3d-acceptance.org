@@ -2,7 +2,7 @@
 #+startup: overview
 
 * Outcome
-Slice 3D is =ACCEPTED SOURCE-LIVE= on the MSI with both outputs connected.
+Slice 3D is =ACCEPTED AND PROMOTED= on the MSI with both outputs connected.
 
 - Accepted payload:
   =1101924147840f4a68aea2197f4aebf31a95fede=
@@ -133,19 +133,29 @@ two-output MSI session.  It does not:
 - add automatic restart/backoff;
 - share the clock or begin Slice 4;
 - remove historical CAVA temporary files;
-- activate NixOS/Home Manager, alter the current generation, push, or promote
-  =main=.
+- activate NixOS/Home Manager or alter the current generation.
 
 Root ownership means CAVA can remain active during output hotplug, including the
 unlikely case of playing media with no visible output.  No speculative
 screen-count plumbing was added.
 
-The live source currently remains on the accepted worktree.  The recorded
-rollback link is the Home Manager-managed path
-=/nix/store/1hafb8jz05y68vf8k0kvm49q296p4qic-home-manager-files/.config/quickshell=,
-which resolves to the pre-slice =main= checkout.  A rollback would stop
-Quickshell, restore that link, validate the source, and restart the service.
+* Promotion And Closeout
+The payload and this acceptance evidence were published together at
+=2a74d3dd9d7b1a0e47e8706bd418854d6bb4c448= on
+=work/quickshell-slice3d=.  Local and GitHub =main= then strictly
+fast-forwarded from =0a0058f= through the two accepted commits without force.
+The user's unrelated =config/hypr/hyprland.lua= edit remained byte-for-byte
+unchanged and uncommitted.
 
-The next separate gate is a local commit of this acceptance document.  Push,
-promotion, managed-link restoration, documentation-index updates, and cleanup
-remain later explicit gates.
+The Home Manager-managed link
+=/nix/store/1hafb8jz05y68vf8k0kvm49q296p4qic-home-manager-files/.config/quickshell=
+was restored and resolves to promoted =main=.  Its exact-source checker passed
+before Quickshell restarted as PID =352826=, invocation
+=4579f313693c4397a8634a997df4b818=.  The final service has one direct-config
+CAVA child, both output bars and wallpapers, zero restarts, and no
+warning-or-higher journal entry.
+
+The disposable candidate worktree, rollback marker, and captures were removed.
+Local and remote =work/quickshell-slice3d= remain at the accepted evidence
+commit.  This closeout update is documentation-only; its commit and push remain
+separate gates and require no further build, activation, or runtime action.
