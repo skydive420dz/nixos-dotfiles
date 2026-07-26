@@ -16,7 +16,7 @@ Scope {
     readonly property bool charging: batteryAvailable && batteryDevice.state === UPowerDeviceState.Charging
     readonly property string nativeBatteryStatus: batteryAvailable ? root.batteryStatusForState(batteryDevice.state, UPower.onBattery) : ""
     readonly property bool bluetoothAvailable: BluetoothApi.Bluetooth.defaultAdapter !== null // qmllint disable unresolved-type
-    readonly property bool bluetoothConnected: (BluetoothApi.Bluetooth.defaultAdapter?.devices.values.length ?? 0) > 0 // qmllint disable unresolved-type
+    readonly property bool bluetoothConnected: BluetoothApi.Bluetooth.defaultAdapter?.devices.values.some(device => device.connected) ?? false // qmllint disable unresolved-type
     property string network: ""
     property string networkDevice: ""
     property int networkDeviceRevision: 0
