@@ -38,6 +38,7 @@ PanelWindow {
     }
 
     required property var mediaController
+    required property var workspacesController
 
     BarFrame {
         id: unifiedBarBackground
@@ -69,7 +70,10 @@ PanelWindow {
 
         LauncherButton {}
 
-        Workspaces {}
+        Workspaces {
+            controller: root.workspacesController
+            screen: root.screen
+        }
 
         WindowTitle {}
 

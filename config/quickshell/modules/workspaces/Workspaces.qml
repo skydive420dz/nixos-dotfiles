@@ -4,10 +4,12 @@ import "../.."
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Hyprland
-import Quickshell.Io
 
 Rectangle {
     id: root
+
+    required property var controller
+    required property var screen
 
     implicitWidth: workspaceRow.implicitWidth + Theme.pad * 2
     implicitHeight: Theme.pillHeight
@@ -21,65 +23,13 @@ Rectangle {
     border.width: 0
     clip: true
 
-    property int activeWorkspace: Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1
-    property var occupiedWorkspaces: ({})
-
-    function refreshWorkspaces() {
-        workspaceTimer.restart();
-    }
+    readonly property var monitor: Hyprland.monitors.values.length > 0 ? Hyprland.monitorFor(screen) : null
+    readonly property int activeWorkspace: monitor?.activeWorkspace?.id ?? 1
+    readonly property var occupiedWorkspaces: controller.occupiedWorkspaces
 
     function switchWorkspace(workspaceId) {
         Hyprland.dispatch("hl.dsp.focus({ workspace = \"" + workspaceId + "\" })");
-        refreshWorkspaces();
-    }
-
-    Component.onCompleted: refreshWorkspaces()
-
-    Connections {
-        target: Hyprland
-
-        function onRawEvent(event) {
-            if (event.name === "workspace")
-                root.activeWorkspace = parseInt(event.data) || root.activeWorkspace;
-            else if (event.name === "focusedmon") {
-                var parts = event.data.split(",");
-                root.activeWorkspace = parseInt(parts[1]) || root.activeWorkspace;
-            }
-
-            if (event.name === "openwindow" || event.name === "closewindow" || event.name === "movewindowv2")
-                root.refreshWorkspaces();
-        }
-    }
-
-    Timer {
-        id: workspaceTimer
-        interval: 150
-        repeat: false
-        onTriggered: {
-            if (!workspaceProc.running)
-                workspaceProc.running = true;
-        }
-    }
-
-    Process {
-        id: workspaceProc
-        command: ["hyprctl", "workspaces", "-j"]
-        stdout: SplitParser {
-            property string buffer: ""
-            onRead: data => buffer += data + "\n"
-        }
-        onExited: {
-            try {
-                var workspaces = JSON.parse(stdout.buffer.trim());
-                var occupied = {};
-                for (var i = 0; i < workspaces.length; i++) {
-                    if (workspaces[i].windows > 0)
-                        occupied[workspaces[i].id] = true;
-                }
-                root.occupiedWorkspaces = occupied;
-            } catch (e) {}
-            stdout.buffer = "";
-        }
+        controller.refreshWorkspaces();
     }
 
     RowLayout {
