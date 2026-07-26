@@ -1,6 +1,6 @@
 import QtQuick
 import Quickshell
-import Quickshell.Bluetooth
+import Quickshell.Bluetooth as BluetoothApi
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Quickshell.Services.UPower
@@ -15,8 +15,8 @@ Scope {
     readonly property int battery: batteryAvailable ? Math.round(batteryDevice.percentage * 100) : -1
     readonly property bool charging: batteryAvailable && batteryDevice.state === UPowerDeviceState.Charging
     readonly property string nativeBatteryStatus: batteryAvailable ? root.batteryStatusForState(batteryDevice.state, UPower.onBattery) : ""
-    readonly property bool bluetoothAvailable: Bluetooth.defaultAdapter !== null // qmllint disable unresolved-type
-    readonly property bool bluetoothConnected: (Bluetooth.defaultAdapter?.devices.values.length ?? 0) > 0 // qmllint disable unresolved-type
+    readonly property bool bluetoothAvailable: BluetoothApi.Bluetooth.defaultAdapter !== null // qmllint disable unresolved-type
+    readonly property bool bluetoothConnected: (BluetoothApi.Bluetooth.defaultAdapter?.devices.values.length ?? 0) > 0 // qmllint disable unresolved-type
     property string network: ""
     property string networkDevice: ""
     property int networkDeviceRevision: 0
