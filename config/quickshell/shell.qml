@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import Quickshell
 import "modules/media"
+import "modules/status"
 import "modules/window"
 import "modules/workspaces"
 import "root"
@@ -10,6 +11,10 @@ import "root"
 ShellRoot {
     MediaController {
         id: rootMediaController
+    }
+
+    StatusController {
+        id: rootStatusController
     }
 
     WindowTitleController {
@@ -34,6 +39,7 @@ ShellRoot {
             required property var modelData
             screen: modelData
             mediaController: rootMediaController
+            statusController: rootStatusController
             windowTitleController: rootWindowTitleController
             workspacesController: rootWorkspacesController
         }

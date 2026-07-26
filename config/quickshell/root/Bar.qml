@@ -38,6 +38,7 @@ PanelWindow {
     }
 
     required property var mediaController
+    required property var statusController
     required property var windowTitleController
     required property var workspacesController
 
@@ -96,6 +97,8 @@ PanelWindow {
             panelWindow: root
         }
 
-        StatusCluster {}
+        StatusCluster {
+            controller: root.statusController
+        }
     }
 }
