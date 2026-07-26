@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Bluetooth
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Quickshell.Services.UPower
@@ -14,6 +15,8 @@ Scope {
     readonly property int battery: batteryAvailable ? Math.round(batteryDevice.percentage * 100) : -1
     readonly property bool charging: batteryAvailable && batteryDevice.state === UPowerDeviceState.Charging
     readonly property string nativeBatteryStatus: batteryAvailable ? root.batteryStatusForState(batteryDevice.state, UPower.onBattery) : ""
+    readonly property bool bluetoothAvailable: Bluetooth.defaultAdapter !== null // qmllint disable unresolved-type
+    readonly property bool bluetoothConnected: (Bluetooth.defaultAdapter?.devices.values.length ?? 0) > 0 // qmllint disable unresolved-type
     property string network: ""
     property string networkDevice: ""
     property int networkDeviceRevision: 0
@@ -27,8 +30,6 @@ Scope {
     property string networkUpRate: ""
     property var networkDownSamples: []
     property var networkUpSamples: []
-    property bool bluetoothAvailable: false
-    property bool bluetoothConnected: false
     property string batteryStatus: ""
     property bool batteryStatusReady: false
     property string timeText: ""
@@ -78,10 +79,7 @@ Scope {
             else if (key === "network_signal") {
                 var signalValue = parseInt(value);
                 root.networkSignal = Number.isFinite(signalValue) ? signalValue : -1;
-            } else if (key === "bluetooth")
-                root.bluetoothAvailable = value === "1";
-            else if (key === "bluetooth_connected")
-                root.bluetoothConnected = value === "1";
+            }
         }
     }
 
@@ -243,7 +241,6 @@ Scope {
         root.updateClock();
         networkInfoProc.running = true;
         root.startTrafficSample();
-        bluetoothProc.running = true;
         root.updateBatteryStatus(root.nativeBatteryStatus);
     }
 
@@ -272,17 +269,6 @@ Scope {
         onTriggered: {
             if (!networkInfoProc.running)
                 networkInfoProc.running = true;
-        }
-    }
-
-    Timer {
-        id: bluetoothTimer
-        interval: 30000
-        repeat: true
-        running: true
-        onTriggered: {
-            if (!bluetoothProc.running)
-                bluetoothProc.running = true;
         }
     }
 
@@ -316,19 +302,6 @@ Scope {
             sampledDevice = "";
             sampledRevision = -1;
             root.parseNetworkTraffic(output, device, revision);
-        }
-    }
-
-    Process {
-        id: bluetoothProc
-        command: ["bash", "-lc", "bt=0; btconn=0; if command -v bluetoothctl >/dev/null 2>&1 && bluetoothctl show >/dev/null 2>&1; then bt=1; bluetoothctl devices Connected 2>/dev/null | grep -q . && btconn=1; fi; printf 'bluetooth=%s\\nbluetooth_connected=%s\\n' \"$bt\" \"$btconn\""]
-        stdout: SplitParser {
-            property string buffer: ""
-            onRead: data => buffer += data + "\n"
-        }
-        onExited: {
-            root.parseKeyValue(stdout.buffer);
-            stdout.buffer = "";
         }
     }
 }
