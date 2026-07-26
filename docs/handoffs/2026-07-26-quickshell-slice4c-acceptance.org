@@ -203,20 +203,17 @@ This slice does not:
 - perform a NixOS activation;
 - authorize cleanup or broader optimization.
 
-* Current State And Remaining Gates
+* Final State
 The accepted payload is =6645a96=.  The source branch and =main= both contain
 the published promotion point =1717326=; this documentation-only closeout does
 not change the payload.  The live managed link resolves to promoted =main=,
 whose =StatusController.qml= matches the accepted SHA-256 above.  Quickshell is
 active/running on the automatically reloaded PID and invocation recorded
-above.  Payload source paths and the candidate worktree are clean.  The sole
-unrelated main-worktree edit remains =config/hypr/hyprland.lua=.
+above.  Payload source paths are clean on the retained source branch.  The
+sole unrelated main-worktree edit remains =config/hypr/hyprland.lua=.
 
-The rollback script, offscreen probe, runtime directory, and local captures
-remain under =/tmp= until a separately authorized cleanup gate.  No transient
-timer or service remains active.
-
-Remaining gates are:
-
-1. review, commit, and publish this documentation-only closeout;
-2. remove temporary artifacts and the clean candidate worktree.
+Cleanup is complete.  The rollback script, offscreen probe, runtime directory,
+local captures, and clean candidate worktree were removed.  The local and
+remote =work/quickshell-slice4c= branches were retained.  No transient timer or
+service remains active.  Slice 4C has no remaining source, build, runtime,
+promotion, or cleanup work.
