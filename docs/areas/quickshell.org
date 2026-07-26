@@ -117,7 +117,7 @@ Original Slice 3 is accepted end-to-end through shared workspace, active-title,
 status, CAVA, and minute-aligned clock ownership.  Exact evidence is in the
 [[../handoffs/2026-07-25-quickshell-slice3a-acceptance.org][Slice 3A]],
 [[../handoffs/2026-07-25-quickshell-slice3b-acceptance.org][Slice 3B]],
-[[../handoffs/2026-07-26-quickshell-slice3c-acceptance.org][Slice 3C]], and
+[[../handoffs/2026-07-26-quickshell-slice3c-acceptance.org][Slice 3C]],
 [[../handoffs/2026-07-26-quickshell-slice3d-acceptance.org][Slice 3D]], and
 [[../handoffs/2026-07-26-quickshell-slice3e-acceptance.org][Slice 3E]] handoffs.
 Root controllers now supply those five backend domains to both output bars while
