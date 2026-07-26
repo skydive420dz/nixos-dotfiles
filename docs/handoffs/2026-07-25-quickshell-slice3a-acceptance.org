@@ -1,0 +1,74 @@
+#+title: Quickshell Slice 3A Workspace Sharing Acceptance - 2026-07-25
+#+startup: overview
+
+* Outcome
+Slice 3A is =ACCEPTED AND PROMOTED= on the MSI with both outputs connected.
+
+- Accepted and published commit:
+  =c9337c69dcdb36de6de2df6080144c3d9ac14c97=
+- Retained branch:
+  =work/quickshell-slice3a=
+- Pre-slice =main=:
+  =bec4d347bb088d4751e0c12e0688015a81b81c51=
+- Pure no-link build:
+  =/nix/store/8q45c24s8jllzd74rvz3zj60ra95rjcl-nixos-system-nixos-26.11.20260718.61b7c44=
+
+At promotion, local and GitHub =main= and =work/quickshell-slice3a= resolved to
+the accepted commit.  Later VS Code commits advanced =main= without changing
+the accepted Quickshell tree; the retained Slice 3A branch remains at the
+payload.  The Home Manager-managed Quickshell link again resolves to the live
+=main= checkout.
+
+* Change
+One root =WorkspacesController= now owns occupied-workspace polling and Hyprland
+workspace refresh events.  Each bar receives that controller while retaining its
+own screen, so =Hyprland.monitorFor(screen)= supplies the active workspace for
+the correct output.
+
+The payload changes exactly four paths:
+
+- =config/quickshell/shell.qml=
+- =config/quickshell/root/Bar.qml=
+- =config/quickshell/modules/workspaces/Workspaces.qml=
+- =config/quickshell/modules/workspaces/WorkspacesController.qml=
+
+No state bus, singleton framework, new dependency, or behavioral redesign was
+added.
+
+* Evidence
+** Source And Build
+=scripts/check-quickshell= passed all 32 QML, 18 Bash, 2 JSON, and 1 Python
+sources with no actionable diagnostics.  The separate pure no-link build passed
+without changing =flake.lock=, creating a result link, or activating NixOS.
+
+The rebase onto the separately committed MSI VS Code/Codex work was patch
+equivalent by =git range-diff=.  Both worktrees were clean before activation.
+
+** Two-Output Runtime
+The controlled candidate activation produced one Quickshell instance with zero
+restarts and no warning-level journal entries.
+
+- =eDP-1=: 1920x1080 at 144 Hz, active workspace 1
+- =HDMI-A-1=: 3440x1440 at 100 Hz, active workspace 2
+- one =qs-bar= and one =qs-wallpaper= layer on each output
+- user-confirmed workspace 1 highlighted on =eDP-1=
+- user-confirmed workspace 2 highlighted on =HDMI-A-1=
+
+Two stable playing-media profiles measured 18.257% and 18.020% cgroup CPU and
+13.473% and 13.758% main-process CPU, each as a percentage of one core.  Both
+had zero swap, zero journal warnings, and the same PID and invocation
+throughout.  These samples establish runtime stability, not a broader
+performance improvement.
+
+The final managed-link restart loaded the same tracked source bytes as PID
+=704230=, invocation =5d639e47d9444371b2eb008bb41bbb78=, with
+=NRestarts=0=.  During Slice 3A, the current system stayed at the build path
+above; no NixOS or Home Manager activation occurred.
+
+* Boundary
+This completes only the workspace portion of original Slice 3.  Shared status
+pollers, active-title ownership, one CAVA backend, and a shared minute-aligned
+clock remain separate jobs.  The two per-output CAVA children are unchanged.
+
+The clean isolated worktree remains present pending a separate cleanup
+acceptance.
