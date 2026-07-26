@@ -1,0 +1,59 @@
+#+title: Quickshell Slice 3B Shared Window Title Acceptance - 2026-07-25
+#+startup: overview
+
+* Outcome
+Slice 3B is =ACCEPTED AND PROMOTED= on the MSI with both outputs connected.
+
+- Accepted commit:
+  =846f8623919e27718848f59d095e5d14b1f336cd=
+- Pre-slice =main=:
+  =b5cf559beefcfb23a50a93fbfde4b1c441011835=
+- Pure no-link build:
+  =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
+
+Local and GitHub =main= resolve to the accepted commit.  The temporary Slice 3B
+branch, worktree, live-source link, rollback marker, and screenshots were
+removed after promotion.  The Home Manager-managed Quickshell link again
+resolves to the live =main= checkout.
+
+* Change
+One root =WindowTitleController= now owns the existing Hyprland title events,
+close debounce, revision guard, and =hyprctl activewindow -j= refresh.  Every
+bar receives that controller; =WindowTitle= only normalizes and renders its
+shared state.
+
+The payload changes exactly four paths:
+
+- =config/quickshell/shell.qml=
+- =config/quickshell/root/Bar.qml=
+- =config/quickshell/modules/window/WindowTitle.qml=
+- =config/quickshell/modules/window/WindowTitleController.qml=
+
+The accepted Slice 1G race behavior was moved without redesign.  No singleton,
+state bus, native-model migration, new dependency, or visual change was added.
+
+* Evidence
+=scripts/check-quickshell= passed all 33 QML, 18 Bash, 2 JSON, and 1 Python
+sources.  Static checks found one controller, one active-window process, one
+title-event owner, and no backend objects in the view.  The separate pure
+no-link build passed without changing =flake.lock=, creating a =result= link,
+or activating NixOS or Home Manager.
+
+The controlled two-output test used Hyprland's configured pure Lua dispatcher
+syntax and passed this sequence on both bars:
+
+1. focus window A: both bars show =Slice3B-A=;
+2. close background window B: both bars retain =Slice3B-A=;
+3. close window A: both bars show =Desktop=.
+
+Automated state checks and captured bar strips agreed.  Test windows and the
+temporary workspace were removed, and the original workspaces were restored.
+The candidate and final managed-link services each stayed at =NRestarts=0= with
+no warning-level journal entries.  Final service PID =98454= is active on
+=HDMI-A-1= and =eDP-1=.
+
+* Boundary
+This completes only the active-window-title portion of original Slice 3.
+Workspace sharing was completed in Slice 3A.  Shared status pollers, one CAVA
+backend, and a shared minute-aligned clock remain separate jobs; the two
+per-output CAVA children are unchanged.
