@@ -1,0 +1,149 @@
+#+title: Quickshell Slice 3E Shared Minute-Aligned Clock Acceptance - 2026-07-26
+#+startup: overview
+
+* Outcome
+Slice 3E is =ACCEPTED SOURCE-LIVE= on the MSI with both outputs connected.
+
+- Accepted payload:
+  =69f9670ba51144b5468aedf48925134ce78343c2=
+- Pre-slice =main= and rollback commit:
+  =bf32bb20241cb48534e7dee4e263f0991f511f45=
+- Accepted Git tree:
+  =74159ef4a63604ebea83d9ad6a0296a3c94321b2=
+- Pure no-link build:
+  =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
+
+The user accepted the source, build, controlled activation, automated topology,
+and captured two-output rollover results.  At this record's preparation
+snapshot, the payload is a clean local commit on =work/quickshell-slice3e= with
+no upstream.  The candidate source link remains active with rollback preserved.
+Local and GitHub =main= remain at the pre-slice commit.  No payload or
+documentation push, =main= promotion, managed-link restoration, or temporary
+artifact cleanup has run.
+
+* Contract And Change
+This completes the final item in original Quickshell Slice 3 from
+[[file:../audits/2026-07-14-quickshell-optimization.org][the optimization
+audit]]: share a minute-aligned clock across output bars.
+
+The payload changes exactly three existing paths:
+
+1. [[file:../../config/quickshell/modules/status/StatusController.qml][StatusController.qml]]
+   already lives once at the shell root.  It now owns =timeText=, =dateText=,
+   unchanged formatting, and one one-shot timer.
+2. [[file:../../config/quickshell/modules/status/StatusCluster.qml][StatusCluster.qml]]
+   binds those two strings into every output's clock view.
+3. [[file:../../config/quickshell/modules/status/Clock.qml][Clock.qml]] retains
+   its exact geometry, fonts, colors, alignment, and two-line rendering while
+   dropping its per-output timer and formatter.
+
+After every update, the controller schedules the next callback with:
+
+#+begin_src qml
+60000 - date.getSeconds() * 1000 - date.getMilliseconds()
+#+end_src
+
+The one-shot timer recomputes that delay after every callback instead of
+accumulating the phase or delay of a repeating timer.  The two output views bind
+to the same formatted strings, so they receive one shared rollover.
+
+No new controller, singleton, process, dependency, QML type, configuration
+option, test framework, or shell/bar plumbing was added.
+
+* Separate Gate Evidence
+** Source
+The accepted payload is a three-path diff with 20 additions and 17 deletions.
+=git diff --check= and =scripts/check-quickshell= passed:
+
+- all 34 QML files parsed, matched four-space formatting, and passed strict lint
+  with no actionable diagnostics;
+- all 18 Bash, 2 JSON, and 1 Python sources passed their checks;
+- the old one-second =Clock.qml= timer, =triggeredOnStart=, and local
+  =updateClock= markers are absent;
+- one shared =updateClock= and one =clockTimer= remain in the root status
+  controller;
+- an independent read-only review found no actionable correctness, timer,
+  ownership, behavior, or minimality defect.
+
+Accepted source SHA-256 values:
+
+| Path | SHA-256 |
+|------+---------|
+| =Clock.qml= | =1c054faa5018676c78c32b07975adfc064fa37db3421b4ef2389ccef250e8ab5= |
+| =StatusCluster.qml= | =ab775f9cb745403db252bd8dee33252767ad09210172d35a2bbe9c674cee1355= |
+| =StatusController.qml= | =e6a28f657cc9902669b8520d2aa6c4879411fb05fd0564ed6c6f1727eff54013= |
+
+** Pure Build
+The separate pure no-link MSI build returned the store path recorded above.
+=flake.lock= remained SHA-256
+=794444f68c2495b667918f0fc57e227ca9d479089436fb49e15bd7f1d20a2bb7=,
+no =result= link was created, and no NixOS or Home Manager activation ran.
+
+The output equals the unchanged current system because Quickshell is
+intentionally linked out of the Nix store.  The build proves Nix evaluation and
+closure integrity; the exact-source gate validates the QML payload.
+
+** Controlled Source Activation
+Before activation, the Home Manager-managed source link resolved to =main=.
+Quickshell was PID =352826=, invocation
+=4579f313693c4397a8634a997df4b818=, with CAVA child =352854=.
+
+A rollback copy of the managed link was created before the service stopped.
+Both old processes exited, the live source link moved to the clean payload
+worktree, and only =quickshell.service= restarted.
+
+The candidate started at =2026-07-26T07:39:54-04:00=:
+
+- Quickshell PID =371507=, invocation
+  =c1ec9a8ad90f43d5a7ee3c6ec2e06084=;
+- =active/running=, =Result=success=, and =NRestarts=0=;
+- one =Configuration Loaded= and no warning-or-higher journal entry;
+- exactly one CAVA child, PID =371550=;
+- one =qs-bar= and one =qs-wallpaper= on both =eDP-1= and =HDMI-A-1=;
+- unchanged system profile generation 863 and current system output.
+
+The user's unrelated =config/hypr/hyprland.lua= edit remained uncommitted and
+byte-identical at SHA-256
+=a9ea7c02e152220d8c080e2ca8009da6d29d03fa4fc0dd22ca52b1ddda45fb61=.
+
+** Minute Rollover Acceptance
+Narrow captures of both output clocks were taken immediately before and after
+one wall-clock minute boundary:
+
+| Capture | eDP-1 | HDMI-A-1 |
+|---------+-------+----------|
+| =2026-07-26T07:41:58.945395845-04:00= | =07:41= | =07:41= |
+| =2026-07-26T07:42:03.841013138-04:00= | =07:42= | =07:42= |
+
+Both retained =Sun, Jul 26= and the accepted two-line geometry, typography,
+colors, alignment, and surrounding status layout.  The final stability check
+kept PID =371507=, its invocation, one CAVA child, both output layers, zero
+restarts, and no warning-or-higher journal entry.  The user accepted the live
+result.
+
+* Boundary And Next Authority
+This result proves one shared minute-aligned clock and preserved two-output
+rendering in the current MSI session.  It does not:
+
+- claim a measurable CPU, GPU, memory, or power improvement;
+- change status pollers or begin event-driven Slice 4 work;
+- add screen-count lifecycle plumbing;
+- manipulate the system clock or test timezone changes;
+- perform suspend/resume testing;
+- activate NixOS or Home Manager, change system profile generation 863, or
+  alter the current system output;
+- authorize publication, =main= promotion, managed-link restoration, branch or
+  worktree removal, or temporary-artifact cleanup.
+
+The root controller and its inexpensive minute timer intentionally remain alive
+when no output is connected.  System-time jumps may remain visible until the
+next scheduled callback, bounded by one minute; no speculative clock-change API
+was added.
+
+* Closeout State
+The accepted payload is still live from the clean isolated worktree.  Its
+rollback copy and diagnostic captures remain under =/tmp=.  The documentation
+prepared here changes only this handoff, the repository README, the
+documentation index, and the Quickshell area record.  Committing and publishing
+that evidence, promoting =main=, restoring the managed link, and removing
+temporary artifacts remain separate gates.

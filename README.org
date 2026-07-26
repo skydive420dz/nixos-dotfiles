@@ -46,10 +46,10 @@ unchanged fallback animation to resume.  Runtime payload =f7107cb= passed the
 separated source, fixture, pure-build, controlled source-live, lifecycle, and
 visual gates on =eDP-1=; immutable acceptance evidence =f8a4c90= records them.
 Original Quickshell Slice 3 is accepted through shared workspace, active-title,
-status, and CAVA ownership.  The latest boundary and two-output lifecycle
-evidence are in
-[[file:docs/handoffs/2026-07-26-quickshell-slice3d-acceptance.org][the Slice 3D
-acceptance handoff]]; shared minute-aligned clock ownership remains separate.
+status, CAVA, and minute-aligned clock ownership.  The final shared-clock
+evidence is in
+[[file:docs/handoffs/2026-07-26-quickshell-slice3e-acceptance.org][the Slice 3E
+acceptance handoff]].
 The preceding Slice 1H network-handoff correction remains recorded in
 [[file:docs/handoffs/2026-07-25-quickshell-slice1h-acceptance.org][the Slice 1H
 acceptance handoff]].  Its real Wi-Fi/Ethernet handoff remains deferred until
@@ -137,8 +137,8 @@ Work stays slice-based:
    Slice 2 service and theme lifecycle is accepted live on generation 861; it
    preserves the accepted live links, uses one ordered theme initializer, and
    reloads Quickshell colors without restarting the shell.
-   Slices 3A-3C share workspace, active-title, and status backends across both
-   outputs.  Keep the remaining one-CAVA and shared-clock jobs separate.
+   Slices 3A-3E share workspace, active-title, status, CAVA, and minute-aligned
+   clock state across both outputs.  Original Slice 3 is complete.
    Run the deferred real network-handoff check only after Ethernet provides a
    verified alternate route.  Keep old CAVA temp-file deletion, clipboard
    lifecycle, rendering, and frame-rate work separate.
