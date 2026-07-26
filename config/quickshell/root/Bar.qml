@@ -38,6 +38,7 @@ PanelWindow {
     }
 
     required property var mediaController
+    required property var windowTitleController
     required property var workspacesController
 
     BarFrame {
@@ -75,7 +76,9 @@ PanelWindow {
             screen: root.screen
         }
 
-        WindowTitle {}
+        WindowTitle {
+            controller: root.windowTitleController
+        }
 
         Item {
             Layout.fillWidth: true

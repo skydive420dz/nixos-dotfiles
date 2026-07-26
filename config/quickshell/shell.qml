@@ -3,12 +3,17 @@ pragma ComponentBehavior: Bound
 
 import Quickshell
 import "modules/media"
+import "modules/window"
 import "modules/workspaces"
 import "root"
 
 ShellRoot {
     MediaController {
         id: rootMediaController
+    }
+
+    WindowTitleController {
+        id: rootWindowTitleController
     }
 
     WorkspacesController {
@@ -29,6 +34,7 @@ ShellRoot {
             required property var modelData
             screen: modelData
             mediaController: rootMediaController
+            windowTitleController: rootWindowTitleController
             workspacesController: rootWorkspacesController
         }
     }
