@@ -119,6 +119,7 @@ Rectangle {
 
         MediaAnalyzer {
             active: root.mediaPlaying
+            levels: root.controller?.levels ?? []
         }
 
         ColumnLayout {
