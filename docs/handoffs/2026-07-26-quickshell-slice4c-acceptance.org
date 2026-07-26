@@ -1,0 +1,214 @@
+#+title: Quickshell Slice 4C Native Bluetooth Acceptance - 2026-07-26
+#+startup: overview
+
+* Outcome
+Slice 4C is =ACCEPTED SOURCE-LIVE= on the MSI and is not yet published or
+promoted.
+
+- Accepted payload:
+  =6645a96fbba71204ca09dab5e1f46fe731231efb=
+- Pre-slice =main= and rollback commit:
+  =3fd78250b1ceaac02c1db3bc5b0f1cd8bbdb13ee=
+- Accepted Git tree:
+  =be1069879aeacfd16af833b0ca5da214cecec112=
+- Pure no-link build:
+  =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
+
+The separated source, build, and rollback-protected runtime gates passed and
+the user accepted the result.  The accepted payload remains local on
+=work/quickshell-slice4c=.  Local =main= and the local =origin/main=
+tracking ref remain at the pre-slice commit, and the live Home
+Manager-managed link has been restored to =main=.
+
+* Contract And Change
+This implements only the third event-driven source in
+[[file:../audits/2026-07-14-quickshell-optimization.org][the original Slice 4
+roadmap]]: native Bluetooth adapter and connected-device state.
+
+The payload changes exactly
+[[file:../../config/quickshell/modules/status/StatusController.qml][StatusController.qml]]:
+
+- =Quickshell.Bluetooth= is imported as =BluetoothApi= so its =Bluetooth=
+  singleton cannot be confused with the sibling =Bluetooth.qml= view;
+- =bluetoothAvailable= is true when =defaultAdapter= exists, preserving the
+  former controller-presence contract even when the adapter is not powered;
+- =bluetoothConnected= is true when any known device on the default adapter
+  reports its native =connected= property;
+- the old Bluetooth parser keys, startup probe, 30-second timer, Bash process,
+  two =bluetoothctl= commands, and =grep= are deleted.
+
+The two line-local =qmllint disable unresolved-type= directives cover an
+installed Quickshell 0.3 tooling-metadata false positive.  The qualified
+runtime import and native bindings were exercised successfully; widening the
+checker allowlist would add code without improving runtime safety.
+
+The existing scalar interface into =StatusCluster.qml= and =Bluetooth.qml=
+is unchanged.  The three-state glyph, colors, geometry, and exact BlueTUI click
+command remain byte-identical.  Networking, traffic sampling, PipeWire,
+UPower, clock, CAVA, output fan-out, packages, and Nix options were not changed.
+No helper, dependency, controller, or persistent test file was added.
+
+* Separate Gate Evidence
+** Source
+Relative to pre-slice =main=, the accepted payload is one file with four
+insertions and 31 deletions.  It is carried by three local corrective commits:
+
+| Commit | Purpose |
+|--------+---------|
+| =c98b15a= | Replace the polling path with native state |
+| =c76c103= | Qualify the native module beside local =Bluetooth.qml= |
+| =6645a96= | Derive connection from each device's =connected= property |
+
+=git diff --check= and =scripts/check-quickshell= passed:
+
+- all 34 QML files parsed, matched four-space formatting, and passed strict
+  lint with no actionable diagnostics;
+- all 18 Bash, 2 JSON, and 1 Python sources passed;
+- the Bluetooth parser keys, startup call, timer, process, shell command, and
+  =bluetoothctl= references are absent;
+- only the unrelated network-info and traffic =Process= objects remain;
+- =flake.nix= and =flake.lock= are unchanged.
+
+A disposable offscreen Quickshell probe included a sibling local
+=Bluetooth.qml= and used the exact qualified native bindings.  After BlueZ
+enumeration it reported:
+
+| Physical state | =bluetoothAvailable= | =bluetoothConnected= |
+|----------------+----------------------+----------------------|
+| GS3 off | =true= | =false= |
+| GS3 on | =true= | =true= |
+
+Accepted =StatusController.qml= SHA-256:
+
+=6d4494ec40d7c2b367b4ee62c7ae24da89e3f79f71536d2f0564dae91c076b1c=
+
+The unchanged view hashes are:
+
+| File | SHA-256 |
+|------+---------|
+| =Bluetooth.qml= | =dbe80e00f7f02c69582699f31fcf8a32fbc41095ce5a49e52694ab18703bf9c7= |
+| =StatusCluster.qml= | =ab775f9cb745403db252bd8dee33252767ad09210172d35a2bbe9c674cee1355= |
+
+** Corrected Assumption
+The first runtime candidate used
+=defaultAdapter.devices.values.length > 0=.  It loaded cleanly and remained
+stable, but the user correctly reported no visible change after powering the
+Sound Blaster GS3 off.
+
+BlueZ reported =Connected=false= while an offscreen probe still reported
+=bluetoothConnected=true=.  On the installed Quickshell build, the adapter
+model therefore contains known devices rather than only connected devices.
+That candidate was not accepted.  The managed link was restored immediately,
+and the final payload replaced the length test with
+=some(device => device.connected)=.  The corrected predicate then passed both
+physical states before the final live retry.
+
+** Pure Build
+The pure no-link MSI build was repeated against final head =6645a96= and
+returned the store path recorded above.  =flake.lock= remained SHA-256
+=794444f68c2495b667918f0fc57e227ca9d479089436fb49e15bd7f1d20a2bb7=,
+no =result= link was created, and no NixOS or Home Manager activation ran.
+
+The output equals the current system because Quickshell is intentionally
+linked out of the Nix store.  The build proves Nix evaluation and closure
+integrity; the source and runtime gates validate the changed QML bytes.
+
+** Controlled Runtime
+The initial baseline used the exact raw Home Manager link:
+
+=/nix/store/1hafb8jz05y68vf8k0kvm49q296p4qic-home-manager-files/.config/quickshell=
+
+It resolved to pre-slice =main=.  Quickshell was PID =527178=, invocation
+=de586c3d284c4c3b8de0feff54f29e49=, active/running with zero restarts and no
+warning.  The adapter was powered and unblocked, and the paired Sound Blaster
+GS3 was connected.
+
+A 36-second baseline observed the legacy 30-second Bluetooth process path.
+The first alias-qualified candidate then completed a 36-second stable
+observation with no sampled Bluetooth helper, zero restarts, no warnings, and
+the expected =eDP-1= bar and wallpaper.  The final source keeps the same
+poller deletion and changes only the corrected native predicate.
+
+Every candidate activation was protected by a ten-minute timer whose script
+restored the exact raw managed link and restarted only =quickshell.service=.
+One timer expired while waiting for the physical response and restored =main=
+successfully.  No NixOS activation occurred.
+
+For the accepted retry, final payload =6645a96= ran as PID =628422=,
+invocation =9c084bf99cbe4c118817242eac8d1924=:
+
+- =active/running=, =Result=success=, =ExecMainStatus=0=, and =NRestarts=0=;
+- one =Configuration Loaded= and no warning-or-higher journal entry;
+- one Quickshell instance on =eDP-1=;
+- the GS3 was already off when this captured retry started, and BlueZ
+  transitioned =Connected=false -> true= when it was powered back on;
+- the same PID and invocation remained throughout the accepted transition.
+
+Narrow status-bar captures verified the actual rendered state:
+
+| State | Capture SHA-256 | Bluetooth crop signature | Rendered color |
+|-------+-----------------+--------------------------+----------------|
+| Disconnected | =08032688da2c743cdc23f14912a15925d9d1def3ec3c2c4b72a73aa7c745dd60= | =1397044e4c2747bc4aceb6a338d304753bad0e8b06944fd7d7d7e38880709787= | exact muted =#676d77= |
+| Reconnected | =d105089c950f8957c40ac44b74cd7249273ae6bd1668ee2eb074662a7751431c= | =5511711e0de2c52eb0d0c61c5c01abe67452ffc5237f4922764f7b5dabdf1f22= | alpha-composited accent near =#b4c0c8= |
+
+The crop signatures are ImageMagick =%#= signatures after applying
+=-crop 16x34+192+0= to each 360-by-40 status capture.
+
+The original visual report of no difference belongs to the rejected length
+predicate.  The accepted corrected retry has distinct captured glyph-region
+bytes and the expected muted-to-accent color transition.
+
+After the gate, the exact raw managed link was restored and again resolves to
+=/home/skydive420dz/Projects/nixos-dotfiles/config/quickshell=.  Pre-slice
+=main= restarted as PID =629705=, invocation
+=2ad79d0d650d49de88ad832cf3b0e60e=, with one configuration load, zero
+restarts, no warnings, and one Quickshell instance.  The GS3 was reconnected
+and its recorded 34% volume was restored.  No Slice 4C timer remains.
+
+System profile generation 863 and
+=/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
+remained unchanged.  The unrelated =config/hypr/hyprland.lua= edit remains
+uncommitted and byte-identical at SHA-256
+=a9ea7c02e152220d8c080e2ca8009da6d29d03fa4fc0dd22ca52b1ddda45fb61=.
+
+* Claim Boundary
+At the accepted 30-second cadence, the deleted healthy-adapter path launched
+one Bash, two =bluetoothctl= commands, and one =grep= per sample: 480
+theoretical process executions per hour.  Removing it reduces the
+source-derived steady status budget from 7,080 to 6,600 executions per hour,
+about 6.8%.
+
+This is a process-churn and event-driven-state result, not a measured CPU,
+memory, GPU, battery-life, power, or end-to-end latency improvement.  The
+persistent native Bluetooth binding's resource cost was not separately
+profiled.
+
+This slice does not:
+
+- change adapter power, pairing, trust, or saved devices;
+- change Bluetooth presentation or the BlueTUI click command;
+- revalidate the unchanged BlueTUI launcher by opening it; the user accepted
+  the slice with that interaction explicitly waived;
+- begin native networking, traffic, or Hyprland migration;
+- claim the full Slice 4 aggregate target;
+- require a second monitor;
+- authorize publication, =main= promotion, final live activation, cleanup,
+  or broader optimization.
+
+* Current State And Remaining Gates
+The accepted payload is local at =6645a96= on =work/quickshell-slice4c=.
+Payload source paths are clean; the worktree contains only this new uncommitted
+handoff.  Local =main= and the local =origin/main= tracking ref remain aligned
+at =3fd7825=.  The live managed link resolves to pre-slice =main=.
+
+The rollback script, offscreen probe, runtime directory, and local captures
+remain under =/tmp= until a separately authorized cleanup gate.  No transient
+timer or service remains active.
+
+Remaining gates are:
+
+1. review and commit this acceptance handoff;
+2. publish the Slice 4C branch;
+3. strictly fast-forward and publish =main=;
+4. restore the managed link to promoted =main= and restart only Quickshell;
+5. remove temporary artifacts and the clean candidate worktree.
