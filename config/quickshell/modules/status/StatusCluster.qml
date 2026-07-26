@@ -54,7 +54,10 @@ Rectangle {
                 status: root.controller.batteryStatus
             }
 
-            Clock {}
+            Clock {
+                timeText: root.controller.timeText
+                dateText: root.controller.dateText
+            }
         }
     }
 }

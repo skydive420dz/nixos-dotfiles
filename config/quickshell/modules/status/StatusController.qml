@@ -26,6 +26,16 @@ Scope {
     property bool charging: false
     property string batteryStatus: ""
     property bool batteryStatusReady: false
+    property string timeText: ""
+    property string dateText: ""
+
+    function updateClock() {
+        var date = new Date();
+        root.timeText = "󱑂 " + Qt.formatTime(date, "HH:mm");
+        root.dateText = Qt.formatDate(date, "ddd, MMM d");
+        clockTimer.interval = 60000 - date.getSeconds() * 1000 - date.getMilliseconds();
+        clockTimer.restart();
+    }
 
     function parseKeyValue(text) {
         var rows = text.trim().split("\n");
@@ -213,11 +223,17 @@ Scope {
     }
 
     Component.onCompleted: {
+        root.updateClock();
         volumeProc.running = true;
         networkInfoProc.running = true;
         root.startTrafficSample();
         bluetoothProc.running = true;
         batteryProc.running = true;
+    }
+
+    Timer {
+        id: clockTimer
+        onTriggered: root.updateClock()
     }
 
     Timer {

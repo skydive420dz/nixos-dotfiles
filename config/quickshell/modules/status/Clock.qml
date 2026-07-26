@@ -12,22 +12,6 @@ Item {
     property string timeText: ""
     property string dateText: ""
 
-    function updateClock() {
-        var date = new Date();
-        root.timeText = "󱑂 " + Qt.formatTime(date, "HH:mm");
-        root.dateText = Qt.formatDate(date, "ddd, MMM d");
-    }
-
-    Component.onCompleted: updateClock()
-
-    Timer {
-        interval: 1000
-        repeat: true
-        running: true
-        triggeredOnStart: true
-        onTriggered: root.updateClock()
-    }
-
     Column {
         width: parent.width
         anchors.verticalCenter: parent.verticalCenter
