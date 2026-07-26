@@ -1,0 +1,159 @@
+#+title: Quickshell Slice 4B Native UPower Battery Acceptance - 2026-07-26
+#+startup: overview
+
+* Outcome
+Slice 4B is =ACCEPTED= on the MSI.
+
+- Accepted payload:
+  =ecb6e7f46388966ec5da26a4ac48a6a1e15ee677=
+- Pre-slice =main= and rollback commit:
+  =e1930e23ba90077239282c7d15f6adfde4069d6c=
+- Accepted Git tree:
+  =071fc3cc225e6af31491d12d62821acd9bc59f94=
+- Pure no-link build:
+  =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
+
+The user accepted the separated source, build, and controlled runtime gates.
+The payload is a clean local commit on =work/quickshell-slice4b=.  Publication,
+=main= promotion, final live activation, and cleanup remain separate decisions.
+
+* Contract And Change
+This implements only the second event-driven source in
+[[file:../audits/2026-07-14-quickshell-optimization.org][the original Slice 4
+roadmap]]: native UPower battery and charge transitions.
+
+The payload changes exactly
+[[file:../../config/quickshell/modules/status/StatusController.qml][StatusController.qml]]:
+
+- one =Quickshell.Services.UPower= import was added;
+- =UPower.displayDevice= now supplies presence, percentage, and state;
+- =UPower.onBattery= makes plug ordering independent of separate device-state
+  notifications;
+- the existing =battery=, =charging=, and =batteryStatus= interface remains;
+- the old battery parser branches, startup probe, ten-second timer, and
+  Bash/two-=cat=/two-=head= process were deleted.
+
+The native state mapping is explicit:
+
+| Native state | Existing status contract |
+|--------------+--------------------------|
+| Global on-battery or =Discharging= | =Discharging= |
+| =Charging= | =Charging= |
+| =FullyCharged= | =Full= |
+| =PendingCharge=, =PendingDischarge=, or =Empty= while not globally on-battery | =Not charging= |
+| =Unknown= | =Unknown= |
+
+=ready && isPresent= suppresses unavailable startup data, and Quickshell's
+normalized =0..1= percentage is converted back to the existing integer
+=0..100= contract.  The existing first-sample suppression and idempotent
+transition handler remain the sole battery OSD owner.
+
+=Battery.qml=, =StatusCluster.qml=, OSD transport and rendering, click
+launchers, network traffic, networking, Bluetooth, PipeWire, clock, CAVA,
+geometry, colors, and output fan-out were not changed.  The traffic, network,
+and Bluetooth process pollers remain.  No helper, dependency, Nix option,
+controller, or persistent test file was added.
+
+* Separate Gate Evidence
+** Source
+The accepted payload is a one-file diff with 29 additions and 33 deletions.
+=git diff --check= and =scripts/check-quickshell= passed:
+
+- all 34 QML files parsed, matched four-space formatting, and passed strict lint
+  with no actionable diagnostics;
+- all 18 Bash, 2 JSON, and 1 Python sources passed their checks;
+- the battery timer, process, parser keys, startup probe, and sysfs command are
+  absent;
+- the three unrelated process pollers remain;
+- =flake.nix= and =flake.lock= are unchanged.
+
+An isolated offscreen controller fixture passed every native-state mapping,
+unavailable-device behavior, first-sample suppression, and repeated-state
+suppression.  Expected restricted-session D-Bus and PipeWire warnings did not
+affect those assertions.  The fixture and its runtime files were removed.
+Three independent inspect-only reviews found no material source or contract
+issue.
+
+Accepted =StatusController.qml= SHA-256:
+
+=6f53016c95f5acdbac250c54de2708a6bf28d2f810ac32be191997d637a4b8f0=
+
+** Pure Build
+The separate pure no-link MSI build returned the store path recorded above.
+=flake.lock= remained SHA-256
+=794444f68c2495b667918f0fc57e227ca9d479089436fb49e15bd7f1d20a2bb7=,
+no =result= link was created, and no NixOS or Home Manager activation ran.
+
+The output equals the current system because Quickshell is intentionally linked
+out of the Nix store.  The build proves Nix evaluation and closure integrity;
+the source gate validates the changed QML bytes.
+
+** Controlled Runtime
+Before activation, the raw Home Manager link targeted
+=/nix/store/1hafb8jz05y68vf8k0kvm49q296p4qic-home-manager-files/.config/quickshell=
+and resolved to pre-slice =main=.  Quickshell was PID =448678=, invocation
+=35dc6c71e1224e27a104b6e88f6773ff=, active and running with zero restarts.
+
+A timed fallback was armed to restore that exact raw link and restart only
+=quickshell.service=.  The candidate started at
+=2026-07-26T12:09:14-04:00= as PID =496749=, invocation
+=386947dcf4024fb19d832f0d5721fe23=:
+
+- =active/running=, =Result=success=, and =NRestarts=0=;
+- one =Configuration Loaded= and no warning-or-higher journal entry;
+- one Quickshell instance, one =qs-bar=, and one =qs-wallpaper= remained on the
+  sole connected output, =eDP-1=;
+- the initial =100%= fully charged sample rendered without a startup OSD.
+
+The physical unplug/replug gate passed:
+
+| Transition | UPower/sysfs result | OSD result |
+|------------+---------------------+------------|
+| AC disconnected at =12:15:41= | on-battery, discharging; later bar sample =97%= | exactly one =On battery= event, initial value =100%= |
+| AC reconnected at =12:19:15= | off-battery; firmware =Not charging= and UPower =fully-charged= at =96%= | exactly one =Charged= event at =96%= |
+
+For each transition, the OSD data and signal modification times and SHA-256
+values remained unchanged during the follow-up interval, proving no duplicate
+write.  Captured =eDP-1= bar crops followed UPower and showed the expected
+unplugged and plugged glyphs.  The captures were inspected rather than compared
+for pixel identity because the translucent animated background changes their
+bytes.
+
+After the gate, the exact raw Home Manager link was restored and again resolved
+to =/home/skydive420dz/Projects/nixos-dotfiles/config/quickshell=.  Pre-slice
+=main= restarted at =2026-07-26T12:20:28-04:00= as PID =500694=, invocation
+=7f35f4a07d00433ca3839e35e7a3daa0=, with one configuration load, zero
+restarts, and no warning.  All fallback units, scripts, fixtures, and captures
+were removed.
+
+System profile generation 863 and
+=/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
+remained unchanged.  The unrelated =config/hypr/hyprland.lua= edit remained
+uncommitted and byte-identical at SHA-256
+=a9ea7c02e152220d8c080e2ca8009da6d29d03fa4fc0dd22ca52b1ddda45fb61=.
+
+* Claim Boundary
+At the accepted ten-second cadence, the deleted path launched one Bash and two
+=cat=/=head= pairs per sample: 1,800 theoretical process executions per hour.
+Removing it reduces the source-derived steady status budget from 8,880 to 7,080
+executions per hour, about 20%.
+
+This is a process-churn and event-latency result, not a measured CPU, memory,
+GPU, battery-life, or power improvement.  The persistent UPower binding's
+resource cost was not separately profiled.
+
+This slice does not:
+
+- change battery presentation, OSD transport, or launcher behavior;
+- begin Bluetooth, networking, traffic, or native Hyprland migration;
+- claim the full Slice 4 aggregate acceptance target;
+- require a second monitor because the shared controller and output views are
+  unchanged;
+- authorize NixOS/Home Manager activation, publication, =main= promotion,
+  worktree removal, branch deletion, or broader cleanup.
+
+* Publication State
+At this record's preparation snapshot, =work/quickshell-slice4b= is one clean
+local payload commit ahead of =main=.  Local and locally recorded GitHub =main=
+remain aligned at =e1930e23ba90077239282c7d15f6adfde4069d6c=.  The candidate
+branch has no upstream.  This handoff is not yet committed or published.
