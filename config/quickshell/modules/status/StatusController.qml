@@ -1,12 +1,13 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.Pipewire
 
 Scope {
     id: root
 
-    property int volume: 0
-    property bool muted: false
+    readonly property int volume: Math.round((Pipewire.defaultAudioSink?.audio.volume ?? 0) * 100)
+    readonly property bool muted: Pipewire.defaultAudioSink?.audio.muted ?? false
     property string network: ""
     property string networkDevice: ""
     property int networkDeviceRevision: 0
@@ -44,11 +45,7 @@ Scope {
             var key = parts[0] ?? "";
             var value = parts.slice(1).join("=");
 
-            if (key === "volume")
-                root.volume = parseInt(value) || 0;
-            else if (key === "muted")
-                root.muted = value === "1";
-            else if (key === "network")
+            if (key === "network")
                 root.network = value;
             else if (key === "network_device")
                 root.setNetworkDevice(value);
@@ -224,7 +221,6 @@ Scope {
 
     Component.onCompleted: {
         root.updateClock();
-        volumeProc.running = true;
         networkInfoProc.running = true;
         root.startTrafficSample();
         bluetoothProc.running = true;
@@ -236,15 +232,8 @@ Scope {
         onTriggered: root.updateClock()
     }
 
-    Timer {
-        id: volumeTimer
-        interval: 2000
-        repeat: true
-        running: true
-        onTriggered: {
-            if (!volumeProc.running)
-                volumeProc.running = true;
-        }
+    PwObjectTracker {
+        objects: [Pipewire.defaultAudioSink]
     }
 
     Timer {
@@ -285,19 +274,6 @@ Scope {
         onTriggered: {
             if (!bluetoothProc.running)
                 bluetoothProc.running = true;
-        }
-    }
-
-    Process {
-        id: volumeProc
-        command: ["bash", "-lc", "vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true); muted=0; case \"$vol\" in *MUTED*) muted=1;; esac; level=$(awk '{ printf \"%d\", ($2+0)*100 }' <<<\"$vol\"); printf 'volume=%s\\nmuted=%s\\n' \"${level:-0}\" \"$muted\""]
-        stdout: SplitParser {
-            property string buffer: ""
-            onRead: data => buffer += data + "\n"
-        }
-        onExited: {
-            root.parseKeyValue(stdout.buffer);
-            stdout.buffer = "";
         }
     }
 
