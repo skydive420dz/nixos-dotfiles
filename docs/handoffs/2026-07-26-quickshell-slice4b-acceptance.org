@@ -175,6 +175,6 @@ and the unchanged OSD files proved startup emitted no false transition.
 
 System profile generation 863 and the current system output remained unchanged.
 The unrelated =config/hypr/hyprland.lua= edit remained byte-identical and
-uncommitted.  The local and remote Slice 4B evidence refs are retained.  The
-clean candidate and detached rollback worktrees and the rollback script remain
-only until separately authorized cleanup.
+uncommitted.  After separate authorization, the clean candidate and detached
+rollback worktrees and rollback script were removed.  The local and remote
+Slice 4B evidence refs remain at the accepted evidence commit.

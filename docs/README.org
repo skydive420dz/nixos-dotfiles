@@ -111,8 +111,7 @@ The accepted and promoted native battery source is in
 - Published =work/quickshell-slice4a= at =0281fd9= is the retained payload and
   acceptance-evidence ref, not an active worktree.
 - Published =work/quickshell-slice4b= at =68218a7= is the retained payload and
-  acceptance-evidence ref.  Its candidate and detached rollback worktrees
-  remain only until separately accepted cleanup.
+  acceptance-evidence ref, not an active worktree.
 - Emacs: complete the current Python acceptance decision before selecting
   another language or optimization slice.
 
