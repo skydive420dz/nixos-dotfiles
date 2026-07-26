@@ -2,23 +2,23 @@
 #+startup: overview
 
 * Outcome
-Slice 4C is =ACCEPTED SOURCE-LIVE= on the MSI and is not yet published or
-promoted.
+Slice 4C is =ACCEPTED, PUBLISHED, AND PROMOTED= on the MSI.
 
 - Accepted payload:
   =6645a96fbba71204ca09dab5e1f46fe731231efb=
+- Published promotion point:
+  =17173266526b76f1cef17b87f03cab449724c331=
 - Pre-slice =main= and rollback commit:
   =3fd78250b1ceaac02c1db3bc5b0f1cd8bbdb13ee=
-- Accepted Git tree:
+- Accepted payload tree:
   =be1069879aeacfd16af833b0ca5da214cecec112=
 - Pure no-link build:
   =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
 
 The separated source, build, and rollback-protected runtime gates passed and
-the user accepted the result.  The accepted payload remains local on
-=work/quickshell-slice4c=.  Local =main= and the local =origin/main=
-tracking ref remain at the pre-slice commit, and the live Home
-Manager-managed link has been restored to =main=.
+the user accepted the result.  The source branch and =main= were published
+through the promotion point above.  The live Home Manager-managed link remains
+unchanged and now resolves to promoted =main=.
 
 * Contract And Change
 This implements only the third event-driven source in
@@ -165,6 +165,14 @@ After the gate, the exact raw managed link was restored and again resolves to
 restarts, no warnings, and one Quickshell instance.  The GS3 was reconnected
 and its recorded 34% volume was restored.  No Slice 4C timer remains.
 
+Promotion then fast-forwarded local =main= from =3fd7825= through =1717326=
+and published both =work/quickshell-slice4c= and =main=.  Because the managed
+link is out of store, Quickshell automatically logged =Reloading
+configuration= at 19:07:55 and =Configuration Loaded= at 19:07:56.  It kept
+PID =629705= and invocation =2ad79d0d650d49de88ad832cf3b0e60e= with zero
+restarts and no warning-or-higher entry.  No manual service restart or NixOS
+activation was needed.
+
 System profile generation 863 and
 =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
 remained unchanged.  The unrelated =config/hypr/hyprland.lua= edit remains
@@ -192,14 +200,17 @@ This slice does not:
 - begin native networking, traffic, or Hyprland migration;
 - claim the full Slice 4 aggregate target;
 - require a second monitor;
-- authorize publication, =main= promotion, final live activation, cleanup,
-  or broader optimization.
+- perform a NixOS activation;
+- authorize cleanup or broader optimization.
 
 * Current State And Remaining Gates
-The accepted payload is local at =6645a96= on =work/quickshell-slice4c=.
-Payload source paths are clean; the worktree contains only this new uncommitted
-handoff.  Local =main= and the local =origin/main= tracking ref remain aligned
-at =3fd7825=.  The live managed link resolves to pre-slice =main=.
+The accepted payload is =6645a96=.  The source branch and =main= both contain
+the published promotion point =1717326=; this documentation-only closeout does
+not change the payload.  The live managed link resolves to promoted =main=,
+whose =StatusController.qml= matches the accepted SHA-256 above.  Quickshell is
+active/running on the automatically reloaded PID and invocation recorded
+above.  Payload source paths and the candidate worktree are clean.  The sole
+unrelated main-worktree edit remains =config/hypr/hyprland.lua=.
 
 The rollback script, offscreen probe, runtime directory, and local captures
 remain under =/tmp= until a separately authorized cleanup gate.  No transient
@@ -207,8 +218,5 @@ timer or service remains active.
 
 Remaining gates are:
 
-1. review and commit this acceptance handoff;
-2. publish the Slice 4C branch;
-3. strictly fast-forward and publish =main=;
-4. restore the managed link to promoted =main= and restart only Quickshell;
-5. remove temporary artifacts and the clean candidate worktree.
+1. review, commit, and publish this documentation-only closeout;
+2. remove temporary artifacts and the clean candidate worktree.
