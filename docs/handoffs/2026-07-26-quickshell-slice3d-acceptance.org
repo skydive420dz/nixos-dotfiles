@@ -1,0 +1,151 @@
+#+title: Quickshell Slice 3D Shared CAVA Backend Acceptance - 2026-07-26
+#+startup: overview
+
+* Outcome
+Slice 3D is =ACCEPTED SOURCE-LIVE= on the MSI with both outputs connected.
+
+- Accepted payload:
+  =1101924147840f4a68aea2197f4aebf31a95fede=
+- Pre-slice =main= and rollback commit:
+  =0a0058f2ace056117e532b9ac2e9ebbdb12bd981=
+- Accepted Quickshell Git tree:
+  =b72b538a6a21a54a44720397fa5d98f0a33a64b3=
+- Pure no-link build:
+  =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
+
+The user accepted the source, build, controlled activation, automated lifecycle,
+and captured two-output visual results.  At this record's preparation snapshot,
+the payload is a clean local commit on =work/quickshell-slice3d= with no
+upstream.  Local =main= and its =origin/main= tracking ref remain at the
+pre-slice commit.  No payload or documentation push, =main= promotion, managed
+link restoration, or temporary-artifact cleanup has been performed.
+
+* Contract
+This slice completes only the shared-analyzer item from
+[[file:../audits/2026-07-14-quickshell-optimization.org][the original
+Quickshell optimization audit]]: run one CAVA backend and pass its levels to
+every bar view.
+
+It preserves:
+
+- the tracked direct-argv CAVA configuration accepted in
+  [[file:2026-07-22-quickshell-slice1d-acceptance.org][Slice 1D]];
+- the 500-ms freshness, stale-sample, process-exit, and no-auto-restart behavior
+  accepted in
+  [[file:2026-07-25-quickshell-slice1i-acceptance.org][Slice 1I]];
+- the per-output 12-column dotted Canvas and 90-ms fallback animation;
+- media controls, artwork, layout, CAVA's 24-fps rate, and its Pulse automatic
+  source.
+
+The preceding shared workspace, title, and status ownership remains unchanged.
+[[file:2026-07-26-quickshell-slice3c-acceptance.org][Slice 3C]] left this CAVA
+move and the shared minute-aligned clock as separate jobs.
+
+* Change
+The payload changes exactly three existing paths:
+
+1. [[file:../../config/quickshell/modules/media/MediaController.qml][MediaController.qml]]
+   is already instantiated once at the shell root.  It now owns the sole CAVA
+   process, parser, levels, 500-ms freshness timer, inactivity clearing, and
+   exit clearing.
+2. [[file:../../config/quickshell/modules/media/MediaAnalyzer.qml][MediaAnalyzer.qml]]
+   retains only the per-output geometry, local fallback tick/timer, repaint
+   handlers, and Canvas.
+3. [[file:../../config/quickshell/modules/media/Media.qml][Media.qml]] binds the
+   controller's shared levels into each analyzer view.
+
+No new controller, dependency, QML type, shell/bar plumbing, or configuration
+file was added.  The accepted parsing/freshness backend moved exactly except
+that its activity guard now derives from the root controller's selected MPRIS
+player.  The fallback timer and Canvas body remained exact.
+
+* Separate Gate Evidence
+** Source
+=git diff --check= and =scripts/check-quickshell= passed:
+
+- all 34 QML files parsed, matched four-space formatting, and passed the strict
+  lint gate with no actionable diagnostics;
+- all 18 Bash, 2 JSON, and 1 Python sources passed their checks;
+- static cardinality found one CAVA command/process and one freshness timer;
+- the moved backend and retained fallback/Canvas compared exactly with the
+  accepted pre-slice source;
+- an independent read-only review found no actionable correctness, ownership,
+  repaint, freshness, lifecycle, or minimality defect.
+
+The accepted =cava.conf= remained unchanged at SHA-256
+=0c3e3fd58eb74c1e2afdd52e128f23cb7460cfbba7035f63b9c7ce505afccd74=.
+
+** Pure Build
+The separate pure no-link MSI build returned the store path recorded above.
+=flake.lock= remained SHA-256
+=794444f68c2495b667918f0fc57e227ca9d479089436fb49e15bd7f1d20a2bb7=,
+no =result= link was created, and no NixOS or Home Manager activation ran.
+
+Because Quickshell is intentionally linked out of the Nix store, this proves
+Nix evaluation and closure integrity; the exact-source gate validates the QML
+payload.
+
+** Controlled Source Activation
+Before activation, Quickshell was PID =145894= with two direct-config CAVA
+children, one per connected output.  The service stopped cleanly and both
+children exited.  The live source link then moved from the Home Manager-managed
+=main= source to the clean immutable payload worktree.  The exact-source checker
+passed against those linked bytes before the service restarted.
+
+The candidate started at =2026-07-26T06:46:49-04:00=:
+
+- Quickshell PID =340207=, invocation
+  =d68e3445629a40ce980886c1551739a8=;
+- =active/running=, =Result=success=, =ExecMainStatus=0=, and =NRestarts=0=;
+- one clean =Configuration Loaded= and no warning-or-higher journal entry;
+- exactly one CAVA child using the tracked live config;
+- one =qs-bar= and one =qs-wallpaper= layer on each of =eDP-1= and =HDMI-A-1=;
+- unchanged current system output and no Nix activation.
+
+** Lifecycle And Visual Acceptance
+The automated test began and ended with the selected media playing:
+
+| Phase | CAVA result | Analyzer result |
+|-------+-------------+-----------------|
+| Pause | zero children | inactive state |
+| Play | one new child, PID =343249= | live levels on both outputs |
+| =SIGSTOP= verified child | same stopped child | moving fallback on both outputs after the 500-ms deadline |
+| =SIGCONT= | same child resumed | live levels recovered on both outputs |
+| =SIGTERM= verified child | zero children; no automatic restart | fallback visible on both outputs |
+| Pause/play recovery | one new child, PID =345139= | live levels restored on both outputs |
+
+Two post-stall frames per output showed fallback motion.  Resume and exit
+captures showed live recovery and exit fallback respectively.  A final
+same-frame capture showed both output bars with the shared live analyzer,
+unchanged media controls/art/layout, and the restored playing state.
+
+Quickshell retained PID =340207= and its invocation throughout the lifecycle
+test, with zero restarts and no warning-or-higher journal entries.  The user
+accepted the automated and captured visual result.
+
+* Boundary And Next Authority
+This result proves one shared CAVA backend and preserved behavior on the current
+two-output MSI session.  It does not:
+
+- claim a CPU, GPU, memory, or power improvement;
+- tune CAVA, frame rate, Canvas rendering, or damage behavior;
+- compare =PwNodePeakMonitor=;
+- add automatic restart/backoff;
+- share the clock or begin Slice 4;
+- remove historical CAVA temporary files;
+- activate NixOS/Home Manager, alter the current generation, push, or promote
+  =main=.
+
+Root ownership means CAVA can remain active during output hotplug, including the
+unlikely case of playing media with no visible output.  No speculative
+screen-count plumbing was added.
+
+The live source currently remains on the accepted worktree.  The recorded
+rollback link is the Home Manager-managed path
+=/nix/store/1hafb8jz05y68vf8k0kvm49q296p4qic-home-manager-files/.config/quickshell=,
+which resolves to the pre-slice =main= checkout.  A rollback would stop
+Quickshell, restore that link, validate the source, and restart the service.
+
+The next separate gate is a local commit of this acceptance document.  Push,
+promotion, managed-link restoration, documentation-index updates, and cleanup
+remain later explicit gates.
