@@ -1,0 +1,144 @@
+#+title: Quickshell Slice 4A Native PipeWire Volume Acceptance - 2026-07-26
+#+startup: overview
+
+* Outcome
+Slice 4A is =ACCEPTED= on the MSI.
+
+- Accepted payload:
+  =5c55f7c6f0f6ab94afe82a0e1b93ae67d550c90e=
+- Pre-slice =main= and rollback commit:
+  =cddeae299300d3e36966379884b9942eed45b63f=
+- Accepted Git tree:
+  =c629247eec71e79be4c71b6aef884d9d4597fe34=
+- Pure no-link build:
+  =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
+
+The user accepted the separated source, build, and controlled runtime gates.
+The payload is a clean local commit on =work/quickshell-slice4a=.  Publication,
+=main= promotion, and final live activation remain separate decisions.
+
+* Contract And Change
+This implements only the first event-driven source in
+[[file:../audits/2026-07-14-quickshell-optimization.org][the original Slice 4
+roadmap]]: native PipeWire volume and mute state.
+
+The payload changes exactly
+[[file:../../config/quickshell/modules/status/StatusController.qml][StatusController.qml]]:
+
+- one =Quickshell.Services.Pipewire= import was added;
+- =volume= and =muted= became null-safe read-only bindings to the current
+  default sink's native audio state;
+- one =PwObjectTracker= binds that sink;
+- the old volume and mute parser branches, startup probe, two-second timer, and
+  Bash/=wpctl=/=awk= process were deleted.
+
+The existing scalar interface into =StatusCluster.qml= and =Volume.qml= is
+unchanged.  WireMix launching, hardware-key OSD scripts, the four remaining
+status pollers, network traffic state, battery-transition notifications, clock,
+CAVA, geometry, colors, and rendering were not changed.  No helper, dependency,
+Nix option, controller, or test framework was added.
+
+* Separate Gate Evidence
+** Source
+The accepted payload is a one-file diff with 6 additions and 30 deletions.
+=git diff --check= and =scripts/check-quickshell= passed:
+
+- all 34 QML files parsed, matched four-space formatting, and passed strict lint
+  with no actionable diagnostics;
+- all 18 Bash, 2 JSON, and 1 Python sources passed their checks;
+- exactly one =PwObjectTracker= remains in the controller;
+- =volumeTimer=, =volumeProc=, their startup call, their parser branches, and
+  Quickshell's =wpctl get-volume= command are absent;
+- the four unrelated status timers and processes remain;
+- =StatusCluster.qml=, =Volume.qml=, =scripts/osd-volume=, OSD QML, =flake.nix=,
+  and =flake.lock= are byte-equivalent to the pre-slice commit.
+
+Accepted =StatusController.qml= SHA-256:
+
+=dfee3e4adf190c1e4485000a0274deb3ec1444e37ca93e5a74212dfbf01a0d58=
+
+The first checker invocation was blocked before source evaluation by the
+restricted environment's Nix fetcher-cache permissions.  The identical offline
+checker passed with access to the existing user cache.
+
+** Pure Build
+The separate pure no-link MSI build returned the store path recorded above.
+=flake.lock= remained SHA-256
+=794444f68c2495b667918f0fc57e227ca9d479089436fb49e15bd7f1d20a2bb7=,
+no =result= link was created, and no NixOS or Home Manager activation ran.
+
+The output equals the current system because Quickshell is intentionally linked
+out of the Nix store.  The build proves Nix evaluation and closure integrity;
+the source gate validates the changed QML bytes.
+
+** Controlled Runtime
+Before activation, the Home Manager-managed source link resolved to =main=.
+Quickshell was PID =389704=, invocation
+=393431d835e143bb8a027760e3172a52=, active and running with zero restarts.
+
+The default sink was Sound Blaster GS3 node =87=
+(=bluez_output.00_02_3C_D2_6A_9D.1=) at =4%=, unmuted.  PipeWire reported no
+active audio streams.  A ten-minute fallback was armed to restore the exact
+audio state, managed source link, and service if the test was interrupted.
+
+Only =quickshell.service= restarted on the candidate.  It started at
+=2026-07-26T09:07:45-04:00= as PID =422809=, invocation
+=301d307cd76c4bb7933ccddd736ce207=:
+
+- =active/running=, =Result=success=, =ExecMainStatus=0=, and =NRestarts=0=;
+- one =Configuration Loaded= and no warning-or-higher journal entry;
+- one =qs-bar= and one =qs-wallpaper= remained on the sole connected output,
+  =eDP-1=.
+
+The actual rendered volume view passed two safe event tests:
+
+| State | Observation deadline | Narrow-capture SHA-256 |
+|-------+----------------------+------------------------|
+| =4%=, unmuted baseline | baseline | =63bab64dcb91bd1a94e677f6b421bd2c4666bc9d73b79616f78dd0a413f3aa2a= |
+| =0%=, unmuted | updated by =302 ms= | =656c895374d8b7c28b8a9f9dc224e06d566c517fd79609f474489a528ad9e32f= |
+| =0%=, muted | updated by =294 ms= | =001edf5bb4853911dce9e0af0e2bdbbaa23d29939ecc065e9f5659f862ae0648= |
+| restored =4%=, unmuted | final | =63bab64dcb91bd1a94e677f6b421bd2c4666bc9d73b79616f78dd0a413f3aa2a= |
+
+The zero-volume glyph and muted warning color both changed as expected.  The
+restored capture was pixel-identical to the baseline.
+
+After the test, audio was restored exactly to =4%= and unmuted.  The raw
+Home Manager link was restored and again resolved to
+=/home/skydive420dz/Projects/nixos-dotfiles/config/quickshell=.  The restored
+pre-slice =main= restarted at =2026-07-26T09:12:40-04:00= as PID =424688=,
+invocation
+=02f495b1ecf0422095b84e648c862095=, with one configuration load, zero
+restarts, no warnings, and the expected =eDP-1= bar and wallpaper.  The fallback
+units and all temporary captures were removed.
+
+System profile generation 863 and
+=/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
+remained unchanged.  The unrelated =config/hypr/hyprland.lua= edit remained
+uncommitted and byte-identical at SHA-256
+=a9ea7c02e152220d8c080e2ca8009da6d29d03fa4fc0dd22ca52b1ddda45fb61=.
+
+* Claim Boundary
+At the accepted two-second cadence, the deleted path launched one Bash,
+=wpctl=, and =awk= execution per sample: 5,400 theoretical executions per hour.
+Removing it reduces the source-derived steady status budget from 14,280 to
+8,880 executions per hour, about 38%.
+
+This is a process-churn and event-latency result, not a measured CPU, memory,
+GPU, battery, or power improvement.  The native tracker adds a persistent
+PipeWire binding whose resource cost was not separately profiled.
+
+This slice does not:
+
+- change volume control or OSD transport;
+- switch the default sink or test a hardware disconnect/reconnect;
+- require a second monitor because controller fan-out and the view are
+  unchanged;
+- begin UPower, Bluetooth, networking, traffic, or native Hyprland migration;
+- authorize NixOS/Home Manager activation, publication, =main= promotion,
+  worktree removal, branch deletion, or broader cleanup.
+
+* Publication State
+At this record's preparation snapshot, =work/quickshell-slice4a= is one clean
+local payload commit ahead of =main=.  Local and GitHub =main= remain aligned at
+=cddeae299300d3e36966379884b9942eed45b63f=.  This handoff is not yet committed
+or published.
