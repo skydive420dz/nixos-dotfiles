@@ -67,6 +67,7 @@ hl.monitor({
 
 hl.on("hyprland.start", function()
 	hl.exec_cmd("uwsm finalize HYPRLAND_INSTANCE_SIGNATURE")
+	hl.exec_cmd("uwsm app -- code")
 	hl.exec_cmd("sh -c 'sleep 3; exec uwsm app -- vesktop -m'")
 	hl.exec_cmd("uwsm app -- wl-paste --type text --watch cliphist store")
 	hl.exec_cmd("uwsm app -- wl-paste --type image --watch cliphist store")

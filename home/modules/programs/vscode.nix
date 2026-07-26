@@ -33,6 +33,8 @@ in
           "workbench.iconTheme" = "vscode-icons";
           "nix.enableLanguageServer" = true;
           "nix.serverPath" = "nil";
+          "window.restoreWindows" = "preserve";
+          "window.openFoldersInNewWindow" = "on";
         };
 
         extensions = with pkgs.vscode-extensions; [
