@@ -2,10 +2,12 @@
 #+startup: overview
 
 * Outcome
-Slice 3E is =ACCEPTED SOURCE-LIVE= on the MSI with both outputs connected.
+Slice 3E is =ACCEPTED AND PROMOTED= on the MSI.
 
 - Accepted payload:
   =69f9670ba51144b5468aedf48925134ce78343c2=
+- Acceptance evidence and promoted head:
+  =49b672adf53e7dd79a07179a1f5bdf0c67d313ea=
 - Pre-slice =main= and rollback commit:
   =bf32bb20241cb48534e7dee4e263f0991f511f45=
 - Accepted Git tree:
@@ -14,12 +16,10 @@ Slice 3E is =ACCEPTED SOURCE-LIVE= on the MSI with both outputs connected.
   =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
 
 The user accepted the source, build, controlled activation, automated topology,
-and captured two-output rollover results.  At this record's preparation
-snapshot, the payload is a clean local commit on =work/quickshell-slice3e= with
-no upstream.  The candidate source link remains active with rollback preserved.
-Local and GitHub =main= remain at the pre-slice commit.  No payload or
-documentation push, =main= promotion, managed-link restoration, or temporary
-artifact cleanup has run.
+and captured two-output rollover results.  The payload and acceptance evidence
+are published, local and GitHub =main= strictly fast-forwarded through them, the
+Home Manager-managed source link is restored to promoted =main=, and temporary
+Slice 3E artifacts are removed.
 
 * Contract And Change
 This completes the final item in original Quickshell Slice 3 from
@@ -132,8 +132,9 @@ rendering in the current MSI session.  It does not:
 - perform suspend/resume testing;
 - activate NixOS or Home Manager, change system profile generation 863, or
   alter the current system output;
-- authorize publication, =main= promotion, managed-link restoration, branch or
-  worktree removal, or temporary-artifact cleanup.
+- by itself authorize publication, =main= promotion, managed-link restoration,
+  worktree removal, or temporary-artifact cleanup; those separately authorized
+  gates are recorded below.
 
 The root controller and its inexpensive minute timer intentionally remain alive
 when no output is connected.  System-time jumps may remain visible until the
@@ -141,9 +142,24 @@ next scheduled callback, bounded by one minute; no speculative clock-change API
 was added.
 
 * Closeout State
-The accepted payload is still live from the clean isolated worktree.  Its
-rollback copy and diagnostic captures remain under =/tmp=.  The documentation
-prepared here changes only this handoff, the repository README, the
-documentation index, and the Quickshell area record.  Committing and publishing
-that evidence, promoting =main=, restoring the managed link, and removing
-temporary artifacts remain separate gates.
+The payload and acceptance evidence were published together at
+=49b672adf53e7dd79a07179a1f5bdf0c67d313ea= on
+=work/quickshell-slice3e=.  Local and GitHub =main= then strictly fast-forwarded
+from =bf32bb2= through the two accepted commits without force.  The unrelated
+=config/hypr/hyprland.lua= edit remained byte-for-byte unchanged and
+uncommitted.
+
+The Home Manager-managed link
+=/nix/store/1hafb8jz05y68vf8k0kvm49q296p4qic-home-manager-files/.config/quickshell=
+was restored and resolves to promoted =main=.  Quickshell restarted from that
+link as PID =389704=, invocation
+=393431d835e143bb8a027760e3172a52=, with one CAVA child, zero restarts, one
+=Configuration Loaded=, and no warning-or-higher journal entry.  At restoration
+verification, both connected outputs retained one bar and one wallpaper.
+System profile generation 863 and the current system output remained unchanged.
+
+The clean candidate worktree, rollback copy, and diagnostic captures were
+removed.  Local and remote =work/quickshell-slice3e= remain at the accepted
+evidence commit.  Older Slice 2 and VS Code worktrees were untouched.  This
+reconciliation is documentation-only and requires no further build, live
+activation, service restart, or monitor test.

@@ -101,10 +101,8 @@ are in
   evidence refs, not active worktrees.
 - Published =work/quickshell-slice0c= at =41095ab= is the retained Slice 0C
   implementation and evidence ref, not an active worktree.
-- Slice 3E is accepted source-live at =69f9670=; its exact candidate and
-  closeout state belongs in
-  [[file:handoffs/2026-07-26-quickshell-slice3e-acceptance.org][the acceptance
-  handoff]].
+- Published =work/quickshell-slice3e= at =49b672a= is the retained acceptance
+  evidence ref, not an active worktree.  Original Slice 3 is complete.
 - Emacs: complete the current Python acceptance decision before selecting
   another language or optimization slice.
 
