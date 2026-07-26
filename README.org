@@ -28,8 +28,9 @@ build, activation, runtime, and hand-test results kept distinct.
 - Vial and QMK are accepted MSI capabilities.  The QMK udev integration is
   active, Vial discovers the Corne v4, and the QMK CLI intentionally remains
   system-wide.
-- VS Code is not configured on NixOS.  A future Linux port should adapt the
-  macOS Home Manager module rather than copy Darwin-specific pins verbatim.
+- VS Code is configured on the MSI through Home Manager with declarative
+  settings and extensions adapted for Linux, project-window restoration, Codex
+  tooling, and =nix-ld= support for Remote SSH.
 
 The accepted baseline is recorded in
 [[file:docs/handoffs/2026-07-18-main-checkpoint.org][the main checkpoint handoff]];
@@ -44,6 +45,10 @@ acceptance handoff]].  It expires stale CAVA samples after a documented
 unchanged fallback animation to resume.  Runtime payload =f7107cb= passed the
 separated source, fixture, pure-build, controlled source-live, lifecycle, and
 visual gates on =eDP-1=; immutable acceptance evidence =f8a4c90= records them.
+Original Quickshell Slice 3 is accepted through shared workspace, active-title,
+and status ownership.  The latest boundary and two-output evidence are in
+[[file:docs/handoffs/2026-07-26-quickshell-slice3c-acceptance.org][the Slice 3C
+acceptance handoff]]; shared CAVA and clock ownership remain separate.
 The preceding Slice 1H network-handoff correction remains recorded in
 [[file:docs/handoffs/2026-07-25-quickshell-slice1h-acceptance.org][the Slice 1H
 acceptance handoff]].  Its real Wi-Fi/Ethernet handoff remains deferred until
@@ -131,14 +136,15 @@ Work stays slice-based:
    Slice 2 service and theme lifecycle is accepted live on generation 861; it
    preserves the accepted live links, uses one ordered theme initializer, and
    reloads Quickshell colors without restarting the shell.
+   Slices 3A-3C share workspace, active-title, and status backends across both
+   outputs.  Keep the remaining one-CAVA and shared-clock jobs separate.
    Run the deferred real network-handoff check only after Ethernet provides a
-   verified alternate route.  Keep dual-output validation, old CAVA temp-file
-   deletion, clipboard lifecycle, shared ownership, and rendering or frame-rate
-   work separate.
+   verified alternate route.  Keep old CAVA temp-file deletion, clipboard
+   lifecycle, rendering, and frame-rate work separate.
 3. Give Emacs measured, real-use-driven TLC; Lua and Nix LSP slices are accepted,
    while Python's manual acceptance remains in progress.
-4. Port the macOS VS Code configuration only as a Linux-specific Home Manager
-   slice.
+4. Refine the MSI VS Code profile only from real use; adapt any remaining macOS
+   choices for Linux instead of copying Darwin-specific pins.
 
 * Documentation
 - [[file:docs/README.org][Documentation dashboard]]

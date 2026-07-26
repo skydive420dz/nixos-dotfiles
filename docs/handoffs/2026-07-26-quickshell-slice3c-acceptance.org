@@ -1,0 +1,85 @@
+#+title: Quickshell Slice 3C Shared Status Backend Acceptance - 2026-07-26
+#+startup: overview
+
+* Outcome
+Slice 3C is =ACCEPTED AND PROMOTED= on the MSI with both outputs connected.
+
+- Accepted commit:
+  =acdf5fc78b69cd832184ee7f12d50acae0e79921=
+- Pre-slice =main=:
+  =d7dfe058d2e2309406e38a9425c9ec52d75fe486=
+- Accepted Quickshell Git tree:
+  =c9a5cbf3152d86dd7258f5652d6b801eb01d4eeb=
+- Pure no-link build:
+  =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
+
+Payload promotion put local and GitHub =main= at the accepted commit.  The
+documentation-only closeout does not change that Quickshell tree.  The temporary
+Slice 3C branch, worktree, live-source link, rollback marker, and captures were
+removed.  The Home Manager-managed Quickshell link again resolves to the live
+=main= checkout.
+
+* Change
+One root =StatusController= now owns the existing volume, traffic, network,
+battery, and Bluetooth pollers; their state and parsing; the accepted Slice 1H
+network guards; and battery transition notifications.  Every bar receives that
+controller while =StatusCluster= retains layout, views, clicks, and its local
+clock.
+
+The payload changes exactly four paths:
+
+- =config/quickshell/shell.qml=
+- =config/quickshell/root/Bar.qml=
+- =config/quickshell/modules/status/StatusCluster.qml=
+- =config/quickshell/modules/status/StatusController.qml=
+
+The 338-line backend body moved byte-for-byte.  Polling commands and intervals,
+network and battery behavior, status geometry, click launchers, Clock, CAVA,
+and the OSD transport were not redesigned.
+
+* Evidence
+=scripts/check-quickshell= passed all 34 QML, 18 Bash, 2 JSON, and 1 Python
+sources.  Static checks found one controller, five status processes, five
+polling timers, one battery transition owner, one battery OSD writer, and no
+backend object in =StatusCluster=.
+
+A disposable offscreen fixture loaded one controller with two views.  It passed
+shared-controller wiring, network baseline and stale-result checks including
+the A-B-A revision case, and the expected =Charging= battery payload at 73%.
+The fixture and its private runtime files were removed.
+
+The separate pure no-link build passed without changing =flake.lock=, creating
+a =result= link, or activating NixOS or Home Manager.
+
+The controlled two-output activation produced one Quickshell instance with zero
+restarts and no warning-level journal entries.  Captures from =eDP-1= and
+=HDMI-A-1= showed the same network, Bluetooth, volume, 100% battery, and clock
+state.  Startup emitted no battery OSD; a later real transition published one
+=Charged= payload at 100%.
+
+Paired 60-second playing-media observations were comparison-ready:
+
+| Observation | Sampled children | Cgroup CPU (% one core) | Main CPU (% one core) |
+|-------------+------------------+-------------------------+-----------------------|
+| Before | 19 | 15.084% | 10.275% |
+| Slice 3C | 2, both unchanged CAVA children | 17.954% | 13.212% |
+
+One-second sampling can miss short children.  The exact source cardinality is
+the ownership proof; the sampled child reduction is supporting evidence.
+Because CPU varied upward, this slice makes no CPU improvement claim and does
+not tune rendering or CAVA.
+
+The final managed-link restart loaded the accepted tree as PID =145894=,
+invocation =530e14b9165e47a1a68c66a9e102bd97=, with =NRestarts=0= and a clean
+configuration load.
+
+* Boundary
+Original Slice 3 now shares workspace state through Slice 3A, active-window
+title through Slice 3B, and status polling/battery transitions through Slice
+3C.  One shared CAVA backend and a shared minute-aligned clock remain separate
+jobs.
+
+Native PipeWire, UPower, Bluetooth, NetworkManager, and Hyprland migrations
+remain Slice 4 work.  Real Wi-Fi/Ethernet handoff still requires a safe alternate
+route.  Historical CAVA cleanup, OSD transport changes, rendering work, and
+frame-rate tuning remain separate.
