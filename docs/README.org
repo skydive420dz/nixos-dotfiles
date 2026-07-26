@@ -14,7 +14,7 @@ commits, pushes, service changes, or branch deletion.
 |---------+-------------------------+--------------------|
 | System | Current system profile is generation 863; the GC timer introduced and accepted in generation 861 remains active; the clean one-shot optimizer run is accepted; O3-A defers recurrence for a roughly 30-day observation; no optimizer timer is armed | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
 | Emacs | Clean Emacs remains active under generation 863 with the same accepted Home Manager root; Lua and Nix =lsp-mode=/Company slices are accepted; the accepted QML policy uses verified four-space formatting in classic and parser-backed modes | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | Cleanup through Slice 1I, Slice 0C profiling, Slice 2 lifecycle, shared ownership Slices 3A-3E, and Slice 4A native PipeWire volume/mute state are accepted and live.  Root controllers supply workspace, active-title, status, CAVA, and minute-aligned clock state to output bars | Slice 4A is complete; keep UPower battery/charge migration and every later network, lifecycle, rendering, frame-rate, or performance change separately authorized and evidence-driven |
+| Quickshell | Cleanup through Slice 1I, Slice 0C profiling, Slice 2 lifecycle, shared ownership Slices 3A-3E, Slice 4A native PipeWire volume/mute, and Slice 4B native UPower battery state are accepted and live.  Root controllers supply workspace, active-title, status, CAVA, and minute-aligned clock state to output bars | Slice 4B is complete; keep Bluetooth and every later networking, lifecycle, rendering, frame-rate, or performance change separately authorized and evidence-driven |
 | Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs, Vial discovers it, and QMK CLI intentionally remains system-wide | Keep firmware writes and flashing separate and explicitly authorized |
 | VS Code | The MSI Home Manager profile owns VS Code settings/extensions and Codex tooling; window state is preserved between launches, and =nix-ld= supports Remote SSH | Refine from measured Linux use; adapt remaining macOS choices without Darwin-specific pins |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -79,10 +79,12 @@ clock ownership slices are in
 [[file:handoffs/2026-07-26-quickshell-slice3e-acceptance.org][Slice 3E]].
 The accepted and promoted first event-driven status source is in
 [[file:handoffs/2026-07-26-quickshell-slice4a-acceptance.org][Slice 4A]].
+The accepted and promoted native battery source is in
+[[file:handoffs/2026-07-26-quickshell-slice4b-acceptance.org][Slice 4B]].
 
 * Current Work Lanes
-- Local and GitHub =main= are at accepted Slice 4A head =0281fd9=; its native
-  PipeWire payload is =5c55f7c=.
+- Local and GitHub =main= contain accepted Slice 4B head =68218a7=; its native
+  UPower payload is =ecb6e7f=.  Later closeout commits are documentation-only.
 - =work/quickshell-cleanup= remains Slice 1I evidence, while retained
   =work/quickshell-slice2=, =work/quickshell-slice3a=, and
   =work/quickshell-slice3d= refs preserve accepted evidence.  Slice 3B and Slice
@@ -107,8 +109,10 @@ The accepted and promoted first event-driven status source is in
 - Published =work/quickshell-slice3e= at =49b672a= is the retained acceptance
   evidence ref, not an active worktree.  Original Slice 3 is complete.
 - Published =work/quickshell-slice4a= at =0281fd9= is the retained payload and
-  acceptance-evidence ref.  Its candidate and pre-promotion worktrees remain
-  only until separately accepted cleanup.
+  acceptance-evidence ref, not an active worktree.
+- Published =work/quickshell-slice4b= at =68218a7= is the retained payload and
+  acceptance-evidence ref.  Its candidate and detached rollback worktrees
+  remain only until separately accepted cleanup.
 - Emacs: complete the current Python acceptance decision before selecting
   another language or optimization slice.
 
@@ -129,6 +133,7 @@ The accepted and promoted first event-driven status source is in
 - [[file:projects/clipboard-launcher.org][Completed clipboard and launcher work]]
 
 * Evidence And History
+- [[file:handoffs/2026-07-26-quickshell-slice4b-acceptance.org][2026-07-26 Quickshell Slice 4B acceptance and promotion]]
 - [[file:handoffs/2026-07-26-quickshell-slice4a-acceptance.org][2026-07-26 Quickshell Slice 4A acceptance and promotion]]
 - [[file:handoffs/2026-07-26-quickshell-slice3e-acceptance.org][2026-07-26 Quickshell Slice 3E acceptance and promotion]]
 - [[file:handoffs/2026-07-26-quickshell-slice3d-acceptance.org][2026-07-26 Quickshell Slice 3D acceptance and promotion]]

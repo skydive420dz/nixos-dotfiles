@@ -2,10 +2,12 @@
 #+startup: overview
 
 * Outcome
-Slice 4B is =ACCEPTED= on the MSI.
+Slice 4B is =ACCEPTED AND PROMOTED= on the MSI.
 
 - Accepted payload:
   =ecb6e7f46388966ec5da26a4ac48a6a1e15ee677=
+- Acceptance evidence and promoted head:
+  =68218a77dacdea9bc005998d41ef81fda21cef4d=
 - Pre-slice =main= and rollback commit:
   =e1930e23ba90077239282c7d15f6adfde4069d6c=
 - Accepted Git tree:
@@ -13,9 +15,10 @@ Slice 4B is =ACCEPTED= on the MSI.
 - Pure no-link build:
   =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
 
-The user accepted the separated source, build, and controlled runtime gates.
-The payload is a clean local commit on =work/quickshell-slice4b=.  Publication,
-=main= promotion, final live activation, and cleanup remain separate decisions.
+The user accepted the separated source, build, controlled runtime, publication,
+promotion, and final live activation gates.  The payload and acceptance
+evidence are published, local and GitHub =main= strictly fast-forwarded through
+them, and the Home Manager-managed source link resolves to promoted =main=.
 
 * Contract And Change
 This implements only the second event-driven source in
@@ -152,8 +155,26 @@ This slice does not:
 - authorize NixOS/Home Manager activation, publication, =main= promotion,
   worktree removal, branch deletion, or broader cleanup.
 
-* Publication State
-At this record's preparation snapshot, =work/quickshell-slice4b= is one clean
-local payload commit ahead of =main=.  Local and locally recorded GitHub =main=
-remain aligned at =e1930e23ba90077239282c7d15f6adfde4069d6c=.  The candidate
-branch has no upstream.  This handoff is not yet committed or published.
+* Closeout State
+The payload and acceptance evidence were published together at
+=68218a77dacdea9bc005998d41ef81fda21cef4d= on
+=work/quickshell-slice4b=.  Local and GitHub =main= then strictly
+fast-forwarded from =e1930e23ba90077239282c7d15f6adfde4069d6c= through both
+commits without force.
+
+To keep promotion separate from activation, live Quickshell was pinned to an
+exact detached copy of the pre-slice commit while =main= advanced.  The raw
+Home Manager-managed link was then restored and resolved to promoted =main=.
+Quickshell started at =2026-07-26T13:40:28-04:00= as PID =527178=, invocation
+=de586c3d284c4c3b8de0feff54f29e49=, with one configuration load, zero
+restarts, no warnings, and one =qs-bar= and =qs-wallpaper= on =eDP-1=.
+
+At final activation, UPower and sysfs agreed that AC was connected and the
+battery was fully charged/not charging at =96%=.  The bar rendered that state,
+and the unchanged OSD files proved startup emitted no false transition.
+
+System profile generation 863 and the current system output remained unchanged.
+The unrelated =config/hypr/hyprland.lua= edit remained byte-identical and
+uncommitted.  The local and remote Slice 4B evidence refs are retained.  The
+clean candidate and detached rollback worktrees and the rollback script remain
+only until separately authorized cleanup.
