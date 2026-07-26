@@ -2,12 +2,18 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
+import Quickshell.Services.UPower
 
 Scope {
     id: root
 
     readonly property int volume: Math.round((Pipewire.defaultAudioSink?.audio.volume ?? 0) * 100)
     readonly property bool muted: Pipewire.defaultAudioSink?.audio.muted ?? false
+    readonly property UPowerDevice batteryDevice: UPower.displayDevice
+    readonly property bool batteryAvailable: batteryDevice.ready && batteryDevice.isPresent
+    readonly property int battery: batteryAvailable ? Math.round(batteryDevice.percentage * 100) : -1
+    readonly property bool charging: batteryAvailable && batteryDevice.state === UPowerDeviceState.Charging
+    readonly property string nativeBatteryStatus: batteryAvailable ? root.batteryStatusForState(batteryDevice.state, UPower.onBattery) : ""
     property string network: ""
     property string networkDevice: ""
     property int networkDeviceRevision: 0
@@ -23,12 +29,32 @@ Scope {
     property var networkUpSamples: []
     property bool bluetoothAvailable: false
     property bool bluetoothConnected: false
-    property int battery: -1
-    property bool charging: false
     property string batteryStatus: ""
     property bool batteryStatusReady: false
     property string timeText: ""
     property string dateText: ""
+
+    onNativeBatteryStatusChanged: root.updateBatteryStatus(nativeBatteryStatus)
+
+    function batteryStatusForState(state, onBattery) {
+        if (onBattery || state === UPowerDeviceState.Discharging)
+            return "Discharging";
+
+        switch (state) {
+        case UPowerDeviceState.Charging:
+            return "Charging";
+        case UPowerDeviceState.FullyCharged:
+            return "Full";
+        case UPowerDeviceState.PendingCharge:
+        case UPowerDeviceState.PendingDischarge:
+        case UPowerDeviceState.Empty:
+            return "Not charging";
+        case UPowerDeviceState.Unknown:
+            return "Unknown";
+        default:
+            return "";
+        }
+    }
 
     function updateClock() {
         var date = new Date();
@@ -56,12 +82,6 @@ Scope {
                 root.bluetoothAvailable = value === "1";
             else if (key === "bluetooth_connected")
                 root.bluetoothConnected = value === "1";
-            else if (key === "battery")
-                root.battery = parseInt(value);
-            else if (key === "charging")
-                root.charging = value === "1";
-            else if (key === "battery_status")
-                root.updateBatteryStatus(value);
         }
     }
 
@@ -224,7 +244,7 @@ Scope {
         networkInfoProc.running = true;
         root.startTrafficSample();
         bluetoothProc.running = true;
-        batteryProc.running = true;
+        root.updateBatteryStatus(root.nativeBatteryStatus);
     }
 
     Timer {
@@ -252,17 +272,6 @@ Scope {
         onTriggered: {
             if (!networkInfoProc.running)
                 networkInfoProc.running = true;
-        }
-    }
-
-    Timer {
-        id: batteryTimer
-        interval: 10000
-        repeat: true
-        running: true
-        onTriggered: {
-            if (!batteryProc.running)
-                batteryProc.running = true;
         }
     }
 
@@ -313,19 +322,6 @@ Scope {
     Process {
         id: bluetoothProc
         command: ["bash", "-lc", "bt=0; btconn=0; if command -v bluetoothctl >/dev/null 2>&1 && bluetoothctl show >/dev/null 2>&1; then bt=1; bluetoothctl devices Connected 2>/dev/null | grep -q . && btconn=1; fi; printf 'bluetooth=%s\\nbluetooth_connected=%s\\n' \"$bt\" \"$btconn\""]
-        stdout: SplitParser {
-            property string buffer: ""
-            onRead: data => buffer += data + "\n"
-        }
-        onExited: {
-            root.parseKeyValue(stdout.buffer);
-            stdout.buffer = "";
-        }
-    }
-
-    Process {
-        id: batteryProc
-        command: ["bash", "-lc", "bat=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n1); stat=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n1); charging=0; [ \"$stat\" = Charging ] && charging=1; printf 'battery=%s\\ncharging=%s\\nbattery_status=%s\\n' \"${bat:--1}\" \"$charging\" \"${stat:-}\""]
         stdout: SplitParser {
             property string buffer: ""
             onRead: data => buffer += data + "\n"
