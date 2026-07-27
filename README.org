@@ -58,6 +58,14 @@ in
 acceptance handoff]].  Slice 4D deliberately retains one traffic sampler and
 does not claim exact default-route selection, which Quickshell 0.3.0 does not
 expose.
+Native Hyprland work has begun with accepted Slice 4E1 workspace occupancy.
+It replaces the workspace helper process with Quickshell's native workspace
+and toplevel models while preserving per-output active workspace state.  Its
+accepted payload is committed locally at =f0ef9a1= but not yet published; exact
+evidence is in
+[[file:docs/handoffs/2026-07-26-quickshell-slice4e1-acceptance.org][the Slice
+4E1 handoff]].  Fresh dual-output validation and Slice 4E2 title state remain
+separate.
 The preceding Slice 1H network-handoff correction remains recorded in
 [[file:docs/handoffs/2026-07-25-quickshell-slice1h-acceptance.org][the Slice 1H
 acceptance handoff]].  Its real Wi-Fi/Ethernet handoff remains deferred until
@@ -151,8 +159,11 @@ Work stays slice-based:
    identity/signal polling with native state.  Slice 4D retains one shared
    traffic sampler because the installed native model has no byte counters;
    exact default-route selection and physical handoff remain deferred.
-   Slice 4E is next in the original roadmap: native Hyprland
-   workspace/toplevel/title state.
+   Slice 4E1 native workspace occupancy is accepted source/build/live on
+   =eDP-1= and committed locally at =f0ef9a1=, but is not yet published or
+   promoted.  Publish and promote that exact payload before considering the
+   separate Slice 4E2 native title candidate; fresh dual-output validation
+   remains deferred.
    Run the deferred real network-handoff check only after Ethernet provides a
    verified alternate route.  Keep old CAVA temp-file deletion, clipboard
    lifecycle, rendering, and frame-rate work separate.

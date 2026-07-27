@@ -1,0 +1,136 @@
+#+title: Quickshell Slice 4E1 Native Workspace Occupancy Acceptance - 2026-07-26
+#+startup: overview
+
+* Outcome
+Slice 4E1 is =ACCEPTED SOURCE/BUILD/LIVE ON eDP-1= and =COMMITTED LOCALLY=.
+It remains =UNPUBLISHED AND UNPROMOTED=.
+
+- Accepted payload:
+  =f0ef9a1ec5d1a7f44120301f5299827d4c1009ce=
+- Pre-slice checkpoint: =300aa25736bf0c4896c66afd197c4e40ee6edc4c=
+- Pure no-link build:
+  =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
+- Live system: generation 863 at the same store path
+- Quickshell: PID =675223=, =active/running=, =Result=success=,
+  =NRestarts=0=
+
+Local =work/quickshell-slice4e1= contains the payload and this later, separate
+acceptance record.  Local and remote =main= remain at the pre-slice checkpoint.
+Push, promotion, and cleanup are separate gates.
+
+* Contract And Change
+The payload changes exactly two files: five insertions and 52 deletions.
+
+- [[file:../../config/quickshell/modules/workspaces/WorkspacesController.qml][WorkspacesController.qml]]
+  derives one shared occupancy map from =Hyprland.workspaces.values= and each
+  workspace's =toplevels.values.length=.
+- [[file:../../config/quickshell/modules/workspaces/Workspaces.qml][Workspaces.qml]]
+  removes the obsolete post-click =refreshWorkspaces()= call.
+
+The timer, raw-event refresh, =hyprctl workspaces -j= process, split parser,
+JSON parser, and manual refresh function are deleted.
+
+The following accepted behavior is unchanged:
+
+- one root controller supplies occupancy to every bar;
+- each output derives its active workspace through
+  =Hyprland.monitorFor(screen)=;
+- workspaces 1 through 9, their styling, and click behavior;
+- the Lua dispatcher expression
+  =hl.dsp.focus({ workspace = "N" })=.
+
+Window-title state is not part of this payload.
+
+Accepted source hashes:
+
+| File | SHA-256 |
+|------+---------|
+| =WorkspacesController.qml= | =7ad191e8d571eb0837ae7ba22863ca8ecdc4e07e8ecc4c30ffb7fc373b4de056= |
+| =Workspaces.qml= | =5af2a1ceb3a15c5bc1564c08bbdbfc46af82821967881d497b837318344a9d20= |
+
+=flake.lock= remained unchanged at
+=794444f68c2495b667918f0fc57e227ca9d479089436fb49e15bd7f1d20a2bb7=.
+
+* Verification
+** Source
+=scripts/check-quickshell= and =git diff --check= passed:
+
+- 34 QML files parsed, matched four-space formatting, and passed strict lint
+  with no actionable diagnostics;
+- 18 Bash, 2 JSON, and 1 Python file passed;
+- no workspace =Process=, =Timer=, =SplitParser=, =hyprctl=, raw-event
+  handler, or refresh function remains.
+
+** Pure Build
+The pure command
+
+#+begin_src sh
+nix build --print-out-paths \
+  '.#nixosConfigurations.nixos.config.system.build.toplevel' \
+  --no-link
+#+end_src
+
+passed and returned the store path above.  It created no =result= link and
+performed no switch or NixOS/Home Manager activation.
+
+The candidate output equals the current system because Quickshell is an
+out-of-store link.  The build validates Nix evaluation and closure integrity;
+the source and runtime gates validate the changed QML.
+
+** Live Runtime
+Because =~/.config/quickshell= resolves directly to this checkout, editing the
+two source files caused two automatic Quickshell reloads.  No manual restart or
+service activation ran.  Both reloads logged =Configuration Loaded=, retained
+PID =675223=, and produced no warning-or-higher service entry.
+
+The initial single-output snapshot contained:
+
+- =eDP-1= focused on workspace 1;
+- Brave on workspace 1;
+- the existing =btop= Ghostty window on workspace 2.
+
+A disposable non-visual probe instantiated the exact controller.  One uniquely
+titled Ghostty window then exercised these transitions:
+
+| State | Controller occupancy |
+|-------+----------------------|
+| Baseline | ={1,2}= |
+| Open on workspace 9 | ={1,2,9}= |
+| Move from 9 to 8 | ={1,2,8}= |
+| Focus empty workspace 9 | ={1,2,8}=; workspace 9 active with zero windows |
+| Close and restore | ={1,2}= |
+
+The exact bar Lua focus expression returned =ok=.  Cleanup restored workspace
+1 and the original Brave focus, retained the original workspace-2 terminal,
+removed workspaces 8 and 9, closed only the disposable window, and deleted the
+probe.  The final client and workspace sets matched the baseline.
+
+The user accepted the restored single-output result.  Only =eDP-1= was
+connected, so fresh dual-output validation remains deferred.
+
+* Honest Impact And Boundaries
+The old workspace path was already event-driven and had no quiet periodic
+polling.  This payload removes:
+
+- one external =hyprctl= helper at Quickshell startup;
+- one helper after each coalesced open, close, move, or workspace-click burst.
+
+The rate therefore depends on actual window activity; this record makes no
+hourly, CPU, memory, GPU, power, latency, or battery-life claim.
+
+This slice does not:
+
+- change per-output active workspace state, rendering, layout, or styling;
+- change title ownership, normalization, close handling, or startup behavior;
+- perform fresh dual-output validation;
+- activate NixOS/Home Manager or restart Quickshell;
+- publish, promote, or clean Git refs;
+- touch the unrelated intentional =config/hypr/hyprland.lua= edit, preserved
+  at SHA-256
+  =a9ea7c02e152220d8c080e2ca8009da6d29d03fa4fc0dd22ca52b1ddda45fb61=.
+
+* Next Gate
+Publish local =work/quickshell-slice4e1= without advancing =main=.  The branch
+contains the two-file payload and this later documentation commit; the unrelated
+Hyprland edit is in neither.  Slice 4E2 title work must not begin until Slice
+4E1 publication and promotion are separately accepted.
