@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Bluetooth as BluetoothApi
 import Quickshell.Io
+import Quickshell.Networking as NetworkApi
 import Quickshell.Services.Pipewire
 import Quickshell.Services.UPower
 
@@ -17,10 +18,13 @@ Scope {
     readonly property string nativeBatteryStatus: batteryAvailable ? root.batteryStatusForState(batteryDevice.state, UPower.onBattery) : ""
     readonly property bool bluetoothAvailable: BluetoothApi.Bluetooth.defaultAdapter !== null // qmllint disable unresolved-type
     readonly property bool bluetoothConnected: BluetoothApi.Bluetooth.defaultAdapter?.devices.values.some(device => device.connected) ?? false // qmllint disable unresolved-type
-    property string network: ""
+    readonly property NetworkApi.NetworkDevice nativeNetworkDevice: NetworkApi.Networking.devices.values.find(device => device.connected) ?? null
+    readonly property NetworkApi.WifiNetwork nativeWifiNetwork: nativeNetworkDevice?.type === NetworkApi.DeviceType.Wifi ? nativeNetworkDevice.networks.values.find(network => network.connected) ?? null : null // qmllint disable unresolved-type
+    readonly property string network: nativeNetworkDevice?.type === NetworkApi.DeviceType.Wifi ? "wifi" : nativeNetworkDevice?.type === NetworkApi.DeviceType.Wired ? "ethernet" : "" // qmllint disable unresolved-type
+    readonly property string nativeNetworkDeviceName: nativeNetworkDevice?.name ?? ""
     property string networkDevice: ""
     property int networkDeviceRevision: 0
-    property int networkSignal: -1
+    readonly property int networkSignal: nativeWifiNetwork ? Math.round(nativeWifiNetwork.signalStrength * 100) : -1
     property double networkRxBytes: 0
     property double networkTxBytes: 0
     property double networkLastRxBytes: 0
@@ -36,6 +40,7 @@ Scope {
     property string dateText: ""
 
     onNativeBatteryStatusChanged: root.updateBatteryStatus(nativeBatteryStatus)
+    onNativeNetworkDeviceNameChanged: root.setNetworkDevice(nativeNetworkDeviceName)
 
     function batteryStatusForState(state, onBattery) {
         if (onBattery || state === UPowerDeviceState.Discharging)
@@ -63,24 +68,6 @@ Scope {
         root.dateText = Qt.formatDate(date, "ddd, MMM d");
         clockTimer.interval = 60000 - date.getSeconds() * 1000 - date.getMilliseconds();
         clockTimer.restart();
-    }
-
-    function parseKeyValue(text) {
-        var rows = text.trim().split("\n");
-        for (var i = 0; i < rows.length; i++) {
-            var parts = rows[i].split("=");
-            var key = parts[0] ?? "";
-            var value = parts.slice(1).join("=");
-
-            if (key === "network")
-                root.network = value;
-            else if (key === "network_device")
-                root.setNetworkDevice(value);
-            else if (key === "network_signal") {
-                var signalValue = parseInt(value);
-                root.networkSignal = Number.isFinite(signalValue) ? signalValue : -1;
-            }
-        }
     }
 
     function resetNetworkTraffic() {
@@ -239,7 +226,7 @@ Scope {
 
     Component.onCompleted: {
         root.updateClock();
-        networkInfoProc.running = true;
+        root.setNetworkDevice(root.nativeNetworkDeviceName);
         root.startTrafficSample();
         root.updateBatteryStatus(root.nativeBatteryStatus);
     }
@@ -259,30 +246,6 @@ Scope {
         repeat: true
         running: true
         onTriggered: root.startTrafficSample()
-    }
-
-    Timer {
-        id: networkInfoTimer
-        interval: 15000
-        repeat: true
-        running: true
-        onTriggered: {
-            if (!networkInfoProc.running)
-                networkInfoProc.running = true;
-        }
-    }
-
-    Process {
-        id: networkInfoProc
-        command: ["bash", "-lc", "netrow=$(nmcli -t -f DEVICE,TYPE,STATE device status 2>/dev/null | awk -F: '$3==\"connected\"{print $1\":\"$2; exit}'); netdev=${netrow%%:*}; net=${netrow#*:}; signal=-1; if [ \"$netdev\" = \"$net\" ]; then netdev=; net=; fi; if [ \"$net\" = wifi ]; then signal=$(nmcli -t -f IN-USE,SIGNAL dev wifi 2>/dev/null | awk -F: '$1==\"*\" || $1==\"yes\"{print $2; exit}'); fi; printf 'network=%s\\nnetwork_device=%s\\nnetwork_signal=%s\\n' \"${net:-}\" \"${netdev:-}\" \"${signal:--1}\""]
-        stdout: SplitParser {
-            property string buffer: ""
-            onRead: data => buffer += data + "\n"
-        }
-        onExited: {
-            root.parseKeyValue(stdout.buffer);
-            stdout.buffer = "";
-        }
     }
 
     Process {
