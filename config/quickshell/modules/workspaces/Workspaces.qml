@@ -29,7 +29,6 @@ Rectangle {
 
     function switchWorkspace(workspaceId) {
         Hyprland.dispatch("hl.dsp.focus({ workspace = \"" + workspaceId + "\" })");
-        controller.refreshWorkspaces();
     }
 
     RowLayout {
