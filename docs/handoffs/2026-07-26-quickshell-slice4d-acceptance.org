@@ -2,22 +2,24 @@
 #+startup: overview
 
 * Outcome
-Slice 4D is =ACCEPTED AND LOCALLY PROMOTED= on the MSI.  It is not yet
-published.
+Slice 4D is =ACCEPTED, PUBLISHED, PROMOTED, AND CLEANED= on the MSI.
 
 - Accepted payload:
   =4b627a5a58044dda50320e54a12d3f01b8512030=
-- Pre-slice rollback and =origin/main=:
+- Published acceptance head:
+  =78c616a57506245f1d1538cbf1e3645d67b25b33=
+- Pre-slice rollback:
   =08827fe431feb97934f29ed51f4822a687093a26=
 - Accepted payload tree:
   =ab1905206282dcf1727d08743bf6221f7870442f=
 - Pure no-link build:
   =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
 
-The separated source, build, rollback-protected runtime, and local promotion
-gates passed.  The Home Manager-managed live link resolves to local =main=,
-whose accepted QML reloaded automatically.  No NixOS or Home Manager
-activation ran.
+The separated source, build, rollback-protected runtime, publication,
+promotion, and cleanup gates passed.  The payload branch was published at the
+accepted commit and =main= through the acceptance head above.  The Home
+Manager-managed live link resolves to promoted =main=, whose accepted QML
+reloaded automatically.  No NixOS or Home Manager activation ran.
 
 * Contract And Change
 The payload changes only
@@ -147,25 +149,19 @@ The following remain separate:
 - SSID state or active Wi-Fi scanning;
 - dead network rate/state cleanup assigned to Slice 8;
 - native Hyprland workspace/toplevel/title state;
-- dual-output validation, which this no-visual-change slice did not require;
-- publication, evidence-ref alignment, and worktree cleanup.
+- dual-output validation, which this no-visual-change slice did not require.
 
-* Current Repository State
-Local =work/quickshell-slice4d= remains at accepted payload =4b627a5=.  Local
-=main= contains that payload plus this documentation-only record.
-=origin/main= remains at rollback =08827fe=, and no remote Slice 4D branch has
-been published.
+* Final Repository State
+Local and remote =work/quickshell-slice4d= align at accepted payload =4b627a5=.
+Local and remote =main= contain published acceptance head =78c616a=.  This
+final closeout changes documentation only and does not change the accepted QML.
 
-The live managed link resolves to local =main= at the accepted controller hash.
-The Slice 4D worktree remains clean under
-=/tmp/nixos-dotfiles-quickshell-slice4d=.  The only unrelated dirty
-main-worktree path is the intentional =config/hypr/hyprland.lua= edit,
-preserved byte-for-byte at SHA-256
+The live managed link resolves to promoted =main= at the accepted controller
+hash.  The clean Slice 4D worktree and disposable source/runtime artifacts are
+removed; the local and remote evidence branches are retained.  The only
+unrelated dirty main-worktree path is the intentional
+=config/hypr/hyprland.lua= edit, preserved byte-for-byte at SHA-256
 =a9ea7c02e152220d8c080e2ca8009da6d29d03fa4fc0dd22ca52b1ddda45fb61=.
 
-Remaining gates are:
-
-1. publish the Slice 4D branch and =main= separately;
-2. remove the clean candidate worktree only after publication is accepted.
-
-Slice 4E is not started or authorized by this record.
+Slice 4D has no remaining source, build, runtime, publication, promotion, or
+cleanup gate.  Slice 4E is not started or authorized by this record.
