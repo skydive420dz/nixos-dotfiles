@@ -14,7 +14,7 @@ commits, pushes, service changes, or branch deletion.
 |---------+-------------------------+--------------------|
 | System | Current system profile is generation 863; the GC timer introduced and accepted in generation 861 remains active; the clean one-shot optimizer run is accepted; O3-A defers recurrence for a roughly 30-day observation; no optimizer timer is armed | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
 | Emacs | Clean Emacs remains active under generation 863 with the same accepted Home Manager root; Lua and Nix =lsp-mode=/Company slices are accepted; the accepted QML policy uses verified four-space formatting in classic and parser-backed modes | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | Cleanup through Slice 1I, Slice 0C profiling, Slice 2 lifecycle, shared ownership Slices 3A-3E, and native status Slices 4A-4D are accepted, published, and live.  Slice 4E1 native workspace occupancy is accepted source/build/live on =eDP-1= and committed locally at =f0ef9a1=, but remains unpublished | Publish and promote the exact Slice 4E1 payload; fresh dual-output validation and Slice 4E2 native title state remain separate |
+| Quickshell | Cleanup through Slice 1I, Slice 0C profiling, Slice 2 lifecycle, shared ownership Slices 3A-3E, native status Slices 4A-4D, and Slice 4E1 native workspace occupancy are accepted, published, promoted, and live.  Slice 4E1 passed on =eDP-1= at payload =f0ef9a1= | Fresh dual-output validation remains deferred; Slice 4E2 native title state is the next roadmap candidate but has not begun |
 | Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs, Vial discovers it, and QMK CLI intentionally remains system-wide | Keep firmware writes and flashing separate and explicitly authorized |
 | VS Code | The MSI Home Manager profile owns VS Code settings/extensions and Codex tooling; window state is preserved between launches, and =nix-ld= supports Remote SSH | Refine from measured Linux use; adapt remaining macOS choices without Darwin-specific pins |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -85,15 +85,14 @@ The accepted and promoted native Bluetooth source is in
 [[file:handoffs/2026-07-26-quickshell-slice4c-acceptance.org][Slice 4C]].
 The accepted, published, and promoted native networking source is in
 [[file:handoffs/2026-07-26-quickshell-slice4d-acceptance.org][Slice 4D]].
-The accepted, locally committed, but not yet published native
-workspace-occupancy source is in
+The accepted, published, and promoted native workspace-occupancy source is in
 [[file:handoffs/2026-07-26-quickshell-slice4e1-acceptance.org][Slice 4E1]].
 
 * Current Work Lanes
-- Local =work/quickshell-slice4e1= contains accepted payload =f0ef9a1= and this
-  separate acceptance record.  The branch remains unpublished; local and
-  remote =main= remain at =300aa25=.  The unrelated Hyprland edit remains
-  outside both Slice 4E1 commits.
+- Local and remote =work/quickshell-slice4e1= are retained at accepted head
+  =177a7fa=.  Local and remote =main= strictly fast-forwarded to the same head;
+  this later closeout changes documentation only.  The unrelated Hyprland edit
+  remains outside Slice 4E1 history.
 - Local and remote =work/quickshell-slice4d= align at accepted payload
   =4b627a5=.  Local and GitHub =main= contain its published acceptance record
   =78c616a=.  The clean candidate worktree is removed, the evidence branch is
@@ -149,7 +148,7 @@ workspace-occupancy source is in
 - [[file:projects/clipboard-launcher.org][Completed clipboard and launcher work]]
 
 * Evidence And History
-- [[file:handoffs/2026-07-26-quickshell-slice4e1-acceptance.org][2026-07-26 Quickshell Slice 4E1 workspace occupancy acceptance]]
+- [[file:handoffs/2026-07-26-quickshell-slice4e1-acceptance.org][2026-07-26 Quickshell Slice 4E1 workspace occupancy acceptance and promotion]]
 - [[file:handoffs/2026-07-26-quickshell-slice4d-acceptance.org][2026-07-26 Quickshell Slice 4D acceptance and promotion]]
 - [[file:handoffs/2026-07-26-quickshell-slice4c-acceptance.org][2026-07-26 Quickshell Slice 4C acceptance and promotion]]
 - [[file:handoffs/2026-07-26-quickshell-slice4b-acceptance.org][2026-07-26 Quickshell Slice 4B acceptance and promotion]]

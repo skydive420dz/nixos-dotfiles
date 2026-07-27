@@ -2,11 +2,12 @@
 #+startup: overview
 
 * Outcome
-Slice 4E1 is =ACCEPTED SOURCE/BUILD/LIVE ON eDP-1= and =COMMITTED LOCALLY=.
-It remains =UNPUBLISHED AND UNPROMOTED=.
+Slice 4E1 is =ACCEPTED, PUBLISHED, AND PROMOTED=.
 
 - Accepted payload:
   =f0ef9a1ec5d1a7f44120301f5299827d4c1009ce=
+- Published acceptance head:
+  =177a7fa9fafb4ade99e529f93eb7765ee9368a4f=
 - Pre-slice checkpoint: =300aa25736bf0c4896c66afd197c4e40ee6edc4c=
 - Pure no-link build:
   =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
@@ -14,9 +15,11 @@ It remains =UNPUBLISHED AND UNPROMOTED=.
 - Quickshell: PID =675223=, =active/running=, =Result=success=,
   =NRestarts=0=
 
-Local =work/quickshell-slice4e1= contains the payload and this later, separate
-acceptance record.  Local and remote =main= remain at the pre-slice checkpoint.
-Push, promotion, and cleanup are separate gates.
+Local and remote =work/quickshell-slice4e1= contain the payload and separate
+acceptance record at the published head.  Local and remote =main= strictly
+fast-forwarded from the pre-slice checkpoint to that same head.  This later
+closeout changes documentation only; its push and promotion-worktree cleanup
+remain separate gates.
 
 * Contract And Change
 The payload changes exactly two files: five insertions and 52 deletions.
@@ -124,13 +127,18 @@ This slice does not:
 - change title ownership, normalization, close handling, or startup behavior;
 - perform fresh dual-output validation;
 - activate NixOS/Home Manager or restart Quickshell;
-- publish, promote, or clean Git refs;
+- delete evidence refs or begin Slice 4E2;
 - touch the unrelated intentional =config/hypr/hyprland.lua= edit, preserved
   at SHA-256
   =a9ea7c02e152220d8c080e2ca8009da6d29d03fa4fc0dd22ca52b1ddda45fb61=.
 
-* Next Gate
-Publish local =work/quickshell-slice4e1= without advancing =main=.  The branch
-contains the two-file payload and this later documentation commit; the unrelated
-Hyprland edit is in neither.  Slice 4E2 title work must not begin until Slice
-4E1 publication and promotion are separately accepted.
+* Final Repository State
+Local and remote =work/quickshell-slice4e1= and the promoted =main= aligned at
+published acceptance head =177a7fa= before this documentation-only closeout.
+The live checkout remained on the work branch with byte-identical accepted QML;
+no reload, restart, or activation accompanied promotion.
+
+The unrelated Hyprland edit remains outside Slice 4E1 history.  Publishing this
+closeout, attaching the live checkout to =main=, and removing the clean
+promotion worktree remain separate gates.  Fresh dual-output validation remains
+deferred.  Slice 4E2 title work has not begun.
