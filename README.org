@@ -50,11 +50,14 @@ status, CAVA, and minute-aligned clock ownership.  The final shared-clock
 evidence is in
 [[file:docs/handoffs/2026-07-26-quickshell-slice3e-acceptance.org][the Slice 3E
 acceptance handoff]].
-Event-driven status work is accepted through Slice 4C: native PipeWire
-volume/mute, UPower battery state, and Bluetooth adapter/connected-device state.
-The latest evidence is in
-[[file:docs/handoffs/2026-07-26-quickshell-slice4c-acceptance.org][the Slice 4C
-acceptance handoff]].  Slice 4D networking has not begun.
+Event-driven status work is accepted through Slice 4D: native PipeWire
+volume/mute, UPower battery state, Bluetooth adapter/connected-device state,
+and connected network device/type/Wi-Fi signal state.  The latest evidence is
+in
+[[file:docs/handoffs/2026-07-26-quickshell-slice4d-acceptance.org][the Slice 4D
+acceptance handoff]].  Slice 4D deliberately retains one traffic sampler and
+does not claim exact default-route selection, which Quickshell 0.3.0 does not
+expose.
 The preceding Slice 1H network-handoff correction remains recorded in
 [[file:docs/handoffs/2026-07-25-quickshell-slice1h-acceptance.org][the Slice 1H
 acceptance handoff]].  Its real Wi-Fi/Ethernet handoff remains deferred until
@@ -144,10 +147,12 @@ Work stays slice-based:
    reloads Quickshell colors without restarting the shell.
    Slices 3A-3E share workspace, active-title, status, CAVA, and minute-aligned
    clock state across both outputs.  Original Slice 3 is complete.
-   Slices 4A-4C replace volume/mute, battery, and Bluetooth polling with native
-   state.  Slice 4D is next: native networking device, default connection, and
-   Wi-Fi signal state.  Retain one shared traffic sampler unless the native
-   model exposes byte counters.
+   Slices 4A-4D replace volume/mute, battery, Bluetooth, and network
+   identity/signal polling with native state.  Slice 4D retains one shared
+   traffic sampler because the installed native model has no byte counters;
+   exact default-route selection and physical handoff remain deferred.
+   Slice 4E is next in the original roadmap: native Hyprland
+   workspace/toplevel/title state.
    Run the deferred real network-handoff check only after Ethernet provides a
    verified alternate route.  Keep old CAVA temp-file deletion, clipboard
    lifecycle, rendering, and frame-rate work separate.

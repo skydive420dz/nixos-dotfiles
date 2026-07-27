@@ -1,0 +1,171 @@
+#+title: Quickshell Slice 4D Native Networking Acceptance - 2026-07-26
+#+startup: overview
+
+* Outcome
+Slice 4D is =ACCEPTED AND LOCALLY PROMOTED= on the MSI.  It is not yet
+published.
+
+- Accepted payload:
+  =4b627a5a58044dda50320e54a12d3f01b8512030=
+- Pre-slice rollback and =origin/main=:
+  =08827fe431feb97934f29ed51f4822a687093a26=
+- Accepted payload tree:
+  =ab1905206282dcf1727d08743bf6221f7870442f=
+- Pure no-link build:
+  =/nix/store/bhl3mvx1id0mbydvvzvd82qcnjzibr21-nixos-system-nixos-26.11.20260718.61b7c44=
+
+The separated source, build, rollback-protected runtime, and local promotion
+gates passed.  The Home Manager-managed live link resolves to local =main=,
+whose accepted QML reloaded automatically.  No NixOS or Home Manager
+activation ran.
+
+* Contract And Change
+The payload changes only
+[[file:../../config/quickshell/modules/status/StatusController.qml][StatusController.qml]]:
+eight insertions and 45 deletions.
+
+It replaces the 15-second network identity and Wi-Fi signal poller with
+=Quickshell.Networking= state:
+
+- the first connected supported native device supplies its name and
+  Wi-Fi/Ethernet type;
+- the connected Wi-Fi network supplies =signalStrength=;
+- a native device-name change still enters the accepted Slice 1H
+  =setNetworkDevice= path.
+
+The old parser, timer, process, Bash command, two =nmcli= commands, and two
+=awk= commands are deleted.  One two-second traffic =Process= remains because
+the installed Quickshell 0.3.0 networking model does not expose RX/TX byte
+counters.
+
+The implementation deliberately means *first connected supported device*, not
+default route.  Quickshell 0.3.0 exposes connected devices and Wi-Fi signal but
+not an exact default-route selector.  Exact default-route selection therefore
+remains deferred rather than being approximated or hidden behind a new helper.
+
+No NetworkManager connection, route, or device was changed.  No view,
+geometry, icon, color, click action, package, dependency, or helper changed.
+
+* Verification
+** Source
+=git diff --check= and =scripts/check-quickshell= passed:
+
+- 34 QML files parsed, matched four-space formatting, and passed the strict
+  lint gate;
+- 18 Bash, 2 JSON, and 1 Python files passed;
+- Slice 4D adds only two line-local metadata workarounds for the installed
+  native enum type; two earlier Bluetooth suppressions remain unchanged;
+- three independent source reviews found no blocker.
+
+A disposable offscreen probe imported the exact controller and reported:
+
+#+begin_example
+fixture.native_device=wlp4s0
+fixture.native_kind=wifi
+fixture.native_signal=74
+fixture.result=pass
+#+end_example
+
+The probe also exercised the unchanged Slice 1H device revision, reset,
+stale-result rejection, and first-sample baseline contracts.  It was removed
+after the source gate.
+
+Accepted SHA-256 values:
+
+| File | SHA-256 |
+|------+---------|
+| =StatusController.qml= | =4e63c013ed7a92e1aeac75996e267e004ca09edf05bde3cee09094bdff65c4cf= |
+| =Network.qml= | =a3def7046ec157a3a04aa4e6d750aeb46b4abcfac59608c19c6fe259e61f48df= |
+| =NetworkGraph.qml= | =ac25effede8d74c3c9eeadd07e31354b98417b30c1a6b36c79b184f6574eaf96= |
+| =StatusCluster.qml= | =ab775f9cb745403db252bd8dee33252767ad09210172d35a2bbe9c674cee1355= |
+
+The three consumer files above are byte-identical to the rollback.  =flake.lock=
+also remained unchanged at SHA-256
+=794444f68c2495b667918f0fc57e227ca9d479089436fb49e15bd7f1d20a2bb7=.
+
+** Pure Build
+The documented no-link build passed at payload =4b627a5= and returned the
+store path recorded above.  It created no =result= link and performed no
+activation.
+
+That output equals current generation 863 because Quickshell is intentionally
+linked out of the Nix store.  The build proves Nix evaluation and closure
+integrity; the source and runtime gates validate the changed QML bytes.
+
+** Controlled Runtime
+Before the live gate, the exact raw managed link was:
+
+=/nix/store/1hafb8jz05y68vf8k0kvm49q296p4qic-home-manager-files/.config/quickshell=
+
+It resolved to pre-slice =main=.  Quickshell was PID =629705=, invocation
+=2ad79d0d650d49de88ad832cf3b0e60e=, with zero restarts.
+
+A ten-minute rollback timer protected a temporary atomic link to the candidate.
+The candidate ran as PID =672686=, invocation
+=0d983350c0e64fd2b3dc8583560f6cf8=:
+
+- =active/running=, =Result=success=, =ExecMainStatus=0=, and =NRestarts=0=;
+- one Quickshell instance and one clean =Configuration Loaded=;
+- zero warning-or-higher journal entries;
+- the expected =qs-bar= and =qs-wallpaper= layers on =eDP-1=;
+- a stable 20.344-second profile with =comparison_ready=true=.
+
+An 18-second cgroup command-line watcher had caught both the legacy identity
+poller and retained traffic sampler on the rollback.  Against the candidate it
+observed =quickshell-network-traffic wlp4s0= and no legacy network-identity
+Bash or =nmcli= command.
+
+The managed link was then restored and verified healthy as PID =675223=,
+invocation =44760a1700e5427d8289c7d9dcdd72dd=.  The timer and disposable runtime
+scripts were removed.
+
+Local =main= subsequently fast-forwarded from =08827fe= to =4b627a5=.  The
+unchanged managed link automatically logged one reload and one successful
+configuration load while retaining PID =675223=, the same invocation, zero
+restarts, one instance, and no warning-or-higher entry.  No manual restart or
+NixOS activation was needed for promotion.
+
+* Honest Impact And Boundaries
+The deleted 15-second path launched one Bash, two =nmcli=, and two =awk=
+processes per sample: 1,200 theoretical executions per hour.  The retained
+two-second traffic sampler launches one Bash and two =cat= processes per
+sample: 5,400 executions per hour.
+
+The source-derived steady status budget therefore falls from 6,600 to 5,400
+executions per hour, a reduction of 1,200 per hour or 18.2%.
+
+This is a process-churn and event-driven-state result.  It is not a measured
+CPU, memory, GPU, power, battery-life, latency, or aggregate Slice 4
+performance result.
+
+The following remain separate:
+
+- exact default-route selection;
+- real disconnect/reconnect and Wi-Fi/Ethernet handoff, because =wlp4s0= was
+  the sole IPv4/IPv6 default route and =eno1= had no carrier;
+- replacing the retained traffic sampler;
+- SSID state or active Wi-Fi scanning;
+- dead network rate/state cleanup assigned to Slice 8;
+- native Hyprland workspace/toplevel/title state;
+- dual-output validation, which this no-visual-change slice did not require;
+- publication, evidence-ref alignment, and worktree cleanup.
+
+* Current Repository State
+Local =work/quickshell-slice4d= remains at accepted payload =4b627a5=.  Local
+=main= contains that payload plus this documentation-only record.
+=origin/main= remains at rollback =08827fe=, and no remote Slice 4D branch has
+been published.
+
+The live managed link resolves to local =main= at the accepted controller hash.
+The Slice 4D worktree remains clean under
+=/tmp/nixos-dotfiles-quickshell-slice4d=.  The only unrelated dirty
+main-worktree path is the intentional =config/hypr/hyprland.lua= edit,
+preserved byte-for-byte at SHA-256
+=a9ea7c02e152220d8c080e2ca8009da6d29d03fa4fc0dd22ca52b1ddda45fb61=.
+
+Remaining gates are:
+
+1. publish the Slice 4D branch and =main= separately;
+2. remove the clean candidate worktree only after publication is accepted.
+
+Slice 4E is not started or authorized by this record.

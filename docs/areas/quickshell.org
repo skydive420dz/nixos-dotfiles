@@ -138,6 +138,20 @@ Bluetooth remain the three process pollers.  Exact evidence and claim
 boundaries are in the
 [[../handoffs/2026-07-26-quickshell-slice4b-acceptance.org][Slice 4B handoff]].
 
+Slice 4C is accepted, published, and promoted.  Native Bluetooth adapter and
+connected-device state replaced its 30-second shell poller without changing
+the status view or click action.  Exact evidence and claim boundaries are in
+the
+[[../handoffs/2026-07-26-quickshell-slice4c-acceptance.org][Slice 4C handoff]].
+
+Slice 4D replaces the 15-second network identity poller with native
+connected-device/type and Wi-Fi signal state.  The unchanged two-second
+traffic sampler is now the controller's only =Process=.  Selection means the
+first connected supported device, not an exact default route; physical handoff
+and traffic replacement remain separate.  Exact evidence and claim boundaries
+are in the
+[[../handoffs/2026-07-26-quickshell-slice4d-acceptance.org][Slice 4D handoff]].
+
 =main= remains the sober checkpoint shell.  The old modular shell lives on
 =prototype/quickshell-legacy= and the archived Quickshell branches.  Treat
 those branches as reference material only: port useful ideas back deliberately,
