@@ -66,8 +66,9 @@ and acceptance head =177a7fa= are published and promoted; exact evidence is in
 4E1 handoff]].  Slice 4E2 replaces the active-title query, parser, timer, and
 raw-event backend with native foreign-toplevel state while preserving the
 shared controller and visible title contract.  Its live-accepted payload
-=bbd7445= and current-main-aligned payload =a467e8b= are committed locally;
-publication and promotion remain the current gate.  Exact evidence is in
+=bbd7445=, current-main-aligned payload =a467e8b=, and acceptance head
+=27f525b= are published and promoted.  The Home Manager-managed live link
+resolves to promoted =main=.  Exact evidence is in
 [[file:docs/handoffs/2026-07-29-quickshell-slice4e2-acceptance.org][the Slice
 4E2 handoff]].  Fresh dual-output validation remains deferred.
 The preceding Slice 1H network-handoff correction remains recorded in
@@ -164,9 +165,9 @@ Work stays slice-based:
    traffic sampler because the installed native model has no byte counters;
    exact default-route selection and physical handoff remain deferred.
    Slice 4E1 native workspace occupancy is accepted, published, and promoted.
-   Slice 4E2 native title state is accepted from source through live runtime on
-   =eDP-1= and is awaiting publication and promotion.  Fresh dual-output
-   validation remains deferred; no later Quickshell slice is selected.
+   Slice 4E2 native title state is accepted, published, promoted, and live on
+   =eDP-1=.  Fresh dual-output validation remains deferred; no later Quickshell
+   slice is selected.
    Run the deferred real network-handoff check only after Ethernet provides a
    verified alternate route.  Keep old CAVA temp-file deletion, clipboard
    lifecycle, rendering, and frame-rate work separate.

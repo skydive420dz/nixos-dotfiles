@@ -2,13 +2,14 @@
 #+startup: overview
 
 * Outcome
-Slice 4E2 is =ACCEPTED SOURCE, BUILD, AND LIVE ON eDP-1=, =COMMITTED LOCALLY=,
-and =UNPUBLISHED AND UNPROMOTED=.
+Slice 4E2 is =ACCEPTED, PUBLISHED, AND PROMOTED=.
 
 - Live-accepted payload:
   =bbd7445b2be15ac5f915b63a66ace67975f70ff4=
 - Current-main-aligned payload:
   =a467e8b98d14651aa52493dc64130e1294b9a1b8=
+- Published acceptance head:
+  =27f525b2fef9192f065f43d24ebd2939e8631bf6=
 - Pre-slice checkpoint:
   =54cc9a65dc6ed8ad775e748993a3787d1e5acd2a=
 - Identical stable patch ID:
@@ -22,7 +23,9 @@ and =UNPUBLISHED AND UNPROMOTED=.
 
 The first payload is the exact source used for runtime and visual acceptance.
 The second applies the identical one-file patch directly above current =main=
-and passed the separate static and pure-build gates.
+at the pre-slice checkpoint and passed the separate static and pure-build
+gates.  Local and GitHub =main= strictly fast-forwarded through the aligned
+payload and acceptance record.
 
 * Contract And Change
 The payload changes only
@@ -115,12 +118,26 @@ This slice does not:
 - touch the unrelated MSI kernel, boot, audio, power, Razer, hardware, or
   Hyprland work in the live =main= checkout.
 
-* Promotion Gate
-Before promotion, publish the current-main-aligned branch without force, fetch
-remote =main= again, and require a strict fast-forward.  Preserve the unrelated
-dirty work byte-for-byte and keep the index clean.  After promoted =main=
-contains the accepted controller hash, restore the current Home Manager-managed
-Quickshell link and verify that the running service did not restart.
+* Publication And Promotion
+The aligned branch was published without force after a fresh fetch confirmed
+remote =main= at pre-slice checkpoint =54cc9a6=.  The live dirty =main=
+checkout then fast-forwarded strictly through acceptance head =27f525b= and
+was published normally.  Remote =main= and
+=work/quickshell-slice4e2-current= both resolved to the full acceptance head.
 
-Publication, promotion, managed-link restoration, and clean temporary-worktree
-removal remain pending.  No NixOS activation is authorized or required.
+All eight unrelated tracked modifications retained their exact pre-promotion
+SHA-256 values, the unrelated audit remained untracked with its exact hash, and
+the index remained clean.
+
+After promotion, =~/.config/quickshell= was restored to the generation-868
+Home Manager entry
+=/nix/store/1hafb8jz05y68vf8k0kvm49q296p4qic-home-manager-files/.config/quickshell=.
+It resolves through the store to promoted
+=/home/skydive420dz/Projects/nixos-dotfiles/config/quickshell= and the accepted
+controller hash.  Quickshell retained PID =2598=, its original start timestamp,
+=NRestarts=0=, and an empty warning-or-higher journal since startup.
+
+This documentation-only closeout does not rebuild or activate NixOS, restart
+Quickshell, perform dual-output validation, select another slice, or absorb the
+unrelated dirty work.  The two clean Slice 4E2 temporary worktrees are removed
+after publishing this closeout; both payload refs are retained.
