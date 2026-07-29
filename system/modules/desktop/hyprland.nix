@@ -9,6 +9,8 @@ in
     pkgs.hyprpolkitagent
   ];
 
+  programs.fuse.enable = true;
+
   programs.hyprland = {
     enable = true;
     package = hyprlandPkgs.hyprland;

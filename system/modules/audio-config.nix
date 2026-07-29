@@ -42,7 +42,10 @@
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
-    settings.General.Experimental = true; # Often required for modern BLE devices
+    settings.General = {
+      Experimental = true; # Often required for modern BLE devices
+      KernelExperimental = "6fbaf188-05e0-496a-9885-d6ddfdb4e03e"; # ISO socket
+    };
   };
 
   services.pipewire = {
