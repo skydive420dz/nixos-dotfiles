@@ -9,12 +9,12 @@ state.  Audits are dated evidence, not implementation authority.
 Documentation does not turn a build into activation and does not authorize
 commits, pushes, service changes, or branch deletion.
 
-* Status At A Glance - 2026-07-26
+* Status At A Glance - 2026-07-29
 | Surface | Confirmed current state | Next accepted step |
 |---------+-------------------------+--------------------|
-| System | Current system profile is generation 863; the GC timer introduced and accepted in generation 861 remains active; the clean one-shot optimizer run is accepted; O3-A defers recurrence for a roughly 30-day observation; no optimizer timer is armed | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
-| Emacs | Clean Emacs remains active under generation 863 with the same accepted Home Manager root; Lua and Nix =lsp-mode=/Company slices are accepted; the accepted QML policy uses verified four-space formatting in classic and parser-backed modes | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | Cleanup through Slice 1I, Slice 0C profiling, Slice 2 lifecycle, shared ownership Slices 3A-3E, native status Slices 4A-4D, and Slice 4E1 native workspace occupancy are accepted, published, promoted, and live.  Slice 4E1 passed on =eDP-1= at payload =f0ef9a1= | Fresh dual-output validation remains deferred; Slice 4E2 native title state is the next roadmap candidate but has not begun |
+| System | Current system profile is generation 868; the GC timer introduced and accepted in generation 861 remains active; the clean one-shot optimizer run is accepted; O3-A defers recurrence for a roughly 30-day observation; no optimizer timer is armed | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
+| Emacs | Clean Emacs remains active under the current system profile with the same accepted Home Manager root; Lua and Nix =lsp-mode=/Company slices are accepted; the accepted QML policy uses verified four-space formatting in classic and parser-backed modes | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
+| Quickshell | Cleanup through Slice 1I, Slice 0C profiling, Slice 2 lifecycle, shared ownership Slices 3A-3E, native status Slices 4A-4D, and Slice 4E1 native workspace occupancy are accepted, published, and promoted.  Slice 4E2 native title state passed source, pure-build, automated runtime, and visual gates on =eDP-1=; aligned payload =a467e8b= is committed locally | Publish and strictly fast-forward Slice 4E2 without NixOS activation; fresh dual-output validation remains deferred and no later slice is selected |
 | Vial/QMK | MSI udev ownership is active; Corne v4 =4653:0004= has user ACLs, Vial discovers it, and QMK CLI intentionally remains system-wide | Keep firmware writes and flashing separate and explicitly authorized |
 | VS Code | The MSI Home Manager profile owns VS Code settings/extensions and Codex tooling; window state is preserved between launches, and =nix-ld= supports Remote SSH | Refine from measured Linux use; adapt remaining macOS choices without Darwin-specific pins |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -87,8 +87,15 @@ The accepted, published, and promoted native networking source is in
 [[file:handoffs/2026-07-26-quickshell-slice4d-acceptance.org][Slice 4D]].
 The accepted, published, and promoted native workspace-occupancy source is in
 [[file:handoffs/2026-07-26-quickshell-slice4e1-acceptance.org][Slice 4E1]].
+The accepted native active-title source and its pending publication gate are in
+[[file:handoffs/2026-07-29-quickshell-slice4e2-acceptance.org][Slice 4E2]].
 
 * Current Work Lanes
+- =work/quickshell-slice4e2= retains the live-accepted payload =bbd7445=.
+  =work/quickshell-slice4e2-current= carries byte-equivalent payload commit
+  =a467e8b=, the direct child of current =main= =54cc9a6=.  Both are local-only;
+  publication, strict fast-forward promotion, managed-link restoration, and
+  clean temporary-worktree removal remain the current gate.
 - Local and remote =work/quickshell-slice4e1= are retained at accepted head
   =177a7fa=.  Local and remote =main= strictly fast-forwarded to the same head;
   this later closeout changes documentation only.  The unrelated Hyprland edit
@@ -148,6 +155,7 @@ The accepted, published, and promoted native workspace-occupancy source is in
 - [[file:projects/clipboard-launcher.org][Completed clipboard and launcher work]]
 
 * Evidence And History
+- [[file:handoffs/2026-07-29-quickshell-slice4e2-acceptance.org][2026-07-29 Quickshell Slice 4E2 native active-title acceptance]]
 - [[file:handoffs/2026-07-26-quickshell-slice4e1-acceptance.org][2026-07-26 Quickshell Slice 4E1 workspace occupancy acceptance and promotion]]
 - [[file:handoffs/2026-07-26-quickshell-slice4d-acceptance.org][2026-07-26 Quickshell Slice 4D acceptance and promotion]]
 - [[file:handoffs/2026-07-26-quickshell-slice4c-acceptance.org][2026-07-26 Quickshell Slice 4C acceptance and promotion]]

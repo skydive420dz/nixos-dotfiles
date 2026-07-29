@@ -1,0 +1,126 @@
+#+title: Quickshell Slice 4E2 Native Active Title Acceptance - 2026-07-29
+#+startup: overview
+
+* Outcome
+Slice 4E2 is =ACCEPTED SOURCE, BUILD, AND LIVE ON eDP-1=, =COMMITTED LOCALLY=,
+and =UNPUBLISHED AND UNPROMOTED=.
+
+- Live-accepted payload:
+  =bbd7445b2be15ac5f915b63a66ace67975f70ff4=
+- Current-main-aligned payload:
+  =a467e8b98d14651aa52493dc64130e1294b9a1b8=
+- Pre-slice checkpoint:
+  =54cc9a65dc6ed8ad775e748993a3787d1e5acd2a=
+- Identical stable patch ID:
+  =6ef227217c892294761ff1cb452a30e5eb6f62c7=
+- Pure no-link build:
+  =/nix/store/5ffli653rrwylwjq8r8ds6vxiw9mj19r-nixos-system-nixos-26.11.20260718.61b7c44=
+- Live system: generation 868 at
+  =/nix/store/wghc918ah5jhbbzplcfkbi5qmqr3wixl-nixos-system-nixos-26.11.20260718.61b7c44=
+- Accepted Quickshell service state: PID =2598=, =active/running=,
+  =Result=success=, =NRestarts=0=
+
+The first payload is the exact source used for runtime and visual acceptance.
+The second applies the identical one-file patch directly above current =main=
+and passed the separate static and pure-build gates.
+
+* Contract And Change
+The payload changes only
+[[file:../../config/quickshell/modules/window/WindowTitleController.qml][WindowTitleController.qml]]:
+three insertions and 79 deletions.
+
+The shared controller now reads:
+
+#+begin_src qml
+readonly property string activeClass: ToplevelManager.activeToplevel?.appId ?? ""
+readonly property string activeTitle: ToplevelManager.activeToplevel?.title ?? ""
+#+end_src
+
+This deletes the =hyprctl activewindow -j= process, split parser, JSON parsing,
+refresh timer, revision state, and raw Hyprland event handling.  The existing
+root controller, per-output views, Desktop fallback, Firefox suffix removal,
+Ghostty-to-Terminal label, Vesktop/Discord label, layout, and styling remain
+unchanged.
+
+Accepted controller SHA-256:
+=05c5898768ec571e65973543883a03d83bc200de3515920cc3f8070ab076c6cc=.
+
+=flake.lock= remained unchanged at
+=794444f68c2495b667918f0fc57e227ca9d479089436fb49e15bd7f1d20a2bb7=.
+
+* Verification
+** Source
+=scripts/check-quickshell= and =git diff --check= passed:
+
+- 34 QML files parsed, matched four-space formatting, and passed strict lint;
+- 18 Bash, 2 JSON, and 1 Python file passed;
+- before this acceptance record, aligned payload =a467e8b= was exactly one
+  commit and one path above pre-slice =main= =54cc9a6=;
+- the live and aligned commits have the same stable patch ID and controller
+  hash.
+
+An isolated observer showed =ToplevelManager.activeToplevel= hydrating the
+already-focused Brave class and title within 250 ms.  The installed
+Quickshell 0.3.0 =Hyprland.activeToplevel= remained empty through two seconds
+until a later focus event, so it is not used for cold-start title state.
+Hyprland publishes the same window class and title as foreign-toplevel =appId=
+and =title= and as =hyprctl='s class and title fields.
+
+** Pure Build
+The aligned payload passed:
+
+#+begin_src sh
+nix build --print-out-paths \
+  '.#nixosConfigurations.nixos.config.system.build.toplevel' \
+  --no-link --no-write-lock-file
+#+end_src
+
+It returned the candidate store path above, created no =result= link, changed
+no lock file, and performed no switch or NixOS/Home Manager activation.  The
+candidate build and live system generation are deliberately recorded
+separately.
+
+** Live Runtime
+An isolated source-live gate passed:
+
+- startup hydration with an already-focused Brave window;
+- focus transitions between disposable A and B windows;
+- the title =Slice4E2-A,comma= without parser damage;
+- closing background B retained A;
+- closing focused A selected B2;
+- closing the final disposable window showed Desktop;
+- real XWayland kitty reported =Slice4E2-X=;
+- the existing Ghostty window normalized to Terminal.
+
+The automated gate restored the original workspaces, clients, and focus and
+removed every disposable window and probe.  The user then visually accepted
+background close, focused close without a visible Desktop flash, and final
+Desktop behavior.  The restored baseline had Brave on workspace 2, Ghostty on
+workspace 1, and Emacs on workspace 3.
+
+Only =eDP-1= was connected.  Fresh dual-output validation remains deferred.
+
+* Honest Impact And Boundaries
+The old path was event-driven rather than a quiet periodic poller.  This
+payload removes one external helper at startup and one after each settled,
+coalesced close burst.  It makes no hourly, CPU, memory, GPU, power, latency,
+or battery-life claim.
+
+This slice does not:
+
+- change window-title presentation, normalization, layout, or styling;
+- change workspace ownership or begin another Quickshell slice;
+- perform fresh dual-output validation;
+- activate NixOS/Home Manager or restart Quickshell;
+- touch the unrelated MSI kernel, boot, audio, power, Razer, hardware, or
+  Hyprland work in the live =main= checkout.
+
+* Promotion Gate
+Before promotion, publish the current-main-aligned branch without force, fetch
+remote =main= again, and require a strict fast-forward.  Preserve the unrelated
+dirty work byte-for-byte and keep the index clean.  After promoted =main=
+contains the accepted controller hash, restore the current Home Manager-managed
+Quickshell link and verify that the running service did not restart.
+
+Publication, promotion, managed-link restoration, and clean temporary-worktree
+removal remain pending.  No NixOS activation is authorized or required.
