@@ -103,7 +103,7 @@ hl.config({
 		shadow = {
 			enabled = false,
 			range = 1,
-			render_power = 6,
+			render_power = 4,
 			color = colors.shadow,
 			color_inactive = colors.shadow,
 		},
@@ -142,7 +142,7 @@ hl.config({
 	},
 
 	cursor = {
-		inactive_timeout = 30,
+		inactive_timeout = 20,
 		no_hardware_cursors = true,
 	},
 })
