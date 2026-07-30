@@ -20,7 +20,7 @@ QtObject {
     readonly property string wallpaperHelper: Quickshell.shellPath("modules/wallpaper/wallpaper-io")
 
     property bool selectorOpen: false
-    property string currentPath: wallpaperDir + "/wallpaper-003.gif"
+    property string currentPath: ""
     property var wallpapers: []
 
     function basename(path) {
@@ -47,6 +47,8 @@ QtObject {
     }
 
     function mediaKind(path) {
+        if (!path)
+            return "";
         if (isVideo(path))
             return "video";
         return isAnimated(path) ? "animated" : "image";
