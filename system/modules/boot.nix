@@ -1,9 +1,9 @@
 # ============================================
 # BOOT CONFIGURATION — NixOS
 # ============================================
-# Silent boot with Plymouth splash (Sky theme).
+# Quiet native boot retaining the firmware framebuffer until Hyprland.
 # TTY1 auto-logs in as skydive420dz with no visible prompt or getty text.
-# Plymouth is held until Hyprland is ready via fbcon reservation.
+# Diagnostics remain in the journal while fbcon keeps TTY1 visually untouched.
 
 {
   config,
@@ -12,9 +12,6 @@
   ...
 }:
 
-let
-  skyPlymouth = import ../../theme/plymouth.nix { inherit pkgs; };
-in
 {
   environment.systemPackages = with pkgs; [
     sbctl
@@ -28,15 +25,6 @@ in
       systemd.enable = true;
     };
 
-    # ── Plymouth splash screen ──────────────────────────────────────────────
-    plymouth = {
-      enable = true;
-      theme = "sky";
-      themePackages = [
-        skyPlymouth
-      ];
-    };
-
     # ── Bootloader ──────────────────────────────────────────────────────────
     loader = {
       timeout = 0;
@@ -45,7 +33,7 @@ in
         # systemd-boot based flow under Secure Boot.
         enable = lib.mkForce false;
         graceful = true;
-        consoleMode = "max"; # match Plymouth resolution to avoid flicker
+        consoleMode = "max"; # avoid a firmware-framebuffer mode switch
         editor = false; # disable boot entry editing (security)
       };
       efi.canTouchEfiVariables = true;
@@ -61,18 +49,15 @@ in
     kernelParams = [
       "video=efifb:1920x1080"
       "quiet"
-      "splash"
-      "loglevel=0"
       "acpi_enforce_resources=lax"
-      "acpi.log_level=0"
-      "rd.udev.log_level=2"
+      "rd.udev.log_level=info"
       "rd.systemd.show_status=false"
-      "udev.log_priority=2"
+      "udev.log_priority=info"
       "systemd.show_status=false"
       "vt.global_cursor_default=0"
       "console=tty0"
-      "printk.devkmsg=off"
-      "fbcon=vc:2-6" # reserves framebuffer consoles so Plymouth holds until Hyprland
+      "printk.devkmsg=on"
+      "fbcon=vc:2-6" # keep TTY1 on the firmware framebuffer until Hyprland
       "fbcon=nodefer"
     ];
   };
@@ -89,16 +74,6 @@ in
     serviceConfig.ExecStart = [
       "" # clear default
       "@${pkgs.util-linux}/sbin/agetty agetty --login-program ${config.services.getty.loginProgram} --autologin skydive420dz --skip-login --nonewline --noissue --noclear %I $TERM"
-    ];
-  };
-
-  # ── Plymouth quit ───────────────────────────────────────────────────────
-  # Retain splash until the desktop is ready; || true prevents service
-  # failure if Plymouth has already exited.
-  systemd.services.plymouth-quit = {
-    serviceConfig.ExecStart = [
-      ""
-      "${pkgs.bash}/bin/bash -c '${pkgs.plymouth}/bin/plymouth quit --retain-splash || true'"
     ];
   };
 }
