@@ -22,15 +22,25 @@ build, activation, runtime, and hand-test results kept distinct.
 - =scripts/theme-select= and =theme/styles.json= own global theme state;
   Quickshell is a consumer, not the palette authority.
 - Clean Emacs is the active personal Emacs configuration.  Doom is retired.
-- NVF remains the package, plugin, and LSP owner for Neovim; live Sky behavior
-  stays under =config/nvim/=.
+- NVF now lives in the standalone =neovim-nvf= repository and is not part of
+  the MSI system closure; editor/client workflows default to Emacs.
 - Ollama is retired from the intended system configuration.
-- Vial and QMK are accepted MSI capabilities.  The QMK udev integration is
-  active, Vial discovers the Corne v4, and the QMK CLI intentionally remains
-  system-wide.
+- QMK udev support remains active for the Corne v4; the Vial and QMK
+  applications are no longer carried in the daily MSI closure.
 - VS Code is configured on the MSI through Home Manager with declarative
   settings and extensions adapted for Linux, project-window restoration, Codex
   tooling, and =nix-ld= support for Remote SSH.
+
+** July 29--August 2 MSI checkpoint
+- Audited boot warnings without suppressing them, fixed their local causes,
+  retained firmware-splash diagnostics, and pruned Linux 7.1.5 for MSI hardware.
+  Boot, suspend/resume, battery/AC transitions, and the full flake update passed.
+- Accepted Quickshell's native active-title path, removed the startup wallpaper
+  flash and VS Code autostart, and retained Kitty terminfo for reliable SSH.
+- Enabled =x86-64-v3=/=znver3= userspace and kernel ThinLTO, then removed unused
+  Firefox, in-tree NVF, Kitty/WezTerm, Vial/QMK applications, Razer tooling, and
+  redundant media/development roots.  Follow-up auditing now keeps package
+  features, CPU targeting, and build placement as separate decisions.
 
 The accepted baseline is recorded in
 [[file:docs/handoffs/2026-07-18-main-checkpoint.org][the main checkpoint handoff]];
@@ -108,7 +118,7 @@ least two actual scheduled GC runs; no optimizer timer is armed.
 | Desktop shell | Quickshell | =config/quickshell/= |
 | Global theme | selector scripts and registry | =scripts/theme-select*=, =theme/= |
 | Emacs | clean live config plus Nix tools | =config/emacs/=, =home/modules/programs/emacs.nix= |
-| Neovim | NVF plus live Sky Lua | =system/modules/programs/nvim/=, =config/nvim/= |
+| Neovim | optional standalone NVF flake | external =neovim-nvf= repository |
 
 Several high-churn configs are intentional out-of-store links into this
 checkout.  Editing them can change the running applications without changing a
