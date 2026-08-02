@@ -117,7 +117,6 @@ let
     basedpyright
     pipenv
     black
-    isort
     ruff
     python3Packages.pyflakes
     python3Packages.pytest

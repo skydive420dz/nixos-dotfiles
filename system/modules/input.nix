@@ -1,3 +1,5 @@
+{ pkgs, ... }:
+
 {
   services.libinput.enable = true;
 
@@ -49,4 +51,9 @@
       '';
     };
   };
+
+  services.ratbagd.enable = true;
+  services.input-remapper.enable = true;
+
+  environment.systemPackages = [ pkgs.piper ];
 }

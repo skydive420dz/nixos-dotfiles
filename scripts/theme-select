@@ -22,7 +22,6 @@ done
 
 write_all_outputs() {
   write_quickshell_theme
-  write_kitty_theme
   write_ghostty_theme
   write_btop_theme
   write_bat_theme

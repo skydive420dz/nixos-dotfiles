@@ -58,28 +58,6 @@
         in
         prev.electron_43.override { electron-unwrapped = unwrapped; };
 
-      frei0r = prev.frei0r.overrideAttrs (old: {
-        patches = (old.patches or [ ]) ++ [
-          (prev.fetchpatch {
-            url = "https://github.com/dyne/frei0r/commit/3713d779b46e04fb88d914a58287d8e717a70559.patch";
-            hash = "sha256-Z71ETxwvOrg4cqGTvv5H8ed1jVjr5Vq7f7lVrAheaNY=";
-          })
-        ];
-      });
-
-      openvino = prev.openvino.overrideAttrs (
-        old:
-        let
-          oldEnv = old.env or { };
-        in
-        {
-          # Keep quantization rounding stable under x86-64-v3.
-          env = oldEnv // {
-            NIX_CFLAGS_COMPILE = "${oldEnv.NIX_CFLAGS_COMPILE or ""} -ffp-contract=off";
-          };
-        }
-      );
-
       pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
         (_pythonFinal: pythonPrev: {
           afdko = pythonPrev.afdko.overrideAttrs (
@@ -89,30 +67,6 @@
             in
             {
               # Keep overlap-removal geometry reproducible under x86-64-v3.
-              env = oldEnv // {
-                NIX_CFLAGS_COMPILE = "${oldEnv.NIX_CFLAGS_COMPILE or ""} -ffp-contract=off";
-              };
-            }
-          );
-
-          scipy = pythonPrev.scipy.overrideAttrs (
-            old:
-            let
-              oldEnv = old.env or { };
-            in
-            {
-              # Backport SciPy's FMA-sensitive signal-test correction.
-              patches = (old.patches or [ ]) ++ [
-                (prev.fetchpatch {
-                  url = "https://github.com/scipy/scipy/commit/5cd79b026a26e1d0cd0812d394f7dec4606f7900.patch";
-                  hash = "sha256-RzMVdLdqcHCrGTPRH6C4qW3eORCyVQNDhGSxwjg55cg=";
-                })
-              ];
-
-              # The upstream patch makes Nixpkgs' existing suppression unnecessary.
-              disabledTests = builtins.filter (test: test != "test_nyquist") (old.disabledTests or [ ]);
-
-              # Retain x86-64-v3 while avoiding solver instability from FMA contraction.
               env = oldEnv // {
                 NIX_CFLAGS_COMPILE = "${oldEnv.NIX_CFLAGS_COMPILE or ""} -ffp-contract=off";
               };

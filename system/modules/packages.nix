@@ -11,6 +11,7 @@
       evtest
       wev
       tmux
+      kitty.terminfo
       vim
       lshw
       wget
@@ -33,12 +34,8 @@
       fastfetch
       nitch
 
-      ffmpeg-full
       (mpv.override { youtubeSupport = false; })
       cava
-
-      vial
-      qmk
 
       bluez
       bluez-tools

@@ -26,7 +26,6 @@ let
     ".config/ghostty/shaders" = "config/ghostty/shaders";
     ".config/quickshell" = "config/quickshell";
     ".config/scripts" = "scripts";
-    ".config/wezterm" = "config/wezterm";
   };
 
   liveFiles = {

@@ -139,7 +139,7 @@ write_qt_config() {
   local active_colors="$window, $window_text, $base, $alternate, $tooltip_base, $tooltip_text, $text, $button, $button_text, $bright_text, $alternate, $button, $(hex '.[$style].semantic.border'), $(hex '.[$style].semantic.border'), $(hex '.[$style].palette.base0'), $highlight, $highlighted_text, $link, $visited_link, $window, $disabled_text"
   local disabled_colors="$window, $disabled_text, $base, $alternate, $tooltip_base, $tooltip_text, $disabled_text, $button, $disabled_text, $bright_text, $alternate, $button, $(hex '.[$style].semantic.border'), $(hex '.[$style].semantic.border'), $(hex '.[$style].palette.base0'), $highlight, $highlighted_text, $link, $visited_link, $window, $disabled_text"
 
-  for toolkit in qt5ct qt6ct; do
+  local toolkit=qt6ct
     mkdir -p "$config_home/$toolkit/colors" "$config_home/$toolkit/qss"
 
     prepare_target "$config_home/$toolkit/colors/Sky.conf"
@@ -204,7 +204,6 @@ wheel_scroll_lines=3
 [SettingsWindow]
 geometry=@ByteArray()
 EOF
-  done
 }
 
 write_kdeglobals() {

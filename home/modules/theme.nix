@@ -3,7 +3,6 @@
 {
   home.packages = with pkgs; [
     papirus-icon-theme
-    libsForQt5.qt5ct
     kdePackages.qt6ct
   ];
 
