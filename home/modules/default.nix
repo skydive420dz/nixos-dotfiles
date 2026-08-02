@@ -7,7 +7,6 @@
     ./services/removable-media.nix
     ./programs/emacs.nix
     ./programs/brave.nix
-    ./programs/firefox.nix
     ./programs/fastfetch.nix
     ./programs/fzf.nix
     ./programs/gnupg.nix
