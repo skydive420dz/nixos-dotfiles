@@ -5,7 +5,8 @@
   nfu = "nix flake update --flake ${repoPath}";
   nrb = "sudo nixos-rebuild boot --flake ${repoPath}#nixos";
   nrs = "sudo nixos-rebuild switch --flake ${repoPath}#nixos";
-  vim = "nvim";
+  vim = "uwsm app -- emacsclient --create-frame --alternate-editor=emacs";
+  nvim = "uwsm app -- emacsclient --create-frame --alternate-editor=emacs";
   ls = "ls --color=auto";
   ll = "ls -la --color=auto";
   cat = "bat";

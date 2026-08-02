@@ -10,7 +10,6 @@
     ./packages.nix
     ./programs/brave.nix
     ./programs/bat.nix
-    ./programs/nvim
     ./services/removable-media.nix
     ./desktop/hyprland.nix
     ./audio-config.nix

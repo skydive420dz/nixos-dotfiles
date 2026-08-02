@@ -89,7 +89,8 @@ in
       "alt+e" = "open_url_with_hints";
       "alt+y" = "kitten hints --type word --program @";
       "alt+p" = "kitten hints --type path --program @";
-      "alt+n" = "kitten hints --type path --program nvim";
+      "alt+n" =
+        "kitten hints --type path --program \"emacsclient --create-frame --alternate-editor=emacs\"";
       "alt+c" = "copy_to_clipboard";
       "alt+v" = "paste_from_clipboard";
       "ctrl+c" = "copy_or_interrupt";

@@ -50,9 +50,9 @@ in
 
       opener.edit = [
         {
-          run = ''nvim "$@"'';
+          run = ''emacsclient --tty --alternate-editor=emacs "$@"'';
           block = true;
-          desc = "Open in Neovim";
+          desc = "Open in Emacs";
         }
       ];
     };

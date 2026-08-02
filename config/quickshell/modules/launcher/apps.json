@@ -16,14 +16,5 @@
     "exec": "ghostty --gtk-single-instance=false --class=wiremix --title=wiremix -e wiremix",
     "terminal": false,
     "desktop": "sky-custom-wiremix"
-  },
-  {
-    "name": "Neovim",
-    "generic": "Text editor",
-    "comment": "Open Neovim in Ghostty",
-    "icon": "nvim",
-    "exec": "nvim",
-    "terminal": true,
-    "desktop": "sky-custom-neovim"
   }
 ]

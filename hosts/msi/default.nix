@@ -38,24 +38,6 @@
         ];
       });
 
-      deno = prev.deno.override {
-        librusty_v8 = prev.deno.passthru.librusty_v8.overrideAttrs (old: {
-          patches = (old.patches or [ ]) ++ [
-            (prev.writeText "rusty-v8-bmi2-header.patch" ''
-              --- a/third_party/abseil-cpp/absl/container/internal/raw_hash_set.h
-              +++ b/third_party/abseil-cpp/absl/container/internal/raw_hash_set.h
-              @@ -228,3 +228,3 @@
-              -#ifdef __BMI2__
-              -#include <bmi2intrin.h>
-              -#endif  // __BMI2__
-              +#if defined(__i386__) || defined(__x86_64__)
-              +#include <immintrin.h>
-              +#endif
-            '')
-          ];
-        });
-      };
-
       electron_43 =
         let
           unwrapped = prev.electron_43.unwrapped.overrideAttrs (old: {

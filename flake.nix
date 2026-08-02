@@ -24,8 +24,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nvf.url = "github:notashelf/nvf";
-
     nix-vscode-extensions = {
       url = "github:nix-community/nix-vscode-extensions";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -41,7 +39,6 @@
     {
       nixpkgs,
       home-manager,
-      nvf,
       lanzaboote,
       ...
     }@inputs:
@@ -73,7 +70,6 @@
           inherit system specialArgs;
 
           modules = [
-            nvf.nixosModules.default
             lanzaboote.nixosModules.lanzaboote
             home-manager.nixosModules.home-manager
             {

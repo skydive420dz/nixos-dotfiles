@@ -220,7 +220,6 @@ config.leader = {
 
 config.launch_menu = {
   { label = "Shell", args = { os.getenv("SHELL") or "zsh" } },
-  { label = "Neovim", args = { "nvim" } },
   { label = "Yazi", args = { "yazi" } },
   { label = "Emacs terminal client", args = { "emacsclient", "-nw" } },
 }

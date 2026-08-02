@@ -68,12 +68,12 @@
             "$tmux_bin" select-window -t "$target:files"
             ;;
           qs)
-            "$tmux_bin" new-session -d -s "$target" -c "$dir" -n vim 'nvim config/quickshell/shell.qml'
+            "$tmux_bin" new-session -d -s "$target" -c "$dir" -n emacs 'emacsclient --tty --alternate-editor=emacs config/quickshell/shell.qml'
             "$tmux_bin" new-window -t "$target:" -c "$dir" -n term
-            "$tmux_bin" select-window -t "$target:vim"
+            "$tmux_bin" select-window -t "$target:emacs"
             ;;
           notes)
-            "$tmux_bin" new-session -d -s "$target" -c "$dir" -n notes 'nvim README.org'
+            "$tmux_bin" new-session -d -s "$target" -c "$dir" -n notes 'emacsclient --tty --alternate-editor=emacs README.org'
             ;;
           *)
             "$tmux_bin" new-session -d -s "$target" -c "$dir" -n "$target"

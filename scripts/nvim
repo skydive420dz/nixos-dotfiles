@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+exec uwsm app -- emacsclient --create-frame --alternate-editor=emacs "$@"

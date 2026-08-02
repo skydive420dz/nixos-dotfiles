@@ -5,7 +5,8 @@
     let
       wlctl = pkgs.callPackage ../../pkgs/wlctl-bin.nix { };
     in
-    with pkgs; [
+    with pkgs;
+    [
       libinput
       evtest
       wev
@@ -33,7 +34,7 @@
       nitch
 
       ffmpeg-full
-      mpv
+      (mpv.override { youtubeSupport = false; })
       cava
 
       vial
