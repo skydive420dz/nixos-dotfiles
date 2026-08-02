@@ -878,10 +878,24 @@ let
       (_: lib.mkForce lib.kernel.no);
 
   msiKernel = pkgs.linux_latest.override {
+    stdenv = pkgs.overrideCC pkgs.llvmPackages.stdenv (
+      pkgs.llvmPackages.stdenv.cc.override {
+        inherit (pkgs.llvmPackages) bintools;
+      }
+    );
+
+    # Kbuild uses unwrapped Clang, so carry the host target explicitly.
+    extraMakeFlags = [
+      "KCFLAGS=-march=x86-64-v3$(space)-mtune=znver3"
+    ];
+
     # Parent cuts leave generic child options unused; verify requested symbols after updates.
     ignoreConfigErrors = true;
     structuredExtraConfig =
       (with lib.kernel; {
+        LTO_CLANG_THIN = lib.mkForce yes;
+        RUST = lib.mkForce no;
+        DRM_PANIC_SCREEN_QR_CODE = lib.mkForce no;
         NR_CPUS = lib.mkForce (freeform "12");
 
         DRM_I915 = lib.mkForce no;
