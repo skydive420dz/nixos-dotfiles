@@ -2,7 +2,9 @@
 :PROPERTIES:
 :CUSTOM_ID: neovim-keymaps
 :END:
-This is the user-facing keymap reference for the NixOS NVF Neovim profile.
+HISTORICAL: this is the user-facing keymap reference for the former in-tree
+NixOS NVF profile.  Current NVF configuration and keymap ownership live in the
+standalone =neovim-nvf= repository; this table remains as migration history.
 
 =<leader>= is =<Space>=.
 

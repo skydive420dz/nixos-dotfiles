@@ -32,11 +32,10 @@ The Sky theme selector is system-wide state. Quickshell exposes a button for it,
 - =scripts/theme-select.d/generators/=: per-output-family runtime generators.
 - =theme/tokens.nix=: Nix-side fallback/default tokens plus semantic aliases for rebuild-time consumers.
 - =theme/lib.nix=: shared Nix helper for deriving Sky semantic palette aliases from any style in =theme/styles.json=.
-- =theme/plymouth.nix=: rebuild-time Sky Plymouth theme package.
 - =config/quickshell/common/Theme.qml=: runtime reader for Quickshell tokens.
 - =config/emacs/lisp/sk-theme.el=: active clean Emacs =sky-night= face definitions and runtime-token loader.
-- =config/nvim/colors/sky.lua=: live Neovim colorscheme entrypoint.
-- =config/nvim/lua/sky/theme.lua=: live Neovim Sky highlight definitions.
+- The standalone =neovim-nvf= repository owns the Neovim colorscheme and
+  consumes the generated =nvim.lua= tokens.
 - Home Manager modules install packages, link scripts, and set fallback session variables. They should not become per-project or per-machine theme patches.
 
 ** Generated Files
@@ -95,7 +94,8 @@ These can change without =nrs=, usually after =theme-select toggle= or =theme-se
 - btop and bat use their generated themes on the next launch or refresh.
 - Yazi reads =~/.config/yazi/theme.toml=, which points at the active generated =yazi.toml=; existing Yazi sessions need restart.
 - aerc loads the generated styleset first through =stylesets-dirs=. Existing sessions need =:reload-config=; new sessions pick it up on launch.
-- Neovim prepends =~/.config/sky-nvim= to runtimepath and loads the live =sky= colorscheme. After changing the global style, restart Neovim or run =:colorscheme sky=/=:SkyThemeReload=.
+- Standalone =neovim-nvf= consumes the generated =nvim.lua= tokens when that
+  external profile is used; MSI does not install or link the profile.
 - GTK and Qt apps get generated settings/palettes. Existing GUI apps usually need restart; new processes should pick up the active style.
 - Clean Emacs uses the local =sky-night= theme in
   =config/emacs/lisp/sk-theme.el=, loads the generated =emacs-theme.el= tokens
@@ -112,9 +112,9 @@ These are still owned by Nix/Home Manager and need =nrs= or a rebuild when the d
 - Package installation for theme tools, fonts, icons, GTK/Qt helpers, and apps.
 - Ghostty package installation and static terminal behavior are installed by Home Manager; live colors are generated at runtime.
 - Home Manager service definitions and fallback session variables.
-- Plymouth uses =theme/plymouth.nix=; changes require =nrs= and a reboot to observe.
 - Any module still consuming =theme/tokens.nix= directly as a static fallback.
-- NVF plugin, package, LSP, and mapping changes still require =nrs=. The live Sky colorscheme under =config/nvim/= does not.
+- NVF package, plugin, LSP, mapping, and colorscheme ownership belongs to the
+  external =neovim-nvf= repository, not this MSI rebuild.
 
 ** Coverage Audit 2026-05-30
 :PROPERTIES:

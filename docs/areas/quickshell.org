@@ -173,6 +173,13 @@ deferred.  Exact evidence and boundaries are in the
 [[../handoffs/2026-07-29-quickshell-slice4e2-acceptance.org][Slice 4E2
 handoff]].
 
+On 2026-08-02, the startup wallpaper correction at =6de53d3= was accepted on
+the current MSI activation.  =WallpaperStore= now starts with an empty media
+path and lets persisted state choose the first wallpaper; the source checker,
+separate pure no-link build, controlled runtime probe, and user visual check
+all passed, with no wrong GIF observed.  This changes no package, dependency,
+service, or wallpaper-selection ownership.
+
 =main= remains the sober checkpoint shell.  The old modular shell lives on
 =prototype/quickshell-legacy= and the archived Quickshell branches.  Treat
 those branches as reference material only: port useful ideas back deliberately,

@@ -29,7 +29,20 @@
 - keyd is disabled. Keep it disabled while Kanata owns keyboards.
 - Keep app-native navigation simple until a real layer system is worth the setup cost.
 
-** Vial And QMK - Accepted
+** Current Vial And QMK Policy
+:PROPERTIES:
+:CUSTOM_ID: current-vial-and-qmk-policy
+:END:
+MSI still enables =hardware.keyboard.qmk.enable= so compatible keyboards can
+receive the declarative udev access policy.  Commit =4673dbd= removed the Vial
+and QMK applications from the system closure.  Reinstall either tool only for
+an explicit configuration or firmware task; flashing remains separately
+authorized.
+
+The accepted Corne discovery below is retained as historical hardware evidence,
+not as a claim that either application is currently installed.
+
+** Historical Vial And QMK Acceptance
 :PROPERTIES:
 :CUSTOM_ID: vial-and-qmk-accepted
 :END:

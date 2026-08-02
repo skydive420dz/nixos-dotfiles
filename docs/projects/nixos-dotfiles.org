@@ -20,11 +20,11 @@ Durable ownership:
 - Quickshell owns the desktop shell surfaces under =config/quickshell/=.
 - =scripts/theme-select= and =theme/styles.json= own global theme state.
 - Clean Emacs is the active Emacs configuration; Doom is retired.
-- NVF owns Neovim packaging, plugins, and LSP while =config/nvim/= owns live Sky
-  behavior.
+- NVF and its Sky configuration live in the standalone =neovim-nvf=
+  repository; they are not part of the MSI system closure.
 - Ollama is retired from the intended system configuration.
-- Vial/QMK device integration is accepted on MSI, and the QMK CLI intentionally
-  remains system-wide.  A Linux VS Code port remains future work.
+- QMK udev support remains MSI-wide, while the Vial and QMK applications are
+  absent.  VS Code is configured through Home Manager for Linux.
 - MSI disk, filesystem, initrd, platform, and microcode facts are tracked in
   =hosts/msi/hardware-configuration.nix=.  The MSI target evaluates and builds
   purely; =nrs= and =nrb= no longer request impure evaluation.
@@ -70,19 +70,24 @@ interactive activation command.
 - Preserve the intentional live-link workflow and validate resolved live bytes.
 - Move machine facts into =hosts/<host>/= without hiding reusable mechanisms.
 - Fix confirmed defects before performance experiments.
-- Treat Vial/QMK as an accepted system capability; keep any future firmware
-  changes separate from Emacs TLC, VS Code, Quickshell optimization, and GC.
+- Treat QMK udev access as an accepted system capability; install Vial or QMK
+  tooling only for an explicit firmware task, separate from editor,
+  Quickshell, and GC work.
 
 Current post-checkpoint lanes:
 
-- =work/nixos-maintenance=: system correctness, security, ownership,
-  organization, and conservative GC.
-- =work/quickshell-cleanup=: deterministic shell bugs, service lifecycle,
-  backend consolidation, then measured optimization.
+- =work/nixos-maintenance=: permanent system-maintenance integration lane.
+  Keep build verification separate from live activation, promote accepted work
+  to =main= only by strict fast-forward, then realign the lane with the new
+  checkpoint.  The next maintenance decision remains the deferred read-only
+  store measurement no earlier than =2026-08-18=.
+- Quickshell: no later slice is selected; take fresh action-labelled
+  measurements before performance work, and keep dual-output validation
+  separate.
 - Emacs: finish the active language acceptance decision, then optimize only
   observed daily-use friction.
-- VS Code: adapt the macOS Home Manager configuration for Linux rather than
-  importing Darwin-specific extension pins.
+- VS Code: refine the current Linux Home Manager profile from measured use;
+  adapt remaining macOS choices without importing Darwin-specific pins.
 
 * History And Evidence
 :PROPERTIES:

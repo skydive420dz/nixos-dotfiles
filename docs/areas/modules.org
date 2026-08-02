@@ -22,7 +22,7 @@ Use this layout for grown-up units:
 Examples:
 
 - =home/modules/programs/tmux/=
-- =system/modules/programs/nvim/=
+- =system/modules/gpu/=
 
 ** Rules
 :PROPERTIES:
