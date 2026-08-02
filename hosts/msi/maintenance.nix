@@ -6,4 +6,6 @@
     persistent = false;
     randomizedDelaySec = "45min";
   };
+
+  nix.settings.keep-outputs = true;
 }
