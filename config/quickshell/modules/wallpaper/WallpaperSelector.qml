@@ -235,6 +235,8 @@ Item {
                                         anchors.fill: parent
                                         visible: !wallpaperCard.video
                                         source: wallpaperCard.video ? "" : WallpaperStore.fileUrl(wallpaperCard.modelData)
+                                        sourceSize.width: width
+                                        sourceSize.height: height
                                         fillMode: Image.PreserveAspectCrop
                                         asynchronous: true
                                         cache: false
@@ -249,6 +251,8 @@ Item {
 
                                             anchors.fill: parent
                                             source: wallpaperCard.thumbnailSource
+                                            sourceSize.width: width
+                                            sourceSize.height: height
                                             fillMode: Image.PreserveAspectCrop
                                             asynchronous: true
                                             cache: false
