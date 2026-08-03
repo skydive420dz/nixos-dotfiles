@@ -184,7 +184,13 @@ Scope {
     }
 
     function showOsd(icon, title, value) {
-        Quickshell.execDetached(["qs", "ipc", "call", "osd", "show", icon, title, value.toString()]);
+        var runtimeDir = Quickshell.env("XDG_RUNTIME_DIR") || "/run/user/" + Quickshell.env("UID");
+        var payload = JSON.stringify({
+            icon: icon,
+            title: title,
+            value: value
+        });
+        Quickshell.execDetached(["bash", "-lc", "printf '%s\\n' " + JSON.stringify(payload) + " > " + JSON.stringify(runtimeDir + "/qs-osd.json") + " && printf '%s\\n' \"$(date +%s%N)\" > " + JSON.stringify(runtimeDir + "/qs-osd-signal")]);
     }
 
     Component.onCompleted: {

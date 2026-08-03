@@ -3,6 +3,9 @@ set -euo pipefail
 
 action=${1:-}
 step=${2:-5}
+runtime_dir=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
+state_file="$runtime_dir/qs-osd.json"
+signal_file="$runtime_dir/qs-osd-signal"
 
 case "$action" in
 up)
@@ -30,7 +33,9 @@ level=$(awk '{ printf "%d", $2 * 100 }' <<<"$status")
 if [[ "$muted" == true ]]; then
     icon="󰖁"
     title="Muted"
+    kind="mute"
 else
+    kind="volume"
     title="Volume"
     if (( level < 33 )); then
         icon="󰕿"
@@ -41,4 +46,5 @@ else
     fi
 fi
 
-qs ipc call osd show "$icon" "$title" "$level" >/dev/null 2>&1 || true
+printf '{"kind":"%s","icon":"%s","title":"%s","value":%d}\n' "$kind" "$icon" "$title" "$level" > "$state_file"
+printf '%s\n' "$(date +%s%N)" > "$signal_file"

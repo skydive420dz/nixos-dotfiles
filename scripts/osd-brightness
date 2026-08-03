@@ -3,6 +3,9 @@ set -euo pipefail
 
 action=${1:-}
 step=${2:-5}
+runtime_dir=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
+state_file="$runtime_dir/qs-osd.json"
+signal_file="$runtime_dir/qs-osd-signal"
 
 case "$action" in
 up)
@@ -19,4 +22,5 @@ esac
 
 level=$(brightnessctl -m | awk -F ',' '{print int($4)}')
 
-qs ipc call osd show "󰃠" Brightness "$level" >/dev/null 2>&1 || true
+printf '{"kind":"brightness","icon":"󰃠","title":"Brightness","value":%d}\n' "$level" > "$state_file"
+printf '%s\n' "$(date +%s%N)" > "$signal_file"
