@@ -9,12 +9,12 @@ state.  Audits are dated evidence, not implementation authority.
 Documentation does not turn a build into activation and does not authorize
 commits, pushes, service changes, or branch deletion.
 
-* Status At A Glance - 2026-08-02
+* Status At A Glance - 2026-08-03
 | Surface | Confirmed current state | Next accepted step |
 |---------+-------------------------+--------------------|
 | System | Current system profile is generation 884 on NixOS =26.11.20260729.0954f7e=; the scheduled 30-day GC policy remains active; reusable build outputs are retained; recurring store optimization remains deferred | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
 | Emacs | Clean Emacs is the MSI editor owner; standalone NVF moved to the external =neovim-nvf= repository and is absent from the MSI closure; the accepted QML policy uses verified four-space formatting | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | Cleanup through Slice 1I, Slice 0C profiling, Slice 2 lifecycle, shared ownership Slices 3A-3E, native status Slices 4A-4D, and native compositor Slices 4E1-4E2 are accepted and promoted.  The startup wallpaper fallback is also removed; persisted state loaded without the wrong GIF in the user visual check.  The managed live link resolves to promoted =main= | Fresh dual-output validation remains deferred; no later Quickshell slice is selected |
+| Quickshell | The accepted shell remains live from =main=.  Native cleanup candidate =3f0f0c0= removes 461 net lines and passed source, no-link build, and rollback-protected runtime gates on =eDP-1=; it is not pushed, promoted, or activated | Accept or reject the candidate; if accepted, publish the maintenance lane, strictly fast-forward =main=, and keep privileged activation as a separate gate.  Fresh dual-output validation remains deferred |
 | Vial/QMK | MSI QMK udev ownership remains active for compatible keyboards; the Vial and QMK applications were removed from the system closure | Keep firmware writes and flashing separate and explicitly authorized; reinstall an application only for a real firmware task |
 | VS Code | The MSI Home Manager profile owns VS Code settings/extensions and Codex tooling; window state is preserved between launches, and =nix-ld= supports Remote SSH | Refine from measured Linux use; adapt remaining macOS choices without Darwin-specific pins |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -89,6 +89,8 @@ The accepted, published, and promoted native workspace-occupancy source is in
 [[file:handoffs/2026-07-26-quickshell-slice4e1-acceptance.org][Slice 4E1]].
 The accepted, published, and promoted native active-title source is in
 [[file:handoffs/2026-07-29-quickshell-slice4e2-acceptance.org][Slice 4E2]].
+The validated but unpromoted native-plumbing cleanup is in
+[[file:handoffs/2026-08-03-quickshell-native-cleanup-candidate.org][the native cleanup candidate handoff]].
 
 * Current Work Lanes
 - System: =work/nixos-maintenance= remains the permanent maintenance
@@ -96,9 +98,10 @@ The accepted, published, and promoted native active-title source is in
   reaches =main= only through a strict fast-forward promotion.  Keep
   conservative GC and perform the deferred read-only store measurement no
   earlier than =2026-08-18= before reconsidering recurring optimization.
-- Quickshell: Slices 1I, 2, 3A-3E, 4A-4E2, and the startup-wallpaper correction
-  are complete.  No later slice is selected; fresh dual-output validation and
-  measured performance work remain separate.
+- Quickshell: the native cleanup is validated locally on
+  =work/nixos-maintenance= and awaits acceptance, publication, strict
+  fast-forward promotion, and a separate privileged activation.  Fresh
+  dual-output validation and measured performance work remain separate.
 - Emacs: complete or explicitly defer the Python acceptance decision before
   selecting another language or optimization slice.
 - VS Code: refine the current Home Manager profile only from measured Linux
@@ -125,6 +128,7 @@ history.
 - [[file:projects/clipboard-launcher.org][Completed clipboard and launcher work]]
 
 * Evidence And History
+- [[file:handoffs/2026-08-03-quickshell-native-cleanup-candidate.org][2026-08-03 Quickshell native cleanup candidate]]
 - [[file:handoffs/2026-07-29-quickshell-slice4e2-acceptance.org][2026-07-29 Quickshell Slice 4E2 native active-title acceptance]]
 - [[file:handoffs/2026-07-26-quickshell-slice4e1-acceptance.org][2026-07-26 Quickshell Slice 4E1 workspace occupancy acceptance and promotion]]
 - [[file:handoffs/2026-07-26-quickshell-slice4d-acceptance.org][2026-07-26 Quickshell Slice 4D acceptance and promotion]]

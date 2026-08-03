@@ -180,6 +180,16 @@ separate pure no-link build, controlled runtime probe, and user visual check
 all passed, with no wrong GIF observed.  This changes no package, dependency,
 service, or wallpaper-selection ownership.
 
+On 2026-08-03, a native-plumbing cleanup reached validated candidate head
+=3f0f0c0= on =work/nixos-maintenance=.  It removes 461 net lines by replacing
+custom launcher discovery and signal-file toggles with Quickshell desktop-entry
+and IPC APIs, using =FileView= for simple text reads, and deleting dead weather,
+network-formatting, and inert QML code.  The compatible OSD transport remains.
+Source, separate no-link build, and rollback-protected runtime gates passed on
+=eDP-1=; the normal service and live generation were restored.  It is not
+pushed, promoted, or activated.  Exact evidence and boundaries are in the
+[[../handoffs/2026-08-03-quickshell-native-cleanup-candidate.org][native cleanup candidate handoff]].
+
 =main= remains the sober checkpoint shell.  The old modular shell lives on
 =prototype/quickshell-legacy= and the archived Quickshell branches.  Treat
 those branches as reference material only: port useful ideas back deliberately,
@@ -205,6 +215,7 @@ one module at a time.
 - [[../../config/quickshell/shell.qml][Shell root]]
 - [[../../config/quickshell/root/Bar.qml][Bar root surface]]
 - [[../../config/quickshell/common/BarFrame.qml][Bar frame primitive]]
+- [[../../config/quickshell/root/Clipboard.qml][Clipboard root surface]]
 - [[../../config/quickshell/root/Launcher.qml][Launcher root surface]]
 - [[../../config/quickshell/root/Osd.qml][OSD root surface]]
 - [[../../config/quickshell/root/Wallpaper.qml][Wallpaper root surface]]
@@ -213,7 +224,7 @@ one module at a time.
 - [[../../config/quickshell/qmldir][QML module index]]
 - [[../../config/quickshell/modules/launcher/LauncherButton.qml][Launcher button]]
 - [[../../config/quickshell/modules/launcher/LauncherView.qml][Launcher view]]
-- [[../../config/quickshell/modules/launcher/apps.json][Launcher custom apps]]
+- [[../../home/modules/services/quickshell.nix][Quickshell service and custom desktop entries]]
 - [[../../config/quickshell/modules/media/Media.qml][Media module]]
 - [[../../config/quickshell/modules/media/MediaAnalyzer.qml][Media analyzer]]
 - [[../../config/quickshell/modules/media/cava.conf][CAVA analyzer configuration]]

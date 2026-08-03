@@ -1,0 +1,111 @@
+#+title: Quickshell Native Cleanup Candidate - 2026-08-03
+#+startup: overview
+
+* Outcome
+The cleanup is an =IMPLEMENTED AND VALIDATED CANDIDATE=.  It is not pushed,
+promoted to =main=, or activated through NixOS/Home Manager.
+
+- Stable checkpoint and live =main=: =23ff5584ff735a4d07259b66157988c0aa596bf2=
+- Native cleanup payload: =c5c54e4=
+- OSD compatibility correction and candidate code head: =3f0f0c0=
+- Integration lane: local =work/nixos-maintenance=, two commits ahead of its
+  remote before this documentation commit
+- No-link build:
+  =/nix/store/3ngbf9jfg8r3yvzpdmrlk8daswdys7pv-nixos-system-nixos-26.11.20260729.0954f7e=
+- Unchanged live system:
+  =/nix/store/zi4wbpinsg4a2prx78335s6d6b0xmklx-nixos-system-nixos-26.11.20260729.0954f7e=
+
+The live checkout remains on =main=.  Its four unrelated untracked wallpaper
+files were not added, removed, edited, or staged.
+
+* Contract And Change
+This is a behavior-preserving simplification, not a visual redesign.  Against
+the checkpoint its code payload changes 31 paths: 70 insertions and 531
+deletions, for a net removal of 461 lines.
+
+- Launcher discovery now uses Quickshell's native
+  =DesktopEntries.applications= model.  The custom parser and
+  =modules/launcher/apps.json= are deleted.
+- BlueTUI and WireMix are ordinary Home Manager =xdg.desktopEntries= in
+  =home/modules/services/quickshell.nix=.
+- Launcher and clipboard toggles use their existing unique Quickshell
+  =IpcHandler= targets through =qs ipc call=.  The signal-file toggle helpers
+  are deleted.
+- Theme and wallpaper text reads use Quickshell =FileView= instead of spawning
+  =cat=.
+- Dead weather code, unused object IDs, no-op visual wrappers, and the obsolete
+  numeric network-rate formatting path are removed.  The current dotted
+  network graph remains.
+- =scripts/check-quickshell= keeps the checks that protect the current source
+  and drops checks for deleted compatibility files.
+
+Deleted helpers:
+
+- =scripts/launcher-apps=
+- =scripts/launcher-toggle=
+- =scripts/clipboard-toggle=
+- =scripts/weather=
+- =config/quickshell/modules/launcher/apps.json=
+
+The OSD keeps its proven file-and-signal transport.  A proposed argument-taking
+=IpcHandler= replacement was reverted after the installed Quickshell 0.3 CLI
+rejected arguments to =qs ipc call=.  Keeping the compatible path avoids a
+deprecated =qs msg= workaround and preserves current OSD behavior.
+
+* Verification
+** Source
+=scripts/check-quickshell= and =git diff --check= passed at candidate head
+=3f0f0c0=:
+
+- 34 QML files parsed, matched the repository format, and passed the strict
+  diagnostic gate;
+- 15 Bash files and one JSON file passed their checks;
+- the baseline parser and native desktop-entry inventory each exposed the same
+  31 application names;
+- the generated BlueTUI and WireMix desktop entries had the intended names,
+  icons, comments, and argv-safe commands.
+
+** No-Link Build
+The candidate passed a full NixOS toplevel build with =--no-link= and
+=--impure=.  It returned the candidate store path above.  The build created no
+=result= link, changed no lock file, and performed no activation.
+
+** Controlled Runtime
+The candidate ran under the real Wayland session with a rollback supervisor.
+The normal Quickshell user service was restored afterward.
+
+- Configuration loaded successfully with zero candidate restarts.
+- Launcher and clipboard opened and closed through =qs ipc call= on =eDP-1=.
+- The launcher and clipboard retained their existing layout and interaction
+  behavior in automated captures.
+- Media, the persisted wallpaper, and same-theme reapplication remained
+  healthy.
+- The retained OSD transport rendered a mute transition and the exact prior
+  audio state was restored.
+- The normal service was restored on live =main=; its managed link and the live
+  NixOS generation remained unchanged.
+
+Only =eDP-1= was connected.  Fresh dual-output validation remains deferred.
+
+Opening clipboard emits a height binding-loop warning.  The same warning was
+reproduced on the unchanged checkpoint, so it is pre-existing and is not a
+regression from this candidate.
+
+* Promotion Boundary
+The next gate is user acceptance of this validated candidate.  After that:
+
+1. publish =work/nixos-maintenance= without force;
+2. strictly fast-forward =main= only after rechecking the remote and live
+   checkout;
+3. perform the NixOS/Home Manager activation as a separate, privileged gate;
+4. verify the activated generation, Quickshell service, IPC targets, custom
+   desktop entries, and visible surfaces.
+
+Publishing the maintenance branch is inert.  Promoting =main= is not assumed
+to be inert because the managed live Quickshell link resolves into the =main=
+checkout.  Activation is also required before the new Home Manager desktop
+entries become the declared live state, so promotion and activation need an
+explicit controlled sequence even though their verification remains separate.
+
+No force push, merge commit, branch deletion, NixOS switch, unrelated cleanup,
+or fresh dual-output claim is authorized by this record.

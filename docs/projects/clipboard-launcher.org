@@ -2,24 +2,30 @@
 :PROPERTIES:
 :CUSTOM_ID: clipboard-and-launcher
 :END:
-** Current
+** Gate State
 :PROPERTIES:
-:CUSTOM_ID: current
+:CUSTOM_ID: gate-state
 :END:
-- Launcher is native Quickshell again. =scripts/launcher-toggle= signals the =qs-launcher= overlay through =$XDG_RUNTIME_DIR=.
-- The launcher searches desktop apps from =scripts/launcher-apps=.
-- Extra terminal-first tools that do not ship desktop entries live in =config/quickshell/modules/launcher/apps.json=.
-- Clipboard is native Quickshell again for text history. =scripts/clipboard-toggle= signals the =qs-clipboard= overlay through =$XDG_RUNTIME_DIR=.
+- Accepted live =main= remains at =23ff558= and still uses the signal-file toggle helpers, custom launcher parser, and custom app JSON.
+- Validated candidate =3f0f0c0= uses =launcher.toggle()= and =clipboard.toggle()= IPC functions, Quickshell's native desktop-entry model, and Home Manager XDG entries for BlueTUI and WireMix.
+- The candidate is not pushed, promoted, or activated.  See the [[../handoffs/2026-08-03-quickshell-native-cleanup-candidate.org][candidate handoff]].
 - Image clipboard entries are detected from =cliphist list= binary markers and get a selected-item thumbnail preview generated under =$XDG_RUNTIME_DIR=.
-- The old fuzzel launcher/clipboard fallback scripts were removed after the native tools were approved.
+- The old fuzzel fallbacks are retired in both states.  The signal-file compatibility helpers retire only when the candidate is accepted and promoted.
 
-** Commands
+** Accepted Live Commands
 :PROPERTIES:
-:CUSTOM_ID: commands
+:CUSTOM_ID: accepted-live-commands
 :END:
 - =systemctl --user restart quickshell=
 - =~/.config/scripts/launcher-toggle=
 - =~/.config/scripts/clipboard-toggle=
+
+** Candidate Commands
+:PROPERTIES:
+:CUSTOM_ID: candidate-commands
+:END:
+- =qs ipc call launcher toggle=
+- =qs ipc call clipboard toggle=
 
 ** Important Files
 :PROPERTIES:
@@ -28,9 +34,7 @@
 - [[../../config/quickshell/modules/launcher/LauncherButton.qml][Launcher button]]
 - [[../../config/quickshell/root/Launcher.qml][Launcher root surface]]
 - [[../../config/quickshell/modules/launcher/LauncherView.qml][Launcher view]]
-- [[../../config/quickshell/modules/launcher/apps.json][Launcher custom apps]]
-- [[../../scripts/launcher-toggle][Launcher toggle]]
-- [[../../scripts/clipboard-toggle][Clipboard toggle]]
+- [[../../home/modules/services/quickshell.nix][Quickshell service and custom desktop entries]]
 - [[../../config/quickshell/root/Clipboard.qml][Clipboard root surface]]
 - [[../../config/quickshell/modules/clipboard/ClipboardView.qml][Clipboard view]]
 
@@ -40,6 +44,7 @@
 :END:
 - Keep launcher and clipboard as separate tools until focus restoration, keyboard navigation, and close behavior are boring and reliable.
 - Native Quickshell is the accepted owner; the fallback scripts are retired.
+- Prefer Quickshell's native IPC and desktop-entry APIs over repository-specific signal files and parsers.
 - Use Quickshell screen binding for layer windows.
 - Keep native launcher results apps-only by default. Window search is noise for the current workflow and can return later as an explicit mode if it earns its place.
 - Follow the Quickshell ownership rules: =root/= owns surfaces, =modules/<name>/= owns behavior, =common/= owns reusable primitives only.
