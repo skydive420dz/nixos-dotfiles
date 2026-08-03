@@ -176,11 +176,11 @@ Work stays slice-based:
    exact default-route selection and physical handoff remain deferred.
    Slice 4E1 native workspace occupancy is accepted, published, and promoted.
    Slice 4E2 native title state is accepted, published, promoted, and live on
-   =eDP-1=.  Native cleanup candidate =3f0f0c0= passed source, no-link build,
-   and rollback-protected runtime checks while leaving the accepted live shell
-   restored.  It still requires acceptance, publication, strict promotion, and
-   a separate privileged activation.  Fresh dual-output validation remains
-   deferred.
+   =eDP-1=.  Native cleanup code head =3f0f0c0= is accepted, published,
+   promoted through =45589bc=, and live on generation 885.  Its separate source,
+   no-link build, controlled-runtime, promotion, and activation gates passed.
+   Fresh dual-output validation remains deferred; no further optimization
+   slice is selected without a measured problem.
    Run the deferred real network-handoff check only after Ethernet provides a
    verified alternate route.  Keep old CAVA temp-file deletion, clipboard
    lifecycle, rendering, and frame-rate work separate.

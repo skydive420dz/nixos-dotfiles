@@ -2,28 +2,20 @@
 :PROPERTIES:
 :CUSTOM_ID: clipboard-and-launcher
 :END:
-** Gate State
+** Current
 :PROPERTIES:
-:CUSTOM_ID: gate-state
+:CUSTOM_ID: current
 :END:
-- Accepted live =main= remains at =23ff558= and still uses the signal-file toggle helpers, custom launcher parser, and custom app JSON.
-- Validated candidate =3f0f0c0= uses =launcher.toggle()= and =clipboard.toggle()= IPC functions, Quickshell's native desktop-entry model, and Home Manager XDG entries for BlueTUI and WireMix.
-- The candidate is not pushed, promoted, or activated.  See the [[../handoffs/2026-08-03-quickshell-native-cleanup-candidate.org][candidate handoff]].
+- Accepted live =main= uses =launcher.toggle()= and =clipboard.toggle()= IPC functions, Quickshell's native desktop-entry model, and Home Manager XDG entries for BlueTUI and WireMix.
+- The native cleanup is promoted and live on generation 885.  See the [[../handoffs/2026-08-03-quickshell-native-cleanup-acceptance.org][acceptance handoff]].
 - Image clipboard entries are detected from =cliphist list= binary markers and get a selected-item thumbnail preview generated under =$XDG_RUNTIME_DIR=.
-- The old fuzzel fallbacks are retired in both states.  The signal-file compatibility helpers retire only when the candidate is accepted and promoted.
+- The old fuzzel fallbacks, signal-file toggle helpers, custom launcher parser, and custom app JSON are retired.
 
-** Accepted Live Commands
+** Commands
 :PROPERTIES:
-:CUSTOM_ID: accepted-live-commands
+:CUSTOM_ID: commands
 :END:
 - =systemctl --user restart quickshell=
-- =~/.config/scripts/launcher-toggle=
-- =~/.config/scripts/clipboard-toggle=
-
-** Candidate Commands
-:PROPERTIES:
-:CUSTOM_ID: candidate-commands
-:END:
 - =qs ipc call launcher toggle=
 - =qs ipc call clipboard toggle=
 
@@ -59,7 +51,7 @@
 - [X] Rebuild the launcher first as a native Quickshell surface while preserving the script fallback.
 - [X] Open native launcher with the normal launcher bind.
 - [X] Type a query and confirm matching apps appear.
-- [X] Confirm =BlueTUI=, =WireMix=, and =Neovim= appear from the custom launcher app list.
+- [X] Confirm =BlueTUI=, =WireMix=, and =Neovim= appear from desktop entries.
 - [X] Navigate rows with arrow keys.
 - [X] Navigate rows with =Ctrl-j= and =Ctrl-k=.
 - [X] Press =Enter= on an app result and confirm it launches.

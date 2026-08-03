@@ -180,15 +180,16 @@ separate pure no-link build, controlled runtime probe, and user visual check
 all passed, with no wrong GIF observed.  This changes no package, dependency,
 service, or wallpaper-selection ownership.
 
-On 2026-08-03, a native-plumbing cleanup reached validated candidate head
-=3f0f0c0= on =work/nixos-maintenance=.  It removes 461 net lines by replacing
-custom launcher discovery and signal-file toggles with Quickshell desktop-entry
-and IPC APIs, using =FileView= for simple text reads, and deleting dead weather,
-network-formatting, and inert QML code.  The compatible OSD transport remains.
-Source, separate no-link build, and rollback-protected runtime gates passed on
-=eDP-1=; the normal service and live generation were restored.  It is not
-pushed, promoted, or activated.  Exact evidence and boundaries are in the
-[[../handoffs/2026-08-03-quickshell-native-cleanup-candidate.org][native cleanup candidate handoff]].
+On 2026-08-03, native-plumbing cleanup code head =3f0f0c0= was accepted,
+published, and promoted through documentation head =45589bc=.  It removes 461
+net lines by replacing custom launcher discovery and signal-file toggles with
+Quickshell desktop-entry and IPC APIs, using =FileView= for simple text reads,
+and deleting dead weather, network-formatting, and inert QML code.  The
+compatible OSD transport remains.  Source, separate no-link build,
+rollback-protected runtime, strict promotion, generation-885 activation, and
+post-activation launcher/clipboard gates passed on =eDP-1=.  Exact evidence and
+boundaries are in the
+[[../handoffs/2026-08-03-quickshell-native-cleanup-acceptance.org][native cleanup acceptance handoff]].
 
 =main= remains the sober checkpoint shell.  The old modular shell lives on
 =prototype/quickshell-legacy= and the archived Quickshell branches.  Treat

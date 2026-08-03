@@ -81,10 +81,10 @@ Current post-checkpoint lanes:
   to =main= only by strict fast-forward, then realign the lane with the new
   checkpoint.  The next maintenance decision remains the deferred read-only
   store measurement no earlier than =2026-08-18=.
-- Quickshell: native cleanup candidate =3f0f0c0= passed source, no-link build,
-  and rollback-protected runtime gates on =eDP-1=.  Acceptance, publication,
-  strict promotion, privileged activation, dual-output validation, and future
-  measured performance work remain separate.
+- Quickshell: native cleanup code head =3f0f0c0= is accepted, published,
+  promoted, and live on generation 885 after separate source, no-link build,
+  controlled-runtime, promotion, and activation gates.  Dual-output validation
+  and future measured performance work remain separate.
 - Emacs: finish the active language acceptance decision, then optimize only
   observed daily-use friction.
 - VS Code: refine the current Linux Home Manager profile from measured use;

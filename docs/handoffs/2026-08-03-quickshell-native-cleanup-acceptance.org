@@ -1,0 +1,124 @@
+#+title: Quickshell Native Cleanup Acceptance - 2026-08-03
+#+startup: overview
+
+* Outcome
+The native cleanup is =ACCEPTED, PUBLISHED, PROMOTED, AND LIVE=.
+
+- Stable pre-cleanup checkpoint: =23ff5584ff735a4d07259b66157988c0aa596bf2=
+- Native cleanup payload: =c5c54e4=
+- OSD compatibility correction and accepted code head: =3f0f0c0=
+- Promoted candidate and pre-closeout documentation head: =45589bc=
+- No-link build and activated generation 885:
+  =/nix/store/3ngbf9jfg8r3yvzpdmrlk8daswdys7pv-nixos-system-nixos-26.11.20260729.0954f7e=
+- Activated Home Manager user environment:
+  =/nix/store/wvm57gq5fndq7gqx8mw5chmwz718m21w-user-environment=
+- Accepted Quickshell service: PID =262257=, =active/running=,
+  =Result=success=, =NRestarts=0=
+
+The live checkout is on promoted =main=.  Its four unrelated untracked
+wallpaper files retained their exact pre-promotion hashes.
+
+* Contract And Change
+This is a behavior-preserving simplification, not a visual redesign.  Against
+the checkpoint its code payload changes 31 paths: 70 insertions and 531
+deletions, for a net removal of 461 lines.
+
+- Launcher discovery now uses Quickshell's native
+  =DesktopEntries.applications= model.  The custom parser and
+  =modules/launcher/apps.json= are deleted.
+- BlueTUI and WireMix are ordinary Home Manager =xdg.desktopEntries= in
+  =home/modules/services/quickshell.nix=.
+- Launcher and clipboard toggles use their existing unique Quickshell
+  =IpcHandler= targets through =qs ipc call=.  The signal-file toggle helpers
+  are deleted.
+- Theme and wallpaper text reads use Quickshell =FileView= instead of spawning
+  =cat=.
+- Dead weather code, unused object IDs, no-op visual wrappers, and the obsolete
+  numeric network-rate formatting path are removed.  The current dotted
+  network graph remains.
+- =scripts/check-quickshell= keeps the checks that protect the current source
+  and drops checks for deleted compatibility files.
+
+Deleted helpers:
+
+- =scripts/launcher-apps=
+- =scripts/launcher-toggle=
+- =scripts/clipboard-toggle=
+- =scripts/weather=
+- =config/quickshell/modules/launcher/apps.json=
+
+The OSD keeps its proven file-and-signal transport.  A proposed argument-taking
+=IpcHandler= replacement was reverted after the installed Quickshell 0.3 CLI
+rejected arguments to =qs ipc call=.  Keeping the compatible path avoids a
+deprecated =qs msg= workaround and preserves current OSD behavior.
+
+* Verification
+** Source
+=scripts/check-quickshell= and =git diff --check= passed at accepted code head
+=3f0f0c0=:
+
+- 34 QML files parsed, matched the repository format, and passed the strict
+  diagnostic gate;
+- 15 Bash files and one JSON file passed their checks;
+- the baseline parser and native desktop-entry inventory each exposed the same
+  31 application names;
+- the generated BlueTUI and WireMix desktop entries had the intended names,
+  icons, comments, and argv-safe commands.
+
+** No-Link Build
+The candidate passed a full NixOS toplevel build with =--no-link= and
+=--impure=.  It returned the store path now used by generation 885.  The build
+created no =result= link, changed no lock file, and performed no activation.
+
+** Controlled Candidate Runtime
+The candidate ran under the real Wayland session with a rollback supervisor.
+The normal Quickshell user service was restored afterward.
+
+- Configuration loaded successfully with zero candidate restarts.
+- Launcher and clipboard opened and closed through =qs ipc call= on =eDP-1=.
+- The launcher and clipboard retained their existing layout and interaction
+  behavior in automated captures.
+- Media, the persisted wallpaper, and same-theme reapplication remained
+  healthy.
+- The retained OSD transport rendered a mute transition and the exact prior
+  audio state was restored.
+
+An earlier clipboard-open probe emitted a height binding-loop warning that was
+also reproduced on the unchanged checkpoint.  It did not recur during the
+activated open-close verification and is not a regression from this cleanup.
+
+* Publication, Promotion, And Activation
+=work/nixos-maintenance= was published without force after a fresh fetch showed
+both remote =main= and the remote maintenance lane at checkpoint =23ff558=.
+The three-commit candidate was their exact linear descendant.
+
+The live =main= checkout was then strictly fast-forwarded to =45589bc=.  Before
+the fast-forward, all four unrelated wallpaper files were hashed; afterward
+each retained the same hash and remained untracked.  Quickshell reloaded the
+promoted source with =Configuration Loaded= while retaining PID =262257= and
+=NRestarts=0=.  The new =media=, =launcher=, and =clipboard= IPC inventory was
+verified on the running =wayland-1= instance.  Remote =main= was then published
+without force.  Local and remote =main= and =work/nixos-maintenance= all
+resolved to =45589bc= before this documentation-only closeout.
+
+The user separately ran =nrs=.  System generation 885 resolves to the exact
+previously built no-link output.  Home Manager's =useUserPackages= profile
+contains the activated =sky-custom-bluetui.desktop= and
+=sky-custom-wiremix.desktop= entries under
+=/etc/profiles/per-user/skydive420dz/share/applications= with their expected
+commands and metadata.
+
+Post-activation verification passed:
+
+- =~/.config/quickshell= resolves to promoted =main=;
+- Quickshell remains =active/running= at PID =262257= with =Result=success= and
+  =NRestarts=0=;
+- the launcher and clipboard each opened on =eDP-1= through the new IPC calls,
+  appeared as their expected overlay layer, and closed cleanly;
+- the final layer state contains only the normal =qs-wallpaper= and =qs-bar=;
+- the post-activation warning journal is empty;
+- the four personal wallpaper hashes remain unchanged.
+
+Only =eDP-1= was connected.  Fresh dual-output validation remains deferred.
+This closeout makes no CPU, GPU, memory, battery-life, or frame-rate claim and
+does not authorize another optimization slice.
