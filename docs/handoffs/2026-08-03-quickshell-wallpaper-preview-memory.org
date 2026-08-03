@@ -1,0 +1,75 @@
+#+title: Quickshell Slice 6A Wallpaper Preview Memory - 2026-08-03
+#+startup: overview
+
+* Status
+Slice 6A is a =CANDIDATE=.  It is not accepted, pushed, promoted, or activated.
+
+- Baseline and live =main=: =768d20cf8ac4f87f8d237b7e8474c230eeaa7fec=
+- Candidate payload: =cf978189e42c7ad21c96b05e3a5f436c6750341d=
+- Lane: =work/nixos-maintenance=, one local commit ahead of its remote
+- Live NixOS: generation 885, unchanged
+
+This resumes the wallpaper work already identified as =QS-06= and Slice 6 in
+[[../audits/2026-07-14-quickshell-optimization.org][the original optimization audit]].
+Later roadmap tracking incorrectly said that no optimization slice was selected
+without first closing this recorded item.
+
+* Change
+The only payload file is
+[[../../config/quickshell/modules/wallpaper/WallpaperSelector.qml][WallpaperSelector.qml]].
+Both still-image and generated-video previews now set =sourceSize= to their
+displayed width and height.  The current picker contains 27 files, of which 22
+have decodable first frames totaling about 418.6 MiB of raw RGBA pixels.  The
+change prevents thumbnail cards from decoding those sources at original size.
+
+No =GridView= conversion, loader framework, cache service, new dependency, or
+directory reorganization is included.  The four-line native Qt fix addresses
+the measured allocation directly; broader Slice 6 work remains conditional on
+new evidence.
+
+* Controlled Runtime Evidence
+Baseline and candidate used the same installed Quickshell package and copied
+the real Wayland-session environment.  Each ran from an isolated worktree while
+the normal user service was stopped under an automatic rollback trap.
+
+Memory values below are Linux =/proc= KiB:
+
+| State | Baseline RSS | Baseline anonymous | Candidate RSS | Candidate anonymous |
+|-------+--------------+--------------------+---------------+---------------------|
+| Picker closed, fresh |       235560 |              67180 |        230020 |               65656 |
+| First open peak      |       704620 |             520800 |        268196 |               98392 |
+| Closed after test    |       237480 |              70024 |     257972-260824 |         88192-91044 |
+
+The open-time RSS increase fell from 469060 KiB to 38176 KiB, a 91.9% reduction.
+A second candidate open peaked at 265732 KiB and then declined after close; it
+did not ratchet upward.  The baseline also returned near its fresh value, so
+this records a large transient allocation rather than claiming a permanent
+leak.
+
+After both controlled runs, the rollback trap restored the normal
+=quickshell.service=.  It was =active/running= with =Result=success= and
+=NRestarts=0=.  No wallpaper was selected or modified during the probes.
+
+* Verification
+- =scripts/check-quickshell= passed after the temporary probe was removed: 34
+  QML files, 15 Bash files, and one JSON file passed their repository gates.
+- =git diff --check= passed.
+- A separate =--no-link --impure= NixOS toplevel build passed and returned
+  =/nix/store/3ngbf9jfg8r3yvzpdmrlk8daswdys7pv-nixos-system-nixos-26.11.20260729.0954f7e=.
+  That is the existing live output because Home Manager links Quickshell
+  out-of-store; the build verifies integration, while the source checker and
+  controlled runtime verify the QML bytes.
+- No NixOS or Home Manager activation occurred.
+
+No installed screenshot utility was available for an automated visual capture.
+Human confirmation that the picker thumbnails remain visually acceptable on
+=eDP-1= is therefore the remaining acceptance gate.  Fresh dual-output testing
+remains deferred.
+
+* Next Gate
+When the user is at the MSI, run this exact candidate under the same rollback
+supervisor and confirm static, GIF, and video thumbnails; search and scrolling;
+the current badge and selection; close/reopen behavior; and an empty warning
+journal.
+Acceptance, documentation closeout, publication, strict fast-forward promotion,
+managed-link activation, and cleanup remain separate facts.

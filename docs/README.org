@@ -14,7 +14,7 @@ commits, pushes, service changes, or branch deletion.
 |---------+-------------------------+--------------------|
 | System | Current system profile is generation 885 on NixOS =26.11.20260729.0954f7e=; the scheduled 30-day GC policy remains active; reusable build outputs are retained; recurring store optimization remains deferred | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
 | Emacs | Clean Emacs is the MSI editor owner; standalone NVF moved to the external =neovim-nvf= repository and is absent from the MSI closure; the accepted QML policy uses verified four-space formatting | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | Native cleanup code head =3f0f0c0= is accepted, published, promoted through =45589bc=, and live on generation 885.  It removes 461 net lines; source, no-link build, controlled runtime, strict promotion, and post-activation gates passed on =eDP-1= | Fresh dual-output validation remains deferred.  Select no further optimization without a measured problem |
+| Quickshell | Native cleanup code head =3f0f0c0= is accepted, published, promoted through =45589bc=, and live on generation 885.  Slice 6A candidate =cf97818= bounds wallpaper-preview decoding; its source, no-link build, and controlled memory gates passed, but it is not live or accepted | Perform one =eDP-1= visual check of the exact Slice 6A candidate.  Fresh dual-output validation remains deferred |
 | Vial/QMK | MSI QMK udev ownership remains active for compatible keyboards; the Vial and QMK applications were removed from the system closure | Keep firmware writes and flashing separate and explicitly authorized; reinstall an application only for a real firmware task |
 | VS Code | The MSI Home Manager profile owns VS Code settings/extensions and Codex tooling; window state is preserved between launches, and =nix-ld= supports Remote SSH | Refine from measured Linux use; adapt remaining macOS choices without Darwin-specific pins |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -91,6 +91,8 @@ The accepted, published, and promoted native active-title source is in
 [[file:handoffs/2026-07-29-quickshell-slice4e2-acceptance.org][Slice 4E2]].
 The accepted, published, promoted, and activated native-plumbing cleanup is in
 [[file:handoffs/2026-08-03-quickshell-native-cleanup-acceptance.org][the native cleanup acceptance handoff]].
+The measured but unaccepted wallpaper-preview memory candidate is in
+[[file:handoffs/2026-08-03-quickshell-wallpaper-preview-memory.org][the Slice 6A candidate handoff]].
 
 * Current Work Lanes
 - System: =work/nixos-maintenance= remains the permanent maintenance
@@ -99,8 +101,9 @@ The accepted, published, promoted, and activated native-plumbing cleanup is in
   conservative GC and perform the deferred read-only store measurement no
   earlier than =2026-08-18= before reconsidering recurring optimization.
 - Quickshell: the native cleanup is accepted, published, promoted, and live on
-  generation 885.  Fresh dual-output validation and measured performance work
-  remain separate; no further optimization slice is selected.
+  generation 885.  Slice 6A is a measured local candidate with one visual gate
+  pending; it is not accepted, pushed, promoted, or activated.  Fresh
+  dual-output validation remains separate.
 - Emacs: complete or explicitly defer the Python acceptance decision before
   selecting another language or optimization slice.
 - VS Code: refine the current Home Manager profile only from measured Linux
@@ -127,6 +130,7 @@ history.
 - [[file:projects/clipboard-launcher.org][Completed clipboard and launcher work]]
 
 * Evidence And History
+- [[file:handoffs/2026-08-03-quickshell-wallpaper-preview-memory.org][2026-08-03 Quickshell Slice 6A wallpaper memory candidate]]
 - [[file:handoffs/2026-08-03-quickshell-native-cleanup-acceptance.org][2026-08-03 Quickshell native cleanup acceptance and activation]]
 - [[file:handoffs/2026-07-29-quickshell-slice4e2-acceptance.org][2026-07-29 Quickshell Slice 4E2 native active-title acceptance]]
 - [[file:handoffs/2026-07-26-quickshell-slice4e1-acceptance.org][2026-07-26 Quickshell Slice 4E1 workspace occupancy acceptance and promotion]]
