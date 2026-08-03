@@ -4,8 +4,6 @@ import QtQuick.Layouts
 import Quickshell
 
 Text {
-    id: root
-
     Layout.preferredWidth: 16
     color: muted ? Theme.warning : Theme.muted
     font.family: Theme.iconFont

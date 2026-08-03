@@ -5,7 +5,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Hyprland
 
-Rectangle {
+Item {
     id: root
 
     required property var controller
@@ -17,10 +17,6 @@ Rectangle {
     Layout.preferredHeight: implicitHeight
     Layout.alignment: Qt.AlignVCenter
 
-    radius: Theme.radius
-    color: "transparent"
-    border.color: "transparent"
-    border.width: 0
     clip: true
 
     readonly property var monitor: Hyprland.monitors.values.length > 0 ? Hyprland.monitorFor(screen) : null

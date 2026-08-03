@@ -4,13 +4,10 @@ import QtQuick.Layouts
 import Quickshell
 
 Rectangle {
-    id: root
-
     Layout.preferredHeight: Theme.pillHeight
     Layout.preferredWidth: launcherText.implicitWidth + Theme.pad * 2
     radius: Theme.radius
     color: launcherMouse.containsMouse ? Theme.panelAlt : "transparent"
-    border.color: "transparent"
     border.width: 0
 
     Text {
@@ -30,9 +27,9 @@ Rectangle {
 
         onClicked: mouse => {
             if (mouse.button === Qt.RightButton)
-                Quickshell.execDetached(["bash", "-lc", "$HOME/.config/scripts/clipboard-toggle"]);
+                Quickshell.execDetached(["qs", "ipc", "call", "clipboard", "toggle"]);
             else
-                Quickshell.execDetached(["bash", "-lc", "$HOME/.config/scripts/launcher-toggle"]);
+                Quickshell.execDetached(["qs", "ipc", "call", "launcher", "toggle"]);
         }
     }
 }

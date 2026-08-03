@@ -4,8 +4,6 @@ import Quickshell.Wayland
 import "../modules/osd"
 
 PanelWindow {
-    id: root
-
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.exclusiveZone: 0
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None

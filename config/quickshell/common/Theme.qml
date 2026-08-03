@@ -60,28 +60,22 @@ QtObject {
         root.good = payload.good || root.good;
     }
 
-    Component.onCompleted: loadThemeProc.running = true
-
     property FileView themeSignalFile: FileView {
         path: root.themeDir + "/quickshell-signal"
         watchChanges: true
         printErrors: false
-        onFileChanged: loadThemeProc.running = true
+        onFileChanged: themeFile.reload()
     }
 
-    property Process loadThemeProc: Process {
-        id: loadThemeProc
-        command: ["bash", "-lc", "cat " + JSON.stringify(root.themeDir + "/quickshell.json") + " 2>/dev/null || true"]
-        stdout: SplitParser {
-            property string buffer: ""
-            onRead: data => buffer += data
-        }
-        onExited: {
+    property FileView themeFile: FileView {
+        id: themeFile
+        path: root.themeDir + "/quickshell.json"
+        printErrors: false
+        onLoaded: {
             try {
-                var payload = JSON.parse(stdout.buffer.trim());
+                var payload = JSON.parse(text().trim());
                 root.applyTheme(payload);
             } catch (e) {}
-            stdout.buffer = "";
         }
     }
 }

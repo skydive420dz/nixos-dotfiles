@@ -4,7 +4,6 @@ import "../.."
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
 import Quickshell.Widgets
 
 Item {
@@ -18,7 +17,7 @@ Item {
     property bool closing: false
     property string query: ""
     property int selectedIndex: 0
-    property var apps: []
+    readonly property var apps: DesktopEntries.applications.values
     readonly property var results: filteredResults()
     readonly property int panelWidth: 620
     readonly property int panelTopMargin: Theme.barHeight + 20
@@ -39,8 +38,6 @@ Item {
         open = true;
         query = "";
         selectedIndex = 0;
-        if (!loadProc.running)
-            loadProc.running = true;
         search.forceActiveFocus();
     }
 
@@ -90,13 +87,15 @@ Item {
         var pool = [];
         for (var i = 0; i < apps.length; i++) {
             var app = apps[i];
+            if (!app.command || app.command.length === 0)
+                continue;
+
             pool.push({
                 "name": app.name,
-                "subtitle": app.generic || app.comment || app.exec,
-                "search": app.desktop + " " + app.generic + " " + app.comment,
+                "subtitle": app.genericName || app.comment || app.execString,
+                "search": app.id + " " + app.genericName + " " + app.comment,
                 "icon": app.icon || "",
-                "exec": app.exec,
-                "terminal": app.terminal || false
+                "entry": app
             });
         }
 
@@ -130,10 +129,15 @@ Item {
         if (!item)
             return;
 
-        if (item.terminal)
-            Quickshell.execDetached(["bash", "-lc", "uwsm app -- ghostty -e " + item.exec]);
-        else
-            Quickshell.execDetached(["bash", "-lc", "uwsm app -- " + item.exec]);
+        var command = ["uwsm", "app", "--"];
+        if (item.entry.runInTerminal)
+            command = command.concat(["ghostty", "-e"]);
+        command = command.concat(item.entry.command);
+
+        Quickshell.execDetached({
+            command: command,
+            workingDirectory: item.entry.workingDirectory
+        });
 
         close();
     }
@@ -149,24 +153,6 @@ Item {
         }
     }
 
-    Process {
-        id: loadProc
-
-        command: ["bash", "-lc", "$HOME/.config/scripts/launcher-apps"]
-        stdout: SplitParser {
-            property string buffer: ""
-            onRead: data => buffer += data + "\n"
-        }
-        onExited: {
-            try {
-                root.apps = JSON.parse(stdout.buffer.trim());
-            } catch (e) {
-                root.apps = [];
-            }
-            stdout.buffer = "";
-        }
-    }
-
     Rectangle {
         id: panel
 
@@ -178,7 +164,6 @@ Item {
         anchors.topMargin: root.panelTopMargin
         radius: Theme.radius
         color: root.panelColor
-        border.color: "transparent"
         border.width: 0
         clip: true
         opacity: root.open ? 1 : 0

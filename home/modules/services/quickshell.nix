@@ -1,6 +1,25 @@
 { lib, pkgs, ... }:
 
 {
+  xdg.desktopEntries = {
+    sky-custom-bluetui = {
+      name = "BlueTUI";
+      genericName = "Bluetooth manager";
+      comment = "Manage Bluetooth devices";
+      icon = "bluetooth";
+      exec = "ghostty --gtk-single-instance=false --class=bluetui --title=bluetui -e bluetui";
+      terminal = false;
+    };
+    sky-custom-wiremix = {
+      name = "WireMix";
+      genericName = "Audio mixer";
+      comment = "Manage PipeWire audio";
+      icon = "audio-card";
+      exec = "ghostty --gtk-single-instance=false --class=wiremix --title=wiremix -e wiremix";
+      terminal = false;
+    };
+  };
+
   systemd.user.services.quickshell = {
     Unit = {
       Description = "Quickshell desktop shell";

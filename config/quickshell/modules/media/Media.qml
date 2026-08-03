@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Services.Mpris
 
-Rectangle {
+Item {
     id: root
 
     visible: mediaActive
@@ -13,10 +13,6 @@ Rectangle {
     Layout.preferredHeight: visible ? implicitHeight : 0
     Layout.alignment: Qt.AlignVCenter
 
-    radius: Theme.radius
-    color: "transparent"
-    border.color: "transparent"
-    border.width: 0
     clip: true
 
     property var controller: null

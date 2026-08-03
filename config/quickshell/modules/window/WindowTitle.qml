@@ -2,7 +2,7 @@ import "../.."
 import QtQuick
 import QtQuick.Layouts
 
-Rectangle {
+Item {
     id: root
 
     implicitWidth: Math.min(titleText.implicitWidth + Theme.pad * 2, 360)
@@ -12,10 +12,6 @@ Rectangle {
     Layout.maximumWidth: 360
     Layout.alignment: Qt.AlignVCenter
 
-    radius: Theme.radius
-    color: "transparent"
-    border.color: "transparent"
-    border.width: 0
     clip: true
 
     required property var controller

@@ -269,7 +269,6 @@ Item {
         anchors.topMargin: root.panelTopMargin
         radius: Theme.radius
         color: root.panelColor
-        border.color: "transparent"
         border.width: 0
         clip: true
         opacity: root.open ? 1 : 0

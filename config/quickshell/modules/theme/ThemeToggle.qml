@@ -12,7 +12,6 @@ Rectangle {
 
     radius: Theme.radius
     color: themeMouse.containsMouse ? Theme.panelAlt : "transparent"
-    border.color: "transparent"
     border.width: 0
 
     readonly property bool light: Theme.styleName === "SkyLight"

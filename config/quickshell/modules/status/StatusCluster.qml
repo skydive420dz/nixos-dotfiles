@@ -2,7 +2,7 @@ import "../.."
 import QtQuick
 import QtQuick.Layouts
 
-Rectangle {
+Item {
     id: root
 
     required property var controller
@@ -13,14 +13,9 @@ Rectangle {
     Layout.preferredHeight: implicitHeight
     Layout.alignment: Qt.AlignVCenter
 
-    radius: Theme.radius
-    color: "transparent"
-    border.color: "transparent"
-    border.width: 0
     clip: true
 
     RowLayout {
-        id: statusRow
         anchors.fill: parent
         anchors.leftMargin: StatusMetrics.statusClusterLeftMargin
         anchors.rightMargin: StatusMetrics.statusClusterRightMargin
@@ -29,8 +24,6 @@ Rectangle {
         Network {
             kind: root.controller.network
             signal: root.controller.networkSignal
-            downRate: root.controller.networkDownRate
-            upRate: root.controller.networkUpRate
             downSamples: root.controller.networkDownSamples
             upSamples: root.controller.networkUpSamples
         }

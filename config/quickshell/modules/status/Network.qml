@@ -11,8 +11,6 @@ Item {
 
     property string kind: ""
     property int signal: -1
-    property string downRate: ""
-    property string upRate: ""
     property var downSamples: []
     property var upSamples: []
 

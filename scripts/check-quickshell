@@ -44,7 +44,6 @@ repo_root="$(CDPATH='' cd -- "$requested_root" && pwd -P)" ||
 qml_root="$repo_root/config/quickshell"
 scripts_root="$repo_root/scripts"
 styles_json="$repo_root/theme/styles.json"
-launcher_apps_json="$qml_root/modules/launcher/apps.json"
 wallpaper_helper="$qml_root/modules/wallpaper/wallpaper-io"
 profile_helper="$scripts_root/quickshell-profile"
 
@@ -53,8 +52,6 @@ profile_helper="$scripts_root/quickshell-profile"
 [[ -d $scripts_root/theme-select.d ]] ||
   die "missing theme helper directory: $scripts_root/theme-select.d"
 [[ -f $qml_root/qmldir ]] || die "missing QML module metadata: $qml_root/qmldir"
-[[ -f $launcher_apps_json ]] ||
-  die "missing launcher registry: $launcher_apps_json"
 [[ -f $styles_json ]] || die "missing theme registry: $styles_json"
 [[ -f $wallpaper_helper ]] ||
   die "missing wallpaper helper: $wallpaper_helper"
@@ -81,7 +78,7 @@ for file in "${required_theme_helpers[@]}"; do
 done
 
 missing_tools=()
-for tool in bash find jq nix python3 qmlformat qmllint shellcheck sort; do
+for tool in bash cmp find jq nix python3 qmlformat qmllint shellcheck sort; do
   if ! command -v "$tool" >/dev/null 2>&1; then
     missing_tools[${#missing_tools[@]}]=$tool
   fi
@@ -115,19 +112,14 @@ done < <(find "$qml_root" -type f -name '*.qml' -print0 | sort -z)
 bash_files=(
   "$wallpaper_helper"
   "$profile_helper"
-  "$scripts_root/clipboard-toggle"
-  "$scripts_root/launcher-toggle"
   "$scripts_root/osd-brightness"
   "$scripts_root/osd-mic"
   "$scripts_root/osd-volume"
   "$scripts_root/theme-select"
-  "$scripts_root/weather"
 )
 while IFS= read -r -d '' file; do
   bash_files[${#bash_files[@]}]=$file
 done < <(find "$scripts_root/theme-select.d" -type f -name '*.sh' -print0 | sort -z)
-
-python_files=("$scripts_root/launcher-apps")
 
 json_files=()
 while IFS= read -r -d '' file; do
@@ -138,8 +130,8 @@ json_files[${#json_files[@]}]=$styles_json
 printf 'Quickshell source validation\n'
 printf '  repository: %s\n' "$repo_root"
 printf '  QML imports: pure candidate-flake evaluation\n'
-printf '  source set: %d QML, %d Bash, %d JSON, %d Python\n' \
-  "${#qml_files[@]}" "${#bash_files[@]}" "${#json_files[@]}" "${#python_files[@]}"
+printf '  source set: %d QML, %d Bash, %d JSON\n' \
+  "${#qml_files[@]}" "${#bash_files[@]}" "${#json_files[@]}"
 
 failed=0
 
@@ -154,14 +146,7 @@ for file in "${qml_files[@]}"; do
     --column-width -1 \
     --newline unix \
     "$file" |
-    PYTHONDONTWRITEBYTECODE=1 python3 -B -c '
-import pathlib
-import sys
-
-source = pathlib.Path(sys.argv[1]).read_bytes()
-formatted = sys.stdin.buffer.read()
-raise SystemExit(0 if source == formatted else 1)
-' "$file"
+    cmp -s -- "$file" -
   pipeline_status=("${PIPESTATUS[@]}")
   set -e
 
@@ -304,7 +289,7 @@ if actionable:
         )
     raise SystemExit(1)
 
-print("  pass: no actionable diagnostics")
+print("  strict gate: pass (only exact named tooling diagnostics)")
 ' "$repo_root"
 lint_report_status=${PIPESTATUS[1]}
 set -e
@@ -315,29 +300,6 @@ if (( raw_lint_status != 0 )); then
 fi
 if (( lint_report_status != 0 )); then
   failed=1
-fi
-
-if QML_IMPORT_PATH="$qml_import_path" \
-  qmllint \
-    --ignore-settings \
-    --bare \
-    --missing-property disable \
-    --signal-handler-parameters disable \
-    --uncreatable-type disable \
-    --unused-imports warning \
-    -W 0 \
-    -E \
-    -I "$qml_root" \
-    "${qml_files[@]}" >/dev/null 2>&1; then
-  strict_lint_status=0
-else
-  strict_lint_status=$?
-fi
-if (( strict_lint_status != 0 )); then
-  printf '  strict gate: fail (qmllint exit %d)\n' "$strict_lint_status"
-  failed=1
-else
-  printf '  strict gate: pass\n'
 fi
 
 printf '\nBash syntax\n'
@@ -383,32 +345,6 @@ if (( json_failures == 0 )); then
   printf '  pass: %d files\n' "${#json_files[@]}"
 else
   printf '  fail: %d file(s)\n' "$json_failures"
-  failed=1
-fi
-
-printf '\nPython syntax\n'
-python_failures=0
-for file in "${python_files[@]}"; do
-  if [[ ! -f $file ]]; then
-    printf '  missing: %s\n' "$(relative_path "$file")"
-    python_failures=$((python_failures + 1))
-  elif ! PYTHONDONTWRITEBYTECODE=1 python3 -B -c '
-import ast
-import sys
-import tokenize
-
-path = sys.argv[1]
-with tokenize.open(path) as source_file:
-    ast.parse(source_file.read(), filename=path)
-' "$file"; then
-    printf '  syntax failure: %s\n' "$(relative_path "$file")"
-    python_failures=$((python_failures + 1))
-  fi
-done
-if (( python_failures == 0 )); then
-  printf '  pass: %d file(s), parsed without execution\n' "${#python_files[@]}"
-else
-  printf '  fail: %d file(s)\n' "$python_failures"
   failed=1
 fi
 

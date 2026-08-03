@@ -43,8 +43,6 @@ PanelWindow {
     required property var workspacesController
 
     BarFrame {
-        id: unifiedBarBackground
-
         anchors {
             left: parent.left
             right: parent.right

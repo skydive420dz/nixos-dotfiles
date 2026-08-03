@@ -1,7 +1,6 @@
 import "../.."
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import Quickshell.Io
 
 Item {
@@ -15,30 +14,15 @@ Item {
     property string title: ""
     property int value: -1
 
-    FileView {
-        path: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-osd-signal"
-        watchChanges: true
-        printErrors: false
-        onFileChanged: loadProc.running = true
-    }
+    IpcHandler {
+        target: "osd"
 
-    Process {
-        id: loadProc
-        command: ["bash", "-lc", "cat \"${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/qs-osd.json\" 2>/dev/null || true"]
-        stdout: SplitParser {
-            property string buffer: ""
-            onRead: data => buffer += data
-        }
-        onExited: {
-            try {
-                var payload = JSON.parse(stdout.buffer.trim());
-                root.icon = payload.icon ?? "";
-                root.title = payload.title ?? "";
-                root.value = payload.value ?? -1;
-                root.showing = true;
-                hideTimer.restart();
-            } catch (e) {}
-            stdout.buffer = "";
+        function show(icon: string, title: string, value: int): void {
+            root.icon = icon;
+            root.title = title;
+            root.value = value;
+            root.showing = true;
+            hideTimer.restart();
         }
     }
 

@@ -9,8 +9,6 @@ import "../common"
 import "../modules/wallpaper"
 
 PanelWindow {
-    id: root
-
     WlrLayershell.layer: WlrLayer.Background
     WlrLayershell.exclusionMode: ExclusionMode.Ignore
     WlrLayershell.exclusiveZone: 0

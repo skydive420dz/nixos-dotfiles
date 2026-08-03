@@ -91,8 +91,6 @@ Scope {
     onAnalyzerActiveChanged: root.clearLiveLevels()
 
     Process {
-        id: cavaProc
-
         running: root.analyzerActive
         command: ["cava", "-p", Quickshell.shellPath("modules/media/cava.conf")]
 

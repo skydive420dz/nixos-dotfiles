@@ -9,7 +9,6 @@ QtObject {
     id: root
 
     readonly property string home: Quickshell.env("HOME")
-    readonly property string configHome: Quickshell.env("XDG_CONFIG_HOME") || (home + "/.config")
     readonly property string stateHome: Quickshell.env("XDG_STATE_HOME") || (home + "/.local/state")
     readonly property string wallpaperDir: Quickshell.env("SKY_WALLPAPER_DIR") || (home + "/Projects/nixos-dotfiles/wallpapers")
     readonly property string stateDir: stateHome + "/quickshell"
@@ -112,30 +111,24 @@ QtObject {
 
     Component.onCompleted: {
         refreshWallpapers();
-        loadStateProc.running = true;
     }
 
     property FileView signalWatcher: FileView {
         path: root.signalFile
         watchChanges: true
         printErrors: false
-        onFileChanged: loadStateProc.running = true
+        onFileChanged: stateReader.reload()
     }
 
-    property Process loadStateProc: Process {
-        id: loadStateProc
-        command: ["cat", "--", root.stateFile]
-        stdout: SplitParser {
-            property string buffer: ""
-            onRead: data => buffer += data
-        }
-        stderr: StdioCollector {}
-        onExited: {
+    property FileView stateReader: FileView {
+        id: stateReader
+        path: root.stateFile
+        printErrors: false
+        onLoaded: {
             try {
-                var payload = JSON.parse(stdout.buffer.trim());
+                var payload = JSON.parse(text().trim());
                 root.applyState(payload);
             } catch (e) {}
-            stdout.buffer = "";
         }
     }
 

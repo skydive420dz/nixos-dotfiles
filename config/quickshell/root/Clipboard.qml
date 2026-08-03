@@ -23,8 +23,6 @@ PanelWindow {
     visible: clipboardView.open || clipboardView.closing
     color: "transparent"
 
-    readonly property string runtimeDir: Quickshell.env("XDG_RUNTIME_DIR") || ("/run/user/" + Quickshell.env("UID"))
-
     mask: Region {
         item: outsideClickCatcher
         Region {
@@ -79,25 +77,11 @@ PanelWindow {
         }
     }
 
-    FileView {
-        path: root.runtimeDir + "/qs-clipboard-toggle"
-        watchChanges: true
-        printErrors: false
-        onFileChanged: targetScreenProc.running = true
-    }
+    IpcHandler {
+        target: "clipboard"
 
-    Process {
-        id: targetScreenProc
-
-        command: ["bash", "-lc", "cat " + JSON.stringify(root.runtimeDir + "/qs-clipboard-target") + " 2>/dev/null || true"]
-        stdout: SplitParser {
-            property string buffer: ""
-            onRead: data => buffer += data
-        }
-        onExited: {
-            var screenName = stdout.buffer.trim();
-            stdout.buffer = "";
-            root.toggle(root.screenByName(screenName));
+        function toggle(): void {
+            root.toggle();
         }
     }
 

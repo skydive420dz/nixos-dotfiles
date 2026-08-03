@@ -25,13 +25,9 @@ Scope {
     property string networkDevice: ""
     property int networkDeviceRevision: 0
     readonly property int networkSignal: nativeWifiNetwork ? Math.round(nativeWifiNetwork.signalStrength * 100) : -1
-    property double networkRxBytes: 0
-    property double networkTxBytes: 0
     property double networkLastRxBytes: 0
     property double networkLastTxBytes: 0
     property double networkLastSampleMs: 0
-    property string networkDownRate: ""
-    property string networkUpRate: ""
     property var networkDownSamples: []
     property var networkUpSamples: []
     property string batteryStatus: ""
@@ -71,13 +67,9 @@ Scope {
     }
 
     function resetNetworkTraffic() {
-        networkRxBytes = 0;
-        networkTxBytes = 0;
         networkLastRxBytes = 0;
         networkLastTxBytes = 0;
         networkLastSampleMs = 0;
-        networkDownRate = "";
-        networkUpRate = "";
         networkDownSamples = [];
         networkUpSamples = [];
     }
@@ -90,25 +82,6 @@ Scope {
         networkDevice = nextDevice;
         networkDeviceRevision++;
         resetNetworkTraffic();
-    }
-
-    function formatRate(bytesPerSecond) {
-        if (!Number.isFinite(bytesPerSecond) || bytesPerSecond < 1024)
-            return "0000";
-
-        if (bytesPerSecond < 1024 * 1024) {
-            var kib = Math.min(Math.round(bytesPerSecond / 1024), 999);
-            return ("00" + kib).slice(-3) + "K";
-        }
-
-        var mib = bytesPerSecond / 1024 / 1024;
-        if (mib < 9.95)
-            return mib.toFixed(1) + "M";
-        if (mib < 100) {
-            var roundedMib = Math.min(Math.round(mib), 99);
-            return ("00" + roundedMib).slice(-3) + "M";
-        }
-        return "99M+";
     }
 
     function applyNetworkTrafficSample(sampledDevice, sampledRevision, rxValue, txValue, sampleMs) {
@@ -130,14 +103,10 @@ Scope {
             var elapsed = Math.max((now - networkLastSampleMs) / 1000, 1);
             var rxRate = Math.max(0, rxBytes - networkLastRxBytes) / elapsed;
             var txRate = Math.max(0, txBytes - networkLastTxBytes) / elapsed;
-            networkDownRate = formatRate(rxRate);
-            networkUpRate = formatRate(txRate);
             networkDownSamples = appendNetworkSample(networkDownSamples, rxRate);
             networkUpSamples = appendNetworkSample(networkUpSamples, txRate);
         }
 
-        networkRxBytes = rxBytes;
-        networkTxBytes = txBytes;
         networkLastRxBytes = rxBytes;
         networkLastTxBytes = txBytes;
         networkLastSampleMs = now;
@@ -215,13 +184,7 @@ Scope {
     }
 
     function showOsd(icon, title, value) {
-        var runtimeDir = Quickshell.env("XDG_RUNTIME_DIR") || "/run/user/" + Quickshell.env("UID");
-        var payload = JSON.stringify({
-            icon: icon,
-            title: title,
-            value: value
-        });
-        Quickshell.execDetached(["bash", "-lc", "printf '%s\\n' " + JSON.stringify(payload) + " > " + JSON.stringify(runtimeDir + "/qs-osd.json") + " && printf '%s\\n' \"$(date +%s%N)\" > " + JSON.stringify(runtimeDir + "/qs-osd-signal")]);
+        Quickshell.execDetached(["qs", "ipc", "call", "osd", "show", icon, title, value.toString()]);
     }
 
     Component.onCompleted: {
@@ -241,7 +204,6 @@ Scope {
     }
 
     Timer {
-        id: trafficTimer
         interval: 2000
         repeat: true
         running: true
