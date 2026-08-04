@@ -17,6 +17,12 @@ acceptance criteria.
 - Nix is =ACCEPTED= under the locked lsp-mode/Company model.
 - Python is =IN PROGRESS=: use the maintained =lsp-pyright= client with
   =basedpyright=, keeping formatting under =sk-format=.
+- Native Eglot server reuse is =ACCEPTED= for QML and prose at payload
+  =e138c039=: buffers in one root share one server while distinct roots remain
+  separate and =eglot-autoshutdown=nil= remains active.  Exact live and memory
+  evidence is in [[file:../handoffs/2026-08-04-emacs-eglot-reuse-acceptance.org][the Eglot reuse handoff]].
+- The formatter-wrapper timeout remains deferred and unvalidated; it is not
+  part of the accepted reuse result.
 
 ** Slice Contract
 :PROPERTIES:
@@ -371,3 +377,22 @@ Manual acceptance probes:
 - Create an obvious type/undefined-symbol error and confirm =SPC c x= shows
   diagnostics after the server settles.
 - Use =SPC c f= and confirm =black= formats the buffer.
+
+*** 2026-08-04 Native Eglot Reuse
+:PROPERTIES:
+:CUSTOM_ID: native-eglot-reuse-2026-08-04
+:END:
+Accepted payload =e138c039= replaces the direct private
+=(apply #'eglot (eglot--guess-contact))= connection with GNU Eglot's public
+=(eglot-ensure)= entrypoint inside the existing guarded wrapper.
+
+The isolated and installed-path gates proved one qmlls for two QML buffers in
+one root, one Harper for two prose buffers in one root, and a separate Harper
+for a genuinely separate prose root.  Completion, hover, and Flymake passed;
+=eglot-autoshutdown=nil= and package ownership remained unchanged.  Matched
+live measurement reduced Eglot processes from six to three.  Total fresh-daemon
+savings include other effects and are broken down in
+[[file:../handoffs/2026-08-04-emacs-eglot-reuse-acceptance.org][the acceptance handoff]].
+
+Formatting was not validated.  The separate formatter-wrapper timeout and the
+pre-existing systemd old-daemon =SIGTERM= accounting remain outside this slice.

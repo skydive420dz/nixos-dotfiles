@@ -1,0 +1,164 @@
+#+title: Emacs Native Eglot Reuse Acceptance - 2026-08-04
+#+startup: overview
+
+* Status
+Payload =e138c03936fba8cb4b4e2ad120d31123ef0f7f8c= is =ACCEPTED=,
+published, promoted, locally adopted, and live-validated.  It is a direct child
+of =79f57cbc7c4318b11886ac7c9eebdfb0cbe85930= and changes one line in
+=config/emacs/lisp/sk-lsp.el=:
+
+#+begin_src diff
+-          (apply #'eglot (eglot--guess-contact))
++          (eglot-ensure)
+#+end_src
+
+Local and remote =main= and remote =work/nixos-maintenance= were verified at
+=e138c039=.  No NixOS or Home Manager activation occurred.
+
+* Ownership And Scope
+The existing =sk/eglot-ensure= eligibility guard, language ownership,
+=eglot-server-programs=, and =eglot-autoshutdown=nil= remain unchanged.  The
+payload delegates connection and reuse to GNU Eglot's public =eglot-ensure=
+instead of directly invoking the private contact/connection path.
+
+Acceptance covers native server reuse for QML and prose while retaining one
+server per distinct project root.  It does not change lsp-mode-owned modes,
+server selection, Harper settings, PATH ownership, formatting, package state,
+or shutdown policy.
+
+* Source And Build Verification
+- The committed file SHA-256 is
+  =aa5555a6857ab2764e5fad4867c7cd6269ce63086be6ecd3c5acba8662405a90=.
+- Parsing, =check-parens=, isolated source loading, and guarded package loading
+  passed against the existing ELPA cache without downloads or mutation.
+- GNU Eglot's native function resolved to the bundled Emacs 30.2
+  =progmodes/eglot.elc=; =sk/eglot-ensure= remained a distinct function and
+  invoked the native entrypoint exactly once.
+- =git diff --check= passed.
+- The separate impure no-link NixOS build passed at:
+  =/nix/store/3ngbf9jfg8r3yvzpdmrlk8daswdys7pv-nixos-system-nixos-26.11.20260729.0954f7e=.
+
+* Isolated Candidate-Daemon Gate
+A uniquely named daemon used temporary runtime, state, and native-comp cache
+directories while reading the existing ELPA package files without mutation.
+
+- Two QML buffers in one project shared one qmlls object and process.
+- Two prose buffers in one project shared one Harper object and process.
+- Completion, hover, and Flymake passed.
+- lsp-mode-owned modes remained excluded.
+- Closing the test buffers retained their shared servers because
+  =eglot-autoshutdown=nil=.
+- Only the candidate daemon and its children were stopped; its temporary
+  artifacts were removed.
+
+The live daemon, package fingerprint, repository, managed links, and wallpaper
+fingerprints remained unchanged during this gate.
+
+* Installed-Path Adoption
+The live checkout advanced only with:
+
+#+begin_src sh
+git merge --ff-only origin/main
+#+end_src
+
+The managed =~/.config/emacs= link continued to resolve to the live checkout,
+and the installed =sk-lsp.el= hash matched the accepted payload.  Before the
+restart, all three frames showed the generated =*Sky Home*= dashboard.  No
+file-backed or user-authored unsaved buffer existed; all other modified buffers
+were internal Emacs/Eglot buffers.
+
+Exactly one controlled =emacs.service= restart replaced daemon PID =2872= with
+=563504=.  The graphical client, dedicated tmux TTY client, and daemon frame
+were recreated, restoring the original three-frame shape.  The service is
+active with =Result=success= and =NRestarts=0=.
+
+Equivalent project coverage was reopened without saving files:
+
+- =shell.qml= and =Bar.qml= under the =nixos-dotfiles= root;
+- two Org files under =Documents/notes/topics/2026=;
+- =Documents/notes/inbox.org= under the separate =Documents/notes= root.
+
+The final registry contained exactly:
+
+| Root | Server | PID | Count |
+|------+--------+-----+-------|
+| =nixos-dotfiles= | qmlls | =563971= | 1 |
+| =Documents/notes/topics/2026= | Harper | =563975= | 1 |
+| =Documents/notes= | Harper | =564051= | 1 |
+
+Both QML buffers shared the same server object and PID.  Both 2026 prose
+buffers shared the same Harper object and PID.  The genuinely separate notes
+root retained its own Harper.  Completion returned 50 live qmlls candidates,
+hover completed with a response, and Eglot's Flymake backend ran with no
+disabled backend or current diagnostics.  All five files remained unmodified.
+
+A first nested prose choice resolved to an extra =Documents/notes/projects=
+root.  Its newly created test Harper and unmodified buffer were removed before
+the matched measurement, then =inbox.org= restored the original notes-root
+coverage.
+
+* Matched Memory Evidence
+The pre-restart registry retained three qmlls processes for one QML root, two
+Harper processes for the 2026 root, and one Harper for the notes root.  The
+post-restart registry retained one server per root.  Measurements used the
+=emacs.service= cgroup and per-process =smaps_rollup= PSS.  The final sample was
+taken after equivalent roots were restored; two post-restart samples ten
+seconds apart differed by only 28 KiB total PSS.
+
+| State | Process | PID | PSS KiB |
+|-------+---------+-----+---------|
+| Before | Emacs | =2872= | 222381 |
+| Before | Harper, 2026 | =27310= | 203162 |
+| Before | Harper, 2026 | =110810= | 221158 |
+| Before | Harper, notes | =112572= | 148252 |
+| Before | qmlls | =485686= | 205270 |
+| Before | qmlls | =485811= | 147007 |
+| Before | qmlls | =486371= | 162708 |
+| Before | Aspell | =113096= | 2260 |
+| After | Emacs | =563504= | 161095 |
+| After | qmlls | =563971= | 200362 |
+| After | Harper, 2026 | =563975= | 150177 |
+| After | Harper, notes | =564051= | 150404 |
+
+- Accounted processes: =8 -> 4=; Eglot servers: =6 -> 3=.
+- Total PSS: =1312198 -> 662038 KiB=, a reduction of =650160 KiB=
+  (=634.92 MiB=, =49.55%=).
+- Cgroup memory: =1487839232 -> 596393984 bytes=, a reduction of
+  =850.15 MiB= (=59.92%=).
+- Cgroup tasks: =58 -> 38=.
+- Aggregate qmlls PSS fell by =307.25 MiB= while its count fell from three to
+  one.
+- Aggregate Harper PSS fell by =265.62 MiB= while its count fell from three to
+  two across the same two distinct prose roots.
+
+The total reduction is not attributed solely to server reuse: the fresh daemon
+used about =59.85 MiB= less PSS, and the previous =2.21 MiB= Aspell process was
+not recreated because no active spelling session required it.  Cgroup memory
+and summed PSS use different accounting and are reported independently.
+
+* Deferred And Unresolved
+Formatting is explicitly unvalidated by this slice.  The
+=sk/run-formatter-command= timeout reproduced without Eglot or language
+servers, while direct =qmlformat= and batch =call-process= passed.  Its wrapper
+investigation remains a separate job; this record makes no formatting claim.
+
+During the controlled restart, systemd recorded the old daemon's expected
+=SIGTERM= exit as status 15 and a failed result before starting the accepted
+daemon successfully.  The current service is healthy, but that accounting and
+the broader deterministic-shutdown problem remain unresolved in
+[[file:../audits/2026-07-14-nixos-system.org][the NixOS system audit]].  They
+predate and were not caused by this payload.
+
+* Preservation And Acceptance Boundary
+- The ELPA cache fingerprint remained
+  =sha256-pzoIKY/wxOmMpUbrs+0IIs7AJ1WdABFhWu6/gyaTXXk==.
+- The four unrelated untracked wallpapers and their hashes were unchanged.
+- Managed Emacs and service links were unchanged.
+- The current and booted NixOS generations were unchanged.
+- No =nrs=, package mutation, second restart, force, rebase, autostash,
+  managed-link change, or NixOS activation occurred.
+
+Acceptance is limited to payload =e138c039= and the native Eglot reuse evidence
+above.  This handoff does not authorize formatter work, shutdown-policy work,
+another restart, code changes, package changes, activation, or another Emacs
+optimization slice.

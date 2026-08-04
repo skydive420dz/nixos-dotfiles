@@ -13,7 +13,7 @@ commits, pushes, service changes, or branch deletion.
 | Surface | Confirmed current state | Next accepted step |
 |---------+-------------------------+--------------------|
 | System | Current system profile is generation 885 on NixOS =26.11.20260729.0954f7e=; the scheduled 30-day GC policy remains active; reusable build outputs are retained; recurring store optimization remains deferred | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
-| Emacs | Clean Emacs is the MSI editor owner; standalone NVF moved to the external =neovim-nvf= repository and is absent from the MSI closure; the accepted QML policy uses verified four-space formatting | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
+| Emacs | Clean Emacs is the MSI editor owner; native Eglot reuse is promoted and live-validated at =e138c039= with one server per project root; standalone NVF remains external | Finish or explicitly defer Python hand tests; formatter-wrapper and systemd shutdown work remain separate |
 | Quickshell | Native cleanup, Slice 6A wallpaper-preview memory, structural maintenance, and theme refresh are promoted and live from =main= at =6aa11687=.  The installed-path =SkyDark -> SkyLight -> SkyDark= gate passed without session loss or unexpected warnings | Slow wheel travel remains a separate native =Flickable= UX micro-slice; fresh dual-output validation remains separate |
 | Vial/QMK | MSI QMK udev ownership remains active for compatible keyboards; the Vial and QMK applications were removed from the system closure | Keep firmware writes and flashing separate and explicitly authorized; reinstall an application only for a real firmware task |
 | VS Code | The MSI Home Manager profile owns VS Code settings/extensions and Codex tooling; window state is preserved between launches, and =nix-ld= supports Remote SSH | Refine from measured Linux use; adapt remaining macOS choices without Darwin-specific pins |
@@ -99,6 +99,9 @@ in
 The accepted, promoted, locally adopted, and live-validated Emacs and Ghostty
 theme-refresh successor is in
 [[file:handoffs/2026-08-04-quickshell-theme-refresh-acceptance.org][the theme refresh acceptance handoff]].
+The accepted, promoted, locally adopted, and live-validated native Eglot reuse
+payload is in
+[[file:handoffs/2026-08-04-emacs-eglot-reuse-acceptance.org][the Emacs Eglot reuse acceptance handoff]].
 
 * Current Work Lanes
 - System: =work/nixos-maintenance= remains the permanent maintenance
@@ -110,8 +113,10 @@ theme-refresh successor is in
   refresh are promoted and live from =main= at =6aa11687=.  Slow wheel travel
   is a separate native =Flickable= UX micro-slice; a =GridView= rewrite is not
   selected.  Fresh dual-output validation remains separate.
-- Emacs: complete or explicitly defer the Python acceptance decision before
-  selecting another language or optimization slice.
+- Emacs: native Eglot reuse is accepted at =e138c039=.  Complete or explicitly
+  defer the Python acceptance decision before selecting another language or
+  optimization slice; formatter-wrapper and systemd shutdown work remain
+  separate.
 - VS Code: refine the current Home Manager profile only from measured Linux
   use.
 
@@ -136,6 +141,7 @@ history.
 - [[file:projects/clipboard-launcher.org][Completed clipboard and launcher work]]
 
 * Evidence And History
+- [[file:handoffs/2026-08-04-emacs-eglot-reuse-acceptance.org][2026-08-04 Emacs native Eglot reuse acceptance and live adoption]]
 - [[file:handoffs/2026-08-04-quickshell-theme-refresh-acceptance.org][2026-08-04 Quickshell theme refresh acceptance, promotion, and live adoption]]
 - [[file:handoffs/2026-08-03-quickshell-structural-maintenance-acceptance.org][2026-08-03 Quickshell structural maintenance acceptance]]
 - [[file:handoffs/2026-08-03-quickshell-wallpaper-preview-memory.org][2026-08-03 Quickshell Slice 6A wallpaper memory acceptance]]
