@@ -2,27 +2,34 @@
 #+startup: overview
 
 * Status
-The theme-refresh successor is =ACCEPTED= after separate source and controlled
-runtime gates.  It is not published, promoted, adopted by the live checkout,
-or activated through NixOS or Home Manager.
+The theme-refresh successor is =ACCEPTED=, published, promoted, locally
+adopted, and live-validated after separate source, controlled-runtime, and
+installed-path gates.  It was not activated through NixOS or Home Manager.
 
-- Live baseline and current =main=:
+- Promotion and adoption base:
   =460db218d5e015efedb3755c9a1592e183184f93=
 - Untouched original payload:
   =cd14b216fdb00a079eed3d15fec043bf84a23003=
 - Accepted successor payload:
   =a8b20caf45ea0fa0c9098c43964212a58c405e64=
-- Accepted full tree:
+- Accepted payload tree:
   =8ff34f088ec01c0dd25e7ed72336dc5c445bcfc0=
+- Acceptance evidence and promoted/live head:
+  =6aa11687e0368b7d217cfbc3c0076b9a139b6bf2=
+- Remote =main=, remote =work/nixos-maintenance=, and local live =main=:
+  =6aa11687e0368b7d217cfbc3c0076b9a139b6bf2=
+- Promoted/live tree:
+  =cd287a6e47582a606cf0be8c5216c90a0bb62135=
 - Stable patch ID:
   =b0115972caf2d65ab1cab66f1abc6dc6f8a4f3fa=
-- Lane: =work/quickshell-theme-refresh-successor=, local and unpublished
+- Payload lane: =work/quickshell-theme-refresh-successor=
 - Live NixOS: generation 885, unchanged
 - Current system:
   =/nix/store/3ngbf9jfg8r3yvzpdmrlk8daswdys7pv-nixos-system-nixos-26.11.20260729.0954f7e=
 
-The successor is the single linear descendant =460db21 -> a8b20ca=.  The
-original =work/quickshell-theme-refresh= branch remains unchanged at =cd14b21=.
+The promoted sequence is the clean linear ancestry
+=460db21 -> a8b20ca -> 6aa1168=.  The original
+=work/quickshell-theme-refresh= branch remains unchanged at =cd14b21=.
 
 * Change
 =scripts/theme-select.d/consumers.sh= keeps the existing tmux =source-file=
@@ -137,18 +144,100 @@ Emacs or Harper failure occurred.
 - =~/.config/quickshell= still points to
   =/nix/store/xrzq7ldn613vjm63xdbcrib7wyvccafr-home-manager-files/.config/quickshell=
   and resolves to the live =main= checkout.
-- Local =main= and =origin/main= remained =460db21=.  The current NixOS system
-  remained the store path recorded above.
+- At the end of the controlled candidate gate, local =main= and =origin/main=
+  remained =460db21=.  The current NixOS system remained the store path
+  recorded above.
 - The rollback timer was disarmed and never triggered.
+
+* Promotion And Installed-Path Adoption
+** Source promotion
+Fresh fetches confirmed both remote =main= and =work/nixos-maintenance= at the
+approved base =460db21=.  The ancestry above was rechecked, then normal
+non-forced pushes advanced maintenance first and =main= second to =6aa1168=.
+Both remote refs were verified directly at that exact commit.  No merge,
+rebase, force, or autostash occurred.
+
+The live checkout remained at =460db21= during source promotion.  Its theme,
+wallpaper, generated files, managed links, NixOS system, and application
+processes were unchanged.
+
+** Local fast-forward
+A separate fetch confirmed local =main= at =460db21=, =origin/main= at
+=6aa1168=, and a strict fast-forward relationship.  The live checkout then ran
+only:
+
+#+begin_src sh
+git merge --ff-only origin/main
+#+end_src
+
+Local =main= and =origin/main= now both equal =6aa1168=.  The four unrelated
+untracked wallpapers retained their exact hashes.  Sibling branches were not
+changed.
+
+** Installed selector
+The installed command resolves through the existing Home Manager out-of-store
+link without a rebuild:
+
+- command: =~/.config/scripts/theme-select=
+- canonical entrypoint:
+  =/home/skydive420dz/Projects/nixos-dotfiles/scripts/theme-select=
+- canonical consumer helper:
+  =/home/skydive420dz/Projects/nixos-dotfiles/scripts/theme-select.d/consumers.sh=
+- accepted installed consumer SHA-256:
+  =e8a506f563a9d563272304dce2ebc5e2e972d6ae7fe14f112eb8309a837c9b3d=
+
+The entrypoint sources the helper on every invocation, so the fast-forward made
+the accepted Emacs and Ghostty reload paths available immediately.  No NixOS
+or Home Manager activation and no managed-link change were required.
+
+** Normal live cycle
+One normal installed-path =SkyDark -> SkyLight -> SkyDark= cycle passed under
+an automatic rollback timer:
+
+- Emacs remained PID =2872= with the same invocation, buffers, modified-file
+  states, LSPs, and subprocesses.  Its default foreground/background changed
+  =#f0efeb/#1a1d21 -> #1a1d21/#f0efeb -> #f0efeb/#1a1d21=.
+- Ghostty remained PID =2870= with the same invocation, window, shell =356668=,
+  and tmux client =357421=.  Both native reloads succeeded.  Its fixed sample
+  changed =#262526 -> #E9E6E2 -> #262526=, and its baseline and final captures
+  were byte-identical.
+- tmux remained server PID =4547= with sessions =$0= and =$2=, panes =%0= and
+  =%2=, pane PIDs, client, and TTYs unchanged.  Its status style changed dark
+  to light and back to the exact dark baseline.
+- Quickshell remained PID =418508= with the same invocation and =NRestarts=0=.
+  Its fixed sample changed =#212B36 -> #BBBEBE -> #212B36= without restart.
+- Mako performed exactly its two expected restart cycles, with PID sequence
+  =436168 -> 441754 -> 442340=; all invocations were successful with
+  =NRestarts=0=.
+
+The journal recorded two successful Ghostty reloads and two expected Mako
+restart cycles.  Each Ghostty reload emitted the known
+~warning(gtk_ghostty_application): unimplemented action=.cell_size~ text
+warning.  No new warning-priority journal entry occurred.
+
+All 23 deterministic generated files returned to their exact =SkyDark=
+baseline.  The timestamp-only =quickshell-signal= was the sole designed
+difference and was restored from the protected baseline; all 24 generated
+files then matched exactly.  The final manifest digest was
+=eda828ba2ed566edb492cca87e00cddbdc1210a3fce77916f29823c7338e18cc=.
+
+The active and session themes are =SkyDark=.  Wallpaper remains
+=mygirlsultrawide.png=; its state files and all four unrelated wallpaper hashes
+remain unchanged.  The Quickshell managed link and current NixOS system remain
+the paths recorded above.  Rollback was disarmed and never triggered.
 
 * Acceptance Boundary
 Acceptance covers only the two-file payload at =a8b20ca=: automatic refresh of
 the existing Emacs and service-owned Ghostty consumers plus the matching theme
 contract documentation.
 
-This record does not authorize publication, promotion, a live-checkout update,
-consumer reload, managed-link change, NixOS or Home Manager activation, branch
-deletion, or another optimization slice.  Promotion requires fresh remote-ref
-checks and a strict non-forced fast-forward through this evidence commit.
+Publication, strict-fast-forward promotion through =6aa1168=, local adoption,
+and installed-path live validation are complete.  No NixOS or Home Manager
+activation occurred or was required; the managed link and current system
+remain unchanged.
+
+This record does not authorize another theme cycle, consumer reload, code or
+configuration change, managed-link change, NixOS or Home Manager activation,
+branch deletion, or another optimization slice.
 
 Slow wallpaper wheel travel and fresh dual-output validation remain separate.
