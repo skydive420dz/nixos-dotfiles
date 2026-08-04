@@ -1,0 +1,154 @@
+#+title: Quickshell Theme Refresh Acceptance - 2026-08-04
+#+startup: overview
+
+* Status
+The theme-refresh successor is =ACCEPTED= after separate source and controlled
+runtime gates.  It is not published, promoted, adopted by the live checkout,
+or activated through NixOS or Home Manager.
+
+- Live baseline and current =main=:
+  =460db218d5e015efedb3755c9a1592e183184f93=
+- Untouched original payload:
+  =cd14b216fdb00a079eed3d15fec043bf84a23003=
+- Accepted successor payload:
+  =a8b20caf45ea0fa0c9098c43964212a58c405e64=
+- Accepted full tree:
+  =8ff34f088ec01c0dd25e7ed72336dc5c445bcfc0=
+- Stable patch ID:
+  =b0115972caf2d65ab1cab66f1abc6dc6f8a4f3fa=
+- Lane: =work/quickshell-theme-refresh-successor=, local and unpublished
+- Live NixOS: generation 885, unchanged
+- Current system:
+  =/nix/store/3ngbf9jfg8r3yvzpdmrlk8daswdys7pv-nixos-system-nixos-26.11.20260729.0954f7e=
+
+The successor is the single linear descendant =460db21 -> a8b20ca=.  The
+original =work/quickshell-theme-refresh= branch remains unchanged at =cd14b21=.
+
+* Change
+=scripts/theme-select.d/consumers.sh= keeps the existing tmux =source-file=
+and Mako restart paths.  Between them it now:
+
+- calls =(sk/load-theme)= through an existing Emacs server with =emacsclient=;
+- asks the service-owned Ghostty instance to perform its native systemd reload.
+
+The payload also updates =docs/areas/theme.org= to describe those two runtime
+reload paths and their existing manual fallbacks.  It does not change tmux,
+Mako, Quickshell, generated-file, service, or palette ownership.
+
+* Verification
+** Source
+- The original and successor payloads have the same stable patch ID above.
+  The original branch and commit remain unchanged.
+- The replay changed only =docs/areas/theme.org= and
+  =scripts/theme-select.d/consumers.sh= above =460db21=.
+- Bash syntax and contextual ShellCheck passed.
+- =scripts/check-quickshell= passed for 34 QML files, 15 Bash files, and one
+  JSON file.  QML lint reported only the repository's exact named tooling
+  metadata diagnostics.
+- =git diff --check= passed.
+- Ghostty 1.3.1 accepted the generated configuration without changing its
+  running PID.
+- An isolated tmux 3.7b server parsed the generated configuration without
+  changing the live server.
+- A non-mutating Emacs lookup found =sk/load-theme= in
+  =config/emacs/lisp/sk-theme.el= through the running daemon.
+- The promoted wallpaper-memory and structural-maintenance work remain
+  unchanged ancestors through =460db21=.
+
+No consumer reload or theme toggle occurred during the source gate.
+
+** Controlled runtime
+The exact accepted successor ran the existing selector flow through
+=SkyDark -> SkyLight -> SkyDark= under an automatic rollback supervisor.  The
+live checkout and managed links were never changed.
+
+The baseline was =SkyDark=.  Exactly 24 theme-managed files were snapshotted;
+their SHA-256 manifest digest was
+=de1e71e8a5a1348a1e7cce49b95ecd38680fb8ea3ff82dd061b5c81a15129654=.
+The nine theme session variables and the live application/session inventories
+were also recorded before the first transition.
+
+*** Emacs
+- PID =2872= and invocation =cdaa46a2a78143288163ea727fc55f70=
+  remained unchanged with =NRestarts=0=.
+- Default foreground/background faces changed
+  =#f0efeb/#1a1d21 -> #1a1d21/#f0efeb -> #f0efeb/#1a1d21=.
+- The complete baseline and final buffer, file-buffer, modified-state, and
+  external-process inventories were identical.
+- Harper language servers =27310=, =110810=, and =112572=; Aspell =113096=;
+  nixd =357902=; and nixd workers =357939= and =357941= remained alive.
+
+The accepted =emacsclient= path therefore refreshed active faces without
+restarting Emacs or losing buffers, LSPs, or subprocesses.
+
+*** Ghostty
+- The service remained type =notify-reload= with reload signal =SIGUSR2=.
+- PID =2870=, invocation =05b82f41930c4fcea818819cf3970da6=,
+  start timestamp, and =NRestarts=0= remained unchanged.
+- Both reloads returned =ReloadResult=success= and reread the tracked Ghostty
+  config plus the generated =ghostty.conf=.
+- The process tree remained Ghostty -> zsh =356668= -> tmux client =357421=.
+- D-Bus retained the same window object
+  =/com/mitchellh/ghostty/window/2=.
+- A fixed background sample changed
+  =#262526 -> #E9E6E2 -> #262526=.  The complete baseline and final Ghostty
+  captures were byte-identical with zero changed pixels.
+
+The tested Ghostty session had no prior scrollback, so its scrollback check was
+waived as not applicable.  It was not directly proven.  A separate existing
+Ghostty session retained its history through the transition; that result is
+user-confirmed.  The user accepted the unchanged PID, window, shell, tmux
+client, and successful native reloads as sufficient, with no contrary evidence.
+
+*** tmux
+- Server PID =4547= remained unchanged.
+- Sessions =$0= and =$2=, panes =%0= and =%2=, pane PIDs =4703= and =357422=,
+  client =357421=, TTYs, commands, and dead-state flags were identical.
+- Status style changed
+  =bg=#1a1d21,fg=#f0efeb -> bg=#f0efeb,fg=#1a1d21 -> bg=#1a1d21,fg=#f0efeb=.
+
+The existing =source-file= path therefore refreshed tmux without session or
+pane loss.  The payload does not change that path.
+
+*** Quickshell and Mako
+- Quickshell remained PID =418508= with invocation
+  =bccae9de706f41b7b6b3b26e084c3df4= and =NRestarts=0=.
+- A fixed bar sample changed =#212B36 -> #BBBEBE -> #212B36=, confirming the
+  existing watched-file refresh without a Quickshell restart.
+- Mako followed its existing restart contract: PID
+  =427826 -> 433139 -> 433796=.  Both new invocations were active and
+  successful with =NRestarts=0=.
+
+No new warning-priority journal entry occurred.  Ghostty emitted its known
+pre-existing ~warning(gtk_ghostty_application): unimplemented action=.cell_size~
+text warning on each reload.
+An August 2 Harper core dump was already present before the gate; no new
+Emacs or Harper failure occurred.
+
+* Restoration
+- =SkyDark= and all nine session variables returned to baseline.
+- The 23 deterministic generated-file hashes matched immediately.  The
+  timestamp-bearing =quickshell-signal= changed as designed, was restored from
+  the protected snapshot, and then all 24 hashes matched baseline exactly.
+- Wallpaper state remained
+  =/home/skydive420dz/Projects/nixos-dotfiles/wallpapers/mygirlsultrawide.png=.
+  Its state files and the four unrelated untracked wallpaper hashes were
+  unchanged.
+- =~/.config/quickshell= still points to
+  =/nix/store/xrzq7ldn613vjm63xdbcrib7wyvccafr-home-manager-files/.config/quickshell=
+  and resolves to the live =main= checkout.
+- Local =main= and =origin/main= remained =460db21=.  The current NixOS system
+  remained the store path recorded above.
+- The rollback timer was disarmed and never triggered.
+
+* Acceptance Boundary
+Acceptance covers only the two-file payload at =a8b20ca=: automatic refresh of
+the existing Emacs and service-owned Ghostty consumers plus the matching theme
+contract documentation.
+
+This record does not authorize publication, promotion, a live-checkout update,
+consumer reload, managed-link change, NixOS or Home Manager activation, branch
+deletion, or another optimization slice.  Promotion requires fresh remote-ref
+checks and a strict non-forced fast-forward through this evidence commit.
+
+Slow wallpaper wheel travel and fresh dual-output validation remain separate.
