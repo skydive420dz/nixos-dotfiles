@@ -1,8 +1,9 @@
 pragma Singleton
 
 import QtQuick
+import Quickshell
 
-QtObject {
+Singleton {
     // Status cluster geometry. Tune these first when the right pill drifts.
     readonly property int statusClusterWidth: 240
     readonly property int statusClusterLeftMargin: 8
