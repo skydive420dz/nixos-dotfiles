@@ -184,7 +184,7 @@ server config to prose servers like Harper."
              (not (eglot-managed-p)))
     (condition-case err
         (progn
-          (apply #'eglot (eglot--guess-contact))
+          (eglot-ensure)
           (when (fboundp 'sk/capf-code-defaults)
             (sk/capf-code-defaults)))
       (error
