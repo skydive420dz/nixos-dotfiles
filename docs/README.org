@@ -14,7 +14,7 @@ commits, pushes, service changes, or branch deletion.
 |---------+-------------------------+--------------------|
 | System | Current system profile is generation 885 on NixOS =26.11.20260729.0954f7e=; the scheduled 30-day GC policy remains active; reusable build outputs are retained; recurring store optimization remains deferred | No earlier than =2026-08-18= and after at least two actual scheduled GC runs, perform a separate read-only accumulation measurement; boot retention remains separate |
 | Emacs | Clean Emacs is the MSI editor owner; standalone NVF moved to the external =neovim-nvf= repository and is absent from the MSI closure; the accepted QML policy uses verified four-space formatting | Finish or explicitly defer Python hand tests; later TLC stays slice-based |
-| Quickshell | Native cleanup code head =3f0f0c0= is accepted, published, promoted through =45589bc=, and live on generation 885.  Slice 6A payload =cf97818= is accepted for bounded wallpaper-preview memory after source, no-link build, matched runtime, and =eDP-1= hands-on gates; it remains local, unpublished, unpromoted, and not live | Promote Slice 6A only through the separately approved strict fast-forward gate.  Treat slow wheel travel as a separate native =Flickable= UX micro-slice; fresh dual-output validation remains deferred |
+| Quickshell | Native cleanup and Slice 6A wallpaper-preview memory are promoted and live from =main= at =42f44b4=.  Structural successor =aa469091= is accepted after source, no-link build, and controlled-runtime gates but remains unpublished, unpromoted, and not live | Promote the structural successor only through a separately approved strict fast-forward gate.  Theme-refresh remains a separate source-ready branch pending its own live gate; slow wheel travel remains a separate native =Flickable= UX micro-slice |
 | Vial/QMK | MSI QMK udev ownership remains active for compatible keyboards; the Vial and QMK applications were removed from the system closure | Keep firmware writes and flashing separate and explicitly authorized; reinstall an application only for a real firmware task |
 | VS Code | The MSI Home Manager profile owns VS Code settings/extensions and Codex tooling; window state is preserved between launches, and =nix-ld= supports Remote SSH | Refine from measured Linux use; adapt remaining macOS choices without Darwin-specific pins |
 | Doom/Ollama | Doom is retired; Ollama unit, binary, listener, and public state path are absent; the user completed privileged state removal | Remember that rollback generation 855 restores the old service configuration |
@@ -93,6 +93,9 @@ The accepted, published, promoted, and activated native-plumbing cleanup is in
 [[file:handoffs/2026-08-03-quickshell-native-cleanup-acceptance.org][the native cleanup acceptance handoff]].
 The accepted local wallpaper-preview memory payload is in
 [[file:handoffs/2026-08-03-quickshell-wallpaper-preview-memory.org][the Slice 6A acceptance handoff]].
+The accepted reload-aware singleton and unused-input maintenance successor is
+in
+[[file:handoffs/2026-08-03-quickshell-structural-maintenance-acceptance.org][the structural maintenance acceptance handoff]].
 
 * Current Work Lanes
 - System: =work/nixos-maintenance= remains the permanent maintenance
@@ -100,11 +103,12 @@ The accepted local wallpaper-preview memory payload is in
   reaches =main= only through a strict fast-forward promotion.  Keep
   conservative GC and perform the deferred read-only store measurement no
   earlier than =2026-08-18= before reconsidering recurring optimization.
-- Quickshell: the native cleanup is accepted, published, promoted, and live on
-  generation 885.  Slice 6A is accepted for bounded preview memory but remains
-  local, unpublished, unpromoted, and not live.  Slow wheel travel is a
-  separate native =Flickable= UX micro-slice; a =GridView= rewrite is not
-  selected.  Fresh dual-output validation remains separate.
+- Quickshell: the native cleanup and Slice 6A are promoted and live from
+  =main= at =42f44b4=.  Structural successor =aa469091= is accepted but remains
+  unpublished, unpromoted, and not live.  Theme-refresh remains separate and
+  pending its live gate.  Slow wheel travel is a separate native =Flickable=
+  UX micro-slice; a =GridView= rewrite is not selected.  Fresh dual-output
+  validation remains separate.
 - Emacs: complete or explicitly defer the Python acceptance decision before
   selecting another language or optimization slice.
 - VS Code: refine the current Home Manager profile only from measured Linux
@@ -131,6 +135,7 @@ history.
 - [[file:projects/clipboard-launcher.org][Completed clipboard and launcher work]]
 
 * Evidence And History
+- [[file:handoffs/2026-08-03-quickshell-structural-maintenance-acceptance.org][2026-08-03 Quickshell structural maintenance acceptance]]
 - [[file:handoffs/2026-08-03-quickshell-wallpaper-preview-memory.org][2026-08-03 Quickshell Slice 6A wallpaper memory acceptance]]
 - [[file:handoffs/2026-08-03-quickshell-native-cleanup-acceptance.org][2026-08-03 Quickshell native cleanup acceptance and activation]]
 - [[file:handoffs/2026-07-29-quickshell-slice4e2-acceptance.org][2026-07-29 Quickshell Slice 4E2 native active-title acceptance]]

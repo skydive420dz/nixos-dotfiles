@@ -1,0 +1,136 @@
+#+title: Quickshell Structural Maintenance Acceptance - 2026-08-03
+#+startup: overview
+
+* Status
+The structural maintenance successor is =ACCEPTED= after separate source,
+build, and controlled-runtime gates.  It is not published, promoted, activated,
+or live.
+
+- Live baseline and current =main=:
+  =42f44b4a823a03ee2a78b64e160abb02330f5658=
+- Reload-aware singleton payload:
+  =b7d36d9d3e96b06a6f8ebc64a9119ad3d7e57a97=
+- Unused-input payload and accepted source head:
+  =aa469091d29c4d58635d87f8e0f4e3e49ef61c04=
+- Accepted full tree:
+  =8646ba3a7596c991b5cc1a254bd7ce6c0eabfe25=
+- Accepted Quickshell tree:
+  =3b714041d97954430f083fce68426b617bf46f50=
+- Lane: =work/quickshell-structural-successor=, local and unpublished
+- Live NixOS: generation 885, unchanged
+- Verified NixOS output:
+  =/nix/store/3ngbf9jfg8r3yvzpdmrlk8daswdys7pv-nixos-system-nixos-26.11.20260729.0954f7e=
+
+The original structural branch and its commits remain unchanged at
+=6e1e7a0b0b84b1ca5efec87baa58695828a61331= and
+=c95dccb36145bc89a9bf96c5307ab3044f196492=.  The theme-refresh branch remains
+unchanged at =cd14b216fdb00a079eed3d15fec043bf84a23003=.  The accepted
+successor is the exact linear descendant
+=42f44b4 -> b7d36d9 -> aa469091=.
+
+* Change
+** Reload-aware singleton roots
+=Theme.qml=, =StatusMetrics.qml=, and =WallpaperStore.qml= now inherit from
+Quickshell's =Singleton= type instead of =QtObject=.  =import Quickshell= was
+added only to =StatusMetrics.qml=, where it was required.  Their
+=pragma Singleton=, =qmldir= declarations, callers, public properties, signals,
+process ownership, and per-screen consumers remain unchanged.
+
+** Unused Quickshell input
+The dedicated upstream Quickshell flake input and its lock node are removed.
+The system and service continue to use =pkgs.quickshell= from the pinned
+=nixpkgs=.  No package owner or runtime command changes.
+
+The two replayed payloads retain the stable patch IDs of the untouched original
+commits:
+
+| Original | Successor | Stable patch ID |
+|----------+-----------+-----------------|
+| =6e1e7a0= | =b7d36d9= | =7cd87fc29a53a9210ccb7ac12add3e6bdd482aec= |
+| =c95dccb= | =aa469091= | =06c755ddd3a2fc72345cca4a00175c99cd40bd70= |
+
+* Verification
+** Source and build
+- =scripts/check-quickshell= passed: 34 QML files, 15 Bash files, and one JSON
+  file passed the repository gates.
+- =git diff --check= passed.
+- The lock graph changed from 26 nodes to 25.  Only =nodes.quickshell= and
+  =nodes.root.inputs.quickshell= disappeared; deleting those fields from the
+  old lock produces the accepted lock exactly, with normalized SHA-256
+  =8748aa09fa9f1ce1faafedcb855c84c9dd1be4913dcc96f01086a14b3aebfaf7=.
+- =pkgs.quickshell= remains version =0.3.0= at
+  =/nix/store/a6igyvb885zblk3khnng7prz205rm89m-quickshell-0.3.0= on both
+  =42f44b4= and =aa469091=.  Its derivation remains
+  =/nix/store/94f36qp5y2dnlr5h7lymq4v9s89vkf41-quickshell-0.3.0.drv=.
+- Read-only evaluation returns the same NixOS toplevel above for both heads.
+  The separate =--no-link --impure= build gate returned that same output and
+  performed no activation.
+- The accepted wallpaper-memory change remains present.  Its
+  =WallpaperSelector.qml= blob is
+  =44f8d84c97b179c7b90651aef1af11b70b75ff42=.
+
+** Controlled runtime
+The exact accepted Quickshell tree ran from its isolated worktree in a distinct
+transient user unit.  The normal service was stopped under an automatic
+rollback timer; the live checkout and Home Manager-managed link were never
+changed.
+
+- Candidate PID: =411130=
+- Candidate invocation: =d1c108ed84384597a109b07ee3af5bc8=
+- Configuration loaded successfully with zero warnings and =NRestarts=0=.
+- =SkyDark= and =mygirlsultrawide.png= remained selected at startup.
+- The closed state contained only =qs-wallpaper= and =qs-bar=.  Opening the
+  selector added one =qs-wallpaper-picker= at =0,36= with size =1920x1044=.
+- The user confirmed that the selector opened normally and the right status
+  geometry had no clipping, spacing shift, or height change.
+- The theme watcher rendered =SkyDark -> SkyLight -> SkyDark= without changing
+  PID or invocation.  A fixed bar pixel changed RGB
+  =33 44 55 -> 183 187 187 -> 33 44 55=.
+- The wallpaper watcher responded to a controlled selection of tracked
+  =wallpaper-008.jpg= and returned to =mygirlsultrawide.png= without changing
+  PID or invocation.
+
+Matched ten-second profiles used the same candidate PID and invocation:
+
+| State | Main PSS start | Main PSS end | Cgroup current | Framebuffer | Sampled children | Warnings |
+|-------+----------------+--------------+----------------+-------------+------------------+----------|
+| Closed | 147298304 B | 147343360 B | 76963840 B | 112 MiB | 1 CAVA | 0 |
+| Selector open | 201143296 B | 201192448 B | 127680512 B | 150 MiB | 1 CAVA | 0 |
+
+Opening added about 51.3 MiB of end-sample PSS and 38 MiB of framebuffer
+allocation.  Open PSS changed by only 49152 bytes during the sample.  No image
+decoder child or warning was observed, so preview memory remained bounded.
+
+** Restoration
+The supervisor restored the unchanged normal service through the original
+managed path.
+
+- Restored PID: =418508=
+- Restored invocation: =bccae9de706f41b7b6b3b26e084c3df4=
+- The original configuration produced one successful load, zero warnings, and
+  =NRestarts=0=.
+- =SkyDark=, =mygirlsultrawide.png=, both watcher signals, and their exact
+  saved bytes were restored.
+- =~/.config/quickshell= still points to
+  =/nix/store/xrzq7ldn613vjm63xdbcrib7wyvccafr-home-manager-files/.config/quickshell=
+  and resolves to the live =main= checkout.
+- The four unrelated untracked wallpapers retained their exact hashes.
+- The transient candidate and rollback units were stopped, and their temporary
+  artifacts were removed.
+
+One reporting assertion expected different whitespace around the journal's
+=Configuration Loaded= message.  Direct invocation-scoped journal and service
+checks passed; this test-reporting mismatch did not affect rollback or
+acceptance.
+
+* Acceptance Boundary
+Acceptance covers the singleton-root correction and unused-input removal only.
+Named-configuration-directory and broad =import qs= migrations remain skipped
+because they solve no current problem.  Theme-refresh automation remains a
+separate source-ready branch pending its own live gate.
+
+This record does not authorize publication, promotion, a live-checkout update,
+Quickshell reload, managed-link change, NixOS or Home Manager activation,
+branch deletion, or a new optimization slice.  Promotion requires a fresh
+remote-ref check and a strict non-forced fast-forward through this evidence
+commit.  Fresh dual-output validation remains deferred.
