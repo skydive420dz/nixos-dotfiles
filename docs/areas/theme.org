@@ -86,7 +86,9 @@ These can change without =nrs=, usually after =theme-select toggle= or =theme-se
 
 - Quickshell reads =quickshell.json= and watches =quickshell-signal=. Normal selector changes reload it in place without restarting =quickshell.service=.
 - Mako is restarted and reads =mako.conf=.
-- Ghostty reads =ghostty.conf= from its generated config include. Existing windows can reload with =Ctrl+Shift+,=; some options only affect new terminals.
+- Ghostty reads =ghostty.conf= from its generated config include.  Normal
+  selector changes reload the service-owned instance in place; =Ctrl+Shift+,=
+  remains a manual fallback, and some options still affect only new terminals.
 - tmux reloads through =tmux source-file ~/.config/theme/current/tmux.conf=.
 - Starship uses =STARSHIP_CONFIG=; new prompts pick up the generated config.
 - zsh and fzf use =~/.config/theme/current/env=; existing shells may need to source it again or start fresh.
@@ -100,8 +102,8 @@ These can change without =nrs=, usually after =theme-select toggle= or =theme-se
 - Clean Emacs uses the local =sky-night= theme in
   =config/emacs/lisp/sk-theme.el=, loads the generated =emacs-theme.el= tokens
   when available, and falls back to its tracked local tokens during startup.
-  Use =SPC h r t= to reload the runtime tokens and active faces in a running
-  Emacs session.
+  Normal selector changes call =sk/load-theme= through =emacsclient= without
+  restarting Emacs; =SPC h r t= remains the manual fallback.
 
 ** Rebuild-Themed Apps
 :PROPERTIES:

@@ -30,5 +30,7 @@ update_session_env() {
 
 reload_consumers() {
   tmux source-file "$current_dir/tmux.conf" >/dev/null 2>&1 || true
+  emacsclient --alternate-editor=false --eval '(sk/load-theme)' >/dev/null 2>&1 || true
+  systemctl --user reload app-com.mitchellh.ghostty.service >/dev/null 2>&1 || true
   systemctl --user restart mako.service >/dev/null 2>&1 || true
 }
