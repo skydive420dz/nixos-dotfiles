@@ -1,12 +1,13 @@
-#+title: Quickshell Slice 6A Wallpaper Preview Memory - 2026-08-03
+#+title: Quickshell Slice 6A Wallpaper Preview Memory Acceptance - 2026-08-03
 #+startup: overview
 
 * Status
-Slice 6A is a =CANDIDATE=.  It is not accepted, pushed, promoted, or activated.
+Slice 6A is =ACCEPTED= specifically for bounded wallpaper-preview memory.  It
+is not pushed, promoted, activated, or live.
 
 - Baseline and live =main=: =768d20cf8ac4f87f8d237b7e8474c230eeaa7fec=
-- Candidate payload: =cf978189e42c7ad21c96b05e3a5f436c6750341d=
-- Lane: =work/nixos-maintenance=, one local commit ahead of its remote
+- Accepted payload: =cf978189e42c7ad21c96b05e3a5f436c6750341d=
+- Lane: =work/nixos-maintenance=, local and unpublished
 - Live NixOS: generation 885, unchanged
 
 This resumes the wallpaper work already identified as =QS-06= and Slice 6 in
@@ -50,6 +51,35 @@ After both controlled runs, the rollback trap restored the normal
 =quickshell.service=.  It was =active/running= with =Result=success= and
 =NRestarts=0=.  No wallpaper was selected or modified during the probes.
 
+** Matched acceptance profile
+The final gate ran the exact candidate Quickshell tree
+=05f3cd80c03af39c0fb5acd9fe158901da81d656= through the real user service under
+an automatic rollback timer.  All three observations used PID =380394= and
+invocation =392974ddbcc94ec38dd6383148b7fe73=.  PSS and cgroup memory are MiB;
+CPU is percent of one core.
+
+| State | Requested | Cgroup CPU | Main CPU | PSS start-end | Cgroup current | Framebuffer | Sampled children | Warnings |
+|-------+-----------+------------+----------+---------------+----------------+-------------+------------------+----------|
+| Closed | 10 s | 0.418% | 0.191% | 139.2 -> 139.0 | 67.4 | 112 MiB | 0 | 0 |
+| Open | 10 s | 0.845% | 0.572% | 175.5 -> 175.8 | 100.3 | 160 MiB | 0 | 0 |
+| Continuous scroll | 15 s | 5.848% | 5.510% | 175.7 -> 175.9 | 100.1 | 160 MiB | 0 | 0 |
+
+Opening added approximately 36.8 MiB of end-sample PSS and 48 MiB of
+framebuffer allocation over the closed state.  During continuous scrolling,
+PSS changed by only about 0.2 MiB and cgroup memory remained near 100 MiB.  No
+child process or warning was sampled.  NVIDIA =pmon= reported 3.833% mean and
+10% maximum numeric SM activity during scrolling.
+
+The user observed smooth rendering that moved too little per scroll input.
+That is a wheel-distance UX issue, not a failure of this memory candidate.
+
+The supervisor restored the exact Home Manager-managed link resolving to live
+=main=.  Quickshell returned as PID =385908=, =active/running=, with
+=Result=success=, =NRestarts=0=, one successful configuration load, zero
+warnings, and only the normal bar and wallpaper layers.  The =SkyDark= theme,
+selected =mygirlsultrawide.png= wallpaper, and their recorded state hashes were
+unchanged.  The rollback unit and temporary artifacts were removed.
+
 * Verification
 - =scripts/check-quickshell= passed after the temporary probe was removed: 34
   QML files, 15 Bash files, and one JSON file passed their repository gates.
@@ -61,15 +91,15 @@ After both controlled runs, the rollback trap restored the normal
   controlled runtime verify the QML bytes.
 - No NixOS or Home Manager activation occurred.
 
-No installed screenshot utility was available for an automated visual capture.
-Human confirmation that the picker thumbnails remain visually acceptable on
-=eDP-1= is therefore the remaining acceptance gate.  Fresh dual-output testing
-remains deferred.
+The final =eDP-1= hands-on gate confirmed smooth rendering while the matched
+profiles established bounded preview memory.  Fresh dual-output testing remains
+deferred.
 
-* Next Gate
-When the user is at the MSI, run this exact candidate under the same rollback
-supervisor and confirm static, GIF, and video thumbnails; search and scrolling;
-the current badge and selection; close/reopen behavior; and an empty warning
-journal.
-Acceptance, documentation closeout, publication, strict fast-forward promotion,
-managed-link activation, and cleanup remain separate facts.
+* Acceptance Boundary
+Acceptance is limited to the four-line preview-memory optimization.  Slow wheel
+travel is a separate UX micro-slice and does not block Slice 6A.  If selected,
+that work must first test the smallest native =Flickable= wheel-distance
+adjustment; it does not authorize a =GridView= rewrite.
+
+Publication, strict fast-forward promotion, managed-link activation, and fresh
+dual-output validation remain separate and unauthorized.
