@@ -44,9 +44,9 @@
     shell-integration-features = no-cursor,title,ssh-env
     confirm-close-surface = true
 
-    custom-shader = ${config.xdg.configHome}/ghostty/shaders/cursor_blaze.glsl
-    custom-shader = ${config.xdg.configHome}/ghostty/shaders/cursor_smear.glsl
-    custom-shader = ${config.xdg.configHome}/ghostty/shaders/bloom025.glsl
+    # custom-shader = ${config.xdg.configHome}/ghostty/shaders/cursor_blaze.glsl
+    # custom-shader = ${config.xdg.configHome}/ghostty/shaders/cursor_smear.glsl
+    # custom-shader = ${config.xdg.configHome}/ghostty/shaders/bloom025.glsl
     custom-shader-animation = true
     window-vsync = true
 
