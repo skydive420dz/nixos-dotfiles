@@ -34,6 +34,11 @@
     enable32Bit = true; # Steam / Wine / 32-bit Vulkan
   };
 
+  services.udev.extraRules = ''
+    SUBSYSTEM=="drm", KERNEL=="card[0-9]*", ENV{ID_PATH_TAG}=="pci-0000_01_00_0", SYMLINK+="dri/nvidia-card"
+    SUBSYSTEM=="drm", KERNEL=="card[0-9]*", ENV{ID_PATH_TAG}=="pci-0000_05_00_0", SYMLINK+="dri/amd-card"
+  '';
+
   # ── NVIDIA driver ─────────────────────────────────────────────────────────
   services.xserver.videoDrivers = [ "nvidia" ];
 
