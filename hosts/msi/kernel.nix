@@ -1,883 +1,9 @@
 { lib, pkgs, ... }:
 
 let
-  enabledKernelOptions =
-    lib.filter (option: option != null) (
-      map
-        (
-          line:
-          let
-            match = builtins.match "CONFIG_([0-9A-Za-z_]+)=[ym]" line;
-          in
-          if match == null then null else builtins.head match
-        )
-        (lib.splitString "\n" (builtins.readFile pkgs.linux_latest.configfile))
-    );
-
-  deadKernelPrefixes = [
-    # Wrong fixed platform vendors.
-    "ACER"
-    "ALIENWARE_"
-    "ASUS_"
-    "BACKLIGHT_"
-    "BATTERY_"
-    "BCMA"
-    "CHARGER_"
-    "CHROME_"
-    "CRYPTO_DEV_"
-    "CROS_"
-    "DELL_"
-    "DRM_"
-    "DVB_"
-    "EDAC_"
-    "FUJITSU_"
-    "GIGABYTE_"
-    "GOOGLE_"
-    "GPD_"
-    "HP_"
-    "HUAWEI_"
-    "HW_RANDOM_"
-    "IBM_"
-    "IDEAPAD_"
-    "IPMI_"
-    "INTEL_"
-    "JOYSTICK_"
-    "KEYBOARD_"
-    "LCD_"
-    "LEDS_"
-    "LENOVO_"
-    "LG_"
-    "MDIO_"
-    "MOUSE_"
-    "NVMEM_"
-    "PANASONIC_"
-    "REDMI_"
-    "SAMSUNG_"
-    "SERIO_"
-    "SIEMENS_"
-    "SONY"
-    "SSB"
-    "SURFACE_"
-    "SYSTEM76_"
-    "THINKPAD_"
-    "TOUCHSCREEN_"
-    "TOSHIBA_"
-    "TUXEDO_"
-    "UNIWILL_"
-    "XIAOMI_"
-    "YOGABOOK"
-
-    # Chip farms behind shared frameworks that this MSI still needs.
-    "DRM_BRIDGE_"
-    "DRM_PANEL_"
-    "GPIO_"
-    "I2C_"
-    "IIO_"
-    "MEDIA_TUNER_"
-    "MFD_"
-    "NET_VENDOR_"
-    "PHY_"
-    "PINCTRL_"
-    "PWM_"
-    "RADIO_"
-    "RC_"
-    "REGULATOR_"
-    "RTC_DRV_"
-    "SENSORS_"
-    "SND_AMD_"
-    "SND_HDA_CODEC_"
-    "SND_HDA_SCODEC_"
-    "SND_SOC_"
-    "SPI_"
-    "VIDEO_"
-  ];
-
-  keptKernelPrefixes = [
-    "DRM_AMD"
-    "DRM_CLIENT"
-    "DRM_DISPLAY_"
-    "DRM_GEM_"
-    "DRM_PANIC"
-    "DRM_TTM"
-    "LEDS_TRIGGER_"
-    "TOUCHSCREEN_USB_"
-  ];
-
-  keptKernelOptions = [
-    "BACKLIGHT_CLASS_DEVICE"
-    "CRYPTO_DEV_CCP"
-    "CRYPTO_DEV_CCP_CRYPTO"
-    "CRYPTO_DEV_CCP_DD"
-    "CRYPTO_DEV_SP_CCP"
-    "CRYPTO_DEV_SP_PSP"
-    "DRM_BUDDY"
-    "DRM_DRAW"
-    "DRM_EXEC"
-    "DRM_FBDEV_EMULATION"
-    "DRM_KMS_HELPER"
-    "DRM_LOAD_EDID_FIRMWARE"
-    "DRM_RAS"
-    "DRM_SCHED"
-    "DRM_SIMPLEDRM"
-    "DRM_SUBALLOC_HELPER"
-    "DRM_SYSFB_HELPER"
-    "EDAC_AMD64"
-    "EDAC_ATOMIC_SCRUB"
-    "EDAC_DECODE_MCE"
-    "EDAC_GHES"
-    "EDAC_SUPPORT"
-    "GPIO_ACPI"
-    "GPIO_CDEV"
-    "HW_RANDOM_AMD"
-    "HW_RANDOM_TPM"
-    "I2C_ALGOBIT"
-    "I2C_BOARDINFO"
-    "I2C_CHARDEV"
-    "I2C_DESIGNWARE_CORE"
-    "I2C_DESIGNWARE_PLATFORM"
-    "I2C_HELPER_AUTO"
-    "I2C_HID"
-    "I2C_HID_ACPI"
-    "I2C_HID_CORE"
-    "I2C_PIIX4"
-    "I2C_SMBUS"
-    "INTEL_RAPL"
-    "INTEL_RAPL_CORE"
-    "JOYSTICK_IFORCE"
-    "JOYSTICK_IFORCE_USB"
-    "JOYSTICK_PXRC"
-    "JOYSTICK_XPAD"
-    "JOYSTICK_XPAD_FF"
-    "JOYSTICK_XPAD_LEDS"
-    "KEYBOARD_ATKBD"
-    "KEYBOARD_GPIO"
-    "LEDS_CLASS"
-    "LEDS_CLASS_FLASH"
-    "LEDS_CLASS_MULTICOLOR"
-    "LEDS_GROUP_MULTICOLOR"
-    "LEDS_TRIGGERS"
-    "LEDS_USER"
-    "MDIO_MVUSB"
-    "MFD_CORE"
-    "MOUSE_APPLETOUCH"
-    "MOUSE_BCM5974"
-    "MOUSE_SYNAPTICS_USB"
-    "NET_VENDOR_REALTEK"
-    "NVMEM_SYSFS"
-    "PHY_COMMON_PROPS"
-    "PHY_PACKAGE"
-    "PINCTRL_AMD"
-    "RTC_DRV_CMOS"
-    "SENSORS_K10TEMP"
-    "SENSORS_SPD5118"
-    "SERIO_I8042"
-    "SERIO_LIBPS2"
-    "SERIO_RAW"
-    "SND_AMD_ACP_CONFIG"
-    "SND_HDA_CODEC_ALC269"
-    "SND_HDA_CODEC_GENERIC"
-    "SND_HDA_CODEC_HDMI"
-    "SND_HDA_CODEC_HDMI_ATI"
-    "SND_HDA_CODEC_HDMI_GENERIC"
-    "SND_HDA_CODEC_HDMI_NVIDIA"
-    "SND_HDA_CODEC_HDMI_SIMPLE"
-    "SND_HDA_CODEC_REALTEK"
-    "SND_HDA_CODEC_REALTEK_LIB"
-    "SND_HDA_SCODEC_COMPONENT"
-    "SND_SOC_ACPI"
-    "SND_SOC_AMD_ACP6x"
-    "SND_SOC_AMD_YC_MACH"
-    "SND_SOC_COMPRESS"
-    "SND_SOC_DMIC"
-    "SND_SOC_GENERIC_DMAENGINE_PCM"
-    "TOUCHSCREEN_SUR40"
-    "VIDEO_DEV"
-  ];
-
-  deadKernelOptions = [
-    # Storage and buses absent from this chassis.
-    "ATA"
-    "ATA_OVER_ETH"
-    "ACPI_NFIT"
-    "DEV_DAX"
-    "FS_DAX"
-    "LIBNVDIMM"
-    "MEMSTICK"
-    "MMC"
-    "MTD"
-    "SCSI_FC_ATTRS"
-    "SCSI_ISCSI_ATTRS"
-    "SCSI_LOWLEVEL"
-    "SCSI_SAS_ATTRS"
-    "SCSI_SAS_LIBSAS"
-    "SCSI_SPI_ATTRS"
-    "SCSI_SRP_ATTRS"
-    "SCSI_UFSHCD"
-    "TARGET_CORE"
-
-    # Card-reader and storage-controller families absent from this laptop.
-    "CB710_CORE"
-    "FUSION"
-    "MISC_ALCOR_PCI"
-    "MISC_RTSX"
-    "MISC_RTSX_PCI"
-    "MISC_RTSX_USB"
-    "TIFM_CORE"
-
-    "ANDROID_BINDER_IPC"
-    "AUXDISPLAY"
-    "FPGA"
-    "FSI"
-    "GAMEPORT"
-    "GNSS"
-    "GREYBUS"
-    "HSI"
-    "I3C"
-    "IIO"
-    "IPACK_BUS"
-    "LCD2S"
-    "MCB"
-    "MHI_BUS"
-    "MHI_BUS_EP"
-    "MOST"
-    "NTB"
-    "PARPORT"
-    "PECI"
-    "PLATFORM_MHU"
-    "PPS"
-    "PTP_1588_CLOCK"
-    "PWM"
-    "RPMSG"
-    "RPMSG_CHAR"
-    "RPMSG_CTRL"
-    "RPMSG_NS"
-    "RPMSG_QCOM_GLINK"
-    "RPMSG_QCOM_GLINK_RPM"
-    "RPMSG_TTY"
-    "RPMSG_VIRTIO"
-    "RPMSG_WWAN_CTRL"
-    "SIOX"
-    "SIOX_BUS_GPIO"
-    "SLIMBUS"
-    "SPI"
-    "SPMI"
-    "STAGING"
-    "STM"
-    "TABLET_SERIAL_WACOM4"
-    "UIO"
-    "W1"
-
-    # Fixed controllers and test clients absent from this host.
-    "ACPI_EXTLOG"
-    "IOMMU_PT_RISCV64"
-    "IOMMU_PT_VTDSS"
-    "PCIEAER_INJECT"
-
-    # Fixed clocks and embedded controllers with no matching device.
-    "AD525X_DPOT"
-    "AD525X_DPOT_I2C"
-    "ALTERA_STAPL"
-    "APDS9802ALS"
-    "BCM_KONA_USB2_PHY"
-    "BCM_VK"
-    "C2PORT"
-    "C2PORT_DURAMAR_2150"
-    "COMMON_CLK_AXI_CLKGEN"
-    "COMMON_CLK_CDCE706"
-    "COMMON_CLK_CDCE925"
-    "COMMON_CLK_CS2000_CP"
-    "COMMON_CLK_MAX9485"
-    "COMMON_CLK_RP1"
-    "COMMON_CLK_RS9_PCIE"
-    "COMMON_CLK_SI514"
-    "COMMON_CLK_SI521XX"
-    "COMMON_CLK_SI5341"
-    "COMMON_CLK_SI5351"
-    "COMMON_CLK_SI544"
-    "COMMON_CLK_SI570"
-    "COMMON_CLK_VC3"
-    "COMMON_CLK_VC5"
-    "COMMON_CLK_VC7"
-    "COMMON_CLK_XLNX_CLKWZRD"
-    "DS1682"
-    "DUMMY_IRQ"
-    "DW_XDATA_PCIE"
-    "EEPROM_93CX6"
-    "EEPROM_AT24"
-    "EEPROM_EE1004"
-    "EEPROM_IDT_89HPESX"
-    "EEPROM_M24LR"
-    "EEPROM_MAX6875"
-    "GENWQE"
-    "GP_PCI1XXXX"
-    "HI6421V600_IRQ"
-    "HISI_HIKEY_USB"
-    "HMC6352"
-    "ICS932S401"
-    "ISL29003"
-    "ISL29020"
-    "KEBA_CP500"
-    "LAN966X_OIC"
-    "MCHP_LAN966X_PCI"
-    "MISC_RP1"
-    "NSM"
-    "OPEN_DICE"
-    "PHANTOM"
-    "RPMB"
-    "TI_FPC202"
-    "UACCE"
-    "VCPU_STALL_DETECTOR"
-    "XILINX_SDFEC"
-
-    # Keep the active AT/GPIO/HID paths and USB input devices.
-    "HID_SENSOR_CUSTOM_SENSOR"
-    "HID_SENSOR_HUB"
-    "INPUT_AD714X"
-    "INPUT_AD714X_I2C"
-    "INPUT_ADXL34X"
-    "INPUT_ADXL34X_I2C"
-    "INPUT_APANEL"
-    "INPUT_ATLAS_BTNS"
-    "INPUT_ATMEL_CAPTOUCH"
-    "INPUT_AW86927"
-    "INPUT_BMA150"
-    "INPUT_CMA3000"
-    "INPUT_CMA3000_I2C"
-    "INPUT_DA7280_HAPTICS"
-    "INPUT_DRV260X_HAPTICS"
-    "INPUT_DRV2665_HAPTICS"
-    "INPUT_DRV2667_HAPTICS"
-    "INPUT_E3X0_BUTTON"
-    "INPUT_GPIO_BEEPER"
-    "INPUT_GPIO_DECODER"
-    "INPUT_GPIO_ROTARY_ENCODER"
-    "INPUT_GPIO_VIBRA"
-    "INPUT_IDEAPAD_SLIDEBAR"
-    "INPUT_IMS_PCU"
-    "INPUT_IQS269A"
-    "INPUT_IQS626A"
-    "INPUT_IQS7222"
-    "INPUT_KXTJ9"
-    "INPUT_MMA8450"
-    "INPUT_PCF8574"
-    "INPUT_RAVE_SP_PWRBUTTON"
-    "INPUT_REGULATOR_HAPTIC"
-
-    # Preserve 8250 DesignWare for the firmware's AMDI0020 nodes.
-    "SERIAL_8250_EXAR"
-    "SERIAL_8250_KEBA"
-    "SERIAL_8250_LPSS"
-    "SERIAL_8250_MEN_MCB"
-    "SERIAL_8250_MID"
-    "SERIAL_8250_NI"
-    "SERIAL_8250_PCI"
-    "SERIAL_8250_PCI1XXXX"
-    "SERIAL_8250_PCILIB"
-    "SERIAL_8250_PERICOM"
-    "SERIAL_ALTERA_JTAGUART"
-    "SERIAL_ALTERA_UART"
-    "SERIAL_ARC"
-    "SERIAL_CONEXANT_DIGICOLOR"
-    "SERIAL_FSL_LINFLEXUART"
-    "SERIAL_FSL_LPUART"
-    "SERIAL_IPOCTAL"
-    "SERIAL_JSM"
-    "SERIAL_LANTIQ"
-    "SERIAL_LITEUART"
-    "SERIAL_MEN_Z135"
-    "SERIAL_MULTI_INSTANTIATE"
-    "SERIAL_OF_PLATFORM"
-    "SERIAL_RP2"
-    "SERIAL_SC16IS7XX"
-    "SERIAL_SC16IS7XX_I2C"
-    "SERIAL_SCCNXP"
-    "SERIAL_SIFIVE"
-    "SERIAL_SPRD"
-    "SERIAL_UARTLITE"
-    "SERIAL_XILINX_PS_UART"
-
-    "PCIE_CADENCE"
-    "PCIE_CADENCE_HOST"
-    "PCIE_CADENCE_PLAT"
-    "PCIE_CADENCE_PLAT_HOST"
-    "PCIE_MICROCHIP_HOST"
-    "PCI_ENDPOINT_TEST"
-    "PCI_HOST_GENERIC"
-    "PCI_MESON"
-    "PCI_PWRCTRL"
-    "PCI_PWRCTRL_GENERIC"
-    "PCI_PWRCTRL_TC9563"
-    "PCI_SW_SWITCHTEC"
-
-    "ALTERA_MSGDMA"
-    "AMD_AE4DMA"
-    "AMD_PTDMA"
-    "AMD_QDMA"
-    "DMABUF_SELFTESTS"
-    "DMAPOOL_TEST"
-    "DMATEST"
-    "DW_AXI_DMAC"
-    "DW_DMAC"
-    "DW_DMAC_CORE"
-    "DW_DMAC_PCI"
-    "DW_EDMA"
-    "DW_EDMA_PCIE"
-    "FSL_EDMA"
-    "HSU_DMA"
-    "PLX_DMA"
-    "QCOM_HIDMA"
-    "QCOM_HIDMA_MGMT"
-    "SF_PDMA"
-    "SWITCHTEC_DMA"
-    "XILINX_DMA"
-    "XILINX_XDMA"
-    "XILINX_ZYNQMP_DPDMA"
-
-    # SP5100_TCO is the bound watchdog; retain software and USB watchdogs.
-    "60XX_WDT"
-    "ACQUIRE_WDT"
-    "ADVANTECH_EC_WDT"
-    "ADVANTECH_WDT"
-    "ALIM1535_WDT"
-    "ALIM7101_WDT"
-    "CADENCE_WATCHDOG"
-    "DW_WATCHDOG"
-    "EBC_C384_WDT"
-    "EUROTECH_WDT"
-    "EXAR_WDT"
-    "F71808E_WDT"
-    "I6300ESB_WDT"
-    "IB700_WDT"
-    "IE6XX_WDT"
-    "IT8712F_WDT"
-    "IT87_WDT"
-    "ITCO_WDT"
-    "MACHZ_WDT"
-    "MAX63XX_WATCHDOG"
-    "MENZ069_WATCHDOG"
-    "MEN_A21_WDT"
-    "NIC7018_WDT"
-    "NI903X_WDT"
-    "PC87413_WDT"
-    "PCIPCWATCHDOG"
-    "RAVE_SP_WATCHDOG"
-    "SBC_EPX_C3_WATCHDOG"
-    "SBC_FITPC2_WATCHDOG"
-    "SC1200_WDT"
-    "SMSC37B787_WDT"
-    "SMSC_SCH311X_WDT"
-    "TQMX86_WDT"
-    "VIA_WDT"
-    "W83627HF_WDT"
-    "W83877F_WDT"
-    "W83977F_WDT"
-    "WAFER_WDT"
-    "WDAT_WDT"
-    "XILINX_WATCHDOG"
-    "ZIIRAVE_WATCHDOG"
-
-    # Preserve AER, APEI, GHES and the ACPI paths bound on this MSI.
-    "ACPI_APEI_EINJ"
-    "ACPI_APEI_ERST_DEBUG"
-    "ACPI_CMPC"
-    "ACPI_CONFIGFS"
-    "ACPI_IPMI"
-    "ACPI_PFRUT"
-    "ACPI_PROCESSOR_AGGREGATOR"
-    "ACPI_QUICKSTART"
-    "ACPI_SBS"
-
-    # Production kernel: omit self-test and fault-injection modules.
-    "KPROBE_EVENT_GEN_TEST"
-    "MAILBOX_TEST"
-    "PKCS7_TEST_KEY"
-    "PREEMPTIRQ_DELAY_TEST"
-    "RCU_REF_SCALE_TEST"
-    "SCF_TORTURE_TEST"
-    "SND_PCMTEST"
-    "SND_TEST_COMPONENT"
-    "TEST_LOCKUP"
-    "TEST_POWER"
-    "THERMAL_CORE_TESTING"
-    "TORTURE_TEST"
-    "TRACE_REMOTE_TEST"
-    "USB_EHSET_TEST_FIXTURE"
-    "USB_LINK_LAYER_TEST"
-    "USB_TEST"
-    "X86_AMD_PSTATE_UT"
-
-    # This laptop is xHCI host-only; retain normal USB device classes.
-    "THUNDERBOLT"
-    "TPS6105X"
-    "TYPEC_TBT_ALTMODE"
-    "USB4"
-    "USB_CDNS_SUPPORT"
-    "USB_CHIPIDEA"
-    "USB_DWC2"
-    "USB_DWC3"
-    "USB_EHCI_HCD"
-    "USB_FOTG210_HCD"
-    "USB_GADGET"
-    "USB_HCD_BCMA"
-    "USB_HCD_SSB"
-    "USB_ISP116X_HCD"
-    "USB_ISP1760"
-    "USB_LGM_PHY"
-    "USB_MUSB_HDRC"
-    "USB_OHCI_HCD"
-    "USB_R8A66597_HCD"
-    "USB_SL811_HCD"
-    "USB_UHCI_HCD"
-    "USB_XHCI_PCI_RENESAS"
-    "USB_XHCI_PLATFORM"
-
-    # Keep UVC and CEC; remove broadcast, tuner, sensor and capture stacks.
-    "DVB_CORE"
-    "MEDIA_ANALOG_TV_SUPPORT"
-    "MEDIA_CEC_RC"
-    "MEDIA_DIGITAL_TV_SUPPORT"
-    "MEDIA_PCI_SUPPORT"
-    "MEDIA_PLATFORM_SUPPORT"
-    "MEDIA_RADIO_SUPPORT"
-    "MEDIA_SDR_SUPPORT"
-    "MEDIA_TEST_SUPPORT"
-    "RC_CORE"
-    "V4L2_FLASH_LED_CLASS"
-    "VIDEO_CAMERA_LENS"
-    "VIDEO_CAMERA_SENSOR"
-    "VIDEO_MAX96714"
-    "VIDEO_MAX96717"
-
-    # AMDGPU and the external NVIDIA driver are the only GPU paths.
-    "DRM_ACCEL"
-    "DRM_AST"
-    "DRM_BOCHS"
-    "DRM_BRIDGE"
-    "DRM_CIRRUS_QEMU"
-    "DRM_ETNAVIV"
-    "DRM_GMA500"
-    "DRM_GUD"
-    "DRM_HISI_HIBMC"
-    "DRM_KOMEDA"
-    "DRM_LOGICVC"
-    "DRM_MGAG200"
-    "DRM_MIPI_DBI"
-    "DRM_MIPI_DSI"
-    "DRM_PANEL"
-    "DRM_QXL"
-    "DRM_SII902X"
-    "DRM_UDL"
-    "DRM_VGEM"
-    "DRM_VIRTIO_GPU"
-    "DRM_VKMS"
-    "DRM_VMWGFX"
-
-    # EFI, DRM fbdev emulation and framebuffer helpers stay.
-    "FB_3DFX"
-    "FB_ARC"
-    "FB_ATY"
-    "FB_ATY128"
-    "FB_CARMINE"
-    "FB_CIRRUS"
-    "FB_CYBER2000"
-    "FB_HECUBA"
-    "FB_HGA"
-    "FB_I740"
-    "FB_IBM_GXT4500"
-    "FB_KYRO"
-    "FB_MB862XX"
-    "FB_METRONOME"
-    "FB_N411"
-    "FB_NEOMAGIC"
-    "FB_OPENCORES"
-    "FB_PM2"
-    "FB_PM3"
-    "FB_RADEON"
-    "FB_S1D13XXX"
-    "FB_SAVAGE"
-    "FB_SIS"
-    "FB_SM712"
-    "FB_SMSCUFX"
-    "FB_SSD1307"
-    "FB_TRIDENT"
-    "FB_UDL"
-    "FB_UVESA"
-    "FB_VGA16"
-    "FB_VIA"
-    "FB_VIRTUAL"
-    "FB_VOODOO1"
-
-    # Fixed Ethernet is Realtek; preserve Wi-Fi, USB networking and VPNs.
-    "6LOWPAN"
-    "8139CP"
-    "8139TOO"
-    "ADIN1100_PHY"
-    "ADIN_PHY"
-    "AIR_EN8811H_PHY"
-    "ALTERA_TSE"
-    "AMD_PHY"
-    "AQUANTIA_PHY"
-    "ARCNET"
-    "AS21XXX_PHY"
-    "ATALK"
-    "AT803X_PHY"
-    "BATMAN_ADV"
-    "BCM54140_PHY"
-    "BCM7XXX_PHY"
-    "BCM84881_PHY"
-    "BCM87XX_PHY"
-    "BCM_NET_PHYLIB"
-    "BROADCOM_PHY"
-    "CAIF"
-    "CAN"
-    "CICADA_PHY"
-    "CORTINA_PHY"
-    "CX_ECAT"
-    "DAVICOM_PHY"
-    "DP83822_PHY"
-    "DP83848_PHY"
-    "DP83867_PHY"
-    "DP83869_PHY"
-    "DP83TC811_PHY"
-    "DP83TD510_PHY"
-    "DP83TG720_PHY"
-    "FDDI"
-    "FEALNX"
-    "HIPPI"
-    "ICPLUS_PHY"
-    "IEEE802154"
-    "JME"
-    "LAPB"
-    "LSI_ET1011C_PHY"
-    "LXT_PHY"
-    "MARVELL_10G_PHY"
-    "MARVELL_88Q2XXX_PHY"
-    "MARVELL_88X2222_PHY"
-    "MARVELL_PHY"
-    "MAXLINEAR_86110_PHY"
-    "MAXLINEAR_GPHY"
-    "MEDIATEK_GE_PHY"
-    "MICREL_PHY"
-    "MICROCHIP_T1_PHY"
-    "MICROCHIP_T1S_PHY"
-    "MICROSEMI_PHY"
-    "MOTORCOMM_PHY"
-    "MTK_NET_PHYLIB"
-    "NATIONAL_PHY"
-    "NCN26000_PHY"
-    "NET_DSA"
-    "NXP_C45_TJA11XX_PHY"
-    "NXP_CBTX_PHY"
-    "NXP_TJA11XX_PHY"
-    "PHONET"
-    "QCA807X_PHY"
-    "QCA808X_PHY"
-    "QCA83XX_PHY"
-    "QCOM_NET_PHYLIB"
-    "QSEMI_PHY"
-    "RENESAS_PHY"
-    "ROCKCHIP_PHY"
-    "RTASE"
-    "SFP"
-    "STE10XP"
-    "TERANETICS_PHY"
-    "TIPC"
-    "VITESSE_PHY"
-    "WAN"
-    "X25"
-    "XILINX_GMII2RGMII"
-
-    # KVM host support stays; physical-host guest drivers do not.
-    "BT_VIRTIO"
-    "DRM_VBOXVIDEO"
-    "EFI_SECRET"
-    "HYPERVISOR_GUEST"
-    "NET_9P_VIRTIO"
-    "SEV_GUEST"
-    "SND_VIRTIO"
-    "TSM_REPORTS"
-    "VBOXGUEST"
-    "VBOXSF_FS"
-    "VDPA"
-    "VHOST_VDPA"
-    "VIRTIO_BLK"
-    "VIRTIO_CONSOLE"
-    "VIRTIO_FS"
-    "VIRTIO_IOMMU"
-    "VIRTIO_MENU"
-    "VIRTIO_NET"
-    "VIRTIO_VSOCKETS"
-    "VMGENID"
-    "VMWARE_BALLOON"
-    "VMWARE_PVSCSI"
-    "VMWARE_VMCI"
-    "VMWARE_VMCI_VSOCKETS"
-    "VMXNET3"
-
-    # The bound audio path is HDA plus AMD ACP6x/Yellow Carp.
-    "SND_AC97_CODEC"
-    "SND_AD1889"
-    "SND_ALI5451"
-    "SND_ALS300"
-    "SND_ALS4000"
-    "SND_ASIHPI"
-    "SND_ATIIXP"
-    "SND_ATIIXP_MODEM"
-    "SND_AU8810"
-    "SND_AU8820"
-    "SND_AU8830"
-    "SND_AW2"
-    "SND_AZT3328"
-    "SND_BT87X"
-    "SND_CA0106"
-    "SND_CMIPCI"
-    "SND_CS4281"
-    "SND_CS46XX"
-    "SND_CS5530"
-    "SND_CS5535AUDIO"
-    "SND_CTXFI"
-    "SND_DARLA20"
-    "SND_DARLA24"
-    "SND_ECHO3G"
-    "SND_EMU10K1"
-    "SND_EMU10K1X"
-    "SND_ENS1370"
-    "SND_ENS1371"
-    "SND_ES1938"
-    "SND_ES1968"
-    "SND_FM801"
-    "SND_GINA20"
-    "SND_GINA24"
-    "SND_HDSP"
-    "SND_HDSPM"
-    "SND_ICE1712"
-    "SND_ICE1724"
-    "SND_INDIGO"
-    "SND_INDIGODJ"
-    "SND_INDIGODJX"
-    "SND_INDIGOIO"
-    "SND_INDIGOIOX"
-    "SND_INTEL8X0"
-    "SND_INTEL8X0M"
-    "SND_KORG1212"
-    "SND_LAYLA20"
-    "SND_LAYLA24"
-    "SND_LOLA"
-    "SND_LX6464ES"
-    "SND_MAESTRO3"
-    "SND_MIA"
-    "SND_MIXART"
-    "SND_MONA"
-    "SND_NM256"
-    "SND_OXYGEN"
-    "SND_PCXHR"
-    "SND_RIPTIDE"
-    "SND_RME32"
-    "SND_RME96"
-    "SND_RME9652"
-    "SND_SE6X"
-    "SND_SIS7019"
-    "SND_SOC_SOF_TOPLEVEL"
-    "SND_SONICVIBES"
-    "SND_TRIDENT"
-    "SND_VIA82XX"
-    "SND_VIA82XX_MODEM"
-    "SND_VIRTUOSO"
-    "SND_VX222"
-    "SND_YMFPCI"
-    "SOUNDWIRE"
-
-    # Wrong fixed laptop/platform generations.
-    "ADV_SWBUTTON"
-    "AMD_3D_VCACHE"
-    "AMD_HSMP"
-    "AMD_HSMP_ACPI"
-    "AMD_HSMP_PLAT"
-    "AMD_ISP_PLATFORM"
-    "APPLE_GMUX"
-    "AYANEO_EC"
-    "BARCO_P50_GPIO"
-    "BITLAND_MIFS_WMI"
-    "CHROME_PLATFORMS"
-    "COMPAL_LAPTOP"
-    "DASHARO_ACPI"
-    "INSPUR_PLATFORM_PROFILE"
-    "INT3406_THERMAL"
-    "INT340X_THERMAL"
-    "MEEGOPAD_ANX7428"
-    "MERAKI_MX100"
-    "MSI_LAPTOP"
-    "MXM_WMI"
-    "NVIDIA_WMI_EC_BACKLIGHT"
-    "OXP_EC"
-    "P2SB"
-    "PCENGINES_APU2"
-    "PORTWELL_EC"
-    "SEL3350_PLATFORM"
-    "SILICOM_PLATFORM"
-    "SURFACE_PLATFORMS"
-    "TC1100_WMI"
-    "TOUCHSCREEN_DMI"
-    "UV_SYSFS"
-    "WINMATE_FM07_KEYS"
-    "WIRELESS_HOTKEY"
-    "X86_ANDROID_TABLETS"
-    "XO15_EBOOK"
-    "XO1_RFKILL"
-    "YT2_1380"
-    "X86_PMEM_LEGACY"
-
-    # Legacy filesystems; retain common removable and recovery formats.
-    "ADFS_FS"
-    "AFFS_FS"
-    "BEFS_FS"
-    "BFS_FS"
-    "CRAMFS"
-    "EFS_FS"
-    "EROFS_FS"
-    "EXT2_FS"
-    "F2FS_FS"
-    "GFS2_FS"
-    "JFS_FS"
-    "MINIX_FS"
-    "NILFS2_FS"
-    "OCFS2_FS"
-    "OMFS_FS"
-    "QNX4FS_FS"
-    "QNX6FS_FS"
-    "SYSV_FS"
-    "UFS_FS"
-    "VXFS_FS"
-    "ZONEFS_FS"
-
-    # This host's zram is explicitly zstd-only.
-    "ZRAM_BACKEND_842"
-    "ZRAM_BACKEND_DEFLATE"
-    "ZRAM_BACKEND_LZ4"
-    "ZRAM_BACKEND_LZ4HC"
-    "ZRAM_BACKEND_LZO"
-    "ZRAM_MULTI_COMP"
-    "ZRAM_WRITEBACK"
-  ];
-
-  deadKernelConfig =
-    lib.genAttrs
-      (
-        lib.unique (
-          deadKernelOptions
-          ++ lib.filter
-            (
-              option:
-              lib.any (prefix: lib.hasPrefix prefix option) deadKernelPrefixes
-              && !(builtins.elem option keptKernelOptions)
-              && !(lib.any (prefix: lib.hasPrefix prefix option) keptKernelPrefixes)
-            )
-            enabledKernelOptions
-        )
-      )
-      (_: lib.mkForce lib.kernel.no);
-
   msiKernel = pkgs.linux_latest.override {
+    autoModules = false;
+
     stdenv = pkgs.overrideCC pkgs.llvmPackages.stdenv (
       pkgs.llvmPackages.stdenv.cc.override {
         inherit (pkgs.llvmPackages) bintools;
@@ -889,66 +15,716 @@ let
       "KCFLAGS=-march=x86-64-v3$(space)-mtune=znver3"
     ];
 
-    # Parent cuts leave generic child options unused; verify requested symbols after updates.
-    ignoreConfigErrors = true;
-    structuredExtraConfig =
-      (with lib.kernel; {
-        LTO_CLANG_THIN = lib.mkForce yes;
-        RUST = lib.mkForce no;
-        DRM_PANIC_SCREEN_QR_CODE = lib.mkForce no;
-        NR_CPUS = lib.mkForce (freeform "12");
+    structuredExtraConfig = with lib.kernel; {
+      # MSI hardware and accepted kernel policy.
+      LTO_CLANG_THIN = lib.mkForce yes;
+      RUST = lib.mkForce unset;
+      NR_CPUS = lib.mkForce (freeform "12");
 
-        DRM_I915 = lib.mkForce no;
-        DRM_XE = lib.mkForce no;
-        DRM_NOUVEAU = lib.mkForce no;
-        DRM_RADEON = lib.mkForce no;
-        FB_NVIDIA = lib.mkForce no;
-        FB_RIVA = lib.mkForce no;
-        DRM_AMDGPU_SI = lib.mkForce no;
-        DRM_AMDGPU_CIK = lib.mkForce no;
-        DRM_AMD_DC_SI = lib.mkForce no;
+      SMP = lib.mkForce yes;
+      PREEMPT_DYNAMIC = lib.mkForce yes;
+      EFI = lib.mkForce yes;
+      EFI_STUB = lib.mkForce yes;
+      EFIVAR_FS = lib.mkForce module;
+      IA32_EMULATION = lib.mkForce yes;
+      MODULES = lib.mkForce yes;
+      MICROCODE = lib.mkForce yes;
+      CPU_SUP_AMD = lib.mkForce yes;
+      X86_AMD_PSTATE = lib.mkForce yes;
+      IOMMU_SUPPORT = lib.mkForce yes;
+      AMD_IOMMU = lib.mkForce yes;
+      ACPI = lib.mkForce yes;
+      ACPI_AC = lib.mkForce module;
+      ACPI_BATTERY = lib.mkForce module;
+      ACPI_BUTTON = lib.mkForce module;
+      ACPI_TAD = lib.mkForce module;
+      ACPI_VIDEO = lib.mkForce module;
+      ACPI_SLEEP = lib.mkForce yes;
+      PM = lib.mkForce yes;
+      PM_SLEEP = lib.mkForce yes;
+      THERMAL = lib.mkForce yes;
+      POWER_SUPPLY = lib.mkForce yes;
+      SUSPEND = lib.mkForce yes;
+      HIBERNATION = lib.mkForce yes;
 
-        KVM_INTEL = lib.mkForce no;
-        HYPERV = lib.mkForce no;
-        XEN = lib.mkForce no;
-        MSI_EC = lib.mkForce no;
+      BLK_DEV_NVME = lib.mkForce module;
+      NVME_AUTH = lib.mkForce module;
+      NVME_KEYRING = lib.mkForce module;
+      SCSI = lib.mkForce module;
+      BLK_DEV_SD = lib.mkForce module;
+      CONFIGFS_FS = lib.mkForce module;
+      EXT4_FS = lib.mkForce module;
+      VFAT_FS = lib.mkForce module;
+      USB_XHCI_HCD = lib.mkForce module;
+      USB_STORAGE = lib.mkForce module;
+      USB_UAS = lib.mkForce module;
 
-        ATM = lib.mkForce no;
-        COMEDI = lib.mkForce no;
-        CXL_BUS = lib.mkForce no;
-        FIREWIRE = lib.mkForce no;
-        FIREWIRE_NOSY = lib.mkForce no;
-        GPIB = lib.mkForce no;
-        INFINIBAND = lib.mkForce no;
-        NFC = lib.mkForce no;
-        NVME_TARGET = lib.mkForce no;
-        PCCARD = lib.mkForce no;
-        RAPIDIO = lib.mkForce no;
+      DRM_SIMPLEDRM = lib.mkForce yes;
+      DRM_AMDGPU = lib.mkForce module;
 
-        BTRFS_FS = lib.mkForce no;
-        CIFS = lib.mkForce no;
-        NFS_FS = lib.mkForce no;
-        XFS_FS = lib.mkForce no;
+      KVM = lib.mkForce module;
+      KVM_AMD = lib.mkForce module;
+      VFIO = lib.mkForce no;
+      IOMMUFD = lib.mkForce no;
+      VHOST = lib.mkForce module;
+      VHOST_NET = lib.mkForce module;
 
-        WLAN_VENDOR_ADMTEK = lib.mkForce no;
-        WLAN_VENDOR_ATH = lib.mkForce no;
-        WLAN_VENDOR_ATMEL = lib.mkForce no;
-        WLAN_VENDOR_BROADCOM = lib.mkForce no;
-        WLAN_VENDOR_INTEL = lib.mkForce no;
-        WLAN_VENDOR_INTERSIL = lib.mkForce no;
-        WLAN_VENDOR_MARVELL = lib.mkForce no;
-        WLAN_VENDOR_MICROCHIP = lib.mkForce no;
-        WLAN_VENDOR_PURELIFI = lib.mkForce no;
-        WLAN_VENDOR_QUANTENNA = lib.mkForce no;
-        WLAN_VENDOR_RALINK = lib.mkForce no;
-        WLAN_VENDOR_REALTEK = lib.mkForce no;
-        WLAN_VENDOR_RSI = lib.mkForce no;
-        WLAN_VENDOR_SILABS = lib.mkForce no;
-        WLAN_VENDOR_ST = lib.mkForce no;
-        WLAN_VENDOR_TI = lib.mkForce no;
-        WLAN_VENDOR_ZYDAS = lib.mkForce no;
-      })
-      // deadKernelConfig;
+      WLAN_VENDOR_MEDIATEK = lib.mkForce yes;
+      MT7921E = lib.mkForce module;
+      CFG80211 = lib.mkForce module;
+      MAC80211 = lib.mkForce module;
+      NET_VENDOR_REALTEK = lib.mkForce yes;
+      R8169 = lib.mkForce module;
+
+      # Fixed Ethernet is Realtek; USB networking remains available.
+      NET_VENDOR_3COM = lib.mkForce no;
+      NET_VENDOR_ADAPTEC = lib.mkForce no;
+      NET_VENDOR_AGERE = lib.mkForce no;
+      NET_VENDOR_ALACRITECH = lib.mkForce no;
+      NET_VENDOR_AMAZON = lib.mkForce no;
+      NET_VENDOR_AMD = lib.mkForce no;
+      NET_VENDOR_AQUANTIA = lib.mkForce no;
+      NET_VENDOR_ARC = lib.mkForce no;
+      NET_VENDOR_ASIX = lib.mkForce no;
+      NET_VENDOR_ATHEROS = lib.mkForce no;
+      NET_VENDOR_BROADCOM = lib.mkForce no;
+      NET_VENDOR_BROCADE = lib.mkForce no;
+      NET_VENDOR_CADENCE = lib.mkForce no;
+      NET_VENDOR_CAVIUM = lib.mkForce no;
+      NET_VENDOR_CHELSIO = lib.mkForce no;
+      NET_VENDOR_CISCO = lib.mkForce no;
+      NET_VENDOR_CORTINA = lib.mkForce no;
+      NET_VENDOR_DAVICOM = lib.mkForce no;
+      NET_VENDOR_DEC = lib.mkForce no;
+      NET_VENDOR_DLINK = lib.mkForce no;
+      NET_VENDOR_EMULEX = lib.mkForce no;
+      NET_VENDOR_ENGLEDER = lib.mkForce no;
+      NET_VENDOR_EZCHIP = lib.mkForce no;
+      NET_VENDOR_FUNGIBLE = lib.mkForce no;
+      NET_VENDOR_GOOGLE = lib.mkForce no;
+      NET_VENDOR_HISILICON = lib.mkForce no;
+      NET_VENDOR_HUAWEI = lib.mkForce no;
+      NET_VENDOR_INTEL = lib.mkForce no;
+      NET_VENDOR_LITEX = lib.mkForce no;
+      NET_VENDOR_MARVELL = lib.mkForce no;
+      NET_VENDOR_MELLANOX = lib.mkForce no;
+      NET_VENDOR_META = lib.mkForce no;
+      NET_VENDOR_MICREL = lib.mkForce no;
+      NET_VENDOR_MICROCHIP = lib.mkForce no;
+      NET_VENDOR_MICROSEMI = lib.mkForce no;
+      NET_VENDOR_MICROSOFT = lib.mkForce no;
+      NET_VENDOR_MUCSE = lib.mkForce no;
+      NET_VENDOR_MYRI = lib.mkForce no;
+      NET_VENDOR_NATSEMI = lib.mkForce no;
+      NET_VENDOR_NETRONOME = lib.mkForce no;
+      NET_VENDOR_NI = lib.mkForce no;
+      NET_VENDOR_NVIDIA = lib.mkForce no;
+      NET_VENDOR_OKI = lib.mkForce no;
+      NET_VENDOR_PENSANDO = lib.mkForce no;
+      NET_VENDOR_QLOGIC = lib.mkForce no;
+      NET_VENDOR_QUALCOMM = lib.mkForce no;
+      NET_VENDOR_RDC = lib.mkForce no;
+      NET_VENDOR_RENESAS = lib.mkForce no;
+      NET_VENDOR_ROCKER = lib.mkForce no;
+      NET_VENDOR_SAMSUNG = lib.mkForce no;
+      NET_VENDOR_SEEQ = lib.mkForce no;
+      NET_VENDOR_SILAN = lib.mkForce no;
+      NET_VENDOR_SIS = lib.mkForce no;
+      NET_VENDOR_SMSC = lib.mkForce no;
+      NET_VENDOR_SOCIONEXT = lib.mkForce no;
+      NET_VENDOR_SOLARFLARE = lib.mkForce no;
+      NET_VENDOR_STMICRO = lib.mkForce no;
+      NET_VENDOR_SUN = lib.mkForce no;
+      NET_VENDOR_SYNOPSYS = lib.mkForce no;
+      NET_VENDOR_TEHUTI = lib.mkForce no;
+      NET_VENDOR_TI = lib.mkForce no;
+      NET_VENDOR_VERTEXCOM = lib.mkForce no;
+      NET_VENDOR_VIA = lib.mkForce no;
+      NET_VENDOR_WANGXUN = lib.mkForce no;
+      NET_VENDOR_WIZNET = lib.mkForce no;
+      NET_VENDOR_XILINX = lib.mkForce no;
+
+      BT = lib.mkForce module;
+      BT_BNEP = lib.mkForce module;
+      BT_HCIBTUSB = lib.mkForce module;
+      BT_HIDP = lib.mkForce module;
+      BT_RFCOMM = lib.mkForce module;
+      RFKILL = lib.mkForce module;
+
+      NETFILTER = lib.mkForce yes;
+      NETFILTER_ADVANCED = lib.mkForce yes;
+      NF_CONNTRACK = lib.mkForce module;
+      NF_TABLES = lib.mkForce module;
+      NFT_COMPAT = lib.mkForce module;
+      IP_NF_MATCH_RPFILTER = lib.mkForce module;
+      IP6_NF_MATCH_RPFILTER = lib.mkForce module;
+      NETFILTER_XT_MATCH_PKTTYPE = lib.mkForce module;
+      IP_VS = lib.mkForce no;
+      NET_SCHED = lib.mkForce yes;
+      NET_SCH_FQ_CODEL = lib.mkForce module;
+      NET_CLS_U32 = lib.mkForce no;
+      VLAN_8021Q = lib.mkForce module;
+      L2TP = lib.mkForce no;
+      SLIP = lib.mkForce no;
+      TUN = lib.mkForce module;
+      WIREGUARD = lib.mkForce module;
+      PPP = lib.mkForce module;
+      PPP_ASYNC = lib.mkForce module;
+      PPP_SYNC_TTY = lib.mkForce module;
+      PPP_DEFLATE = lib.mkForce module;
+      PPP_BSDCOMP = lib.mkForce module;
+      PPPOE = lib.mkForce module;
+      BRIDGE = lib.mkForce module;
+      VETH = lib.mkForce module;
+
+      INPUT = lib.mkForce yes;
+      HID_SUPPORT = lib.mkForce yes;
+      HID = lib.mkForce module;
+      SERIO = lib.mkForce module;
+      SERIO_I8042 = lib.mkForce module;
+      KEYBOARD_ATKBD = lib.mkForce module;
+      I2C_HID_ACPI = lib.mkForce module;
+      HID_GENERIC = lib.mkForce module;
+      HID_MULTITOUCH = lib.mkForce module;
+      HID_LOGITECH = lib.mkForce module;
+      HID_LOGITECH_DJ = lib.mkForce module;
+      HID_LOGITECH_HIDPP = lib.mkForce module;
+      HID_NINTENDO = lib.mkForce module;
+      HID_PLAYSTATION = lib.mkForce module;
+      HID_SONY = lib.mkForce module;
+      HID_STEAM = lib.mkForce module;
+      HID_WIIMOTE = lib.mkForce module;
+      HID_XINMO = lib.mkForce module;
+      HIDRAW = lib.mkForce yes;
+      USB_HID = lib.mkForce module;
+      UHID = lib.mkForce module;
+      INPUT_EVDEV = lib.mkForce module;
+      INPUT_JOYDEV = lib.mkForce module;
+      INPUT_MOUSEDEV = lib.mkForce module;
+      INPUT_SOC_BUTTON_ARRAY = lib.mkForce module;
+      INPUT_FF_MEMLESS = lib.mkForce module;
+      INPUT_UINPUT = lib.mkForce module;
+      JOYSTICK_XPAD = lib.mkForce module;
+      KEYBOARD_GPIO = lib.mkForce module;
+      MOUSE_PS2 = lib.mkForce no;
+      SONY_FF = lib.mkForce no;
+      SERIO_RAW = lib.mkForce module;
+      LEDS_CLASS = lib.mkForce module;
+      LEDS_CLASS_MULTICOLOR = lib.mkForce module;
+      LEDS_TRIGGERS = lib.mkForce yes;
+      BACKLIGHT_CLASS_DEVICE = lib.mkForce yes;
+
+      AMD_PMC = lib.mkForce module;
+      AMD_PMF = lib.mkForce module;
+      AMD_SFH_HID = lib.mkForce module;
+      TEE = lib.mkForce module;
+      AMDTEE = lib.mkForce module;
+      MSI_WMI = lib.mkForce module;
+      MSI_WMI_PLATFORM = lib.mkForce module;
+      SP5100_TCO = lib.mkForce module;
+      SENSORS_K10TEMP = lib.mkForce module;
+      SENSORS_SPD5118 = lib.mkForce module;
+      DMI_SYSFS = lib.mkForce module;
+      INTEL_RAPL_CORE = lib.mkForce module;
+      INTEL_RAPL = lib.mkForce module;
+      I2C_PIIX4 = lib.mkForce module;
+      CRYPTO_DEV_CCP = lib.mkForce yes;
+      CRYPTO_DEV_CCP_DD = lib.mkForce module;
+      CRYPTO_DEV_SP_CCP = lib.mkForce yes;
+      CRYPTO_DEV_SP_PSP = lib.mkForce yes;
+      CRYPTO_DRBG_MENU = lib.mkForce module;
+      TCG_TPM = lib.mkForce yes;
+      TCG_CRB = lib.mkForce yes;
+      HW_RANDOM = lib.mkForce yes;
+      HW_RANDOM_AMD = lib.mkForce module;
+      HW_RANDOM_TPM = lib.mkForce yes;
+      EDAC = lib.mkForce module;
+      EDAC_AMD64 = lib.mkForce module;
+      EDAC_GHES = lib.mkForce module;
+      ACPI_APEI = lib.mkForce yes;
+      ACPI_APEI_GHES = lib.mkForce yes;
+      RTC_DRV_CMOS = lib.mkForce module;
+
+      MEDIA_SUPPORT = lib.mkForce module;
+      MEDIA_SUPPORT_FILTER = lib.mkForce yes;
+      MEDIA_CAMERA_SUPPORT = lib.mkForce yes;
+      MEDIA_USB_SUPPORT = lib.mkForce yes;
+      VIDEO_DEV = lib.mkForce module;
+      USB_VIDEO_CLASS = lib.mkForce module;
+      VIDEO_CAMERA_LENS = lib.mkForce no;
+      VIDEO_CAMERA_SENSOR = lib.mkForce no;
+
+      SOUND = lib.mkForce module;
+      SND = lib.mkForce module;
+      SND_SOC = lib.mkForce module;
+      SND_HDA_INTEL = lib.mkForce module;
+      SND_HDA_CODEC_REALTEK = lib.mkForce module;
+      SND_HDA_CODEC_ALC269 = lib.mkForce module;
+      SND_HDA_CODEC_HDMI = lib.mkForce module;
+      SND_AMD_ACP_CONFIG = lib.mkForce module;
+      SND_SOC_AMD_ACP6x = lib.mkForce module;
+      SND_SOC_AMD_YC_MACH = lib.mkForce module;
+      SND_SOC_DMIC = lib.mkForce module;
+      SND_USB_AUDIO = lib.mkForce module;
+
+      # Normal removable, recovery and network-mount filesystems.
+      BTRFS_FS = lib.mkForce no;
+      XFS_FS = lib.mkForce no;
+      CIFS = lib.mkForce no;
+      NFS_FS = lib.mkForce no;
+      NFSD = lib.mkForce no;
+      CEPH_FS = lib.mkForce no;
+      EXFAT_FS = lib.mkForce module;
+      NTFS3_FS = lib.mkForce module;
+      ISO9660_FS = lib.mkForce module;
+      UDF_FS = lib.mkForce module;
+      SQUASHFS = lib.mkForce module;
+      FUSE_FS = lib.mkForce module;
+      OVERLAY_FS = lib.mkForce module;
+
+      CGROUPS = lib.mkForce yes;
+      NAMESPACES = lib.mkForce yes;
+      USER_NS = lib.mkForce yes;
+      SECCOMP = lib.mkForce yes;
+      BPF = lib.mkForce yes;
+      BPF_SYSCALL = lib.mkForce yes;
+      SECURITY = lib.mkForce yes;
+      SECURITY_YAMA = lib.mkForce yes;
+      SECURITY_LANDLOCK = lib.mkForce yes;
+      CPU_FREQ_GOV_POWERSAVE = lib.mkForce module;
+      CRYPTO_AES_NI_INTEL = lib.mkForce module;
+      CRYPTO_USER_API_AEAD = lib.mkForce module;
+      CRYPTO_USER_API_HASH = lib.mkForce module;
+      CRYPTO_USER_API_SKCIPHER = lib.mkForce module;
+
+      # Common USB recovery and hardware-development devices.
+      USB_ACM = lib.mkForce module;
+      USB_SERIAL = lib.mkForce yes;
+      USB_SERIAL_CH341 = lib.mkForce module;
+      USB_SERIAL_CP210X = lib.mkForce module;
+      USB_SERIAL_FTDI_SIO = lib.mkForce module;
+      USB_USBNET = lib.mkForce module;
+      USB_NET_AX8817X = lib.mkForce module;
+      USB_NET_AX88179_178A = lib.mkForce module;
+      USB_NET_CDCETHER = lib.mkForce module;
+      USB_NET_CDC_NCM = lib.mkForce module;
+      USB_NET_RNDIS_HOST = lib.mkForce module;
+      USB_RTL8152 = lib.mkForce module;
+      TYPEC = lib.mkForce module;
+      TYPEC_DP_ALTMODE = lib.mkForce module;
+      TYPEC_UCSI = lib.mkForce module;
+      UCSI_ACPI = lib.mkForce module;
+      USB_ROLE_SWITCH = lib.mkForce module;
+      USB4 = lib.mkForce no;
+
+      ZRAM = lib.mkForce module;
+      ZRAM_BACKEND_ZSTD = lib.mkForce yes;
+      ZRAM_DEF_COMP_ZSTD = lib.mkForce yes;
+
+      # Fixed buses and device families absent from this chassis.
+      ACPI_NFIT = lib.mkForce no;
+      NET_9P = lib.mkForce no;
+      AGP = lib.mkForce no;
+      BLK_DEV_MD = lib.mkForce module;
+      ANDROID_BINDER_IPC = lib.mkForce no;
+      BATTERY_DS2780 = lib.mkForce no;
+      BATTERY_DS2781 = lib.mkForce no;
+      ATA = lib.mkForce no;
+      ATM = lib.mkForce no;
+      AUXDISPLAY = lib.mkForce no;
+      COMEDI = lib.mkForce no;
+      COMPILE_TEST = lib.mkForce no;
+      CXL_BUS = lib.mkForce no;
+      F2FS_FS = lib.mkForce no;
+      FIREWIRE = lib.mkForce no;
+      FPGA = lib.mkForce no;
+      FSI = lib.mkForce no;
+      FS_DAX = lib.mkForce no;
+      FUSION = lib.mkForce no;
+      GOOGLE_FIRMWARE = lib.mkForce no;
+      GNSS = lib.mkForce no;
+      GPIB = lib.mkForce no;
+      GREYBUS = lib.mkForce no;
+      HSI = lib.mkForce no;
+      HW_RANDOM_VIA = lib.mkForce no;
+      I3C = lib.mkForce no;
+      IIO = lib.mkForce no;
+      I2C_I801 = lib.mkForce no;
+      I2C_MUX = lib.mkForce no;
+      EEPROM_93CX6 = lib.mkForce no;
+      INFINIBAND = lib.mkForce no;
+      IPACK_BUS = lib.mkForce no;
+      KUNIT = lib.mkForce no;
+      LIBNVDIMM = lib.mkForce no;
+      DW_DMAC_PCI = lib.mkForce no;
+      MCB = lib.mkForce no;
+      MEMSTICK = lib.mkForce no;
+      MHI_BUS = lib.mkForce no;
+      MHI_BUS_EP = lib.mkForce no;
+      MMC = lib.mkForce no;
+      MTD = lib.mkForce no;
+      NFC = lib.mkForce no;
+      NTB = lib.mkForce no;
+      NVME_TARGET = lib.mkForce no;
+      PARPORT = lib.mkForce no;
+      PCCARD = lib.mkForce no;
+      PECI = lib.mkForce no;
+      RAPIDIO = lib.mkForce no;
+      PPS = lib.mkForce no;
+      PTP_1588_CLOCK = lib.mkForce no;
+      PWM = lib.mkForce no;
+      RC_CORE = lib.mkForce no;
+      SCSI_LOWLEVEL = lib.mkForce no;
+      SCSI_SPI_ATTRS = lib.mkForce no;
+      SCSI_UFSHCD = lib.mkForce no;
+      SERIO_SERPORT = lib.mkForce no;
+      SEV_GUEST = lib.mkForce no;
+      SIOX = lib.mkForce no;
+      SLIMBUS = lib.mkForce no;
+      SPI = lib.mkForce no;
+      SPMI = lib.mkForce no;
+      STAGING = lib.mkForce no;
+      STM = lib.mkForce no;
+      TARGET_CORE = lib.mkForce no;
+      UIO = lib.mkForce no;
+      VMGENID = lib.mkForce no;
+      W1 = lib.mkForce no;
+      WAN = lib.mkForce no;
+
+      # AMDGPU and the external NVIDIA driver are the only GPU paths.
+      DRM_ACCEL = lib.mkForce no;
+      DRM_AMDGPU_SI = lib.mkForce no;
+      DRM_AMDGPU_CIK = lib.mkForce no;
+      DRM_GMA500 = lib.mkForce no;
+      DRM_I915 = lib.mkForce no;
+      DRM_NOUVEAU = lib.mkForce no;
+      DRM_RADEON = lib.mkForce no;
+      DRM_XE = lib.mkForce no;
+      FB_NVIDIA = lib.mkForce no;
+      FB_RADEON = lib.mkForce no;
+      FB_RIVA = lib.mkForce no;
+
+      # Physical KVM host; guest-only device families stay out.
+      HYPERVISOR_GUEST = lib.mkForce no;
+      KVM_INTEL = lib.mkForce no;
+      VIRTIO_MENU = lib.mkForce no;
+
+      # Keep UVC camera support, not broadcast/capture/test stacks.
+      MEDIA_ANALOG_TV_SUPPORT = lib.mkForce no;
+      MEDIA_DIGITAL_TV_SUPPORT = lib.mkForce no;
+      MEDIA_RADIO_SUPPORT = lib.mkForce no;
+      MEDIA_SDR_SUPPORT = lib.mkForce no;
+      MEDIA_PLATFORM_SUPPORT = lib.mkForce no;
+      MEDIA_PCI_SUPPORT = lib.mkForce no;
+      MEDIA_TEST_SUPPORT = lib.mkForce no;
+
+      # This laptop is an xHCI host; normal USB classes remain.
+      USB_CDNS_SUPPORT = lib.mkForce no;
+      USB_DWC2 = lib.mkForce no;
+      USB_DWC3 = lib.mkForce no;
+      USB_EHCI_HCD = lib.mkForce no;
+      USB_GADGET = lib.mkForce no;
+      USB_ISP116X_HCD = lib.mkForce no;
+      USB_ISP1760 = lib.mkForce no;
+      USB_MUSB_HDRC = lib.mkForce no;
+      USB_OHCI_HCD = lib.mkForce no;
+      USB_R8A66597_HCD = lib.mkForce no;
+      USB_SL811_HCD = lib.mkForce no;
+      USB_UHCI_HCD = lib.mkForce no;
+      USB_XHCI_PLATFORM = lib.mkForce no;
+
+      # Fixed non-MSI platform families with parent Kconfig switches.
+      CHROME_PLATFORMS = lib.mkForce no;
+      SURFACE_PLATFORMS = lib.mkForce no;
+      X86_PLATFORM_DRIVERS_DELL = lib.mkForce no;
+      X86_PLATFORM_DRIVERS_HP = lib.mkForce no;
+      X86_PMEM_LEGACY = lib.mkForce no;
+      INTEL_HFI_THERMAL = lib.mkForce no;
+      INTEL_IDLE = lib.mkForce no;
+      INTEL_IOMMU = lib.mkForce no;
+      IOMMU_PT_VTDSS = lib.mkForce no;
+      INTEL_MEI = lib.mkForce no;
+      INTEL_SOC_PMIC = lib.mkForce no;
+      INTEL_TURBO_MAX_3 = lib.mkForce no;
+      PINCTRL_BAYTRAIL = lib.mkForce no;
+      PINCTRL_CHERRYVIEW = lib.mkForce no;
+      SERIAL_8250_EXAR = lib.mkForce no;
+      SERIAL_8250_LPSS = lib.mkForce no;
+      SERIAL_8250_MID = lib.mkForce no;
+      SERIAL_8250_PCI = lib.mkForce no;
+      SERIAL_8250_PERICOM = lib.mkForce no;
+      X86_INTEL_LPSS = lib.mkForce no;
+
+      # The soldered WLAN is MediaTek; alternate vendor menus stay closed.
+      WLAN_VENDOR_ADMTEK = lib.mkForce no;
+      WLAN_VENDOR_ATH = lib.mkForce no;
+      WLAN_VENDOR_ATMEL = lib.mkForce no;
+      WLAN_VENDOR_BROADCOM = lib.mkForce no;
+      WLAN_VENDOR_INTEL = lib.mkForce no;
+      WLAN_VENDOR_INTERSIL = lib.mkForce no;
+      WLAN_VENDOR_MARVELL = lib.mkForce no;
+      WLAN_VENDOR_MICROCHIP = lib.mkForce no;
+      WLAN_VENDOR_PURELIFI = lib.mkForce no;
+      WLAN_VENDOR_QUANTENNA = lib.mkForce no;
+      WLAN_VENDOR_RALINK = lib.mkForce no;
+      WLAN_VENDOR_REALTEK = lib.mkForce no;
+      WLAN_VENDOR_RSI = lib.mkForce no;
+      WLAN_VENDOR_SILABS = lib.mkForce no;
+      WLAN_VENDOR_ST = lib.mkForce no;
+      WLAN_VENDOR_TI = lib.mkForce no;
+      WLAN_VENDOR_ZYDAS = lib.mkForce no;
+
+      # The active HDA/ACP6x path does not use SOF or SoundWire.
+      SND_SOC_SOF_TOPLEVEL = lib.mkForce no;
+      SOUNDWIRE = lib.mkForce no;
+      SND_HDA_CODEC_ALC260 = lib.mkForce no;
+      SND_HDA_CODEC_ALC262 = lib.mkForce no;
+      SND_HDA_CODEC_ALC268 = lib.mkForce no;
+      SND_HDA_CODEC_ALC662 = lib.mkForce no;
+      SND_HDA_CODEC_ALC680 = lib.mkForce no;
+      SND_HDA_CODEC_ALC861 = lib.mkForce no;
+      SND_HDA_CODEC_ALC861VD = lib.mkForce no;
+      SND_HDA_CODEC_ALC880 = lib.mkForce no;
+      SND_HDA_CODEC_ALC882 = lib.mkForce no;
+      SND_HDA_CODEC_HDMI_INTEL = lib.mkForce no;
+      SND_HDA_CODEC_HDMI_NVIDIA_MCP = lib.mkForce no;
+      SND_HDA_CODEC_HDMI_TEGRA = lib.mkForce no;
+      SND_SOC_AMD_ACP63_TOPLEVEL = lib.mkForce no;
+      SND_SOC_INTEL_SST_TOPLEVEL = lib.mkForce no;
+
+      # Camera support is UVC; do not re-enable generic sensor farms.
+      MEDIA_SUBDRV_AUTOSELECT = lib.mkForce no;
+
+      # This is a KVM host, not a virtio guest.
+      VIRTIO_CONSOLE = lib.mkForce no;
+
+      # Legacy 10/100 Realtek PCI NICs are absent; R8169 remains enabled.
+      "8139TOO" = lib.mkForce no;
+
+      # This host's zram is explicitly zstd-only.
+      ZRAM_BACKEND_842 = lib.mkForce no;
+      ZRAM_BACKEND_DEFLATE = lib.mkForce no;
+      ZRAM_BACKEND_LZ4 = lib.mkForce no;
+      ZRAM_BACKEND_LZ4HC = lib.mkForce no;
+      ZRAM_BACKEND_LZO = lib.mkForce no;
+      ZRAM_MULTI_COMP = lib.mkForce no;
+      ZRAM_WRITEBACK = lib.mkForce no;
+
+      # Remove inherited child answers made unreachable by the parent cuts.
+      AIC79XX_DEBUG_ENABLE = lib.mkForce unset;
+      AIC7XXX_DEBUG_ENABLE = lib.mkForce unset;
+      AIC94XX_DEBUG = lib.mkForce unset;
+      ANDROID_BINDERFS = lib.mkForce unset;
+      ANDROID_BINDER_DEVICES = lib.mkForce unset;
+      ATA_BMDMA = lib.mkForce unset;
+      ATA_SFF = lib.mkForce unset;
+      BTRFS_FS_POSIX_ACL = lib.mkForce unset;
+      CEPH_FSCACHE = lib.mkForce unset;
+      CEPH_FS_POSIX_ACL = lib.mkForce unset;
+      CHROMEOS_LAPTOP = lib.mkForce unset;
+      CHROMEOS_PSTORE = lib.mkForce unset;
+      CHROMEOS_TBMC = lib.mkForce unset;
+      CIFS_DFS_UPCALL = lib.mkForce unset;
+      CIFS_FSCACHE = lib.mkForce unset;
+      CIFS_UPCALL = lib.mkForce unset;
+      CIFS_XATTR = lib.mkForce unset;
+      CROS_EC = lib.mkForce unset;
+      CROS_EC_I2C = lib.mkForce unset;
+      CROS_EC_ISHTP = lib.mkForce unset;
+      CROS_EC_LPC = lib.mkForce unset;
+      CROS_EC_SPI = lib.mkForce unset;
+      CROS_KBD_LED_BACKLIGHT = lib.mkForce unset;
+      DRM_AMD_DC_SI = lib.mkForce unset;
+      DRM_HYPERV = lib.mkForce unset;
+      DRM_I915_GVT = lib.mkForce unset;
+      DRM_I915_GVT_KVMGT = lib.mkForce unset;
+      DRM_NOUVEAU_SVM = lib.mkForce unset;
+      DRM_NOVA = lib.mkForce unset;
+      DRM_PANIC_SCREEN_QR_CODE = lib.mkForce unset;
+      DVB_DYNAMIC_MINORS = lib.mkForce unset;
+      FB_NVIDIA_I2C = lib.mkForce unset;
+      FB_RIVA_I2C = lib.mkForce unset;
+      FSCACHE_STATS = lib.mkForce unset;
+      HVC_XEN = lib.mkForce unset;
+      HVC_XEN_FRONTEND = lib.mkForce unset;
+      HYPERV = lib.mkForce unset;
+      INFINIBAND_IPOIB = lib.mkForce unset;
+      INFINIBAND_IPOIB_CM = lib.mkForce unset;
+      INTEL_TDX_GUEST = lib.mkForce unset;
+      IP_VS_IPV6 = lib.mkForce unset;
+      IP_VS_PROTO_AH = lib.mkForce unset;
+      IP_VS_PROTO_ESP = lib.mkForce unset;
+      IP_VS_PROTO_TCP = lib.mkForce unset;
+      IP_VS_PROTO_UDP = lib.mkForce unset;
+      JOYSTICK_PSXPAD_SPI_FF = lib.mkForce unset;
+      KEYBOARD_APPLESPI = lib.mkForce unset;
+      KVM_GUEST = lib.mkForce unset;
+      MEDIA_ATTACH = lib.mkForce unset;
+      MEGARAID_NEWGEN = lib.mkForce unset;
+      MLX5_CORE_EN = lib.mkForce unset;
+      MMC_BLOCK_MINORS = lib.mkForce unset;
+      MTD_COMPLEX_MAPPINGS = lib.mkForce unset;
+      MTD_TESTS = lib.mkForce unset;
+      NFSD_V3_ACL = lib.mkForce unset;
+      NFSD_V4 = lib.mkForce unset;
+      NFSD_V4_SECURITY_LABEL = lib.mkForce unset;
+      NFS_FSCACHE = lib.mkForce unset;
+      NFS_LOCALIO = lib.mkForce unset;
+      NFS_SWAP = lib.mkForce unset;
+      NFS_V3_ACL = lib.mkForce unset;
+      NFS_V4_2 = lib.mkForce unset;
+      NFS_V4_SECURITY_LABEL = lib.mkForce unset;
+      NOVA_CORE = lib.mkForce unset;
+      NVME_TARGET_AUTH = lib.mkForce unset;
+      NVME_TARGET_PASSTHRU = lib.mkForce unset;
+      NVME_TARGET_TCP_TLS = lib.mkForce unset;
+      PARAVIRT = lib.mkForce unset;
+      PARAVIRT_SPINLOCKS = lib.mkForce unset;
+      PARAVIRT_TIME_ACCOUNTING = lib.mkForce unset;
+      PCI_XEN = lib.mkForce unset;
+      SATA_MOBILE_LPM_POLICY = lib.mkForce unset;
+      SCSI_LOWLEVEL_PCMCIA = lib.mkForce unset;
+      SCSI_SAS_ATA = lib.mkForce unset;
+      SLIP_COMPRESSED = lib.mkForce unset;
+      SLIP_SMART = lib.mkForce unset;
+      SND_SOC_INTEL_SOUNDWIRE_SOF_MACH = lib.mkForce unset;
+      SND_SOC_SOF_ACPI = lib.mkForce unset;
+      SND_SOC_SOF_APOLLOLAKE = lib.mkForce unset;
+      SND_SOC_SOF_CANNONLAKE = lib.mkForce unset;
+      SND_SOC_SOF_COFFEELAKE = lib.mkForce unset;
+      SND_SOC_SOF_COMETLAKE = lib.mkForce unset;
+      SND_SOC_SOF_ELKHARTLAKE = lib.mkForce unset;
+      SND_SOC_SOF_GEMINILAKE = lib.mkForce unset;
+      SND_SOC_SOF_HDA_AUDIO_CODEC = lib.mkForce unset;
+      SND_SOC_SOF_HDA_LINK = lib.mkForce unset;
+      SND_SOC_SOF_ICELAKE = lib.mkForce unset;
+      SND_SOC_SOF_INTEL_TOPLEVEL = lib.mkForce unset;
+      SND_SOC_SOF_JASPERLAKE = lib.mkForce unset;
+      SND_SOC_SOF_MERRIFIELD = lib.mkForce unset;
+      SND_SOC_SOF_PCI = lib.mkForce unset;
+      SND_SOC_SOF_TIGERLAKE = lib.mkForce unset;
+      SPI_MASTER = lib.mkForce unset;
+      STAGING_MEDIA = lib.mkForce unset;
+      SWIOTLB_XEN = lib.mkForce unset;
+      TCG_TIS_SPI_CR50 = lib.mkForce unset;
+      TDX_GUEST_DRIVER = lib.mkForce unset;
+      USB_DWC2_DUAL_ROLE = lib.mkForce unset;
+      USB_DWC3_DUAL_ROLE = lib.mkForce unset;
+      USB_EHCI_ROOT_HUB_TT = lib.mkForce unset;
+      USB_EHCI_TT_NEWSCHED = lib.mkForce unset;
+      U_SERIAL_CONSOLE = lib.mkForce unset;
+      VIRTIO_MMIO_CMDLINE_DEVICES = lib.mkForce unset;
+      X86_SGX_KVM = lib.mkForce unset;
+      XEN = lib.mkForce unset;
+      XEN_BACKEND = lib.mkForce unset;
+      XEN_BALLOON = lib.mkForce unset;
+      XEN_BALLOON_MEMORY_HOTPLUG = lib.mkForce unset;
+      XEN_DOM0 = lib.mkForce unset;
+      XEN_EFI = lib.mkForce unset;
+      XEN_HAVE_PVMMU = lib.mkForce unset;
+      XEN_MCE_LOG = lib.mkForce unset;
+      XEN_PVH = lib.mkForce unset;
+      XEN_PVHVM = lib.mkForce unset;
+      XEN_SAVE_RESTORE = lib.mkForce unset;
+      XEN_SYS_HYPERVISOR = lib.mkForce unset;
+      "9P_FSCACHE" = lib.mkForce unset;
+      "9P_FS_POSIX_ACL" = lib.mkForce unset;
+      "8139TOO_8129" = lib.mkForce unset;
+      "8139TOO_PIO" = lib.mkForce unset;
+      ATH10K_DFS_CERTIFIED = lib.mkForce unset;
+      ATH9K_AHB = lib.mkForce unset;
+      ATH9K_DFS_CERTIFIED = lib.mkForce unset;
+      ATH9K_PCI = lib.mkForce unset;
+      B43_PHY_HT = lib.mkForce unset;
+      BCMA_HOST_PCI = lib.mkForce unset;
+      BRCMFMAC_PCIE = lib.mkForce unset;
+      BRCMFMAC_USB = lib.mkForce unset;
+      BXT_WC_PMIC_OPREGION = lib.mkForce unset;
+      BYTCRC_PMIC_OPREGION = lib.mkForce unset;
+      CHTCRC_PMIC_OPREGION = lib.mkForce unset;
+      CHT_DC_TI_PMIC_OPREGION = lib.mkForce unset;
+      CHT_WC_PMIC_OPREGION = lib.mkForce unset;
+      CIFS_POSIX = lib.mkForce unset;
+      CLS_U32_MARK = lib.mkForce unset;
+      CLS_U32_PERF = lib.mkForce unset;
+      CRC32_SELFTEST = lib.mkForce unset;
+      CRYPTO_TEST = lib.mkForce unset;
+      DEVFREQ_THERMAL = lib.mkForce unset;
+      DRAGONRISE_FF = lib.mkForce unset;
+      EROFS_FS_ZIP_DEFLATE = lib.mkForce unset;
+      EROFS_FS_ZIP_ZSTD = lib.mkForce unset;
+      EXT2_FS_POSIX_ACL = lib.mkForce unset;
+      EXT2_FS_SECURITY = lib.mkForce unset;
+      EXT2_FS_XATTR = lib.mkForce unset;
+      EXT3_FS_POSIX_ACL = lib.mkForce unset;
+      EXT3_FS_SECURITY = lib.mkForce unset;
+      F2FS_FS_COMPRESSION = lib.mkForce unset;
+      F2FS_FS_SECURITY = lib.mkForce unset;
+      FB_3DFX_ACCEL = lib.mkForce unset;
+      FB_ATY_CT = lib.mkForce unset;
+      FB_ATY_GX = lib.mkForce unset;
+      FB_SAVAGE_ACCEL = lib.mkForce unset;
+      FB_SAVAGE_I2C = lib.mkForce unset;
+      FB_SIS_300 = lib.mkForce unset;
+      FB_SIS_315 = lib.mkForce unset;
+      FW_LOADER_USER_HELPER_FALLBACK = lib.mkForce unset;
+      GLOB_SELFTEST = lib.mkForce unset;
+      GREENASIA_FF = lib.mkForce unset;
+      HID_ACRUX_FF = lib.mkForce unset;
+      HOLTEK_FF = lib.mkForce unset;
+      INET_ESPINTCP = lib.mkForce unset;
+      INTEL_SOC_PMIC_CHTDC_TI = lib.mkForce unset;
+      INTEL_SOC_PMIC_CHTWC = lib.mkForce unset;
+      IPW2100_MONITOR = lib.mkForce unset;
+      IPW2200_MONITOR = lib.mkForce unset;
+      JFS_POSIX_ACL = lib.mkForce unset;
+      JFS_SECURITY = lib.mkForce unset;
+      L2TP_ETH = lib.mkForce unset;
+      L2TP_IP = lib.mkForce unset;
+      L2TP_V3 = lib.mkForce unset;
+      MOUSE_ELAN_I2C_SMBUS = lib.mkForce unset;
+      MOUSE_PS2_ELANTECH = lib.mkForce unset;
+      MOUSE_PS2_VMMOUSE = lib.mkForce unset;
+      LIRC = lib.mkForce unset;
+      MEDIA_CEC_RC = lib.mkForce unset;
+      NETCONSOLE_DYNAMIC = lib.mkForce unset;
+      NFT_REJECT_NETDEV = lib.mkForce unset;
+      NF_FLOW_TABLE_PROCFS = lib.mkForce unset;
+      NTFS_FS_POSIX_ACL = lib.mkForce unset;
+      NVIDIA_SHIELD_FF = lib.mkForce unset;
+      NVME_TCP_TLS = lib.mkForce unset;
+      OCFS2_DEBUG_MASKLOG = lib.mkForce unset;
+      PMIC_OPREGION = lib.mkForce unset;
+      POWER_RESET_GPIO = lib.mkForce unset;
+      POWER_RESET_GPIO_RESTART = lib.mkForce unset;
+      RT2800USB_RT53XX = lib.mkForce unset;
+      RT2800USB_RT55XX = lib.mkForce unset;
+      RC_DECODERS = lib.mkForce unset;
+      RC_DEVICES = lib.mkForce unset;
+      RTW88 = lib.mkForce unset;
+      RTW88_8822BE = lib.mkForce unset;
+      RTW88_8822CE = lib.mkForce unset;
+      RTL8XXXU_UNTESTED = lib.mkForce unset;
+      SMARTJOYPLUS_FF = lib.mkForce unset;
+      SND_AC97_POWER_SAVE = lib.mkForce unset;
+      SND_AC97_POWER_SAVE_DEFAULT = lib.mkForce unset;
+      SND_HDA_CODEC_CS8409 = lib.mkForce unset;
+      SND_SOC_INTEL_USER_FRIENDLY_LONG_NAMES = lib.mkForce unset;
+      SND_USB_CAIAQ_INPUT = lib.mkForce unset;
+      SUNRPC_DEBUG = lib.mkForce unset;
+      THRUSTMASTER_FF = lib.mkForce unset;
+      TPS68470_PMIC_OPREGION = lib.mkForce unset;
+      UBIFS_FS_ADVANCED_COMPR = lib.mkForce unset;
+      VFIO_DEVICE_CDEV = lib.mkForce unset;
+      VFIO_NOIOMMU = lib.mkForce unset;
+      VFIO_PCI_VGA = lib.mkForce unset;
+      XPOWER_PMIC_OPREGION = lib.mkForce unset;
+      ZEROPLUS_FF = lib.mkForce unset;
+      XFS_ONLINE_SCRUB = lib.mkForce unset;
+      XFS_POSIX_ACL = lib.mkForce unset;
+      XFS_QUOTA = lib.mkForce unset;
+      XFS_RT = lib.mkForce unset;
+    };
   };
 in
 {
