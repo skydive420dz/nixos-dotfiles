@@ -1,0 +1,66 @@
+#+title: MSI AMD-Primary Graphics And Hypridle Acceptance - 2026-08-14
+#+startup: overview
+
+* Status
+Generation 890 is =ACCEPTED= for the MSI internal-panel workflow.  At
+closeout it was current, booted, and profile-selected.
+
+- NixOS output:
+  =/nix/store/2f0f7117wj7xw3rlz4qqxjx5bxf3hn30-nixos-system-nixos-26.11.20260729.0954f7e=
+- Derivation:
+  =/nix/store/kj3z70mha0hhshdy9rhy4inazykvjcjy-nixos-system-nixos-26.11.20260729.0954f7e.drv=
+
+* Accepted Runtime Evidence
+- Hyprland and Aquamarine selected the Radeon 660M through
+  =/dev/dri/amd-card=.
+- The internal =eDP-1= panel operated at =1920x1080@144 Hz=.
+- One normal fresh UWSM startup independently started AMD-primary Hyprland,
+  Quickshell, and the managed Hypridle service.
+- One managed 600-second =eDP-1= true-DPMS cycle passed.  Ordinary physical
+  input restored the image without restarting Hyprland or Quickshell.
+- Brave 4K60 playback reported ~kVideoDecoderName=VaapiVideoDecoder~ on the AMD
+  render node.
+- Black Desert Online was observed using NVIDIA under real game load while the
+  compositor remained AMD-primary.  This is partial workload evidence, not
+  universal proof of the =nvidia-offload= wrapper.
+
+* Known Limitations
+- =AQ_DRM_DEVICES=/dev/dri/amd-card= excludes NVIDIA-owned display connectors
+  from Aquamarine.  NVIDIA-wired HDMI, USB-C, and DisplayPort outputs and their
+  HDMI/DisplayPort audio are unavailable or unvalidated in this compositor
+  configuration.
+- NVIDIA remains installed and the native offload wrapper remains configured,
+  but isolated GLX, EGL, and Vulkan wrapper inheritance is not fully accepted.
+- Fullscreen and media idle inhibition, external-display behavior,
+  suspend/resume, and hotplug are not accepted.
+- Design B was statically reviewed but runtime-inconclusive.  Its compositor-only
+  Mesa EGL selector, =__EGL_VENDOR_LIBRARY_FILENAMES=, and UWSM service-mode
+  setting, =UWSM_APP_UNIT_TYPE=service=, are deliberately not persisted.
+- Fine-grained NVIDIA power management is configured, but GPU =0000:01:00.0=
+  and HDA =0000:01:00.1= remained active in =D0= with =power/control=on=.
+- RTD3 remains unresolved; the incomplete experiment does not establish an RTD3
+  failure.  No improved battery life is claimed.
+
+* TODO Battery savings — TBD
+Measured battery savings: TBD
+
+Future work is one consolidated root-capable acceptance cycle:
+
+1. Persist or transiently validate the compositor-only Mesa EGL/UWSM service
+   boundary while following Vesktop across its service-to-scope cgroup move.
+2. Apply a native declarative fix that leaves NVIDIA GPU =0000:01:00.0= and HDA
+   =0000:01:00.1= at =power/control=auto= after boot.
+3. Complete one direct root-wide NVIDIA file-descriptor and library-holder audit.
+4. Prove both functions reach runtime-suspended/D3cold with advancing suspended
+   time.
+5. Launch BDO explicitly through a clean NVIDIA-offload environment, prove
+   NVIDIA wake and use, exit it, and prove return to D3.
+6. Separately validate suspend/resume, then measure controlled battery-only idle
+   discharge before claiming savings.
+7. Treat NVIDIA-wired external-output support as a separate future architecture
+   decision.
+
+* Acceptance Boundary
+This record accepts only generation-890 internal-panel behavior and the specific
+workloads above.  It does not authorize Design B persistence, another runtime
+experiment, activation, boot/profile changes, or a battery claim.
