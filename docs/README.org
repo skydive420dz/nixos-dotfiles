@@ -141,6 +141,8 @@ history.
 - [[file:projects/clipboard-launcher.org][Completed clipboard and launcher work]]
 
 * Evidence And History
+- [[file:handoffs/2026-08-15-msi-nvidia-610.57-kernel-build.org][2026-08-15 MSI NVIDIA 610.57 kernel build workaround]]
+- [[file:handoffs/2026-08-14-msi-amd-primary-hypridle-acceptance.org][2026-08-14 MSI AMD-primary graphics and Hypridle acceptance]]
 - [[file:handoffs/2026-08-04-emacs-eglot-reuse-acceptance.org][2026-08-04 Emacs native Eglot reuse acceptance and live adoption]]
 - [[file:handoffs/2026-08-04-quickshell-theme-refresh-acceptance.org][2026-08-04 Quickshell theme refresh acceptance, promotion, and live adoption]]
 - [[file:handoffs/2026-08-03-quickshell-structural-maintenance-acceptance.org][2026-08-03 Quickshell structural maintenance acceptance]]

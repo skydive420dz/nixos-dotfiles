@@ -1,0 +1,81 @@
+#+title: MSI NVIDIA 610.57 Kernel Build Workaround - 2026-08-15
+#+startup: overview
+
+* Status
+Commit =6b213fc= updates the locked inputs and carries one temporary source
+correction for the proprietary NVIDIA 610.57.04 kernel module.  The user ran
+=nrs= successfully after the correction.
+
+- Current/profile-selected generation: =891=
+- Current output:
+  =/nix/store/0f92qrvvbdj6kz7p2canakpcpw80gfm1-nixos-system-nixos-26.11.20260813.0e251e2=
+- Toplevel derivation:
+  =/nix/store/axqgvp1mv13hkfkpmlkwqp6xkb1qrpbw-nixos-system-nixos-26.11.20260813.0e251e2.drv=
+- Candidate kernel: =/nix/store/m4691djl2m514nz24pn5x0mj4q69ljml-linux-7.1.8/bzImage=
+- Candidate NVIDIA module: =610.57.04= with =7.1.8= vermagic
+
+The machine was still booted on accepted generation 890, Linux 7.1.5, and
+NVIDIA 610.43.03 when this source was promoted.  Generation 891 therefore
+remains a reboot candidate rather than accepted boot/runtime evidence.
+
+* Failure And Cause
+The input update moved nixpkgs from =0954f7e= to =0e251e2=, selecting Linux
+7.1.8 and NVIDIA 610.57.04.  The proprietary NVIDIA module failed under Clang
+21 because =__to_hwgpio= declared its =gdev= argument as
+=const struct gpio_device *= and passed it to
+=gpio_device_get_chip(struct gpio_device *)=.  The mismatch was promoted to a
+build error by =-Werror=.
+
+Linux 7.1.5 and 7.1.8 expose the same mutable kernel API.  NVIDIA 610.43.03
+also used a mutable pointer.  This was therefore a 610.57.04 source regression,
+not evidence against the MSI kernel's Clang, ThinLTO, =x86-64-v3=, or =znver3=
+configuration.
+
+* Temporary Correction
+=system/modules/gpu/nvidia-hybrid.nix= overrides the selected NVIDIA package's
+=postPatch= and changes only the incorrect helper parameter:
+
+#+begin_src nix
+substituteInPlace kernel/common/inc/nv-linux.h \
+  --replace-fail \
+    'static inline int __to_hwgpio(const struct gpio_device *gdev,' \
+    'static inline int __to_hwgpio(struct gpio_device *gdev,'
+#+end_src
+
+The proprietary module derivation consumes the package's patched =modsrc=
+output.  =--replace-fail= deliberately stops a future build once NVIDIA changes
+the source, rather than silently retaining a stale workaround.  The identical
+proposed change is preserved in
+[[https://github.com/NVIDIA/open-gpu-kernel-modules/commit/24e68a854f50e2de5b7ead18bd4d28d22566c005][NVIDIA commit 24e68a8]]
+and tracked by
+[[https://github.com/NVIDIA/open-gpu-kernel-modules/pull/1288][NVIDIA PR 1288]].
+Last directly verified on 2026-08-14, that PR and
+[[https://github.com/NixOS/nixpkgs/pull/551471][nixpkgs PR 551471]] were open
+and unmerged.  The nixpkgs proposal used =patchesOpen= and therefore did not
+cover this host's proprietary build because =hardware.nvidia.open= is false.
+
+Do not replace this with a cast, compiler-warning suppression, disabled
+=CONFIG_OF_GPIO=, or a compiler change.
+
+* Verification
+- =nixfmt --check=, Nix parsing, and =git diff --check= passed.
+- Offline evaluation selected NVIDIA =610.57.04= and produced patched package
+  derivation
+  =/nix/store/rjvgyk6n25myh35g3p4yrl1sgwnrx2k6-nvidia-x11-610.57.04.drv=
+  and proprietary module derivation
+  =/nix/store/gnqbbng70fyqdmqc45dr0m9af2pf58v3-nvidia-kernel-modules-610.57.04-7.1.8.drv=.
+- The proprietary module output realized as
+  =/nix/store/pbv81lziyhnfrx72wwslv789nf5ps75z-nvidia-kernel-modules-610.57.04-7.1.8=.
+- The realized generation-891 closure contains Linux 7.1.8 and an NVIDIA
+  610.57.04 module whose vermagic begins =7.1.8 SMP preempt mod_unload=.
+- The successful switch moved =/run/current-system= and the system profile to
+  the generation-891 output without changing the running kernel.
+
+* Removal And Acceptance Boundary
+At a future input update, inspect the selected source and remove the override
+only after the proprietary NVIDIA source or nixpkgs package contains the
+correction; a version change alone is insufficient.  Restore the bare
+=nvidiaPackages.latest= assignment and build the exact MSI toplevel again.  A
+successful build and switch do not establish boot, module load, Secure Boot,
+AMD-primary compositor, offload, suspend, or RTD3 acceptance.  Keep generation
+890 available until generation 891 passes its separate reboot and runtime gate.
