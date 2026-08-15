@@ -2,12 +2,11 @@
 # NVIDIA HYBRID CONFIGURATION — MSI NixOS
 # ============================================
 # Hardware (confirmed):
-#   GPU:  NVIDIA (NVreg, modesetting, Prime sync)
+#   GPU:  NVIDIA (NVreg, modesetting, PRIME offload)
 #   iGPU: AMD Radeon (amdgpuBusId PCI:5:0:0)
 #   dGPU: NVIDIA    (nvidiaBusId  PCI:1:0:0)
 #
-# Mode: Prime Sync (both GPUs active, NVIDIA drives all outputs)
-# Offload mode is disabled — sync gives better performance on this setup.
+# Mode: AMD-primary with NVIDIA available on demand through PRIME offload.
 
 { config, pkgs, ... }:
 
@@ -48,25 +47,23 @@
     modesetting.enable = true;
     open = false; # use proprietary driver (better perf + compatibility)
     nvidiaSettings = true; # install nvidia-settings GUI tool
-    nvidiaPersistenced = true; # on/off GPU initialized — avoids cold-start latency if on
+    nvidiaPersistenced = false; # allow the offload GPU to suspend while idle
 
     powerManagement = {
       enable = true; # set true if you need suspend/resume on NVIDIA
-      finegrained = false; # fine-grained power management (Turing+ only)
+      finegrained = true; # runtime-suspend the Turing+ GPU while unused
     };
 
     # ── Prime (hybrid graphics) ─────────────────────────────────────────────
-    # Sync mode: NVIDIA drives all displays, AMD handles internal rendering bus.
-    # Both GPUs are always on — best for a desktop-replacement / gaming laptop.
-    # Switch to offload mode if you need battery life over performance.
+    # AMD renders the desktop; use nvidia-offload for selected applications.
     prime = {
-      sync.enable = true;
+      sync.enable = false;
       amdgpuBusId = "PCI:5:0:0";
       nvidiaBusId = "PCI:1:0:0";
 
       offload = {
-        enable = false; # flip to true + sync.enable = false for offload mode
-        enableOffloadCmd = false;
+        enable = true;
+        enableOffloadCmd = true;
       };
     };
   };

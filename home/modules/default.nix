@@ -4,6 +4,7 @@
     ./theme.nix
     ./email.nix
     ./notifications.nix
+    ./services/hypridle.nix
     ./services/removable-media.nix
     ./programs/emacs.nix
     ./programs/brave.nix

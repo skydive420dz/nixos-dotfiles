@@ -33,11 +33,8 @@ let
   };
 
   nvidiaSessionVariables = lib.optionalAttrs (gpuProfile == "nvidia-hybrid") {
-    LIBVA_DRIVER_NAME = "nvidia";
-    GBM_BACKEND = "nvidia-drm";
-    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    AQ_DRM_DEVICES = "/dev/dri/nvidia-card:/dev/dri/amd-card";
-    NVD_BACKEND = "direct";
+    LIBVA_DRIVER_NAME = "radeonsi";
+    AQ_DRM_DEVICES = "/dev/dri/amd-card";
   };
 
   amdSessionVariables = lib.optionalAttrs (gpuProfile == "amd-rdna4") {
