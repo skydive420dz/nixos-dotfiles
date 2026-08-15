@@ -42,7 +42,16 @@
   services.xserver.videoDrivers = [ "nvidia" ];
 
   hardware.nvidia = {
-    package = config.boot.kernelPackages.nvidiaPackages.latest;
+    # Temporary proprietary-module fix for NVIDIA 610.57.04:
+    # https://github.com/NVIDIA/open-gpu-kernel-modules/pull/1288
+    package = config.boot.kernelPackages.nvidiaPackages.latest.overrideAttrs (_: {
+      postPatch = ''
+        substituteInPlace kernel/common/inc/nv-linux.h \
+          --replace-fail \
+            'static inline int __to_hwgpio(const struct gpio_device *gdev,' \
+            'static inline int __to_hwgpio(struct gpio_device *gdev,'
+      '';
+    });
 
     modesetting.enable = true;
     open = false; # use proprietary driver (better perf + compatibility)
