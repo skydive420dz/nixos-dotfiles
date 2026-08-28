@@ -1,11 +1,16 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   theme = import ../../../../theme/tokens.nix;
   semantic = theme.semantic;
 
   tmuxCopy = pkgs.writeShellScriptBin "tmux-copy" (
-    if pkgs.stdenv.isDarwin then
+    if pkgs.stdenv.hostPlatform.isDarwin then
       ''
         exec /usr/bin/pbcopy
       ''
@@ -46,7 +51,13 @@ let
   '';
 
   extraConfig = import ./extra-config.nix {
-    inherit config pkgs semantic tmuxCopy tmuxDirName;
+    inherit
+      config
+      pkgs
+      semantic
+      tmuxCopy
+      tmuxDirName
+      ;
   };
 in
 {
