@@ -1,3 +1,5 @@
+{ pkgs, ... }:
+
 {
   imports = [
     ./hardware-configuration.nix
@@ -12,4 +14,9 @@
   hardware.keyboard.qmk.enable = true;
 
   zramSwap.enable = true;
+
+  environment.systemPackages = with pkgs; [
+    bubblewrap
+    socat
+  ];
 }
