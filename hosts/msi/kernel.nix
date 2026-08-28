@@ -232,7 +232,7 @@ let
       CRYPTO_DEV_CCP_DD = lib.mkForce module;
       CRYPTO_DEV_SP_CCP = lib.mkForce yes;
       CRYPTO_DEV_SP_PSP = lib.mkForce yes;
-      CRYPTO_DRBG_MENU = lib.mkForce module;
+      CRYPTO_DRBG = lib.mkForce module;
       TCG_TPM = lib.mkForce yes;
       TCG_CRB = lib.mkForce yes;
       HW_RANDOM = lib.mkForce yes;
