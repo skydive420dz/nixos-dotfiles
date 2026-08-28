@@ -109,6 +109,17 @@ remain the detailed evidence.
 - Quickshell now starts with no media path until persisted wallpaper state
   loads, removing the wrong-GIF startup flash.  The user accepted the live
   result after observing no wrong GIF.
+- The late-August MSI input refresh advanced nixpkgs to =56c02bc= and Hyprland
+  to =0bd11c7=.  Linux 7.2 removed =CRYPTO_DRBG_MENU=, so the MSI kernel contract
+  now sets =CRYPTO_DRBG= to =lib.mkForce module= and preserves the prior modular
+  DRBG policy.
+- =bubblewrap= and =socat= are intentional MSI-scoped system packages for local
+  agent tooling.  The Emacs and tmux platform checks now use
+  =stdenv.hostPlatform=; this is Nix API maintenance with no intended runtime
+  behavior change.
+- The user ran =nrs= successfully for the input, host-tool, and kernel slice, so
+  it built and switch-activated.  Fresh-boot Linux 7.2 and NVIDIA, Secure Boot,
+  graphics, suspend, and other hardware/runtime acceptance remain separate.
 
 * Former Experiments And Continuing Direction
 - Vial and QMK packages initially reached the MSI system without active QMK
