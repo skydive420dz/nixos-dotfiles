@@ -118,8 +118,20 @@ remain the detailed evidence.
   =stdenv.hostPlatform=; this is Nix API maintenance with no intended runtime
   behavior change.
 - The user ran =nrs= successfully for the input, host-tool, and kernel slice, so
-  it built and switch-activated.  Fresh-boot Linux 7.2 and NVIDIA, Secure Boot,
-  graphics, suspend, and other hardware/runtime acceptance remain separate.
+  it built and switch-activated.  Generation 893 later booted Linux 7.2 and
+  remained stable for more than three days.  Current, booted, and
+  profile-selected outputs agree; =CONFIG_CRYPTO_DRBG=m=, Secure
+  Boot/Lanzaboote, NVIDIA 610.57.04 kernel ABI and management, AMD-primary
+  Hyprland on the internal 144 Hz panel, system and user managers, networking,
+  time synchronization, mounts, and system/kernel/initrd store verification
+  passed.
+- Fresh-boot acceptance retains existing boundaries: module-signature and
+  lockdown-LSM enforcement remain disabled, and full =sbctl verify= plus
+  fallback ESP-entry inspection require privileged =/boot= access.  The
+  recurring ACPI =SystemCMOS=/=VRTC= =_Q9A= error and duplicate D-Bus activation
+  names both predate Linux 7.2 and remain open.  Offload workloads, external
+  outputs, RTD3, suspend/resume, and separate physical-display acceptance were
+  not tested.
 
 * Former Experiments And Continuing Direction
 - Vial and QMK packages initially reached the MSI system without active QMK
