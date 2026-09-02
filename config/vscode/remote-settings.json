@@ -1,0 +1,8 @@
+{
+    "qt-core.additionalQtPaths": [
+        {
+            "name": "Qt-6.11.1-linux-g++-x86_64_from_PATH",
+            "path": "/run/current-system/sw/bin/qtpaths"
+        }
+    ]
+}
