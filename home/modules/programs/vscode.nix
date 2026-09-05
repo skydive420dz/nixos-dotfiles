@@ -9,51 +9,29 @@
 }:
 
 let
-  extensionIds = [
-    "eamodio.gitlens"
-    "jnoortheen.nix-ide"
-    "ms-python.debugpy"
-    "ms-python.python"
-    "ms-python.vscode-pylance"
-    "ms-vscode.cmake-tools"
-    "ms-vscode.cpptools"
-    "ms-vscode.cpptools-extension-pack"
-    "vscode-icons-team.vscode-icons"
-    "vscodevim.vim"
-    "bbenoist.qml"
-    "davidanson.vscode-markdownlint"
-    "editorconfig.editorconfig"
-    "evzen-wybitul.magic-racket"
-    "fireblast.hyprlang-vscode"
-    "github.copilot-chat"
-    "mads-hartmann.bash-ide-vscode"
-    "malmaud.tmux"
-    "ms-python.vscode-python-envs"
-    "ms-vscode.cpp-devtools"
-    "ms-vscode.cpptools-themes"
-    "ms-vscode.powershell"
-    "openai.chatgpt"
-    "qingpeng.common-lisp"
-    "rszyma.vscode-kanata"
-    "sjhuangx.vscode-scheme"
-    "sumneko.lua"
-    "theqtcompany.qt-core"
-    "theqtcompany.qt-qml"
-    "tootone.org-mode"
-  ];
+  release = builtins.fromJSON (builtins.readFile ../../../config/vscode/release.json);
+  vscode = import ../../../config/vscode/package.nix { inherit pkgs release; };
+  agentHostCli = pkgs.callPackage ../../../config/vscode/agent-host-cli.nix {
+    inherit vscode release;
+  };
 
   vscodeInstallExtensions = pkgs.writeShellApplication {
     name = "vscode-install-extensions";
-    runtimeInputs = [ pkgs.vscode ];
+    runtimeInputs = [
+      pkgs.python3
+      vscode
+    ];
+    text = ''
+      exec python3 ${../../../config/vscode/extensions.py} "$@" \
+        --manifest ${../../../config/vscode/release.json}
+    '';
+  };
+
+  vscodeMsi = pkgs.writeShellApplication {
+    name = "code-msi";
     text = ''
       unset VSCODE_IPC_HOOK_CLI
-
-      for extension in ${lib.escapeShellArgs extensionIds}; do
-        code --extensions-dir "$HOME/.vscode/extensions" --install-extension "$extension"
-      done
-
-      code --extensions-dir "$HOME/.vscode/extensions" \
-        --install-extension ms-vscode.vscode-chat-customizations-evaluations --pre-release
+      exec ${vscode}/bin/code --remote ssh-remote+msi "$@"
     '';
   };
 in
@@ -63,6 +41,8 @@ in
       packages = [
         pkgs.codex
         vscodeInstallExtensions
+        vscodeMsi
+        agentHostCli
       ];
 
       file.".agents/skills/ponytail".source = "${inputs.ponytail}/skills/ponytail";
@@ -73,9 +53,34 @@ in
     xdg.configFile."Code/User/settings.json".source =
       config.lib.file.mkOutOfStoreSymlink "${repoPath}/config/vscode/settings.json";
 
+    xdg.desktopEntries.code = {
+      name = "Visual Studio Code";
+      genericName = "Text Editor";
+      comment = "Edit projects on MSI over SSH";
+      exec = "${vscodeMsi}/bin/code-msi %F";
+      icon = "vscode";
+      startupNotify = true;
+      categories = [
+        "Utility"
+        "TextEditor"
+        "Development"
+        "IDE"
+      ];
+      mimeType = [
+        "application/x-code-workspace"
+        "text/plain"
+        "inode/directory"
+      ];
+      settings.StartupWMClass = "Code";
+      actions.new-empty-window = {
+        name = "New Window";
+        exec = "${vscodeMsi}/bin/code-msi --new-window";
+      };
+    };
+
     programs.vscode = {
       enable = true;
-      package = pkgs.vscode;
+      package = vscode;
       mutableExtensionsDir = true;
     };
   };
