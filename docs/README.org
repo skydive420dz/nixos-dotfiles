@@ -9,6 +9,13 @@ state.  Audits are dated evidence, not implementation authority.
 Documentation does not turn a build into activation and does not authorize
 commits, pushes, service changes, or branch deletion.
 
+* Latest Scoped Update - 2026-09-18
+Pi is LIVE through Home Manager.  Shared skill discovery and the local Codex
+conversation import are validated; private runtime data remains outside Git.
+See the [[file:areas/pi.org][Pi ownership contract]] and
+[[file:handoffs/2026-09-18-msi-pi-acceptance.org][installation/import handoff]].
+This scoped update does not refresh the older desktop/system snapshot below.
+
 * Status At A Glance - 2026-08-04
 | Surface | Confirmed current state | Next accepted step |
 |---------+-------------------------+--------------------|
@@ -125,6 +132,7 @@ lanes.  The handoffs above preserve their exact payloads, gates, and promotion
 history.
 
 * Ownership Contracts
+- [[file:areas/pi.org][Pi coding agent, shared skills, and private session ownership]]
 - [[file:projects/nixos-dotfiles.org][NixOS system map]]
 - [[file:areas/modules.org][Modules and hosts]]
 - [[file:areas/hyprland.org][Hyprland]]
@@ -141,6 +149,7 @@ history.
 - [[file:projects/clipboard-launcher.org][Completed clipboard and launcher work]]
 
 * Evidence And History
+- [[file:handoffs/2026-09-18-msi-pi-acceptance.org][2026-09-18 MSI Pi activation, shared skills, and Codex imports]]
 - [[file:handoffs/2026-08-15-msi-nvidia-610.57-kernel-build.org][2026-08-15 MSI NVIDIA 610.57 kernel build workaround]]
 - [[file:handoffs/2026-08-14-msi-amd-primary-hypridle-acceptance.org][2026-08-14 MSI AMD-primary graphics and Hypridle acceptance]]
 - [[file:handoffs/2026-08-04-emacs-eglot-reuse-acceptance.org][2026-08-04 Emacs native Eglot reuse acceptance and live adoption]]

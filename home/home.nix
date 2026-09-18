@@ -14,6 +14,7 @@
     stateVersion = "25.05";
 
     packages = with pkgs; [
+      pi-coding-agent
       python3
       grimblast
       jq

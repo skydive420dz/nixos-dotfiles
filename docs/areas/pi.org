@@ -1,0 +1,92 @@
+#+title: Pi Coding Agent
+
+* Ownership
+SUPPORTED: [[file:../../home/home.nix][home/home.nix]] declares
+=pkgs.pi-coding-agent= in the shared Home Manager package list.  The MSI uses
+flake target =#nixos=.  The package has no separate version override or
+hardcoded store path: =flake.lock='s nixpkgs revision selects the version.
+Updating nixpkgs and rebuilding advances Pi to the version packaged there,
+which need not be the latest upstream release.
+
+Pi's mutable state is deliberately not Home Manager-managed:
+
+- =~/.pi/agent/settings.json=: provider/model preferences and skill paths.
+- =~/.pi/agent/AGENTS.md=: shared-workflow compatibility instructions.
+- =~/.pi/agent/auth.json=: private credentials; never commit this file.
+- =~/.pi/agent/sessions/=: private native and imported conversations.
+- =~/.pi/agent/skills/=: local skill adapters and links to workspace agents.
+
+The package is reproducible from this repository.  The private state and
+external skill sources are not restored by cloning these dotfiles; preserve
+them separately when migrating machines.
+
+* Shared Skills On MSI
+SUPPORTED: the local Pi settings explicitly include:
+
+#+begin_src json
+{
+  "skills": [
+    "~/Projects/.agents/skills",
+    "~/.codex/skills",
+    "~/.codex/skills/.system"
+  ],
+  "enableSkillCommands": true
+}
+#+end_src
+
+Pi also discovers =~/.agents/skills= by default.  The custom definitions under
+=~/Projects/.github/agents= are linked as
+=~/.pi/agent/skills/<name>/SKILL.md=.  A local =llm-grounding= adapter points to
+=~/Projects/llm-grounding=; it does not automatically intercept Pi responses.
+
+Imported skills are workflows, not installations of Codex/Copilot tools.
+Unavailable MCP services, image-generation tools, and parallel subagents must
+not be represented as available just because an imported workflow mentions
+them.  Preserve approval gates and resolve linked-agent supporting paths
+against their original source directory.
+
+* Daily Use
+#+begin_src sh
+cd ~/Projects/nixos-dotfiles
+pi
+pi -c                    # Continue the latest session for this directory
+pi -r                    # Browse sessions
+pi --session SESSION_ID  # Resume a specific session
+#+end_src
+
+In Pi, use =/reload= after changing skills or context files, and =/skill:= to
+browse skill commands.  In =/resume=, Tab switches between current-project and
+all-project sessions.  Imported conversations have =[Codex]= or
+=[Codex subagent]= names.
+
+Use the normal flake update/build workflow and =nrs= for activation; do not
+replace the Nix-owned binary with a separate npm installation.  Updating the
+package does not require overwriting Pi's mutable state.
+
+* Local Import And Validation Helpers
+SUPPORTED: these helpers were created on the MSI under =~/.pi/agent/=, outside
+this repository:
+
+- =check-shared-skills.mjs=: offline discovery and source-coverage check.
+- =import-codex.py=: non-destructive transcript converter with =--test=.
+- =validate-codex-imports.mjs=: native Pi loader/listing and source-hash checks.
+- =imports/=: private conversion manifests, validation report, and intermediate
+  import backups.
+
+The JavaScript helpers currently reference the Pi 0.84.2 store installation.
+=check-shared-skills.mjs= accepts an alternative Pi package directory as its
+first argument; the import validator needs its module path reviewed after an
+upgrade.  These are local migration/checking utilities, not a packaged service
+or automatic synchronization job.
+
+Conversation imports preserve historical text and tool records without
+executing tools.  Original Codex files remain the full-fidelity archive:
+opaque reasoning, runtime events, and compaction internals are not replayed.
+A missing original working directory falls back to =~/Projects=, with its
+original path recorded.  Verify the actual target before continuing old work.
+
+* Acceptance Evidence
+See [[file:../handoffs/2026-09-18-msi-pi-acceptance.org][the 2026-09-18 Pi handoff]]
+for exact build/activation outputs, skill counts, import results, and backup
+boundaries.  The observations are local checks, not a claim that an interactive
+resume or every imported workflow has been exercised.

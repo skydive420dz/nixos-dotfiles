@@ -1,0 +1,142 @@
+#+title: MSI Pi Installation, Shared Skills, And Conversation Import
+#+date: 2026-09-18
+
+* Scope And Status
+LIVE / ACCEPTED: Pi package ownership moved from an ephemeral Nix environment,
+through a temporary persistent user-profile installation, to the shared Home
+Manager package list in =home/home.nix=.  Target: MSI Bravo 15 C7VE, hostname
+=nixos=, flake =#nixos=, user =skydive420dz=.  Dates in this handoff are UTC.
+
+The user authorized activation, ran =nrs=, and accepted the verified result.
+This handoff records build, activation, and subsequent local observations
+separately.  No reboot acceptance or unrelated desktop audit is claimed.
+
+* Source And Build — SUPPORTED
+The only Nix change adds =pi-coding-agent= to =home.packages=.  The existing
+nixpkgs input supplies version =0.84.2=; no input update, override, or additional
+version pin was introduced.  =nixfmt --check home/home.nix= and
+=git diff --check= passed.
+
+Pure no-link builds with =--no-write-lock-file= passed for:
+
+- =nixosConfigurations.nixos.config.home-manager.users.skydive420dz.home.activationPackage=
+- =nixosConfigurations.nixos.config.system.build.toplevel=
+
+Realized outputs:
+
+#+begin_example
+Home Manager:
+/nix/store/v07gd7859wm6lq16lhbjfnrk8k0b6sl5-home-manager-generation
+System:
+/nix/store/vbarhqh2azfh68pkrpq9wz4731vxypas-nixos-system-nixos-26.11.20260823.56c02bc
+Pi:
+/nix/store/s8r8x6j993gmv0dqjvh3xs1nwjqdhh9q-pi-coding-agent-0.84.2
+#+end_example
+
+* Activation And Cleanup — SUPPORTED
+The pre-switch current/profile-selected output was:
+
+#+begin_example
+/nix/store/hn9qsppcm8mazap4mvxmpbn4p2h7hcp3-nixos-system-nixos-26.11.20260823.56c02bc
+#+end_example
+
+After the user ran =nrs=, direct checks found:
+
+- =/run/current-system= and =/nix/var/nix/profiles/system= both resolved to the
+  built =vbarhqh2...= output above.
+- =home-manager-skydive420dz.service= reported =ActiveState=active= and
+  =Result=success=.
+- =command -v pi= returned =/etc/profiles/per-user/skydive420dz/bin/pi=;
+  =PI_OFFLINE=1 pi --version= returned =0.84.2=.
+- The duplicate =pi-coding-agent= entry was then removed with
+  =nix profile remove pi-coding-agent=.  A subsequent =nix profile list= was
+  empty, while the Home Manager command remained available.
+- =systemctl --failed --no-legend= and the equivalent =--user= check returned
+  no failed units.  These checks were repeated before this documentation update.
+
+A private pre-install snapshot is at
+=~/.local/state/pi-backups/20260918T014716Z/pi-agent.tar.gz=, with a companion
+=session-path.txt=.  It predates the conversation import and is not a backup of
+that later import.  The profile installation verified unchanged configuration
+file hashes and preservation of the then-current session content.  Credentials
+and transcripts were not added to this repository.
+
+* Shared Workflow Discovery — SUPPORTED
+Pi's own resource loader passed offline checks from both =~/= and
+=~/Projects/nixos-dotfiles=:
+
+| Source | Discovered workflows |
+|--------+----------------------|
+| =~/.agents/skills= | 9 |
+| =~/Projects/.agents/skills= | 19 |
+| =~/.codex/skills=, including explicit =.system= discovery | 11 |
+| Custom agent definitions linked into Pi | 20 |
+| Local grounding adapter | 1 |
+| Total | 60 |
+
+All expected source files were discovered with no diagnostics, hidden skills,
+or name collisions.  The check also verified discovery of the global
+=~/.pi/agent/AGENTS.md= compatibility instructions.  Repeat with:
+
+#+begin_src sh
+PI_OFFLINE=1 node ~/.pi/agent/check-shared-skills.mjs
+#+end_src
+
+Discovery does not establish successful execution of every skill.  The source
+files and Pi-side setup remain local, external to this repository; see the
+[[file:../areas/pi.org][Pi ownership contract]].
+
+* VS Code / Codex Conversation Import — SUPPORTED
+An offline conversion imported all =2,611= session files found under the local
+=~/.codex/sessions/= tree, including subagent histories.  The six session files
+found in native VS Code =chatSessions= stores contained no conversation
+requests; their one observed update only changed a responder label.
+
+The converter's checks covered role preservation, no tool replay, idempotence,
+source preservation, image-block conversion, and malformed input.  Three sample
+imports passed Pi's native session loader before the full conversion.  A
+coverage audit then added inter-agent and special tool records to untouched
+imports, preserving intermediate versions under
+=~/.pi/agent/imports/pre-special-records/=.
+
+Final native-loader/listing validation recorded:
+
+#+begin_example
+result: PASS
+sessions: 2611
+messages: 98972
+contextRecords: 405059
+projectDirectories: 2
+nativeListingVerified: true
+originalHashesVerified: true
+#+end_example
+
+Source: =~/.pi/agent/imports/validation.txt=, produced by
+=validate-codex-imports.mjs=.  The original source hashes matched the conversion
+receipts for every imported session.  Private per-file manifests are:
+
+- =imports/codex-20260918T015528501353Z.jsonl= — sample import;
+- =imports/codex-20260918T015547652579Z.jsonl= — full pass;
+- =imports/codex-20260918T015751301336Z.jsonl= — special-record coverage pass.
+
+All paths above are relative to =~/.pi/agent/= unless otherwise stated.
+
+* Boundaries And Follow-Up
+- These are historical transcript imports, not native Codex runtime migration.
+  Tool calls are text records; they were not executed.  Usage counters are
+  explicitly marked zero placeholders rather than measured historical costs.
+- Original Codex files retain opaque reasoning, runtime events, and compaction
+  internals.  External attachment availability is not established by a stored
+  reference.  A native loader PASS does not prove interactive usability of
+  every large thread or full fidelity to the VS Code UI.
+- Missing original working directories fall back to =~/Projects=; their
+  original paths remain in provenance.  Do not assume an old remote-host task
+  now targets the MSI.
+- Browse with =/resume=, Tab for all projects, and search =Codex=.  Import is a
+  snapshot, not ongoing synchronization with VS Code.
+- Package updates follow the version in the updated nixpkgs input after build
+  and =nrs=.  Mutable Pi state and external skill sources need separate private
+  backups for a fresh-machine migration.
+- The user authorized documentation, commit, and push after acceptance.  Git
+  publication is a subsequent operation, not inferred from the build or this
+  handoff's existence.

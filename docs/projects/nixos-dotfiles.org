@@ -22,6 +22,10 @@ Durable ownership:
 - Clean Emacs is the active Emacs configuration; Doom is retired.
 - NVF and its Sky configuration live in the standalone =neovim-nvf=
   repository; they are not part of the MSI system closure.
+- Pi is a shared Home Manager package via =pkgs.pi-coding-agent=; updates
+  follow the pinned nixpkgs input.  Private Pi settings, skills, credentials,
+  and conversation imports remain external to this repository.  See
+  [[../areas/pi.org][Pi ownership and usage]].
 - Ollama is retired from the intended system configuration.
 - QMK udev support remains MSI-wide, while the Vial and QMK applications are
   absent.  VS Code is configured through Home Manager for Linux.
