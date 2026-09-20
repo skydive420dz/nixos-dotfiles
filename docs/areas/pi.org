@@ -85,6 +85,40 @@ opaque reasoning, runtime events, and compaction internals are not replayed.
 A missing original working directory falls back to =~/Projects=, with its
 original path recorded.  Verify the actual target before continuing old work.
 
+* Local Workbench — First Stage (2026-09-19)
+SUPPORTED: =~/.pi/agent/settings.json= now registers the local package
+=~/Projects/pi-workbench=.  It is locally owned source outside this repository,
+not an installation of the entire upstream pi-config setup.  Pi itself remains
+Nix-owned.  No system activation or original/imported transcript deletion was
+performed.  Existing preferences and shared skill sources were preserved.
+
+The package supplies supervised scout/researcher/reviewer delegation, public
+HTTPS evidence fetching, a Brave search adapter (credential not configured),
+PDF extraction/rendering, structured questions, composable next-message snippets,
+and on-demand research/memory/improvement/learning workflows.  Delegation uses
+fresh read-only subprocesses with per-task UI approval; this is not an OS sandbox
+or asynchronous tmux orchestration.  Use =/reload=, then =/workbench= for help.
+Interactive UI acceptance is still pending.
+
+The historical memory pilot locally indexes 30 original Codex files (1,525
+text/tool records), preserving source locators and hashes.  It is not yet an
+approved knowledge library: no claims have been extracted/promoted and no archive
+was sent to model workers.  State is private under =~/.pi/agent/workbench/=.
+Upstream live memory is staged but inactive after a synthetic test reproduced
+outside-root reads/writes through symlinks in its consolidation tools.  Browser
+automation is not installed; dictation is excluded.
+
+Local source and evidence:
+- =~/Projects/pi-workbench/README.md=: usage, dependencies and rollback.
+- =~/Projects/pi-workbench/ACCEPTANCE.md=: exact tested/pending boundaries.
+- =~/Projects/pi-workbench/TRIALS.md=: remaining trials and activation gates.
+- =~/.pi/agent/workbench/acceptance/=: private test receipts.
+- =~/.pi/agent/backups/settings-pre-workbench-20260919T151159Z.json=: settings backup.
+
+The source and private data are not restored by cloning these dotfiles.  Source
+version-control/publication remains a separate decision; no commit or push was
+performed for this setup.
+
 * Acceptance Evidence
 See [[file:../handoffs/2026-09-18-msi-pi-acceptance.org][the 2026-09-18 Pi handoff]]
 for exact build/activation outputs, skill counts, import results, and backup

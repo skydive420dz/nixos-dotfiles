@@ -1,0 +1,97 @@
+#+title: Local SSH alias inventory and audit — 2026-09-20
+
+* Scope
+SUPPORTED: inspected the local =nixos= host, user =skydive420dz=, with
+OpenSSH_10.5p1. This is a client-configuration audit, not a remote fleet audit.
+No network connections, authentication attempts, private-key reads, host-key
+replacement, system activation, or remote edits were performed.
+
+Sources: =~/.ssh/config=, =/etc/ssh/ssh_config=, its systemd include, the active
+=~/.zshrc=, and repository SSH references. The active six user aliases are in a
+regular user-owned file, not in a Home Manager SSH declaration in this repo.
+The reviewed shell alias source =home/modules/programs/shell-aliases.nix= adds
+no SSH command aliases. =home/modules/programs/vscode.nix= uses =ssh-remote+msi=.
+
+* User alias inventory
+SUPPORTED by =~/.ssh/config= and the saved =ssh -G= outputs. All use port 22.
+These are configured destinations, not verified live device identities.
+
+| Alias     | Configured address | User          | Identity policy                          |
+|-----------+--------------------+---------------+------------------------------------------|
+| t430      | 192.168.1.216      | skydive420dz   | id_ed25519; IdentitiesOnly yes             |
+| x230t     | 192.168.1.200      | skydive420dz   | id_ed25519; IdentitiesOnly yes             |
+| guixpc    | 192.168.1.221      | skydive420dz   | id_ed25519; IdentitiesOnly yes             |
+| msi       | 192.168.1.175      | skydive420dz   | id_ed25519; IdentitiesOnly yes             |
+| mac       | 192.168.1.201      | skydive420dz   | id_ed25519; IdentitiesOnly yes             |
+| ipad-mini | 192.168.1.185      | root          | OpenSSH default identities; agent allowed |
+
+* Adjustments and findings
+- SUPPORTED: consolidated the five repeated user/key declarations into one
+  exact-name Host block at the end of =~/.ssh/config=; users are unchanged.
+  Subsequently corrected =x230t= from =192.168.1.164= to =192.168.1.200= per
+  the user's reserved-address correction. Other addresses are unchanged.
+  Set =IdentitiesOnly yes= on those five aliases so unrelated agent
+  identities are not offered. This intentionally removes agent-key fallback
+  outside the configured identities; authentication has not been tested.
+  Semantics: installed =ssh_config(5)=, =IdentitiesOnly= and =IdentityFile=.
+- SUPPORTED: =HostKeyAlgorithms +ssh-rsa= and
+  =PubkeyAcceptedAlgorithms +ssh-rsa= remain confined to =ipad-mini=.
+  =../home-deck/docs/home-deck.org= (relative to the repository root), section
+  "iPad State", documents this legacy configuration. Whether both allowances
+  remain necessary is INSUFFICIENT without a server-side/connection check.
+- SUPPORTED: effective =StrictHostKeyChecking ask= and =ForwardAgent no= are
+  unchanged for all six user aliases. The user config has no proxy or jump
+  declarations. The configured =id_ed25519= file exists; permissions are 0600
+  on the config and private-key file and 0700 on =~/.ssh=.
+- CONFLICTED address records: active =t430= uses =192.168.1.216=; the earlier
+  =~/.ssh/config.before-shared-hosts-2026-08-02= and Home Deck's "Current Network
+  Map"/"DD-WRT Static Leases" sections use =192.168.1.88=. Neither establishes
+  the current remote device address. Preserved the active setting. A current
+  router lease plus device identity confirmation would resolve this.
+- SUPPORTED: =ssh-keygen -F= found records for the configured T430, guixpc,
+  MSI, Mac and iPad addresses in =~/.ssh/known_hosts=. It found none for
+  the former X230T address =192.168.1.164= there; that finding does not apply
+  to the corrected address =192.168.1.200=. This does not establish trust or key freshness;
+  confirm X230T's fingerprint out of band before accepting a new key.
+
+* System-managed aliases (unchanged)
+SUPPORTED by the include in =/etc/ssh/ssh_config=:
+=/nix/store/mc901k2s1n3v1disrj0356l7lwz7l6vg-systemd-261.1/lib/systemd/ssh_config.d/20-systemd-ssh-proxy.conf=.
+
+- =.host= and =machine/.host=: local Unix-socket SSH proxy.
+- =unix/*=, =unix%*=, =vsock/*=, =vsock%*=, =vsock-mux/*=,
+  =vsock-mux%*=, =machine/*=, =machine%*=: systemd transport namespaces.
+  This block sets =User root=, =StrictHostKeyChecking no= and
+  =UserKnownHostsFile /dev/null=. It also matches =machine/.host=.
+  These settings are not applied to the six user LAN aliases in the saved
+  effective configurations. No system-owned configuration was edited.
+
+* Validation and rollback
+SUPPORTED by the private audit bundle:
+=/home/skydive420dz/.ssh/alias-audit-20260920-JxRbhi/=.
+
+- =config.before=: original user config, preserved with its permissions.
+- =effective.before.json= / =effective.after.json=: complete =ssh -G= outputs.
+- =check.py= / =validation.txt=: passing local regression check across 17
+  targets: six user aliases, one unconfigured name and ten system transport
+  representatives. The only effective differences are =IdentitiesOnly no= to
+  =yes= for the five explicit-key aliases and the user-corrected X230T address
+  (=192.168.1.164= to =192.168.1.200=). The check also covers RSA exception
+  isolation, agent forwarding, host-key checking and file permissions.
+- =ssh_config.5=: snapshot of the installed manual used for option semantics.
+
+Re-run (does not connect):
+#+begin_src sh
+python3 ~/.ssh/alias-audit-20260920-JxRbhi/check.py
+#+end_src
+
+Rollback this edit (overwrites later edits; inspect first):
+#+begin_src sh
+cp -p ~/.ssh/alias-audit-20260920-JxRbhi/config.before ~/.ssh/config
+#+end_src
+
+INSUFFICIENT: I do not know whether these destinations currently belong to the
+named devices or whether login succeeds from the available evidence. Current
+device/lease identification and an explicitly approved SSH authentication test
+would establish those facts. Other machines' client configurations were not
+inspected or synchronized. No speculative aliases were added.
