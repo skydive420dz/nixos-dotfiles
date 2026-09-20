@@ -85,7 +85,36 @@ opaque reasoning, runtime events, and compaction internals are not replayed.
 A missing original working directory falls back to =~/Projects=, with its
 original path recorded.  Verify the actual target before continuing old work.
 
-* Local Workbench — First Stage (2026-09-19)
+* Current local startup and workbench (2026-09-20)
+SUPPORTED: ordinary =pi= loads the workbench package, local startup extension,
+and local-v2 memory extension through =~/.pi/agent/settings.json= and automatic
+extension discovery. =pi= starts a new session; =pi -c=, =pi -r= and =/resume=
+remain optional. No forced session ID, shell alias or Nix rebuild is required.
+The proposed Home Manager alias was removed before activation.
+
+The local startup file =~/.pi/agent/extensions/workbench-startup.ts= reads the
+private Brave key and supplies the tested Chromium path when their environment
+variables are absent. The key is plaintext at =~/.config/pi/brave-api-key=,
+mode 0600 with parent directory mode 0700; it is not in Git or the Nix store.
+Versioned startup source and restore instructions: =~/Projects/pi-workbench/config/README.md=.
+Do not copy credentials into this repository.
+
+SUPPORTED runtime checks: Brave API search returned five results and the first
+primary source was fetched; public HTTPS navigation/screenshots and an HTTPS
+cross-host redirect passed; concurrent read-only subagents accepted messaging,
+returned a report, and cancelled a running job. Memory search/read worked alongside
+them. Browser and local memory retain per-session enable controls. HTTP/logins/POST
+submissions remain outside the browser's allowed scope. The Brave website's earlier
+HTTP 429 was not resolved or bypassed; the working search path is the Brave API.
+
+Detailed boundaries and receipts: =pi-workbench/ACCEPTANCE.md= and =BROWSER-JOBS.md=.
+Memory source is retained as a reproducible patch in =pi-workbench/patches/= against
+its MIT-licensed upstream base; no push to the original author's remote is intended.
+Private archives, screenshots, dependencies and trial output remain excluded.
+The earlier first-stage section below is historical and does not describe current
+credential, browser, async-job, source-versioning or memory activation status.
+
+* Local Workbench — First Stage (historical, 2026-09-19)
 SUPPORTED: =~/.pi/agent/settings.json= now registers the local package
 =~/Projects/pi-workbench=.  It is locally owned source outside this repository,
 not an installation of the entire upstream pi-config setup.  Pi itself remains
