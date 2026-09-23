@@ -1,0 +1,91 @@
+#+title: Machine inventory
+
+* Scope
+Manually reviewed reference for machine identity, configuration ownership and
+configured network addresses. Addresses are not proof of current reachability.
+This file grants no permission to connect, modify, deploy or reboot.
+
+No incident history, live-status tracking or automatic updates belong here.
+Update deliberate configuration facts through user-reviewed edits only.
+
+* Machines
+Repository names below refer to sibling checkouts under =~/Projects/= unless
+noted otherwise. Documented OS/configuration targets are not a fresh runtime audit.
+
+| Machine | Operating system | Configuration repository | Primary LAN address |
+|---------+------------------+--------------------------+---------------------|
+| MSI laptop | NixOS | nixos-dotfiles, flake #nixos | 192.168.1.175 |
+| GuixPC, Lenovo ideacentre 510A-15ARR | Guix System | guix-dotfiles | 192.168.1.221 |
+| ThinkPad T480s | NixOS | t480s-dotfiles, flake #t480s | 192.168.1.212 |
+| ThinkPad X230 Tablet | FreeBSD | x230t-freebsd | 192.168.1.200 |
+| ThinkPad T430 | Gentoo | Unspecified | 192.168.1.216 |
+| Mac, exact model unspecified | macOS + Nix | nixos-macos association unconfirmed | 192.168.1.153 |
+| iPad mini | iOS 9.3.5, older documentation | No OS repository established | 192.168.1.185, older documentation |
+| windowspc | Windows | None | 192.168.1.100 |
+
+* Configuration ownership and aliases
+- MSI configuration entry point: =hosts/msi/= in =nixos-dotfiles=.
+- GuixPC system entry point: =guix/systems/guixpc.scm= in =guix-dotfiles=.
+- T480s system entry point: =host/t480s/system/= in =t480s-dotfiles=.
+- X230T's control repository is =x230t-freebsd=; its on-machine checkout is
+  named =freebsd-dotfiles=. See that repository's ownership documentation.
+- =home-deck= owns the iPad dashboard, not the iPad operating system.
+- =windowspc= is the user-selected inventory name, not a verified system hostname.
+
+The following are aliases in the inspected MSI user's =~/.ssh/config=, not
+fleet-wide aliases or verified remote hostnames. This inventory does not manage
+or change SSH configuration.
+
+| Alias | Configured destination |
+|-------+------------------------|
+| msi | 192.168.1.175 |
+| guixpc | 192.168.1.221 |
+| x230t | 192.168.1.200 |
+| t430 | 192.168.1.216 |
+| mac | 192.168.1.102 |
+| ipad-mini | 192.168.1.185 |
+
+The Mac has two reservations. The user identifies =.153= as the primary address;
+the inspected =mac= alias still selects =.102=. Neither reservation establishes
+which interface/address is currently in use. No T480s or Windows alias was
+present in the inspected configuration.
+
+* Router reservations
+Reservation pairs below come from the router table supplied by the user.
+Machine labels combine the inventory mappings with those address/MAC pairs;
+they are not independent hardware-MAC measurements of every machine.
+
+| Machine/address | Reserved MAC |
+|-----------------+--------------|
+| MSI 192.168.1.175 | 00:41:0e:2b:fd:73 |
+| GuixPC 192.168.1.221 | f8:e4:e3:de:fd:37 |
+| T480s 192.168.1.212 | 28:0c:50:6c:1d:3a |
+| X230T 192.168.1.200 | fc:f8:ae:b8:7e:c3 |
+| T430 192.168.1.216 | 6c:88:14:fe:92:94 |
+| Mac 192.168.1.153 | ba:da:ed:f1:50:b7 |
+| Mac 192.168.1.102 | 7c:d1:ad:bb:42:53 |
+| windowspc 192.168.1.100 | fc:9d:05:02:c2:94 |
+
+* Sources and confirmation boundaries
+SUPPORTED by user confirmation in the inventory review:
+- GuixPC is the Guix machine in this inventory.
+- X230T runs FreeBSD at =192.168.1.200=.
+- T430 runs Gentoo; its repository remains unspecified.
+- The Mac runs macOS + Nix; =.153= is the preferred address, with two reservations.
+- =windowspc= runs Windows, has no configuration repository, and was checked by
+  the user to be the device at =192.168.1.100=.
+
+SUPPORTED as repository declarations, documentation or inspected client settings:
+- [[file:../flake.nix][MSI flake output]] and [[file:../hosts/msi/][MSI host configuration]].
+- [[file:../../guix-dotfiles/README.org][GuixPC identity and ownership]].
+- [[file:../../t480s-dotfiles/README.org][T480s ownership]] and
+  [[file:../../t480s-dotfiles/docs/t480s/handoff.org][T480s handoff, Identity section]] for =192.168.1.212=.
+- [[file:../../x230t-freebsd/README.md][X230T FreeBSD source and target checkout ownership]].
+- [[file:../../nixos-macos/README.md][macOS Nix configuration repository]]; association with this Mac is unconfirmed.
+- [[file:../../home-deck/docs/home-deck.org][Older iPad identity and dashboard documentation]]. Its older network map is
+  not adopted wholesale here; the iPad OS/address still need current confirmation.
+- =~/.ssh/config= as inspected during this inventory review. The older
+  [[file:audits/2026-09-20-ssh-aliases.org][SSH audit]] is historical and does not override the inspected alias values.
+
+INSUFFICIENT: current iPad OS/address confirmation, T430 repository ownership,
+and the Mac's exact model and repository association remain unspecified.
