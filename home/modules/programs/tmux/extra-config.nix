@@ -23,6 +23,8 @@
 
   set -as terminal-features ",xterm-ghostty:RGB,xterm-256color:RGB"
   set -g allow-passthrough on
+  # Allow applications such as Pi to copy to the SSH client's clipboard via OSC 52.
+  set -s set-clipboard on
 
   # =========================================
   # STATUS BAR
