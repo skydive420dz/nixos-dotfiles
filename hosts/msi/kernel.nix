@@ -691,6 +691,7 @@ let
       NFT_REJECT_NETDEV = lib.mkForce unset;
       NF_FLOW_TABLE_PROCFS = lib.mkForce unset;
       NTFS_FS_POSIX_ACL = lib.mkForce unset;
+      NTFS_FS_WOF_COMPRESSION = lib.mkForce unset;
       NVIDIA_SHIELD_FF = lib.mkForce unset;
       NVME_TCP_TLS = lib.mkForce unset;
       OCFS2_DEBUG_MASKLOG = lib.mkForce unset;

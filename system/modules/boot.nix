@@ -20,11 +20,6 @@
   boot = {
     consoleLogLevel = 0;
 
-    initrd = {
-      verbose = false;
-      systemd.enable = true;
-    };
-
     # ── Bootloader ──────────────────────────────────────────────────────────
     loader = {
       timeout = 0;
